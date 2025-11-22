@@ -134,19 +134,19 @@ export default function Footer() {
                   <div className="bg-white/5 p-2 rounded-lg group-hover:bg-primary/20 transition-colors">
                     <MapPin className='shrink-0 text-primary' size={18} />
                   </div>
-                  <span className="leading-relaxed">{clinicData?.address || 'Nouvelle ville Ali Mendjeli, Constantine, Algérie'}</span>
+                  <span className="leading-relaxed">{clinicData?.contact.address || 'Nouvelle ville Ali Mendjeli, Constantine, Algérie'}</span>
                 </li>
                 <li className='flex items-center gap-4 text-sm text-gray-400 group'>
                   <div className="bg-white/5 p-2 rounded-lg group-hover:bg-primary/20 transition-colors">
                     <Phone className='shrink-0 text-primary' size={18} />
                   </div>
-                  <span>{clinicData?.phone || '+213 555 123 456'}</span>
+                  <span>{clinicData?.contact.phone || '+213 555 123 456'}</span>
                 </li>
                 <li className='flex items-center gap-4 text-sm text-gray-400 group'>
                   <div className="bg-white/5 p-2 rounded-lg group-hover:bg-primary/20 transition-colors">
                     <Mail className='shrink-0 text-primary' size={18} />
                   </div>
-                  <span>{clinicData?.email || 'contact@cliniqueokba.com'}</span>
+                  <span>{clinicData?.contact.email || 'contact@cliniqueokba.com'}</span>
                 </li>
               </ul>
             </motion.div>
