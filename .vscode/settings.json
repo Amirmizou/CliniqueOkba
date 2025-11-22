@@ -1,5 +1,6 @@
 {
     "i18n-ally.localesPaths": [
         "messages"
-    ]
+    ],
+    "codium.codeCompletion.enable": false
 }

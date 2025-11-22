@@ -3,6 +3,8 @@ import Header from '@/components/header'
 import Footer from '@/components/footer'
 import { defaultMetadata } from '@/lib/seo'
 
+export const dynamic = 'force-dynamic'
+
 export const metadata: Metadata = {
   ...defaultMetadata,
   title: 'Politique de Confidentialité - Clinique OKBA',
