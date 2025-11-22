@@ -1,0 +1,32 @@
+[
+  {
+    "id": "1",
+    "src": "/modern-medical-clinic-facade-architecture.png",
+    "alt": "Façade architecturale moderne de la Clinique OKBA",
+    "title": "Façade de la clinique",
+    "description": "Vue extérieure de la clinique avec son architecture moderne",
+    "category": "exterior",
+    "featured": true,
+    "order": 1
+  },
+  {
+    "id": "2",
+    "src": "/modern-medical-clinic-interior-with-green-plants-a.jpg",
+    "alt": "Intérieur moderne de la clinique avec plantes vertes",
+    "title": "Hall d'accueil",
+    "description": "Hall d'accueil spacieux et moderne",
+    "category": "interior",
+    "featured": true,
+    "order": 2
+  },
+  {
+    "id": "1761728114090",
+    "src": "/uploads/1761728126927-2f3a01cca2821.png",
+    "alt": "test",
+    "title": "sas",
+    "description": "tzqst",
+    "category": "other",
+    "featured": false,
+    "order": 1
+  }
+]

@@ -1,0 +1,223 @@
+{
+  "name": "Clinique OKBA",
+  "hero": {
+    "title": "Votre Santé Mérite L'Excellence Absolue",
+    "subtitle": "Découvrez une nouvelle ère de soins médicaux à la Clinique OKBA. Technologie de pointe, experts dévoués et confort absolu pour votre rétablissement.",
+    "stats": {
+      "patients": "5000+"
+    }
+  },
+  "heroSlides": [
+    {
+      "id": "1",
+      "image": "/uploads/hero/1763826316615-okba.png",
+      "title": "Votre Santé Mérite L'Excellence Absolue",
+      "subtitle": "Découvrez une nouvelle ère de soins médicaux à la Clinique OKBA",
+      "order": 1,
+      "active": true
+    },
+    {
+      "image": "/uploads/hero/1763826628906-Gemini_Generated_Image_ubdtr0ubdtr0ubdt.png",
+      "title": "Clinique Okba L'Excellence Médicale",
+      "subtitle": "",
+      "order": 1,
+      "active": true,
+      "id": "2"
+    },
+    {
+      "image": "/uploads/hero/1763826354545-Gemini_Generated_Image_x461z6x461z6x461.png",
+      "title": "Okba",
+      "subtitle": "",
+      "order": 1,
+      "active": true,
+      "id": "3"
+    }
+  ],
+  "equipment": [
+    {
+      "id": "1",
+      "name": "Scanner CT",
+      "brand": "Siemens Healthineers",
+      "model": "SOMATOM",
+      "category": "imaging",
+      "description": "Tomodensitométrie de dernière génération pour des diagnostics précis et rapides",
+      "icon": "Scan",
+      "image": "",
+      "features": [
+        "Haute résolution",
+        "Faible dose de radiation",
+        "Acquisition rapide"
+      ]
+    },
+    {
+      "id": "2",
+      "name": "IRM",
+      "brand": "Siemens Healthineers",
+      "model": "MAGNETOM",
+      "category": "imaging",
+      "description": "Imagerie par Résonance Magnétique de haute performance",
+      "icon": "Brain",
+      "image": "",
+      "features": [
+        "Images 3D détaillées",
+        "Confort patient",
+        "Technologie silencieuse"
+      ]
+    },
+    {
+      "id": "3",
+      "name": "Radiologie Numérique",
+      "brand": "Siemens Healthineers",
+      "model": "MULTIX",
+      "category": "imaging",
+      "description": "Système de radiologie numérique avancé",
+      "icon": "Activity",
+      "image": "",
+      "features": [
+        "Images numériques instantanées",
+        "Dose optimisée",
+        "Qualité supérieure"
+      ]
+    },
+    {
+      "id": "4",
+      "name": "Mammographie",
+      "brand": "Siemens Healthineers",
+      "model": "MAMMOMAT",
+      "category": "imaging",
+      "description": "Mammographie numérique pour le dépistage précoce",
+      "icon": "Heart",
+      "image": "",
+      "features": [
+        "Détection précoce",
+        "Confort amélioré",
+        "Précision diagnostique"
+      ]
+    },
+    {
+      "id": "5",
+      "name": "Échographie",
+      "brand": "GE Healthcare",
+      "model": "LOGIQ",
+      "category": "imaging",
+      "description": "Échographie haute définition pour tous types d'examens",
+      "icon": "Radio",
+      "image": "",
+      "features": [
+        "Imagerie 4D",
+        "Doppler couleur",
+        "Polyvalence"
+      ]
+    },
+    {
+      "id": "6",
+      "name": "Panoramique Dentaire",
+      "brand": "Planmeca",
+      "model": "ProMax",
+      "category": "imaging",
+      "description": "Radiographie panoramique dentaire numérique",
+      "icon": "Smile",
+      "image": "",
+      "features": [
+        "Vue complète",
+        "Faible radiation",
+        "Diagnostic précis"
+      ]
+    },
+    {
+      "id": "7",
+      "name": "Laboratoire d'Analyse",
+      "brand": "Roche Diagnostics",
+      "model": "cobas",
+      "category": "laboratory",
+      "description": "Laboratoire d'analyse médicale moderne équipé des dernières technologies",
+      "icon": "FlaskConical",
+      "image": "",
+      "features": [
+        "Analyses rapides",
+        "Résultats précis",
+        "Large gamme de tests"
+      ]
+    },
+    {
+      "id": "8",
+      "name": "Salle d'Opération",
+      "brand": "Stryker",
+      "model": "Integrated OR",
+      "category": "facility",
+      "description": "Salle d'opération moderne avec équipements chirurgicaux de pointe",
+      "icon": "Scissors",
+      "image": "",
+      "features": [
+        "Stérilisation avancée",
+        "Équipement dernière génération",
+        "Sécurité maximale"
+      ]
+    }
+  ],
+  "contact": {
+    "email": "contact@cliniqueokba.com",
+    "phone": "+213 555 123 456",
+    "address": "Nouvelle ville Ali Mendjeli, Constantine, Algérie"
+  },
+  "social": {
+    "facebook": "https://facebook.com",
+    "instagram": "https://instagram.com",
+    "linkedin": "https://linkedin.com"
+  },
+  "hours": {
+    "emergency": "24h/24 - 7j/7",
+    "consultation": "08:00 - 18:00",
+    "weekdays": "08:00 - 18:00",
+    "saturday": "08:00 - 14:00"
+  },
+  "address": "Nouvelle ville Ali Mendjeli, Constantine, Algérie",
+  "description": "Clinique privée moderne",
+  "email": "contact@cliniqueokba.com",
+  "phone": "+213 555 123 456",
+  "coordinates": {
+    "lat": 36.241485,
+    "lng": 6.550478
+  },
+  "socialMedia": {
+    "facebook": "https://facebook.com",
+    "instagram": "https://instagram.com"
+  },
+  "articles": [
+    {
+      "id": "1",
+      "title": "Nouvelle technologie de radiologie",
+      "excerpt": "Nous avons acquis un nouveau scanner de dernière génération",
+      "content": "La Clinique OKBA est fière d'annoncer l'acquisition d'un scanner de dernière génération qui permettra des diagnostics plus précis et rapides.",
+      "image": "/images/articles/scanner.jpg",
+      "date": "2025-01-15",
+      "published": true
+    }
+  ],
+  "gallery": [
+    {
+      "image": "/uploads/gallery/1763815720550-images-(1).jpg",
+      "caption": "hhhh",
+      "category": "infrastructure",
+      "id": "3"
+    },
+    {
+      "image": "/uploads/gallery/1763815971677-images-(1).jpg",
+      "caption": "test",
+      "category": "infrastructure",
+      "id": "4"
+    },
+    {
+      "image": "/uploads/gallery/1763816789310-hero-dental-2.jpg",
+      "caption": "AN",
+      "category": "infrastructure",
+      "id": "5"
+    },
+    {
+      "image": "/uploads/gallery/1763827420029-Gemini_Generated_Image_gzjk7ygzjk7ygzjk.png",
+      "caption": "",
+      "category": "exterior",
+      "id": "6"
+    }
+  ]
+}

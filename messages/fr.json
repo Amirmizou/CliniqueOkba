@@ -1,0 +1,54 @@
+{
+  "nav": {
+    "home": "Accueil",
+    "about": "À propos",
+    "specialties": "Spécialités",
+    "services": "Services",
+    "homeCare": "Soins à domicile",
+    "gallery": "Galerie",
+    "testimonials": "Témoignages",
+    "contact": "Contact",
+    "emergency": "Urgences"
+  },
+  "hero": {
+    "title": "Bienvenue à la Clinique OKBA",
+    "subtitle": "Excellence médicale et soins personnalisés à Constantine",
+    "cta": {
+      "contact": "Nous contacter",
+      "services": "Nos services"
+    }
+  },
+  "about": {
+    "title": "À propos de nous",
+    "subtitle": "Votre santé, notre priorité"
+  },
+  "contact": {
+    "title": "Contact & Localisation",
+    "subtitle": "Nous sommes à votre écoute pour toute question ou demande de rendez-vous",
+    "form": {
+      "firstName": "Prénom",
+      "lastName": "Nom",
+      "email": "Email",
+      "phone": "Téléphone",
+      "message": "Message",
+      "send": "Envoyer le message",
+      "sending": "Envoi en cours...",
+      "optional": "optionnel",
+      "required": "requis",
+      "success": "Message envoyé avec succès !",
+      "error": "Erreur lors de l'envoi",
+      "errorMessage": "Veuillez réessayer ou nous contacter directement."
+    },
+    "info": {
+      "address": "Adresse",
+      "phone": "Téléphone",
+      "email": "Email",
+      "hours": "Horaires"
+    }
+  },
+  "footer": {
+    "rights": "Tous droits réservés",
+    "privacy": "Politique de confidentialité",
+    "terms": "Mentions légales"
+  }
+}
