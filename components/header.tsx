@@ -44,21 +44,21 @@ export default function Header() {
   return (
     <header
       className={`sticky top-0 z-50 transition-all duration-300 ${scrolled
-        ? 'glass-panel border-b border-white/20'
-        : 'bg-background/0 border-transparent'
+        ? 'glass-panel border-b border-white/20 h-14 sm:h-16'
+        : 'bg-background/0 border-transparent h-14 sm:h-20'
         }`}
       role='banner'
       aria-label='Navigation principale'
     >
       <div className='mx-auto max-w-7xl px-4 sm:px-6 lg:px-8'>
-        <div className='flex h-16 sm:h-20 items-center justify-between'>
+        <div className='flex h-full items-center justify-between'>
           {/* Logo */}
           <div
             className='group flex cursor-pointer items-center gap-4'
             onClick={() => scrollToSection('#home')}
           >
             <motion.div
-              className='relative h-12 w-12 sm:h-14 sm:w-14'
+              className='relative h-10 w-10 sm:h-12 sm:w-12 md:h-14 md:w-14'
               initial={{ scale: 0.9, rotate: -5, opacity: 0 }}
               animate={{ scale: 1, rotate: 0, opacity: 1 }}
               transition={{ type: 'spring', stiffness: 260, damping: 18 }}
@@ -69,7 +69,7 @@ export default function Header() {
                 src='/logo.png'
                 alt='Clinique OKBA Logo'
                 fill
-                sizes="56px"
+                sizes="(max-width: 640px) 40px, (max-width: 768px) 48px, 56px"
                 className='object-contain'
                 priority
               />
@@ -82,10 +82,10 @@ export default function Header() {
               />
             </motion.div>
             <div className='hidden sm:block'>
-              <p className='text-primary group-hover:text-primary/80 text-base font-semibold transition-colors'>
+              <p className='text-primary group-hover:text-primary/80 text-sm sm:text-base font-semibold transition-colors'>
                 Clinique
               </p>
-              <p className='text-muted-foreground group-hover:text-muted-foreground/80 text-sm transition-colors'>
+              <p className='text-muted-foreground group-hover:text-muted-foreground/80 text-xs sm:text-sm transition-colors'>
                 OKBA
               </p>
             </div>
@@ -162,7 +162,7 @@ export default function Header() {
               <button
                 key={item.label}
                 onClick={() => scrollToSection(item.href)}
-                className='text-foreground hover:bg-primary/10 hover:text-primary focus:ring-primary touch-target block min-h-[44px] w-full rounded-lg px-4 py-3 text-left text-sm font-medium transition-all duration-300 hover:translate-x-2 focus:ring-2 focus:ring-offset-2 focus:outline-none'
+                className='mobile-menu-item text-foreground hover:bg-primary/10 hover:text-primary focus:ring-primary block w-full rounded-lg text-left font-medium transition-all duration-300 hover:translate-x-2 focus:ring-2 focus:ring-offset-2 focus:outline-none'
                 style={{ animationDelay: `${index * 50}ms` }}
                 aria-label={`Aller à la section ${item.label}`}
               >
