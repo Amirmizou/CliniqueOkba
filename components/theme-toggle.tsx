@@ -17,8 +17,8 @@ export function ThemeToggle() {
 
   if (!mounted) {
     return (
-      <Button variant='outline' size='icon' className='h-9 w-9'>
-        <Sun className='h-4 w-4' />
+      <Button variant='outline' size='icon' className='h-11 w-11 sm:h-9 sm:w-9'>
+        <Sun className='h-5 w-5 sm:h-4 sm:w-4' />
         <span className='sr-only'>Toggle theme</span>
       </Button>
     )
@@ -29,19 +29,15 @@ export function ThemeToggle() {
       variant='outline'
       size='icon'
       onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')}
-      className='h-9 w-9 transition-all duration-300 hover:scale-105'
+      className='h-11 w-11 sm:h-9 sm:w-9 transition-all duration-300 hover:scale-105 touch-target'
+      aria-label={theme === 'light' ? 'Passer au mode sombre' : 'Passer au mode clair'}
     >
       {theme === 'light' ? (
-        <Moon className='h-4 w-4 transition-all duration-300' />
+        <Moon className='h-5 w-5 sm:h-4 sm:w-4 transition-all duration-300' />
       ) : (
-        <Sun className='h-4 w-4 transition-all duration-300' />
+        <Sun className='h-5 w-5 sm:h-4 sm:w-4 transition-all duration-300' />
       )}
       <span className='sr-only'>Toggle theme</span>
     </Button>
   )
 }
-
-
-
-
-
