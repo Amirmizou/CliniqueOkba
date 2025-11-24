@@ -50,19 +50,19 @@ export default function Footer() {
       <div className='absolute -top-24 -right-24 w-96 h-96 bg-primary/20 rounded-full blur-[100px] pointer-events-none' />
       <div className='absolute -bottom-24 -left-24 w-96 h-96 bg-secondary/20 rounded-full blur-[100px] pointer-events-none' />
 
-      <div className='py-20 relative z-10'>
+      <div className='py-12 sm:py-16 md:py-20 relative z-10'>
         <div className='mx-auto max-w-7xl px-4 sm:px-6 lg:px-8'>
           <motion.div
             variants={containerVariants}
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true }}
-            className='grid gap-12 md:grid-cols-2 lg:grid-cols-4'
+            className='grid gap-8 sm:gap-10 md:gap-12 md:grid-cols-2 lg:grid-cols-4'
           >
             {/* Brand Section */}
             <motion.div variants={itemVariants} className='space-y-6'>
               <div className='flex items-center gap-4'>
-                <div className='relative h-16 w-16 bg-white/5 rounded-2xl p-2 backdrop-blur-sm border border-white/10'>
+                <div className='relative h-12 w-12 sm:h-14 sm:w-14 md:h-16 md:w-16 bg-white/5 rounded-2xl p-2 backdrop-blur-sm border border-white/10'>
                   <Image
                     src='/logo.png'
                     alt='Clinique OKBA Logo'
@@ -71,14 +71,14 @@ export default function Footer() {
                   />
                 </div>
                 <div>
-                  <p className='text-xl font-bold tracking-tight text-white'>Clinique OKBA</p>
+                  <p className='text-lg sm:text-xl font-bold tracking-tight text-white'>Clinique OKBA</p>
                   <p className='text-sm text-gray-400'>Excellence Médicale</p>
                 </div>
               </div>
               <p className='text-sm leading-relaxed text-gray-400 max-w-xs'>
                 Votre partenaire santé de confiance à Constantine. Une équipe dévouée et des équipements de pointe pour votre bien-être.
               </p>
-              <div className='flex gap-4'>
+              <div className='flex gap-3 sm:gap-4'>
                 {[Facebook, Instagram, Linkedin].map((Icon, i) => (
                   <a key={i} href="#" className='bg-white/5 p-2.5 rounded-xl hover:bg-primary hover:text-white text-gray-400 hover:scale-110 transition-all duration-300 border border-white/5'>
                     <Icon size={18} />

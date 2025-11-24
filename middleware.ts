@@ -26,18 +26,25 @@ const authMiddleware = withAuth(
 )
 
 export default function middleware(req: NextRequest) {
-  // Exclude API routes from intl middleware but keep them for auth if needed
-  // For now, we only protect /admin routes with auth
-  const isAuthPage = req.nextUrl.pathname.startsWith('/admin')
+  const isAuthRoute = req.nextUrl.pathname.startsWith('/auth')
+  const isAdminRoute = req.nextUrl.pathname.startsWith('/admin')
+  const isAdminDashboard = req.nextUrl.pathname.startsWith('/admin/dashboard') ||
+    req.nextUrl.pathname.startsWith('/admin/api')
 
-  if (isAuthPage) {
-    return (authMiddleware as any)(req)
+  // Auth and admin routes should not be processed by intl middleware
+  if (isAuthRoute || isAdminRoute) {
+    // Only apply auth middleware to dashboard
+    if (isAdminDashboard) {
+      return (authMiddleware as any)(req)
+    }
+    // For /admin and /auth, no middleware
+    return
   }
 
   return intlMiddleware(req)
 }
 
 export const config = {
-  // Match only internationalized pathnames and admin routes
-  matcher: ['/((?!api|_next|.*\\..*).*)', '/admin/:path*']
+  // Match only internationalized pathnames, exclude auth and admin routes
+  matcher: ['/((?!api|auth|admin|_next|.*\\..*).*)']
 }

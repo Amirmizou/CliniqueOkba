@@ -86,22 +86,22 @@ const specialties = [
 
 export default function Specialties() {
   return (
-    <section id='specialties' className='bg-background py-20'>
+    <section id='specialties' className='bg-background py-12 sm:py-16 md:py-20'>
       <div className='mx-auto max-w-7xl px-4 sm:px-6 lg:px-8'>
         <ScrollAnimation variant="fadeUp" className='mb-16 space-y-4 text-center'>
           <p className='text-primary text-sm font-semibold tracking-wide uppercase'>
             Nos services
           </p>
-          <h2 className='text-foreground text-4xl font-bold'>
+          <h2 className='text-foreground text-2xl sm:text-3xl md:text-4xl font-bold'>
             Nos Spécialités
           </h2>
-          <p className='text-muted-foreground mx-auto max-w-2xl text-lg'>
+          <p className='text-muted-foreground mx-auto max-w-2xl text-base sm:text-lg'>
             Une gamme complète de spécialités médicales pour répondre à tous vos
             besoins de santé
           </p>
         </ScrollAnimation>
 
-        <StaggerContainer className='grid gap-8 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4'>
+        <StaggerContainer className='grid gap-4 sm:gap-6 md:gap-8 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4'>
           {specialties.map((specialty, index) => {
             const Icon = specialty.icon
             return (

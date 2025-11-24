@@ -74,22 +74,22 @@ export default function Gallery() {
   }
 
   return (
-    <section id='gallery' className='bg-muted/30 py-20'>
+    <section id='gallery' className='bg-muted/30 py-12 sm:py-16 md:py-20'>
       <div className='mx-auto max-w-7xl px-4 sm:px-6 lg:px-8'>
         <ScrollAnimation variant="fadeUp" className='mb-16 text-center'>
-          <h2 className='text-foreground text-3xl font-bold sm:text-4xl'>
+          <h2 className='text-foreground text-2xl sm:text-3xl md:text-4xl font-bold'>
             Notre Galerie
           </h2>
-          <p className='text-muted-foreground mt-4 text-lg'>
+          <p className='text-muted-foreground mt-4 text-base sm:text-lg'>
             Découvrez nos installations modernes
           </p>
         </ScrollAnimation>
 
         {/* Filtres de catégorie */}
-        <ScrollAnimation variant="fadeUp" delay={0.1} className='mb-12 flex flex-wrap justify-center gap-4'>
+        <ScrollAnimation variant="fadeUp" delay={0.1} className='mb-8 sm:mb-12 flex flex-wrap justify-center gap-2 sm:gap-4'>
           <button
             onClick={() => setSelectedCategory('all')}
-            className={`rounded-full px-6 py-3 transition-all duration-300 ${selectedCategory === 'all'
+            className={`rounded-full px-4 py-2 sm:px-6 sm:py-3 text-sm sm:text-base transition-all duration-300 ${selectedCategory === 'all'
               ? 'bg-primary text-primary-foreground'
               : 'bg-muted text-muted-foreground hover:bg-muted/80'
               }`}
@@ -100,7 +100,7 @@ export default function Gallery() {
             <button
               key={category}
               onClick={() => setSelectedCategory(category)}
-              className={`flex items-center gap-2 rounded-full px-6 py-3 transition-all duration-300 ${selectedCategory === category
+              className={`flex items-center gap-2 rounded-full px-4 py-2 sm:px-6 sm:py-3 text-sm sm:text-base transition-all duration-300 ${selectedCategory === category
                 ? 'bg-primary text-primary-foreground'
                 : 'bg-muted text-muted-foreground hover:bg-muted/80'
                 }`}
@@ -115,7 +115,7 @@ export default function Gallery() {
         </ScrollAnimation>
 
         {/* Grille de photos */}
-        <StaggerContainer className='grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3'>
+        <StaggerContainer className='grid grid-cols-1 gap-4 sm:gap-6 sm:grid-cols-2 lg:grid-cols-3'>
           {filteredImages.map((image, index) => {
             const Icon = categoryIcons[image.category as keyof typeof categoryIcons] ?? ImageIcon
             return (

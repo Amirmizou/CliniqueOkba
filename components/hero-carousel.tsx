@@ -129,13 +129,13 @@ export default function HeroCarousel() {
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: -30 }}
                         transition={{ duration: 0.6, ease: "easeOut" }}
-                        className='text-white max-w-3xl'
+                        className='text-white max-w-3xl py-8 sm:py-0'
                     >
                         <motion.div
                             initial={{ opacity: 0, x: -30 }}
                             animate={{ opacity: 1, x: 0 }}
                             transition={{ delay: 0.2, duration: 0.8 }}
-                            className="mb-4 inline-block px-4 py-1.5 rounded-full bg-primary/20 backdrop-blur-md border border-primary/30 text-primary-foreground text-sm font-medium"
+                            className="mb-3 sm:mb-4 inline-block px-3 py-1 sm:px-4 sm:py-1.5 rounded-full bg-primary/20 backdrop-blur-md border border-primary/30 text-primary-foreground text-xs sm:text-sm font-medium"
                         >
                             Excellence Médicale
                         </motion.div>
@@ -143,7 +143,7 @@ export default function HeroCarousel() {
                             initial={{ opacity: 0, x: -50 }}
                             animate={{ opacity: 1, x: 0 }}
                             transition={{ delay: 0.3, duration: 0.8 }}
-                            className='text-5xl md:text-7xl lg:text-8xl font-bold mb-6 tracking-tight leading-tight drop-shadow-lg'
+                            className='text-3xl sm:text-4xl md:text-6xl lg:text-7xl font-bold mb-4 sm:mb-6 tracking-tight leading-tight drop-shadow-lg'
                         >
                             {currentSlide.title}
                         </motion.h1>
@@ -152,7 +152,7 @@ export default function HeroCarousel() {
                                 initial={{ opacity: 0, x: -50 }}
                                 animate={{ opacity: 1, x: 0 }}
                                 transition={{ delay: 0.5, duration: 0.8 }}
-                                className='text-xl md:text-2xl lg:text-3xl text-gray-100 mb-10 font-light drop-shadow-md max-w-2xl'
+                                className='text-lg sm:text-xl md:text-2xl text-gray-100 mb-6 sm:mb-8 md:mb-10 font-light drop-shadow-md max-w-2xl'
                             >
                                 {currentSlide.subtitle}
                             </motion.p>
@@ -164,10 +164,10 @@ export default function HeroCarousel() {
                         >
                             <button
                                 onClick={() => document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' })}
-                                className="bg-primary hover:bg-primary/90 text-white px-8 py-4 rounded-full font-semibold text-lg transition-all duration-300 shadow-[0_0_20px_rgba(34,197,94,0.3)] hover:shadow-[0_0_30px_rgba(34,197,94,0.5)] hover:scale-105 flex items-center gap-2"
+                                className="bg-primary hover:bg-primary/90 text-white px-6 py-3 sm:px-8 sm:py-4 rounded-full font-semibold text-base sm:text-lg transition-all duration-300 shadow-[0_0_20px_rgba(34,197,94,0.3)] hover:shadow-[0_0_30px_rgba(34,197,94,0.5)] hover:scale-105 active:scale-95 flex items-center gap-2 min-h-[44px]"
                             >
                                 Prendre Rendez-vous
-                                <ChevronRight className="w-5 h-5" />
+                                <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5" />
                             </button>
                         </motion.div>
                     </motion.div>
@@ -179,34 +179,36 @@ export default function HeroCarousel() {
                 <>
                     <button
                         onClick={prevSlide}
-                        className='absolute left-4 top-1/2 -translate-y-1/2 z-30 bg-white/10 hover:bg-white/20 backdrop-blur-sm p-3 rounded-full transition-all'
+                        className='absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 z-30 bg-white/10 hover:bg-white/20 active:bg-white/30 backdrop-blur-sm p-2 sm:p-3 rounded-full transition-all min-h-[44px] min-w-[44px] flex items-center justify-center'
                         aria-label='Previous slide'
                     >
-                        <ChevronLeft className='h-6 w-6 text-white' />
+                        <ChevronLeft className='h-5 w-5 sm:h-6 sm:w-6 text-white' />
                     </button>
                     <button
                         onClick={nextSlide}
-                        className='absolute right-4 top-1/2 -translate-y-1/2 z-30 bg-white/10 hover:bg-white/20 backdrop-blur-sm p-3 rounded-full transition-all'
+                        className='absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 z-30 bg-white/10 hover:bg-white/20 active:bg-white/30 backdrop-blur-sm p-2 sm:p-3 rounded-full transition-all min-h-[44px] min-w-[44px] flex items-center justify-center'
                         aria-label='Next slide'
                     >
-                        <ChevronRight className='h-6 w-6 text-white' />
+                        <ChevronRight className='h-5 w-5 sm:h-6 sm:w-6 text-white' />
                     </button>
                 </>
             )}
 
             {/* Dots Indicator */}
             {slides.length > 1 && (
-                <div className='absolute bottom-8 left-1/2 -translate-x-1/2 z-30 flex gap-2'>
+                <div className='absolute bottom-4 sm:bottom-8 left-1/2 -translate-x-1/2 z-30 flex gap-2'>
                     {slides.map((_, index) => (
                         <button
                             key={index}
                             onClick={() => goToSlide(index)}
-                            className={`h-2 rounded-full transition-all ${index === currentIndex
-                                ? 'w-8 bg-white'
-                                : 'w-2 bg-white/50 hover:bg-white/75'
+                            className={`h-2.5 sm:h-2 rounded-full transition-all min-h-[44px] min-w-[44px] sm:min-h-0 sm:min-w-0 flex items-center justify-center ${index === currentIndex
+                                ? 'w-2.5 sm:w-8 bg-white'
+                                : 'w-2.5 sm:w-2 bg-white/50 hover:bg-white/75 active:bg-white'
                                 }`}
                             aria-label={`Go to slide ${index + 1}`}
-                        />
+                        >
+                            <span className="sr-only">Slide {index + 1}</span>
+                        </button>
                     ))}
                 </div>
             )}

@@ -7,18 +7,21 @@ export const authOptions: NextAuthOptions = {
         CredentialsProvider({
             name: "Credentials",
             credentials: {
-                username: { label: "Username", type: "text" },
                 password: { label: "Password", type: "password" }
             },
             async authorize(credentials) {
-                // This is a temporary hardcoded check. 
-                // In production, this should check against a database.
-                if (
-                    credentials?.username === process.env.ADMIN_USER &&
-                    credentials?.password === process.env.ADMIN_PASSWORD
-                ) {
+                // Vérification du mot de passe uniquement
+                console.log('🔐 Auth attempt:', {
+                    hasPassword: !!credentials?.password,
+                    envPassword: !!process.env.ADMIN_PASSWORD,
+                    passwordMatch: credentials?.password === process.env.ADMIN_PASSWORD
+                })
+
+                if (credentials?.password === process.env.ADMIN_PASSWORD) {
+                    console.log('✅ Auth successful')
                     return { id: "1", name: "Admin", email: "admin@cliniqueokba.com" }
                 }
+                console.log('❌ Auth failed')
                 return null
             }
         })

@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import fs from 'fs/promises'
 import path from 'path'
+import { revalidateAllPages } from '@/lib/revalidate'
 
 const dataPath = path.join(process.cwd(), 'data', 'clinic.json')
 
@@ -31,6 +32,7 @@ export async function POST(request: Request) {
         data.testimonials.push(newTestimonial)
 
         await fs.writeFile(dataPath, JSON.stringify(data, null, 2), 'utf-8')
+        revalidateAllPages()
         return NextResponse.json({ success: true, testimonial: newTestimonial })
     } catch (error) {
         return NextResponse.json({ error: 'Failed to add testimonial' }, { status: 500 })

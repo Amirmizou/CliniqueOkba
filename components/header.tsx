@@ -51,14 +51,14 @@ export default function Header() {
       aria-label='Navigation principale'
     >
       <div className='mx-auto max-w-7xl px-4 sm:px-6 lg:px-8'>
-        <div className='flex h-20 items-center justify-between'>
+        <div className='flex h-16 sm:h-20 items-center justify-between'>
           {/* Logo */}
           <div
             className='group flex cursor-pointer items-center gap-4'
             onClick={() => scrollToSection('#home')}
           >
             <motion.div
-              className='relative h-14 w-14'
+              className='relative h-12 w-12 sm:h-14 sm:w-14'
               initial={{ scale: 0.9, rotate: -5, opacity: 0 }}
               animate={{ scale: 1, rotate: 0, opacity: 1 }}
               transition={{ type: 'spring', stiffness: 260, damping: 18 }}
@@ -149,12 +149,12 @@ export default function Header() {
         {/* Mobile Navigation */}
         <div
           id='mobile-menu'
-          className={`glass-panel mt-2 rounded-xl overflow-hidden transition-all duration-300 md:hidden ${isOpen ? 'max-h-96 opacity-100 shadow-xl' : 'max-h-0 opacity-0'
+          className={`glass-panel mt-2 rounded-xl overflow-hidden transition-all duration-300 md:hidden ${isOpen ? 'max-h-[500px] opacity-100 shadow-xl' : 'max-h-0 opacity-0'
             }`}
           aria-hidden={!isOpen}
         >
           <nav
-            className='space-y-2 p-4'
+            className='space-y-1 p-3 sm:p-4'
             role='navigation'
             aria-label='Menu mobile'
           >

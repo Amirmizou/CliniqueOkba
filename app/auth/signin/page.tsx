@@ -11,7 +11,6 @@ import { Lock, AlertCircle } from 'lucide-react'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 
 export default function SignInPage() {
-    const [username, setUsername] = useState('')
     const [password, setPassword] = useState('')
     const [error, setError] = useState('')
     const [isLoading, setIsLoading] = useState(false)
@@ -24,20 +23,24 @@ export default function SignInPage() {
         setError('')
         setIsLoading(true)
 
+        console.log('📝 Form submitted with password:', password ? '***' : 'empty')
+
         try {
             const result = await signIn('credentials', {
-                username,
                 password,
                 redirect: false,
             })
 
+            console.log('🔄 SignIn result:', result)
+
             if (result?.error) {
-                setError('Nom d\'utilisateur ou mot de passe incorrect')
+                setError('Mot de passe incorrect')
             } else if (result?.ok) {
                 router.push(callbackUrl)
                 router.refresh()
             }
         } catch (err) {
+            console.error('❌ SignIn error:', err)
             setError('Une erreur s\'est produite. Veuillez réessayer.')
         } finally {
             setIsLoading(false)
@@ -70,30 +73,17 @@ export default function SignInPage() {
                         )}
 
                         <div className="space-y-2">
-                            <Label htmlFor="username">Nom d'utilisateur</Label>
-                            <Input
-                                id="username"
-                                type="text"
-                                placeholder="Entrez votre nom d'utilisateur"
-                                value={username}
-                                onChange={(e) => setUsername(e.target.value)}
-                                required
-                                disabled={isLoading}
-                                autoComplete="username"
-                            />
-                        </div>
-
-                        <div className="space-y-2">
                             <Label htmlFor="password">Mot de passe</Label>
                             <Input
                                 id="password"
                                 type="password"
-                                placeholder="Entrez votre mot de passe"
+                                placeholder="Entrez le mot de passe admin"
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
                                 required
                                 disabled={isLoading}
                                 autoComplete="current-password"
+                                autoFocus
                             />
                         </div>
 

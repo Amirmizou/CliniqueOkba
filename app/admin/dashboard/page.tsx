@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { useSession, signOut } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -54,6 +55,7 @@ interface HeroSlide {
 }
 
 export default function AdminDashboard() {
+    const { data: session, status } = useSession()
     const router = useRouter()
     const [data, setData] = useState<any>(null)
     const [articles, setArticles] = useState<Article[]>([])
@@ -84,32 +86,35 @@ export default function AdminDashboard() {
     const [editingSlide, setEditingSlide] = useState<HeroSlide | null>(null)
 
     useEffect(() => {
-        const auth = localStorage.getItem('admin_auth')
-        if (!auth) {
-            router.push('/admin')
+        // Check authentication with NextAuth
+        if (status === 'unauthenticated') {
+            router.push('/auth/signin?callbackUrl=/admin/dashboard')
             return
         }
 
-        Promise.all([
-            fetch('/api/admin/clinic').then(r => r.json()),
-            fetch('/api/admin/articles').then(r => r.json()),
-            fetch('/api/admin/gallery').then(r => r.json()),
-            fetch('/api/admin/services').then(r => r.json()),
-            fetch('/api/admin/testimonials').then(r => r.json()),
-            fetch('/api/admin/hero-slides').then(r => r.json())
-        ]).then(([clinicData, articlesData, galleryData, servicesData, testimonialsData, heroSlidesData]) => {
-            setData(clinicData)
-            setArticles(articlesData)
-            setGallery(galleryData)
-            setServices(servicesData)
-            setTestimonials(testimonialsData)
-            setHeroSlides(heroSlidesData)
-            setLoading(false)
-        }).catch(err => {
-            console.error(err)
-            setLoading(false)
-        })
-    }, [router])
+        if (status === 'authenticated') {
+            // Load data only when authenticated
+            Promise.all([
+                fetch('/api/admin/clinic').then(r => r.json()),
+                fetch('/api/admin/articles').then(r => r.json()),
+                fetch('/api/admin/gallery').then(r => r.json()),
+                fetch('/api/admin/services').then(r => r.json()),
+                fetch('/api/admin/testimonials').then(r => r.json()),
+                fetch('/api/admin/hero-slides').then(r => r.json())
+            ]).then(([clinicData, articlesData, galleryData, servicesData, testimonialsData, heroSlidesData]) => {
+                setData(clinicData)
+                setArticles(articlesData)
+                setGallery(galleryData)
+                setServices(servicesData)
+                setTestimonials(testimonialsData)
+                setHeroSlides(heroSlidesData)
+                setLoading(false)
+            }).catch(err => {
+                console.error(err)
+                setLoading(false)
+            })
+        }
+    }, [router, status])
 
     const handleSave = async () => {
         if (!data) return
@@ -269,9 +274,8 @@ export default function AdminDashboard() {
         }
     }
 
-    const handleLogout = () => {
-        localStorage.removeItem('admin_auth')
-        router.push('/admin')
+    const handleLogout = async () => {
+        await signOut({ callbackUrl: '/auth/signin' })
     }
 
     if (loading) return <div className="flex h-screen items-center justify-center"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>

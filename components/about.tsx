@@ -5,11 +5,11 @@ import StaggerContainer from '@/components/ui/stagger-container'
 
 export default function About() {
   return (
-    <section id='about' className='bg-card py-20'>
+    <section id='about' className='bg-card py-12 sm:py-16 md:py-20'>
       <div className='mx-auto max-w-7xl px-4 sm:px-6 lg:px-8'>
         <div className='grid items-center gap-12 md:grid-cols-2'>
           {/* Image */}
-          <ScrollAnimation variant="fadeRight" className='relative order-2 h-96 min-h-96 md:order-1 md:h-full'>
+          <ScrollAnimation variant="fadeRight" className='relative order-2 h-64 sm:h-80 md:h-96 md:order-1'>
             <div className='from-secondary/30 to-primary/20 absolute inset-0 rounded-2xl bg-gradient-to-br'></div>
             <Image
               src='/modern-medical-clinic-facade-architecture.png'
@@ -29,13 +29,13 @@ export default function About() {
               <p className='text-primary text-sm font-semibold tracking-wide uppercase'>
                 À propos de nous
               </p>
-              <h2 className='text-foreground text-4xl font-bold'>
+              <h2 className='text-foreground text-2xl sm:text-3xl md:text-4xl font-bold'>
                 {clinicData.name}
               </h2>
             </ScrollAnimation>
 
             <ScrollAnimation variant="fadeLeft" delay={0.1}>
-              <p className='text-muted-foreground text-lg leading-relaxed'>
+              <p className='text-muted-foreground text-base sm:text-lg leading-relaxed'>
                 {clinicData.description || 'Clinique médicale multidisciplinaire offrant des soins complets et de haute qualité à Constantine. Nous sommes équipés des dernières technologies médicales et disposons d\'une équipe de spécialistes expérimentés.'}
               </p>
             </ScrollAnimation>

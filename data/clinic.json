@@ -1,7 +1,7 @@
 {
   "name": "Clinique OKBA",
   "hero": {
-    "title": "Votre Santé Mérite L'Excellence Absolue",
+    "title": "Votre Santé Mérite L'Excellence Absolue test par mizou",
     "subtitle": "Découvrez une nouvelle ère de soins médicaux à la Clinique OKBA. Technologie de pointe, experts dévoués et confort absolu pour votre rétablissement.",
     "stats": {
       "patients": "5000+"
@@ -31,6 +31,14 @@
       "order": 1,
       "active": true,
       "id": "3"
+    },
+    {
+      "image": "/uploads/hero/1763975074979-GeminiGeneratedImagecv1y7ncv1y7ncv1y.png",
+      "title": "Excelent test",
+      "subtitle": "by mizou",
+      "order": 1,
+      "active": true,
+      "id": "4"
     }
   ],
   "equipment": [

@@ -187,16 +187,16 @@ export default function Contact() {
 
 
   return (
-    <section id='contact' className='bg-background py-20'>
+    <section id='contact' className='bg-background py-12 sm:py-16 md:py-20'>
       <div className='mx-auto max-w-7xl px-4 sm:px-6 lg:px-8'>
         <ScrollAnimation variant="fadeUp" className='mb-16 space-y-4 text-center'>
           <p className='text-primary text-sm font-semibold tracking-wide uppercase'>
             Nous contacter
           </p>
-          <h2 className='text-foreground text-4xl font-bold'>
+          <h2 className='text-foreground text-2xl sm:text-3xl md:text-4xl font-bold'>
             Contact & Localisation
           </h2>
-          <p className='text-muted-foreground mx-auto max-w-2xl text-lg'>
+          <p className='text-muted-foreground mx-auto max-w-2xl text-base sm:text-lg'>
             Nous sommes à votre écoute pour toute question ou demande de
             rendez-vous
           </p>
@@ -308,7 +308,7 @@ export default function Contact() {
 
           {/* Contact Form */}
           <ScrollAnimation variant="fadeLeft" as="div">
-            <Card className='p-8'>
+            <Card className='p-4 sm:p-6 md:p-8'>
               <form onSubmit={handleSubmit} className='space-y-6'>
                 <div className='grid grid-cols-1 gap-4 sm:grid-cols-2'>
                   <div>

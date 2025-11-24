@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import fs from 'fs/promises'
 import path from 'path'
+import { revalidateAllPages } from '@/lib/revalidate'
 
 const dataPath = path.join(process.cwd(), 'data', 'clinic.json')
 
@@ -34,6 +35,7 @@ export async function POST(request: Request) {
         data.articles.push(newArticle)
 
         await fs.writeFile(dataPath, JSON.stringify(data, null, 2), 'utf-8')
+        revalidateAllPages()
         return NextResponse.json({ success: true, article: newArticle })
     } catch (error) {
         return NextResponse.json({ error: 'Failed to add article' }, { status: 500 })
@@ -53,6 +55,7 @@ export async function PUT(request: Request) {
 
         data.articles[index] = updatedArticle
         await fs.writeFile(dataPath, JSON.stringify(data, null, 2), 'utf-8')
+        revalidateAllPages()
         return NextResponse.json({ success: true, article: updatedArticle })
     } catch (error) {
         return NextResponse.json({ error: 'Failed to update article' }, { status: 500 })
@@ -74,6 +77,7 @@ export async function DELETE(request: Request) {
         data.articles = data.articles?.filter((a: any) => a.id !== id) || []
 
         await fs.writeFile(dataPath, JSON.stringify(data, null, 2), 'utf-8')
+        revalidateAllPages()
         return NextResponse.json({ success: true })
     } catch (error) {
         return NextResponse.json({ error: 'Failed to delete article' }, { status: 500 })
