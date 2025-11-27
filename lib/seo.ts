@@ -58,7 +58,7 @@ export const defaultMetadata: Metadata = {
     siteName,
     images: [
       {
-        url: '/modern-medical-clinic-facade-architecture.png',
+        url: '/uploads/hero/1763825620251-Gemini_Generated_Image_gzjk7ygzjk7ygzjk.png',
         width: 1200,
         height: 630,
         alt: 'Façade de la Clinique OKBA à Constantine',
@@ -69,7 +69,7 @@ export const defaultMetadata: Metadata = {
     card: 'summary_large_image',
     title: `${siteName} - Constantine, Algérie`,
     description,
-    images: ['/modern-medical-clinic-facade-architecture.png'],
+    images: ['/uploads/hero/1763825620251-Gemini_Generated_Image_gzjk7ygzjk7ygzjk.png'],
   },
   robots: {
     index: true,
@@ -97,7 +97,7 @@ export const generateStructuredData = () => {
     description,
     url: baseUrl,
     logo: `${baseUrl}/logo.png`,
-    image: `${baseUrl}/modern-medical-clinic-facade-architecture.png`,
+    image: `${baseUrl}/uploads/hero/1763825620251-Gemini_Generated_Image_gzjk7ygzjk7ygzjk.png`,
     telephone: process.env.NEXT_PUBLIC_CONTACT_PHONE || '+213 555 123 456',
     email: process.env.NEXT_PUBLIC_CONTACT_EMAIL || 'contact@cliniqueokba.com',
     address: {

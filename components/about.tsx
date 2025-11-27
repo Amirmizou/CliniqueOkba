@@ -2,8 +2,11 @@ import Image from 'next/image'
 import clinicData from '@/data/clinic.json'
 import ScrollAnimation from '@/components/ui/scroll-animation'
 import StaggerContainer from '@/components/ui/stagger-container'
+import { useTranslations } from 'next-intl'
 
 export default function About() {
+  const t = useTranslations('about')
+
   return (
     <section id='about' className='bg-card py-12 sm:py-16 md:py-20'>
       <div className='mx-auto max-w-7xl px-4 sm:px-6 lg:px-8'>
@@ -12,7 +15,7 @@ export default function About() {
           <ScrollAnimation variant="fadeRight" className='relative order-2 h-64 sm:h-80 md:h-96 md:order-1'>
             <div className='from-secondary/30 to-primary/20 absolute inset-0 rounded-2xl bg-gradient-to-br'></div>
             <Image
-              src='/modern-medical-clinic-facade-architecture.png'
+              src='/uploads/hero/1763825620251-Gemini_Generated_Image_gzjk7ygzjk7ygzjk.png'
               alt='Façade architecturale moderne de la Clinique OKBA située à Constantine, Ali Mendjeli'
               className='h-full w-full rounded-2xl object-cover'
               fill
@@ -27,7 +30,7 @@ export default function About() {
           <div className='order-1 space-y-6 md:order-2'>
             <ScrollAnimation variant="fadeLeft" className='space-y-2'>
               <p className='text-primary text-sm font-semibold tracking-wide uppercase'>
-                À propos de nous
+                {t('title')}
               </p>
               <h2 className='text-foreground text-2xl sm:text-3xl md:text-4xl font-bold'>
                 {clinicData.name}
@@ -36,7 +39,7 @@ export default function About() {
 
             <ScrollAnimation variant="fadeLeft" delay={0.1}>
               <p className='text-muted-foreground text-base sm:text-lg leading-relaxed'>
-                {clinicData.description || 'Clinique médicale multidisciplinaire offrant des soins complets et de haute qualité à Constantine. Nous sommes équipés des dernières technologies médicales et disposons d\'une équipe de spécialistes expérimentés.'}
+                {clinicData.description || t('description')}
               </p>
             </ScrollAnimation>
 
@@ -49,10 +52,10 @@ export default function About() {
                 </div>
                 <div>
                   <h3 className='text-foreground font-semibold'>
-                    Équipements modernes
+                    {t('features.equipment.title')}
                   </h3>
                   <p className='text-muted-foreground text-sm'>
-                    Dernières technologies médicales
+                    {t('features.equipment.desc')}
                   </p>
                 </div>
               </ScrollAnimation>
@@ -65,10 +68,10 @@ export default function About() {
                 </div>
                 <div>
                   <h3 className='text-foreground font-semibold'>
-                    Équipe expérimentée
+                    {t('features.team.title')}
                   </h3>
                   <p className='text-muted-foreground text-sm'>
-                    Spécialistes qualifiés et dévoués
+                    {t('features.team.desc')}
                   </p>
                 </div>
               </ScrollAnimation>
@@ -81,10 +84,10 @@ export default function About() {
                 </div>
                 <div>
                   <h3 className='text-foreground font-semibold'>
-                    Soins de qualité
+                    {t('features.care.title')}
                   </h3>
                   <p className='text-muted-foreground text-sm'>
-                    Approche centrée sur le patient
+                    {t('features.care.desc')}
                   </p>
                 </div>
               </ScrollAnimation>

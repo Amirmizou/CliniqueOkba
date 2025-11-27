@@ -11,16 +11,103 @@
     "emergency": "Urgences"
   },
   "hero": {
-    "title": "Bienvenue à la Clinique OKBA",
-    "subtitle": "Excellence médicale et soins personnalisés à Constantine",
+    "badge": "Leader en Innovation Médicale",
+    "titlePart1": "L'Excellence Médicale",
+    "titlePart2": "Réinventée",
+    "subtitle": "Une fusion parfaite entre expertise humaine et technologie de pointe pour votre santé.",
     "cta": {
-      "contact": "Nous contacter",
-      "services": "Nos services"
+      "services": "Nos Services",
+      "discover": "Découvrir"
+    },
+    "stats": {
+      "patients": "Patients Satisfaits",
+      "emergency": "Service Urgences",
+      "specialties": "Spécialités"
+    },
+    "carousel": {
+      "tech": {
+        "title": "Technologie Avancée",
+        "desc": "PET Scan & IRM de dernière génération"
+      },
+      "expert": {
+        "title": "Expertise Médicale",
+        "desc": "Équipe pluridisciplinaire d'élite"
+      },
+      "care": {
+        "title": "Soins Personnalisés",
+        "desc": "Parcours patient sur mesure"
+      }
     }
   },
   "about": {
     "title": "À propos de nous",
-    "subtitle": "Votre santé, notre priorité"
+    "subtitle": "Votre santé, notre priorité",
+    "description": "Clinique médicale multidisciplinaire offrant des soins complets et de haute qualité à Constantine. Nous sommes équipés des dernières technologies médicales et disposons d'une équipe de spécialistes expérimentés.",
+    "features": {
+      "equipment": {
+        "title": "Équipements modernes",
+        "desc": "Dernières technologies médicales"
+      },
+      "team": {
+        "title": "Équipe expérimentée",
+        "desc": "Spécialistes qualifiés et dévoués"
+      },
+      "care": {
+        "title": "Soins de qualité",
+        "desc": "Approche centrée sur le patient"
+      }
+    }
+  },
+  "specialties": {
+    "sectionTitle": "Nos services",
+    "title": "Nos Spécialités",
+    "subtitle": "Une gamme complète de spécialités médicales pour répondre à tous vos besoins de santé",
+    "items": {
+      "cardiology": {
+        "name": "Cardiologie",
+        "desc": "Maladies du cœur et des vaisseaux sanguins"
+      },
+      "pneumology": {
+        "name": "Pneumologie",
+        "desc": "Maladies de la respiration et du système pulmonaire"
+      },
+      "internalMedicine": {
+        "name": "Médecine interne",
+        "desc": "Diagnostic et traitement médical général"
+      },
+      "dermatology": {
+        "name": "Dermatologie & esthétique",
+        "desc": "Soins de la peau et traitements esthétiques"
+      },
+      "gynecology": {
+        "name": "Gynécologie & obstétrique",
+        "desc": "Santé féminine et suivi de maternité"
+      },
+      "pediatrics": {
+        "name": "Pédiatrie",
+        "desc": "Soins spécialisés des enfants et nourrissons"
+      },
+      "neurology": {
+        "name": "Neurologie",
+        "desc": "Maladies du système nerveux"
+      },
+      "dentistry": {
+        "name": "Dentisterie",
+        "desc": "Soins dentaires complets et chirurgie dentaire"
+      },
+      "rheumatology": {
+        "name": "Rhumatologie",
+        "desc": "Maladies des articulations et rhumatismes"
+      },
+      "ophthalmology": {
+        "name": "Ophtalmologie",
+        "desc": "Soins des yeux et chirurgie ophtalmologique"
+      },
+      "orl": {
+        "name": "ORL",
+        "desc": "Oto-rhino-laryngologie et chirurgie ORL"
+      }
+    }
   },
   "contact": {
     "title": "Contact & Localisation",
@@ -47,8 +134,17 @@
     }
   },
   "footer": {
+    "brandDescription": "Votre santé est notre priorité absolue. Nous combinons expertise médicale de pointe et soins humanisés pour votre rétablissement.",
+    "navigation": "Navigation",
+    "poles": "Nos Pôles",
+    "contact": "Contact",
+    "address": "Adresse",
+    "phone": "Téléphone",
+    "email": "Email",
     "rights": "Tous droits réservés",
-    "privacy": "Politique de confidentialité",
-    "terms": "Mentions légales"
+    "privacy": "Confidentialité",
+    "terms": "Mentions Légales",
+    "cookies": "Cookies",
+    "sitemap": "Plan du site"
   }
 }

@@ -14,8 +14,8 @@
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.14 0.02 142);
 
-  /* Vibrant yet Trustworthy Green */
-  --primary: oklch(0.55 0.15 145);
+  /* Vibrant yet Trustworthy Green - Extracted from Billboard */
+  --primary: oklch(0.48 0.16 145);
   --primary-foreground: oklch(0.99 0.005 142);
 
   /* Soft Teal/Blue for secondary actions */
@@ -25,16 +25,17 @@
   --muted: oklch(0.96 0.01 142);
   --muted-foreground: oklch(0.50 0.04 142);
 
-  /* Energetic Accent */
-  --accent: oklch(0.95 0.03 145);
+  /* Energetic Accent - Yellow/Green from Billboard */
+  --accent: oklch(0.88 0.22 110);
   --accent-foreground: oklch(0.25 0.05 145);
 
-  --destructive: oklch(0.65 0.22 25);
+  /* Urgency Red - From Billboard */
+  --destructive: oklch(0.55 0.22 25);
   --destructive-foreground: oklch(0.99 0.005 142);
 
   --border: oklch(0.92 0.01 142);
   --input: oklch(0.92 0.01 142);
-  --ring: oklch(0.55 0.15 145);
+  --ring: oklch(0.48 0.16 145);
 
   --radius: 0.75rem;
   /* Slightly more rounded */

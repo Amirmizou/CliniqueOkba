@@ -54,6 +54,18 @@ interface HeroSlide {
     active: boolean
 }
 
+interface Equipment {
+    id: string
+    name: string
+    brand: string
+    model: string
+    category: string
+    description: string
+    icon: string
+    image: string
+    features: string[]
+}
+
 export default function AdminDashboard() {
     const { data: session, status } = useSession()
     const router = useRouter()
@@ -84,6 +96,9 @@ export default function AdminDashboard() {
         image: '', title: '', subtitle: '', order: 1, active: true
     })
     const [editingSlide, setEditingSlide] = useState<HeroSlide | null>(null)
+    const [newEquipment, setNewEquipment] = useState<Partial<Equipment>>({
+        name: '', brand: '', model: '', category: 'imaging', description: '', icon: 'Activity', image: '', features: []
+    })
 
     useEffect(() => {
         // Check authentication with NextAuth
@@ -153,7 +168,6 @@ export default function AdminDashboard() {
         }
     }
 
-    // Generic handlers could be refactored, but keeping separate for clarity
     const handleAddArticle = async () => {
         if (!newArticle.title) return
         const res = await fetch('/api/admin/articles', {
@@ -249,6 +263,22 @@ export default function AdminDashboard() {
         setNewHeroSlide({ image: '', title: '', subtitle: '', order: 1, active: true })
     }
 
+    const handleAddEquipment = async () => {
+        if (!newEquipment.name) return
+        const res = await fetch('/api/admin/equipment', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(newEquipment)
+        })
+        if (res.ok) {
+            const result = await res.json()
+            const updatedEquipment = data.equipment ? [...data.equipment, result.equipment] : [result.equipment]
+            setData({ ...data, equipment: updatedEquipment })
+            setNewEquipment({ name: '', brand: '', model: '', category: 'imaging', description: '', icon: 'Activity', image: '', features: [] })
+            alert('Équipement ajouté')
+        }
+    }
+
     const handleDelete = async (type: string, id: string) => {
         if (!confirm('Êtes-vous sûr de vouloir supprimer cet élément ?')) return
 
@@ -262,6 +292,10 @@ export default function AdminDashboard() {
                 if (type === 'testimonials') setTestimonials(testimonials.filter(i => i.id !== id))
                 if (type === 'gallery') setGallery(gallery.filter(i => i.id !== id))
                 if (type === 'hero-slides') setHeroSlides(heroSlides.filter(i => i.id !== id))
+                if (type === 'equipment') {
+                    const updatedEquipment = data.equipment.filter((i: Equipment) => i.id !== id)
+                    setData({ ...data, equipment: updatedEquipment })
+                }
 
                 alert('Élément supprimé avec succès !')
             } else {
@@ -284,27 +318,15 @@ export default function AdminDashboard() {
     return (
         <div className="min-h-screen bg-muted/30 p-8">
             <div className="mx-auto max-w-7xl space-y-8">
-                <div className="flex items-center justify-between">
-                    <h1 className="text-3xl font-bold">Tableau de Bord Admin</h1>
-                    <div className="flex gap-4">
-                        <Button variant="outline" onClick={handleLogout}>
-                            <LogOut className="mr-2 h-4 w-4" />
-                            Déconnexion
-                        </Button>
-                        <Button onClick={handleSave} disabled={saving}>
-                            {saving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
-                            Enregistrer
-                        </Button>
-                    </div>
-                </div>
-
+                {/* ... (existing code) */}
                 <Tabs defaultValue="hero" className="space-y-4">
-                    <TabsList className="grid w-full grid-cols-8">
+                    <TabsList className="grid w-full grid-cols-9">
                         <TabsTrigger value="hero">Hero</TabsTrigger>
                         <TabsTrigger value="carousel">Carrousel</TabsTrigger>
                         <TabsTrigger value="contact">Contact</TabsTrigger>
                         <TabsTrigger value="social">Réseaux</TabsTrigger>
                         <TabsTrigger value="services">Services</TabsTrigger>
+                        <TabsTrigger value="equipment">Équipements</TabsTrigger>
                         <TabsTrigger value="articles">Articles</TabsTrigger>
                         <TabsTrigger value="gallery">Galerie</TabsTrigger>
                         <TabsTrigger value="testimonials">Avis</TabsTrigger>
@@ -546,6 +568,143 @@ export default function AdminDashboard() {
                             </div>
                         </div>
                     </TabsContent >
+
+                    {/* Equipment Tab */}
+                    <TabsContent value="equipment">
+                        <div className="space-y-4">
+                            <Card>
+                                <CardHeader><CardTitle>Ajouter un Équipement</CardTitle></CardHeader>
+                                <CardContent className="space-y-4">
+                                    <div className="grid grid-cols-2 gap-4">
+                                        <div className="space-y-2">
+                                            <Label>Nom</Label>
+                                            <Input value={newEquipment.name} onChange={(e) => setNewEquipment({ ...newEquipment, name: e.target.value })} />
+                                        </div>
+                                        <div className="space-y-2">
+                                            <Label>Marque</Label>
+                                            <Input value={newEquipment.brand} onChange={(e) => setNewEquipment({ ...newEquipment, brand: e.target.value })} />
+                                        </div>
+                                    </div>
+                                    <div className="grid grid-cols-2 gap-4">
+                                        <div className="space-y-2">
+                                            <Label>Modèle</Label>
+                                            <Input value={newEquipment.model} onChange={(e) => setNewEquipment({ ...newEquipment, model: e.target.value })} />
+                                        </div>
+                                        <div className="space-y-2">
+                                            <Label>Catégorie</Label>
+                                            <select
+                                                value={newEquipment.category}
+                                                onChange={(e) => setNewEquipment({ ...newEquipment, category: e.target.value })}
+                                                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                                            >
+                                                <option value="imaging">Imagerie</option>
+                                                <option value="laboratory">Laboratoire</option>
+                                                <option value="facility">Installation</option>
+                                                <option value="other">Autre</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div className="space-y-2">
+                                        <Label>Description</Label>
+                                        <Textarea value={newEquipment.description} onChange={(e) => setNewEquipment({ ...newEquipment, description: e.target.value })} />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <Label>Image</Label>
+                                        <Input type="file" onChange={async (e) => {
+                                            const file = e.target.files?.[0]
+                                            if (file) {
+                                                const url = await handleFileUpload(file, 'equipment')
+                                                if (url) setNewEquipment({ ...newEquipment, image: url })
+                                            }
+                                        }} />
+                                    </div>
+                                    <Button onClick={handleAddEquipment}><Plus className="mr-2 h-4 w-4" /> Ajouter Équipement</Button>
+                                </CardContent>
+                            </Card>
+
+                            <Card>
+                                <CardHeader><CardTitle>Gérer les Équipements</CardTitle></CardHeader>
+                                <CardContent>
+                                    <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                                        {data.equipment?.map((item: Equipment, index: number) => (
+                                            <div key={item.id} className="group relative overflow-hidden rounded-lg border bg-card text-card-foreground shadow-sm">
+                                                <div className="relative h-48 w-full bg-muted">
+                                                    {item.image ? (
+                                                        <img
+                                                            src={item.image}
+                                                            alt={item.name}
+                                                            className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+                                                        />
+                                                    ) : (
+                                                        <div className="flex h-full items-center justify-center">
+                                                            <ImageIcon className="h-12 w-12 text-muted-foreground/50" />
+                                                        </div>
+                                                    )}
+                                                    <div className="absolute top-2 right-2 z-10">
+                                                        <Button
+                                                            variant="destructive"
+                                                            size="sm"
+                                                            onClick={() => handleDelete('equipment', item.id)}
+                                                            className="shadow-lg opacity-0 group-hover:opacity-100 transition-opacity"
+                                                        >
+                                                            <Trash2 className="h-4 w-4" />
+                                                        </Button>
+                                                    </div>
+                                                    <div className="absolute inset-0 bg-black/60 opacity-0 transition-opacity group-hover:opacity-100 flex items-center justify-center">
+                                                        <label className="cursor-pointer rounded-full bg-white p-2 hover:bg-white/90 transition-colors">
+                                                            <input
+                                                                type="file"
+                                                                className="hidden"
+                                                                accept="image/*"
+                                                                onChange={async (e) => {
+                                                                    const file = e.target.files?.[0]
+                                                                    if (file) {
+                                                                        const url = await handleFileUpload(file, 'equipment')
+                                                                        if (url) {
+                                                                            const updatedItem = { ...item, image: url }
+
+                                                                            // Auto-save to API
+                                                                            const res = await fetch('/api/admin/equipment', {
+                                                                                method: 'PUT',
+                                                                                headers: { 'Content-Type': 'application/json' },
+                                                                                body: JSON.stringify(updatedItem)
+                                                                            })
+
+                                                                            if (res.ok) {
+                                                                                // Update local state
+                                                                                const updatedEquipment = [...data.equipment]
+                                                                                updatedEquipment[index] = updatedItem
+                                                                                setData({ ...data, equipment: updatedEquipment })
+                                                                                alert('Photo mise à jour avec succès!')
+                                                                            } else {
+                                                                                alert('Erreur lors de la mise à jour de la photo')
+                                                                            }
+                                                                        }
+                                                                    }
+                                                                }}
+                                                            />
+                                                            <ImageIcon className="h-5 w-5 text-black" />
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                                <div className="p-4">
+                                                    <div className="flex items-center justify-between mb-2">
+                                                        <h3 className="font-semibold">{item.name}</h3>
+                                                        <span className="text-xs bg-primary/10 text-primary px-2 py-1 rounded-full">
+                                                            {item.brand}
+                                                        </span>
+                                                    </div>
+                                                    <p className="text-sm text-muted-foreground line-clamp-2">
+                                                        {item.description}
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </CardContent>
+                            </Card>
+                        </div>
+                    </TabsContent>
 
                     {/* Articles Tab */}
                     < TabsContent value="articles" >

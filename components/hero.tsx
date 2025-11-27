@@ -3,19 +3,20 @@
 import { useState, useEffect } from 'react'
 import Image from 'next/image'
 import { Button } from '@/components/ui/button'
-import { motion, useScroll, useTransform } from 'framer-motion'
-import { ArrowRight, Play, Shield, Heart, Users, Stethoscope, Activity } from 'lucide-react'
+import { motion, useScroll, useTransform, AnimatePresence } from 'framer-motion'
+import { ArrowRight, Play, Shield, Heart, Activity, Star, ChevronRight, ChevronLeft } from 'lucide-react'
+import { cn } from '@/lib/utils'
+import { useTranslations } from 'next-intl'
 
 export default function Hero() {
-  const [isVisible, setIsVisible] = useState(false)
+  const t = useTranslations('hero')
   const [heroData, setHeroData] = useState({
-    title: "Votre Santé Mérite L'Excellence Absolue",
-    subtitle: "Découvrez une nouvelle ère de soins médicaux à la Clinique OKBA. Technologie de pointe, experts dévoués et confort absolu pour votre rétablissement.",
     stats: { patients: "5000+" }
   })
 
+  const [activeIndex, setActiveIndex] = useState(0)
+
   useEffect(() => {
-    setIsVisible(true)
     fetch('/api/admin/clinic')
       .then(res => res.json())
       .then(data => {
@@ -28,7 +29,7 @@ export default function Hero() {
 
   const { scrollY } = useScroll()
   const y1 = useTransform(scrollY, [0, 500], [0, 200])
-  const y2 = useTransform(scrollY, [0, 500], [0, -150])
+  const opacity = useTransform(scrollY, [0, 300], [1, 0])
 
   const scrollToSection = (id: string) => {
     const element = document.getElementById(id)
@@ -37,184 +38,238 @@ export default function Hero() {
     }
   }
 
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.1,
-        delayChildren: 0.3,
-      },
+  const carouselItems = [
+    {
+      id: 1,
+      title: t('carousel.tech.title'),
+      desc: t('carousel.tech.desc'),
+      image: "/uploads/hero/1763826628906-Gemini_Generated_Image_ubdtr0ubdtr0ubdt.png",
+      icon: <Activity className="w-6 h-6 text-blue-500" />,
+      color: "bg-blue-500/10 text-blue-500"
     },
+    {
+      id: 2,
+      title: t('carousel.expert.title'),
+      desc: t('carousel.expert.desc'),
+      image: "/uploads/hero/1763825620251-Gemini_Generated_Image_gzjk7ygzjk7ygzjk.png",
+      icon: <Star className="w-6 h-6 text-yellow-500" />,
+      color: "bg-yellow-500/10 text-yellow-500"
+    },
+    {
+      id: 3,
+      title: t('carousel.care.title'),
+      desc: t('carousel.care.desc'),
+      image: "/uploads/hero/1763975074979-GeminiGeneratedImagecv1y7ncv1y7ncv1y.png",
+      icon: <Heart className="w-6 h-6 text-red-500" />,
+      color: "bg-red-500/10 text-red-500"
+    }
+  ]
+
+  const nextSlide = () => {
+    setActiveIndex((prev) => (prev + 1) % carouselItems.length)
   }
 
-  const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: { duration: 0.6, ease: 'easeOut' },
-    },
+  const prevSlide = () => {
+    setActiveIndex((prev) => (prev - 1 + carouselItems.length) % carouselItems.length)
   }
+
+  useEffect(() => {
+    const timer = setInterval(nextSlide, 5000)
+    return () => clearInterval(timer)
+  }, [])
 
   return (
     <section
       id='home'
-      className='relative flex min-h-[90vh] items-center justify-center overflow-hidden bg-gradient-to-br from-background via-background to-secondary/5 pt-20'
+      className='relative flex min-h-[95vh] items-center justify-center overflow-hidden bg-background pt-20'
       aria-label="Section d'accueil"
     >
-      {/* Dynamic Background Elements */}
-      <div className='absolute inset-0 overflow-hidden pointer-events-none'>
+      {/* Animated Background Pulse */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_50%_50%,rgba(var(--primary-rgb),0.05),transparent_50%)]" />
         <motion.div
-          style={{ y: y1, x: -50 }}
-          className='absolute top-20 left-10 h-64 w-64 rounded-full bg-primary/5 blur-3xl'
+          animate={{ scale: [1, 1.1, 1], opacity: [0.3, 0.5, 0.3] }}
+          transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
+          className="absolute -top-[20%] -right-[10%] w-[800px] h-[800px] rounded-full bg-primary/5 blur-3xl"
         />
         <motion.div
-          style={{ y: y2, x: 50 }}
-          className='absolute bottom-20 right-10 h-96 w-96 rounded-full bg-secondary/10 blur-3xl'
+          animate={{ scale: [1, 1.2, 1], opacity: [0.2, 0.4, 0.2] }}
+          transition={{ duration: 10, repeat: Infinity, ease: "easeInOut", delay: 1 }}
+          className="absolute -bottom-[20%] -left-[10%] w-[600px] h-[600px] rounded-full bg-secondary/5 blur-3xl"
         />
+
+        {/* EKG Line Animation */}
+        <svg className="absolute top-1/2 left-0 w-full h-32 opacity-10" preserveAspectRatio="none">
+          <motion.path
+            d="M0,16 L200,16 L210,0 L220,32 L230,16 L400,16 L410,0 L420,32 L430,16 L600,16 L610,0 L620,32 L630,16 L800,16 L810,0 L820,32 L830,16 L1000,16 L1010,0 L1020,32 L1030,16 L1200,16"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            className="text-primary"
+            initial={{ pathLength: 0, x: -1000 }}
+            animate={{ pathLength: 1, x: 0 }}
+            transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+          />
+        </svg>
       </div>
 
       <div className='relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 w-full'>
-        <div className='grid items-center gap-12 lg:grid-cols-2 lg:gap-8'>
+        <div className='grid items-center gap-12 lg:grid-cols-2 lg:gap-16'>
+
           {/* Left Content */}
           <motion.div
-            variants={containerVariants}
-            initial="hidden"
-            animate="visible"
+            initial={{ opacity: 0, x: -50 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.8, ease: "easeOut" }}
             className='space-y-8 text-center lg:text-left'
           >
-            <motion.div variants={itemVariants} className='inline-flex items-center gap-2 rounded-full bg-primary/10 px-4 py-1.5 text-sm font-medium text-primary ring-1 ring-inset ring-primary/20'>
-              <span className="relative flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-secondary/10 border border-secondary/20 backdrop-blur-sm">
+              <span className="relative flex h-2.5 w-2.5">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-secondary opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-secondary"></span>
               </span>
-              Excellence Médicale à Constantine
-            </motion.div>
+              <span className="text-sm font-medium text-secondary-foreground">{t('badge')}</span>
+            </div>
 
-            <motion.h1 variants={itemVariants} className='text-4xl font-bold tracking-tight text-foreground sm:text-5xl md:text-6xl lg:leading-tight'>
-              {heroData.title.split(' ').slice(0, 3).join(' ')} <br className="hidden lg:block" />
-              <span className='bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent'>
-                {heroData.title.split(' ').slice(3).join(' ')}
+            <h1 className='text-4xl font-bold tracking-tight text-foreground sm:text-6xl lg:leading-[1.1]'>
+              {t('titlePart1')} <br />
+              <span className='text-transparent bg-clip-text bg-gradient-to-r from-primary to-blue-600 relative'>
+                {t('titlePart2')}
+                <svg className="absolute w-full h-3 -bottom-1 left-0 text-primary opacity-30" viewBox="0 0 100 10" preserveAspectRatio="none">
+                  <path d="M0 5 Q 50 10 100 5" stroke="currentColor" strokeWidth="3" fill="none" />
+                </svg>
               </span>
-            </motion.h1>
+            </h1>
 
-            <motion.p variants={itemVariants} className='mx-auto max-w-2xl text-lg text-muted-foreground lg:mx-0'>
-              {heroData.subtitle}
-            </motion.p>
+            <p className='mx-auto max-w-2xl text-lg text-muted-foreground lg:mx-0 leading-relaxed'>
+              {t('subtitle')}
+            </p>
 
-            <motion.div variants={itemVariants} className='flex flex-col items-center gap-4 sm:flex-row sm:justify-center lg:justify-start'>
+            <div className='flex flex-col items-center gap-4 sm:flex-row sm:justify-center lg:justify-start'>
               <Button
                 size='lg'
-                className='group relative overflow-hidden bg-primary px-8 py-6 text-lg shadow-lg transition-all hover:scale-105 hover:shadow-primary/25'
+                className='h-14 px-8 rounded-full bg-primary hover:bg-primary/90 shadow-lg shadow-primary/25 transition-all hover:scale-105'
                 onClick={() => scrollToSection('specialties')}
               >
-                <span className="relative z-10 flex items-center gap-2">
-                  Nos Services
-                  <ArrowRight className='h-5 w-5 transition-transform group-hover:translate-x-1' />
-                </span>
-                <div className="absolute inset-0 -z-10 bg-gradient-to-r from-primary via-primary/80 to-primary opacity-0 transition-opacity group-hover:opacity-100" />
+                {t('cta.services')}
+                <ArrowRight className='ml-2 h-5 w-5 rtl:rotate-180' />
               </Button>
 
               <Button
                 size='lg'
                 variant='outline'
-                className='group px-8 py-6 text-lg backdrop-blur-sm transition-all hover:bg-secondary/10 hover:text-secondary-foreground'
+                className='h-14 px-8 rounded-full border-2 hover:bg-secondary/5 transition-all hover:scale-105'
                 onClick={() => scrollToSection('contact')}
               >
-                <Play className='mr-2 h-5 w-5 fill-current transition-transform group-hover:scale-110' />
-                Visite Virtuelle
+                <Play className='mr-2 h-4 w-4 fill-current' />
+                {t('cta.discover')}
               </Button>
-            </motion.div>
+            </div>
 
-            {/* Trust Indicators */}
-            <motion.div variants={itemVariants} className='flex items-center justify-center gap-8 pt-8 lg:justify-start grayscale transition-all hover:grayscale-0'>
-              <div className="flex -space-x-4">
-                {[1, 2, 3, 4].map((i) => (
-                  <div key={i} className="h-10 w-10 rounded-full border-2 border-background bg-muted flex items-center justify-center overflow-hidden">
-                    <Users className="h-6 w-6 text-muted-foreground/50" />
-                  </div>
-                ))}
+            <div className="pt-8 flex items-center justify-center lg:justify-start gap-8 border-t border-border/50 mt-8">
+              <div>
+                <p className="text-3xl font-bold text-foreground">{heroData.stats.patients}</p>
+                <p className="text-sm text-muted-foreground">{t('stats.patients')}</p>
               </div>
-              <div className="text-sm">
-                <p className="font-bold text-foreground">{heroData.stats.patients} Patients</p>
-                <p className="text-muted-foreground">Satisfaits cette année</p>
+              <div className="w-px h-12 bg-border/50" />
+              <div>
+                <p className="text-3xl font-bold text-foreground">24/7</p>
+                <p className="text-sm text-muted-foreground">{t('stats.emergency')}</p>
               </div>
-            </motion.div>
+              <div className="w-px h-12 bg-border/50" />
+              <div>
+                <p className="text-3xl font-bold text-foreground">15+</p>
+                <p className="text-sm text-muted-foreground">{t('stats.specialties')}</p>
+              </div>
+            </div>
           </motion.div>
 
-          {/* Right Visual */}
+          {/* Right Content - 3D Carousel */}
           <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
+            initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.8, delay: 0.2 }}
-            className='relative mx-auto w-full max-w-[500px] lg:max-w-none'
+            className='relative h-[500px] w-full perspective-1000'
           >
-            <div className='relative aspect-square lg:aspect-[4/5]'>
-              {/* Main Image Container */}
-              <div className='absolute inset-0 rounded-[2rem] bg-gradient-to-br from-primary/20 to-secondary/20 p-2'>
-                <div className='h-full w-full overflow-hidden rounded-[1.8rem] bg-background relative'>
+            <div className="relative w-full h-full flex items-center justify-center">
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={activeIndex}
+                  initial={{ opacity: 0, rotateY: -20, x: 100 }}
+                  animate={{ opacity: 1, rotateY: 0, x: 0 }}
+                  exit={{ opacity: 0, rotateY: 20, x: -100 }}
+                  transition={{ duration: 0.5, ease: "easeInOut" }}
+                  className="absolute w-full max-w-md aspect-[4/5] rounded-3xl overflow-hidden shadow-2xl border border-white/20 bg-card/30 backdrop-blur-md group z-10"
+                >
+                  <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/80 z-10" />
+
                   <Image
-                    src='/modern-medical-clinic-interior-with-green-plants-a.jpg'
-                    alt='Clinique OKBA Interior'
+                    src={carouselItems[activeIndex].image}
+                    alt={carouselItems[activeIndex].title}
                     fill
-                    className='object-cover transition-transform duration-700 hover:scale-105'
+                    sizes="(max-width: 768px) 100vw, 500px"
+                    className="object-cover transition-transform duration-700 group-hover:scale-110"
                     priority
-                    sizes='(max-width: 768px) 100vw, 50vw'
                   />
-                  {/* Overlay Gradient */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
-                </div>
+
+                  <div className="absolute bottom-0 left-0 right-0 p-8 z-20">
+                    <motion.div
+                      initial={{ y: 20, opacity: 0 }}
+                      animate={{ y: 0, opacity: 1 }}
+                      transition={{ delay: 0.2 }}
+                      className={cn("inline-flex p-3 rounded-2xl mb-4 backdrop-blur-md bg-white/10 border border-white/20", carouselItems[activeIndex].color.split(' ')[1])}
+                    >
+                      {carouselItems[activeIndex].icon}
+                    </motion.div>
+                    <motion.h3
+                      initial={{ y: 20, opacity: 0 }}
+                      animate={{ y: 0, opacity: 1 }}
+                      transition={{ delay: 0.3 }}
+                      className="text-2xl font-bold text-white mb-2"
+                    >
+                      {carouselItems[activeIndex].title}
+                    </motion.h3>
+                    <motion.p
+                      initial={{ y: 20, opacity: 0 }}
+                      animate={{ y: 0, opacity: 1 }}
+                      transition={{ delay: 0.4 }}
+                      className="text-white/80"
+                    >
+                      {carouselItems[activeIndex].desc}
+                    </motion.p>
+                  </div>
+                </motion.div>
+              </AnimatePresence>
+
+              {/* Navigation Buttons */}
+              <div className="absolute bottom-8 right-8 z-30 flex gap-2">
+                <button
+                  onClick={prevSlide}
+                  className="p-3 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-white hover:bg-white/20 transition-colors"
+                >
+                  <ChevronLeft className="w-5 h-5 rtl:rotate-180" />
+                </button>
+                <button
+                  onClick={nextSlide}
+                  className="p-3 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-white hover:bg-white/20 transition-colors"
+                >
+                  <ChevronRight className="w-5 h-5 rtl:rotate-180" />
+                </button>
               </div>
 
-              {/* Floating Cards */}
-              <motion.div
-                animate={{ y: [0, -10, 0] }}
-                transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-                className='absolute -left-4 top-10 rounded-xl bg-card/90 p-4 shadow-xl backdrop-blur-md border border-border/50'
-              >
-                <div className="flex items-center gap-3">
-                  <div className="rounded-full bg-red-100 p-2 text-red-600">
-                    <Heart className="h-6 w-6 fill-current" />
-                  </div>
-                  <div>
-                    <p className="text-xs font-medium text-muted-foreground">Soins</p>
-                    <p className="text-sm font-bold text-foreground">Cardiologie</p>
-                  </div>
-                </div>
-              </motion.div>
-
-              <motion.div
-                animate={{ y: [0, 10, 0] }}
-                transition={{ duration: 5, repeat: Infinity, ease: "easeInOut", delay: 1 }}
-                className='absolute -right-4 bottom-20 rounded-xl bg-card/90 p-4 shadow-xl backdrop-blur-md border border-border/50'
-              >
-                <div className="flex items-center gap-3">
-                  <div className="rounded-full bg-green-100 p-2 text-green-600">
-                    <Shield className="h-6 w-6" />
-                  </div>
-                  <div>
-                    <p className="text-xs font-medium text-muted-foreground">Qualité</p>
-                    <p className="text-sm font-bold text-foreground">Certifiée ISO</p>
-                  </div>
-                </div>
-              </motion.div>
-
-              <motion.div
-                animate={{ x: [0, 5, 0] }}
-                transition={{ duration: 6, repeat: Infinity, ease: "easeInOut", delay: 0.5 }}
-                className='absolute -right-8 top-1/2 rounded-xl bg-card/90 p-4 shadow-xl backdrop-blur-md border border-border/50 hidden sm:block'
-              >
-                <div className="flex items-center gap-3">
-                  <div className="rounded-full bg-blue-100 p-2 text-blue-600">
-                    <Activity className="h-6 w-6" />
-                  </div>
-                  <div>
-                    <p className="text-xs font-medium text-muted-foreground">Urgences</p>
-                    <p className="text-sm font-bold text-foreground">24/7 Ouvert</p>
-                  </div>
-                </div>
-              </motion.div>
+              {/* Progress Indicators */}
+              <div className="absolute -right-8 top-1/2 -translate-y-1/2 flex flex-col gap-3">
+                {carouselItems.map((_, idx) => (
+                  <button
+                    key={idx}
+                    onClick={() => setActiveIndex(idx)}
+                    className={cn(
+                      "w-2 h-2 rounded-full transition-all duration-300",
+                      idx === activeIndex ? "h-8 bg-primary" : "bg-muted-foreground/30 hover:bg-primary/50"
+                    )}
+                  />
+                ))}
+              </div>
             </div>
           </motion.div>
         </div>

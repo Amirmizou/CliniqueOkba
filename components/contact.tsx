@@ -264,7 +264,7 @@ export default function Contact() {
                 <div>
                   <h3 className='text-foreground font-semibold'>Horaires</h3>
                   <p className='text-muted-foreground mt-1'>
-                    Lun - Ven: {clinicData.hours.weekdays}
+                    Sam - jeudi: {clinicData.hours.weekdays}
                   </p>
                   <p className='text-muted-foreground text-sm'>
                     Samedi: {clinicData.hours.saturday}

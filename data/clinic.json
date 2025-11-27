@@ -50,7 +50,7 @@
       "category": "imaging",
       "description": "Tomodensitométrie de dernière génération pour des diagnostics précis et rapides",
       "icon": "Scan",
-      "image": "",
+      "image": "/imageries/scannerCT.png",
       "features": [
         "Haute résolution",
         "Faible dose de radiation",
@@ -65,7 +65,7 @@
       "category": "imaging",
       "description": "Imagerie par Résonance Magnétique de haute performance",
       "icon": "Brain",
-      "image": "",
+      "image": "/uploads/equipment/1764187649082-siemensmri3t-mri-scannersmagnetom-vidateaser-21800000003659960.webp",
       "features": [
         "Images 3D détaillées",
         "Confort patient",
@@ -80,7 +80,7 @@
       "category": "imaging",
       "description": "Système de radiologie numérique avancé",
       "icon": "Activity",
-      "image": "",
+      "image": "/imageries/siemens-healthineers_MULTIX_Impact_C-hero.webp",
       "features": [
         "Images numériques instantanées",
         "Dose optimisée",
@@ -160,6 +160,21 @@
         "Stérilisation avancée",
         "Équipement dernière génération",
         "Sécurité maximale"
+      ]
+    },
+    {
+      "id": "9",
+      "name": "PET Scan",
+      "brand": "Siemens Healthineers",
+      "model": "Biograph Vision",
+      "category": "imaging",
+      "description": "Tomographie par émission de positons pour une détection précise des lésions",
+      "icon": "Scan",
+      "image": "/uploads/equipment/1764187632265-tlchargement.jpeg",
+      "features": [
+        "Détection précoce",
+        "Haute sensibilité",
+        "Images fusionnées TEP/TDM"
       ]
     }
   ],

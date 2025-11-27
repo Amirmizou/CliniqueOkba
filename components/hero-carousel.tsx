@@ -98,6 +98,7 @@ export default function HeroCarousel() {
                             src={currentSlide.image}
                             alt=""
                             fill
+                            sizes="100vw"
                             className='object-cover blur-xl scale-110 opacity-50'
                             priority
                         />
@@ -113,7 +114,6 @@ export default function HeroCarousel() {
                             className='object-contain object-center'
                             priority
                             sizes="100vw"
-                            quality={90}
                         />
                     </div>
                     <div className='absolute inset-0 bg-gradient-to-r from-black/80 via-black/40 to-transparent z-10' />
@@ -135,7 +135,7 @@ export default function HeroCarousel() {
                             initial={{ opacity: 0, x: -30 }}
                             animate={{ opacity: 1, x: 0 }}
                             transition={{ delay: 0.2, duration: 0.8 }}
-                            className="mb-3 sm:mb-4 inline-block px-3 py-1 sm:px-4 sm:py-1.5 rounded-full bg-primary/20 backdrop-blur-md border border-primary/30 text-primary-foreground text-xs sm:text-sm font-medium"
+                            className="mb-3 sm:mb-4 inline-block px-3 py-1 sm:px-4 sm:py-1.5 rounded-full bg-primary/20 backdrop-blur-md border border-primary/30 text-primary-foreground text-xs sm:text-sm font-medium relative z-10"
                         >
                             Excellence Médicale
                         </motion.div>
@@ -164,7 +164,7 @@ export default function HeroCarousel() {
                         >
                             <button
                                 onClick={() => document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' })}
-                                className="bg-primary hover:bg-primary/90 text-white px-6 py-3 sm:px-8 sm:py-4 rounded-full font-semibold text-base sm:text-lg transition-all duration-300 shadow-[0_0_20px_rgba(34,197,94,0.3)] hover:shadow-[0_0_30px_rgba(34,197,94,0.5)] hover:scale-105 active:scale-95 flex items-center gap-2 min-h-[44px]"
+                                className="bg-primary hover:bg-primary/90 text-white px-6 py-3 sm:px-8 sm:py-4 rounded-full font-semibold text-base sm:text-lg transition-all duration-300 shadow-lg shadow-primary/40 hover:shadow-xl hover:shadow-primary/50 hover:scale-105 active:scale-95 flex items-center gap-2 min-h-[44px]"
                             >
                                 Prendre Rendez-vous
                                 <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5" />

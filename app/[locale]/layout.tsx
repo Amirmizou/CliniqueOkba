@@ -9,6 +9,7 @@ import { NextIntlClientProvider } from 'next-intl'
 import { getMessages } from 'next-intl/server'
 import { notFound } from 'next/navigation'
 import { locales } from '@/i18n'
+import PageTransition from '@/components/page-transition'
 import '../globals.css'
 
 const poppins = Poppins({
@@ -48,7 +49,9 @@ export default async function LocaleLayout({
         enableSystem
         disableTransitionOnChange
       >
-        {children}
+        <PageTransition>
+          {children}
+        </PageTransition>
         <Analytics />
         {process.env.NEXT_PUBLIC_GA_ID && (
           <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID} />
