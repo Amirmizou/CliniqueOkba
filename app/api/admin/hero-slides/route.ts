@@ -10,7 +10,8 @@ export async function GET() {
         return NextResponse.json(slides)
     } catch (error) {
         console.error('Failed to fetch slides:', error)
-        return NextResponse.json({ error: 'Failed to load hero slides' }, { status: 500 })
+        // Return empty array instead of error object to prevent frontend crashes
+        return NextResponse.json([])
     }
 }
 
