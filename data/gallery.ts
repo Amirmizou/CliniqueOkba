@@ -4,39 +4,21 @@
 export const galleryImages = [
     {
         id: '1',
-        image: '/images/gallery/exterior1.jpg',
-        caption: 'Façade de la clinique',
-        category: 'exterior'
+        image: '/uploads/gallery/1763815720550-images-(1).jpg',
+        caption: 'Infrastructure de la clinique',
+        category: 'infrastructure'
     },
     {
         id: '2',
-        image: '/images/gallery/reception.jpg',
-        caption: 'Réception principale',
+        image: '/uploads/gallery/1763816789310-hero-dental-2.jpg',
+        caption: 'Salle de soins dentaires',
         category: 'interior'
     },
     {
         id: '3',
-        image: '/images/gallery/waiting-room.jpg',
-        caption: 'Salle d\'attente',
-        category: 'interior'
-    },
-    {
-        id: '4',
-        image: '/images/gallery/scanner.jpg',
-        caption: 'Salle de Scanner',
-        category: 'equipment'
-    },
-    {
-        id: '5',
-        image: '/images/gallery/irm.jpg',
-        caption: 'IRM de dernière génération',
-        category: 'equipment'
-    },
-    {
-        id: '6',
-        image: '/images/gallery/team1.jpg',
-        caption: 'Notre équipe médicale',
-        category: 'team'
+        image: '/uploads/gallery/1763827420029-Gemini_Generated_Image_gzjk7ygzjk7ygzjk.png',
+        caption: 'Vue extérieure',
+        category: 'exterior'
     }
 ]
 
