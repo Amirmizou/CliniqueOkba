@@ -2,25 +2,25 @@
 export const heroSlides = [
     {
         id: '1',
-        image: '/images/hero/slide1.jpg',
-        title: 'Bienvenue à la Clinique OKBA',
-        subtitle: 'Votre santé, notre priorité',
+        image: '/uploads/hero/1763825620251-Gemini_Generated_Image_gzjk7ygzjk7ygzjk.png',
+        title: 'Technologie de Pointe',
+        subtitle: 'Des équipements modernes pour des diagnostics précis',
         order: 1,
         active: true
     },
     {
         id: '2',
-        image: '/images/hero/slide2.jpg',
-        title: 'Excellence Médicale',
-        subtitle: 'Des équipements de pointe pour votre bien-être',
+        image: '/uploads/hero/1763826628906-Gemini_Generated_Image_ubdtr0ubdtr0ubdt.png',
+        title: 'Soins Personnalisés',
+        subtitle: 'Une équipe médicale à votre écoute pour votre bien-être',
         order: 2,
         active: true
     },
     {
         id: '3',
-        image: '/images/hero/slide3.jpg',
-        title: 'Équipe Dévouée',
-        subtitle: 'Des professionnels à votre écoute 24/7',
+        image: '/uploads/hero/1763826249107-logo.png',
+        title: 'Clinique OKBA',
+        subtitle: 'Votre partenaire santé de confiance',
         order: 3,
         active: true
     }

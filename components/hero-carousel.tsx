@@ -92,29 +92,18 @@ export default function HeroCarousel() {
                     transition={{ duration: 1 }}
                     className='absolute inset-0 z-0'
                 >
-                    {/* Blurred Background for Fill */}
-                    <div className='absolute inset-0'>
-                        <Image
-                            src={currentSlide.image}
-                            alt=""
-                            fill
-                            sizes="100vw"
-                            className='object-cover blur-xl scale-110 opacity-50'
-                            priority
-                        />
-                        <div className="absolute inset-0 bg-black/40" />
-                    </div>
-
-                    {/* Main Image - Contained */}
+                    {/* Main Image */}
                     <div className='relative w-full h-full'>
                         <Image
                             src={currentSlide.image}
                             alt={currentSlide.title}
                             fill
-                            className='object-contain object-center'
+                            className='object-cover object-center'
                             priority
                             sizes="100vw"
+                            unoptimized={true} // Bypass optimization for large images to avoid 400 errors
                         />
+                        <div className="absolute inset-0 bg-black/40" />
                     </div>
                     <div className='absolute inset-0 bg-gradient-to-r from-black/80 via-black/40 to-transparent z-10' />
                 </motion.div>

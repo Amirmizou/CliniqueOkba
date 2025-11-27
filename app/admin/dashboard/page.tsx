@@ -45,15 +45,6 @@ interface Testimonial {
     visible: boolean
 }
 
-interface HeroSlide {
-    id: string
-    image: string
-    title: string
-    subtitle: string
-    order: number
-    active: boolean
-}
-
 interface Equipment {
     id: string
     name: string
@@ -74,7 +65,6 @@ export default function AdminDashboard() {
     const [gallery, setGallery] = useState<GalleryImage[]>([])
     const [services, setServices] = useState<Service[]>([])
     const [testimonials, setTestimonials] = useState<Testimonial[]>([])
-    const [heroSlides, setHeroSlides] = useState<HeroSlide[]>([])
     const [loading, setLoading] = useState(true)
     const [saving, setSaving] = useState(false)
     const [uploading, setUploading] = useState(false)
@@ -92,10 +82,6 @@ export default function AdminDashboard() {
     const [newTestimonial, setNewTestimonial] = useState<Partial<Testimonial>>({
         name: '', role: 'Patient', content: '', rating: 5, image: '', visible: true
     })
-    const [newHeroSlide, setNewHeroSlide] = useState<Partial<HeroSlide>>({
-        image: '', title: '', subtitle: '', order: 1, active: true
-    })
-    const [editingSlide, setEditingSlide] = useState<HeroSlide | null>(null)
     const [newEquipment, setNewEquipment] = useState<Partial<Equipment>>({
         name: '', brand: '', model: '', category: 'imaging', description: '', icon: 'Activity', image: '', features: []
     })
@@ -114,15 +100,13 @@ export default function AdminDashboard() {
                 fetch('/api/admin/articles').then(r => r.json()),
                 fetch('/api/admin/gallery').then(r => r.json()),
                 fetch('/api/admin/services').then(r => r.json()),
-                fetch('/api/admin/testimonials').then(r => r.json()),
-                fetch('/api/admin/hero-slides').then(r => r.json())
-            ]).then(([clinicData, articlesData, galleryData, servicesData, testimonialsData, heroSlidesData]) => {
+                fetch('/api/admin/testimonials').then(r => r.json())
+            ]).then(([clinicData, articlesData, galleryData, servicesData, testimonialsData]) => {
                 setData(clinicData)
                 setArticles(articlesData)
                 setGallery(galleryData)
                 setServices(servicesData)
                 setTestimonials(testimonialsData)
-                setHeroSlides(heroSlidesData)
                 setLoading(false)
             }).catch(err => {
                 console.error(err)
@@ -228,41 +212,6 @@ export default function AdminDashboard() {
         }
     }
 
-    const handleAddHeroSlide = async () => {
-        if (!newHeroSlide.image) return
-
-        const method = editingSlide ? 'PUT' : 'POST'
-        const body = editingSlide ? { ...newHeroSlide, id: editingSlide.id } : newHeroSlide
-
-        const res = await fetch('/api/admin/hero-slides', {
-            method,
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(body)
-        })
-        if (res.ok) {
-            const result = await res.json()
-            if (editingSlide) {
-                setHeroSlides(heroSlides.map(s => s.id === result.slide.id ? result.slide : s))
-                alert('Slide modifiée')
-            } else {
-                setHeroSlides([...heroSlides, result.slide])
-                alert('Slide ajoutée')
-            }
-            setNewHeroSlide({ image: '', title: '', subtitle: '', order: 1, active: true })
-            setEditingSlide(null)
-        }
-    }
-
-    const handleEditSlide = (slide: HeroSlide) => {
-        setEditingSlide(slide)
-        setNewHeroSlide(slide)
-    }
-
-    const handleCancelEdit = () => {
-        setEditingSlide(null)
-        setNewHeroSlide({ image: '', title: '', subtitle: '', order: 1, active: true })
-    }
-
     const handleAddEquipment = async () => {
         if (!newEquipment.name) return
         const res = await fetch('/api/admin/equipment', {
@@ -291,7 +240,7 @@ export default function AdminDashboard() {
                 if (type === 'services') setServices(services.filter(i => i.id !== id))
                 if (type === 'testimonials') setTestimonials(testimonials.filter(i => i.id !== id))
                 if (type === 'gallery') setGallery(gallery.filter(i => i.id !== id))
-                if (type === 'hero-slides') setHeroSlides(heroSlides.filter(i => i.id !== id))
+                if (type === 'gallery') setGallery(gallery.filter(i => i.id !== id))
                 if (type === 'equipment') {
                     const updatedEquipment = data.equipment.filter((i: Equipment) => i.id !== id)
                     setData({ ...data, equipment: updatedEquipment })
@@ -319,10 +268,8 @@ export default function AdminDashboard() {
         <div className="min-h-screen bg-muted/30 p-8">
             <div className="mx-auto max-w-7xl space-y-8">
                 {/* ... (existing code) */}
-                <Tabs defaultValue="hero" className="space-y-4">
-                    <TabsList className="grid w-full grid-cols-9">
-                        <TabsTrigger value="hero">Hero</TabsTrigger>
-                        <TabsTrigger value="carousel">Carrousel</TabsTrigger>
+                <Tabs defaultValue="contact" className="space-y-4">
+                    <TabsList className="w-full justify-start overflow-x-auto flex-nowrap">
                         <TabsTrigger value="contact">Contact</TabsTrigger>
                         <TabsTrigger value="social">Réseaux</TabsTrigger>
                         <TabsTrigger value="services">Services</TabsTrigger>
@@ -332,123 +279,8 @@ export default function AdminDashboard() {
                         <TabsTrigger value="testimonials">Avis</TabsTrigger>
                     </TabsList>
 
-                    {/* Hero Tab */}
-                    <TabsContent value="hero">
-                        <Card>
-                            <CardHeader><CardTitle>Hero Section</CardTitle></CardHeader>
-                            <CardContent className="space-y-4">
-                                <div className="space-y-2">
-                                    <Label>Titre Principal</Label>
-                                    <Input value={data.hero.title} onChange={(e) => setData({ ...data, hero: { ...data.hero, title: e.target.value } })} />
-                                </div>
-                                <div className="space-y-2">
-                                    <Label>Sous-titre</Label>
-                                    <Textarea value={data.hero.subtitle} onChange={(e) => setData({ ...data, hero: { ...data.hero, subtitle: e.target.value } })} />
-                                </div>
-                                <div className="space-y-2">
-                                    <Label>Nombre de Patients</Label>
-                                    <Input value={data.hero.stats.patients} onChange={(e) => setData({ ...data, hero: { ...data.hero, stats: { patients: e.target.value } } })} />
-                                </div>
-                            </CardContent>
-                        </Card>
-                    </TabsContent>
-
-                    {/* Hero Carousel Tab */}
-                    <TabsContent value="carousel">
-                        <div className="space-y-4">
-                            <Card>
-                                <CardHeader>
-                                    <CardTitle>{editingSlide ? 'Modifier la Slide' : 'Ajouter une Slide'}</CardTitle>
-                                </CardHeader>
-                                <CardContent className="space-y-4">
-                                    <div className="space-y-2">
-                                        <Label>Image</Label>
-                                        <Input type="file" onChange={async (e) => {
-                                            const file = e.target.files?.[0]
-                                            if (file) {
-                                                const url = await handleFileUpload(file, 'hero')
-                                                if (url) setNewHeroSlide({ ...newHeroSlide, image: url })
-                                            }
-                                        }} />
-                                        {uploading && <p className="text-sm text-muted-foreground">Upload en cours...</p>}
-                                    </div>
-                                    <div className="space-y-2">
-                                        <Label>Titre</Label>
-                                        <Input value={newHeroSlide.title} onChange={(e) => setNewHeroSlide({ ...newHeroSlide, title: e.target.value })} />
-                                    </div>
-                                    <div className="space-y-2">
-                                        <Label>Sous-titre</Label>
-                                        <Textarea value={newHeroSlide.subtitle} onChange={(e) => setNewHeroSlide({ ...newHeroSlide, subtitle: e.target.value })} />
-                                    </div>
-                                    <div className="grid grid-cols-2 gap-4">
-                                        <div className="space-y-2">
-                                            <Label>Ordre</Label>
-                                            <Input type="number" value={newHeroSlide.order} onChange={(e) => setNewHeroSlide({ ...newHeroSlide, order: parseInt(e.target.value) })} />
-                                        </div>
-                                        <div className="flex items-center space-x-2 pt-8">
-                                            <input
-                                                type="checkbox"
-                                                id="slideActive"
-                                                checked={newHeroSlide.active}
-                                                onChange={(e) => setNewHeroSlide({ ...newHeroSlide, active: e.target.checked })}
-                                                className="h-4 w-4"
-                                            />
-                                            <Label htmlFor="slideActive">Active</Label>
-                                        </div>
-                                    </div>
-                                    <div className="flex gap-2">
-                                        <Button onClick={handleAddHeroSlide}>
-                                            {editingSlide ? <Save className="mr-2 h-4 w-4" /> : <Plus className="mr-2 h-4 w-4" />}
-                                            {editingSlide ? 'Modifier Slide' : 'Ajouter Slide'}
-                                        </Button>
-                                        {editingSlide && (
-                                            <Button variant="outline" onClick={handleCancelEdit}>
-                                                Annuler
-                                            </Button>
-                                        )}
-                                    </div>
-                                </CardContent>
-                            </Card>
-                            <div className="grid grid-cols-2 gap-4">
-                                {heroSlides.map((slide) => (
-                                    <div key={slide.id} className="relative group border rounded-lg overflow-hidden">
-                                        <img src={slide.image} alt={slide.title} className="w-full h-48 object-cover" />
-                                        <div className="absolute top-2 right-2 flex gap-2">
-                                            <Button
-                                                variant="secondary"
-                                                size="sm"
-                                                onClick={() => handleEditSlide(slide)}
-                                                className="shadow-lg"
-                                            >
-                                                <ImageIcon className="h-4 w-4" />
-                                            </Button>
-                                            <Button
-                                                variant="destructive"
-                                                size="sm"
-                                                onClick={() => handleDelete('hero-slides', slide.id)}
-                                                className="shadow-lg"
-                                            >
-                                                <Trash2 className="h-4 w-4" />
-                                            </Button>
-                                        </div>
-                                        <div className="p-3 bg-white">
-                                            <h3 className="font-bold truncate">{slide.title}</h3>
-                                            <p className="text-sm text-muted-foreground truncate">{slide.subtitle}</p>
-                                            <div className="flex gap-2 mt-2">
-                                                <span className="text-xs bg-muted px-2 py-1 rounded">Ordre: {slide.order}</span>
-                                                <span className={`text-xs px-2 py-1 rounded ${slide.active ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-700'}`}>
-                                                    {slide.active ? 'Active' : 'Inactive'}
-                                                </span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
-                    </TabsContent>
-
                     {/* Contact Tab */}
-                    < TabsContent value="contact" >
+                    <TabsContent value="contact">
                         <Card>
                             <CardHeader><CardTitle>Informations de Contact</CardTitle></CardHeader>
                             <CardContent className="space-y-4">
@@ -464,7 +296,7 @@ export default function AdminDashboard() {
                                     <Label>Adresse</Label>
                                     <Input value={data.contact.address} onChange={(e) => setData({ ...data, contact: { ...data.contact, address: e.target.value } })} />
                                 </div>
-                                <div className="grid grid-cols-2 gap-4">
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     <div className="space-y-2">
                                         <Label>Latitude GPS</Label>
                                         <Input
@@ -506,7 +338,7 @@ export default function AdminDashboard() {
                                 </div>
                             </CardContent>
                         </Card>
-                    </TabsContent >
+                    </TabsContent>
 
                     {/* Social Tab */}
                     < TabsContent value="social" >
@@ -751,65 +583,45 @@ export default function AdminDashboard() {
                     </TabsContent >
 
                     {/* Gallery Tab */}
-                    < TabsContent value="gallery" >
+                    <TabsContent value="gallery">
                         <div className="space-y-4">
                             <Card>
-                                <CardHeader><CardTitle>Ajouter une Image</CardTitle></CardHeader>
-                                <CardContent className="space-y-4">
-                                    <div className="space-y-2">
-                                        <Label>Image</Label>
-                                        <Input type="file" onChange={async (e) => {
-                                            const file = e.target.files?.[0]
-                                            if (file) {
-                                                const url = await handleFileUpload(file, 'gallery')
-                                                if (url) setNewGalleryImage({ ...newGalleryImage, image: url })
-                                            }
-                                        }} />
+                                <CardHeader><CardTitle>Gestion de la Galerie</CardTitle></CardHeader>
+                                <CardContent>
+                                    <div className="bg-blue-50 text-blue-800 p-4 rounded-md mb-6">
+                                        <p className="font-semibold flex items-center gap-2">
+                                            ℹ️ Mode Fichier Statique
+                                        </p>
+                                        <p className="mt-2 text-sm">
+                                            La galerie est gérée via le fichier de configuration <code>data/gallery.ts</code>.
+                                            Pour ajouter ou supprimer des images :
+                                        </p>
+                                        <ol className="list-decimal list-inside mt-2 text-sm space-y-1 ml-2">
+                                            <li>Ajoutez vos images dans le dossier <code>public/images/gallery/</code></li>
+                                            <li>Éditez le fichier <code>data/gallery.ts</code> pour référencer ces images</li>
+                                            <li>Pushez vos modifications sur Git</li>
+                                        </ol>
+                                        <p className="mt-2 text-sm">
+                                            Voir <code>data/README-GALLERY.md</code> pour plus de détails.
+                                        </p>
                                     </div>
-                                    <div className="space-y-2">
-                                        <Label>Catégorie</Label>
-                                        <select
-                                            value={newGalleryImage.category}
-                                            onChange={(e) => setNewGalleryImage({ ...newGalleryImage, category: e.target.value })}
-                                            className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-                                        >
-                                            <option value="exterior">🏢 Extérieur</option>
-                                            <option value="interior">🏥 Intérieur</option>
-                                            <option value="equipment">🔬 Équipement</option>
-                                            <option value="team">👥 Équipe</option>
-                                            <option value="other">📷 Autre</option>
-                                        </select>
-                                    </div>
-                                    <div className="space-y-2">
-                                        <Label>Légende</Label>
-                                        <Input value={newGalleryImage.caption} onChange={(e) => setNewGalleryImage({ ...newGalleryImage, caption: e.target.value })} />
-                                    </div>
-                                    <Button onClick={handleAddGalleryImage}><Plus className="mr-2 h-4 w-4" /> Ajouter Image</Button>
                                 </CardContent>
                             </Card>
-                            <div className="grid grid-cols-3 gap-4">
+                            <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                                 {gallery.map((img) => (
                                     <div key={img.id} className="relative group border rounded-lg overflow-hidden">
                                         <img src={img.image} alt={img.caption} className="w-full h-48 object-cover" />
-                                        <div className="absolute top-2 right-2">
-                                            <Button
-                                                variant="destructive"
-                                                size="sm"
-                                                onClick={() => handleDelete('gallery', img.id)}
-                                                className="shadow-lg"
-                                            >
-                                                <Trash2 className="h-4 w-4" />
-                                            </Button>
-                                        </div>
-                                        <div className="p-2 bg-white">
-                                            <p className="text-sm truncate">{img.caption}</p>
-                                            <p className="text-xs text-muted-foreground">{img.category}</p>
+                                        <div className="p-3 bg-white">
+                                            <p className="font-medium truncate">{img.caption}</p>
+                                            <span className="text-xs bg-muted px-2 py-1 rounded mt-1 inline-block">
+                                                {img.category}
+                                            </span>
                                         </div>
                                     </div>
                                 ))}
                             </div>
                         </div>
-                    </TabsContent >
+                    </TabsContent>
 
                     {/* Testimonials Tab */}
                     < TabsContent value="testimonials" >
