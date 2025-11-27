@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { motion } from 'framer-motion'
 import { useState, useEffect } from 'react'
 import { type ClinicData } from '@/lib/admin-data'
-import { Facebook, Instagram, Linkedin, Mail, MapPin, Phone, ArrowRight, HeartPulse } from 'lucide-react'
+import { Facebook, Instagram, Mail, MapPin, Phone, ArrowRight, HeartPulse } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 
 import { siteConfig } from '@/data/site-config'
@@ -103,16 +103,24 @@ export default function Footer() {
               {t('brandDescription')}
             </p>
             <div className='flex gap-3'>
-              {[Facebook, Instagram, Linkedin].map((Icon, i) => (
-                <motion.a
-                  key={i}
-                  href="#"
-                  whileHover={{ y: -3, backgroundColor: 'rgba(59, 130, 246, 0.2)' }}
-                  className='bg-white/5 p-2.5 rounded-full text-slate-400 hover:text-primary transition-colors border border-white/5'
-                >
-                  <Icon size={18} />
-                </motion.a>
-              ))}
+              <motion.a
+                href={clinicData?.social?.facebook || '#'}
+                target="_blank"
+                rel="noopener noreferrer"
+                whileHover={{ y: -3, backgroundColor: 'rgba(59, 130, 246, 0.2)' }}
+                className='bg-white/5 p-2.5 rounded-full text-slate-400 hover:text-primary transition-colors border border-white/5'
+              >
+                <Facebook size={18} />
+              </motion.a>
+              <motion.a
+                href={clinicData?.social?.instagram || '#'}
+                target="_blank"
+                rel="noopener noreferrer"
+                whileHover={{ y: -3, backgroundColor: 'rgba(59, 130, 246, 0.2)' }}
+                className='bg-white/5 p-2.5 rounded-full text-slate-400 hover:text-primary transition-colors border border-white/5'
+              >
+                <Instagram size={18} />
+              </motion.a>
             </div>
           </motion.div>
 
