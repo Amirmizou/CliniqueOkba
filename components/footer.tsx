@@ -7,18 +7,22 @@ import { type ClinicData } from '@/lib/admin-data'
 import { Facebook, Instagram, Linkedin, Mail, MapPin, Phone, ArrowRight, HeartPulse } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 
+import { siteConfig } from '@/data/site-config'
+
 export default function Footer() {
   const t = useTranslations('footer')
   const tNav = useTranslations('nav')
-  const [clinicData, setClinicData] = useState<ClinicData | null>(null)
+  // Initialize with siteConfig directly for instant rendering
+  const [clinicData, setClinicData] = useState<any>(siteConfig)
 
   useEffect(() => {
+    // Optional: fetch for dynamic updates if we still support them
     const load = async () => {
       try {
         const res = await fetch('/api/admin/clinic', { cache: 'no-store' })
         if (res.ok) {
-          const data: ClinicData = await res.json()
-          setClinicData(data)
+          const data = await res.json()
+          setClinicData(prev => ({ ...prev, ...data }))
         }
       } catch { }
     }

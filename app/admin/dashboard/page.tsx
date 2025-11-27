@@ -66,7 +66,6 @@ export default function AdminDashboard() {
     const [services, setServices] = useState<Service[]>([])
     const [testimonials, setTestimonials] = useState<Testimonial[]>([])
     const [loading, setLoading] = useState(true)
-    const [saving, setSaving] = useState(false)
     const [uploading, setUploading] = useState(false)
 
     // Forms state
@@ -114,24 +113,6 @@ export default function AdminDashboard() {
             })
         }
     }, [router, status])
-
-    const handleSave = async () => {
-        if (!data) return
-        setSaving(true)
-        try {
-            const res = await fetch('/api/admin/clinic', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(data),
-            })
-            if (res.ok) alert('Modifications enregistrées !')
-            else alert('Erreur lors de l\'enregistrement')
-        } catch (error) {
-            alert('Erreur lors de l\'enregistrement')
-        } finally {
-            setSaving(false)
-        }
-    }
 
     const handleFileUpload = async (file: File, category: string = 'general') => {
         setUploading(true)
@@ -267,7 +248,32 @@ export default function AdminDashboard() {
     return (
         <div className="min-h-screen bg-muted/30 p-8">
             <div className="mx-auto max-w-7xl space-y-8">
-                {/* ... (existing code) */}
+                <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                    <div>
+                        <h1 className="text-3xl font-bold tracking-tight">Administration</h1>
+                        <p className="text-muted-foreground">Gérez le contenu de votre site web.</p>
+                    </div>
+                    <div className="flex gap-2">
+                        <Button variant="outline" onClick={() => window.open('/', '_blank')}>
+                            Voir le site
+                        </Button>
+                        <Button variant="destructive" onClick={handleLogout}>
+                            <LogOut className="mr-2 h-4 w-4" /> Déconnexion
+                        </Button>
+                    </div>
+                </div>
+
+                <div className="bg-yellow-50 border border-yellow-200 text-yellow-800 p-4 rounded-lg flex items-start gap-3">
+                    <div className="mt-1">⚠️</div>
+                    <div>
+                        <h3 className="font-semibold">Mode Configuration Statique</h3>
+                        <p className="text-sm mt-1">
+                            Pour garantir la stabilité et la performance, certaines sections (Contact, Réseaux, Galerie, Slides) sont gérées via des fichiers de configuration.
+                            Les modifications doivent être faites directement dans le code source (dossier <code>data/</code>) et redéployées.
+                        </p>
+                    </div>
+                </div>
+
                 <Tabs defaultValue="contact" className="space-y-4">
                     <TabsList className="w-full justify-start overflow-x-auto flex-nowrap">
                         <TabsTrigger value="contact">Contact</TabsTrigger>
@@ -284,82 +290,62 @@ export default function AdminDashboard() {
                         <Card>
                             <CardHeader><CardTitle>Informations de Contact</CardTitle></CardHeader>
                             <CardContent className="space-y-4">
+                                <div className="bg-blue-50 text-blue-800 p-4 rounded-md mb-4">
+                                    <p className="text-sm">
+                                        Ces informations sont configurées dans <code>data/site-config.ts</code>.
+                                    </p>
+                                </div>
                                 <div className="space-y-2">
                                     <Label>Email</Label>
-                                    <Input value={data.contact.email} onChange={(e) => setData({ ...data, contact: { ...data.contact, email: e.target.value } })} />
+                                    <Input value={data.contact.email} disabled />
                                 </div>
                                 <div className="space-y-2">
                                     <Label>Téléphone</Label>
-                                    <Input value={data.contact.phone} onChange={(e) => setData({ ...data, contact: { ...data.contact, phone: e.target.value } })} />
+                                    <Input value={data.contact.phone} disabled />
                                 </div>
                                 <div className="space-y-2">
                                     <Label>Adresse</Label>
-                                    <Input value={data.contact.address} onChange={(e) => setData({ ...data, contact: { ...data.contact, address: e.target.value } })} />
+                                    <Input value={data.contact.address} disabled />
                                 </div>
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     <div className="space-y-2">
                                         <Label>Latitude GPS</Label>
-                                        <Input
-                                            type="number"
-                                            step="0.000001"
-                                            value={data.coordinates?.lat || ''}
-                                            onChange={(e) => setData({
-                                                ...data,
-                                                coordinates: {
-                                                    ...data.coordinates,
-                                                    lat: parseFloat(e.target.value) || 0
-                                                }
-                                            })}
-                                            placeholder="Ex: 36.3"
-                                        />
+                                        <Input value={data.coordinates?.lat} disabled />
                                     </div>
                                     <div className="space-y-2">
                                         <Label>Longitude GPS</Label>
-                                        <Input
-                                            type="number"
-                                            step="0.000001"
-                                            value={data.coordinates?.lng || ''}
-                                            onChange={(e) => setData({
-                                                ...data,
-                                                coordinates: {
-                                                    ...data.coordinates,
-                                                    lng: parseFloat(e.target.value) || 0
-                                                }
-                                            })}
-                                            placeholder="Ex: 6.6"
-                                        />
+                                        <Input value={data.coordinates?.lng} disabled />
                                     </div>
-                                </div>
-                                <div className="p-3 bg-muted/50 rounded-lg">
-                                    <p className="text-sm text-muted-foreground">
-                                        💡 <strong>Astuce :</strong> Pour trouver les coordonnées GPS, allez sur Google Maps,
-                                        faites un clic droit sur l'emplacement de la clinique et cliquez sur les coordonnées pour les copier.
-                                    </p>
                                 </div>
                             </CardContent>
                         </Card>
                     </TabsContent>
 
                     {/* Social Tab */}
-                    < TabsContent value="social" >
+                    <TabsContent value="social">
                         <Card>
                             <CardHeader><CardTitle>Réseaux Sociaux</CardTitle></CardHeader>
                             <CardContent className="space-y-4">
+                                <div className="bg-blue-50 text-blue-800 p-4 rounded-md mb-4">
+                                    <p className="text-sm">
+                                        Ces informations sont configurées dans <code>data/site-config.ts</code>.
+                                    </p>
+                                </div>
                                 <div className="space-y-2">
                                     <Label>Facebook</Label>
-                                    <Input value={data.social.facebook} onChange={(e) => setData({ ...data, social: { ...data.social, facebook: e.target.value } })} />
+                                    <Input value={data.social.facebook} disabled />
                                 </div>
                                 <div className="space-y-2">
                                     <Label>Instagram</Label>
-                                    <Input value={data.social.instagram} onChange={(e) => setData({ ...data, social: { ...data.social, instagram: e.target.value } })} />
+                                    <Input value={data.social.instagram} disabled />
                                 </div>
                                 <div className="space-y-2">
                                     <Label>LinkedIn</Label>
-                                    <Input value={data.social.linkedin} onChange={(e) => setData({ ...data, social: { ...data.social, linkedin: e.target.value } })} />
+                                    <Input value={data.social.linkedin} disabled />
                                 </div>
                             </CardContent>
                         </Card>
-                    </TabsContent >
+                    </TabsContent>
 
                     {/* Services Tab */}
                     < TabsContent value="services" >

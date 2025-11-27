@@ -1,31 +1,37 @@
 import { NextResponse } from 'next/server'
 import fs from 'fs/promises'
 import path from 'path'
-import { revalidatePath } from 'next/cache'
-import { ClinicData } from '@/lib/admin-data'
+import { siteConfig } from '@/data/site-config'
 
 const dataPath = path.join(process.cwd(), 'data', 'clinic.json')
 
 export async function GET() {
     try {
-        const fileContent = await fs.readFile(dataPath, 'utf-8')
-        const data: ClinicData = JSON.parse(fileContent)
+        // On essaie de lire les anciennes données pour les parties non migrées (services, articles...)
+        let legacyData = {}
+        try {
+            const fileContent = await fs.readFile(dataPath, 'utf-8')
+            legacyData = JSON.parse(fileContent)
+        } catch (e) {
+            console.warn('Could not read legacy clinic.json', e)
+        }
+
+        // On fusionne avec la config statique qui est prioritaire pour Contact/Social/Hero
+        const data = {
+            ...legacyData,
+            contact: siteConfig.contact,
+            social: siteConfig.social,
+            // Hero est géré ailleurs maintenant
+        }
+
         return NextResponse.json(data)
     } catch (error) {
         return NextResponse.json({ error: 'Failed to load data' }, { status: 500 })
     }
 }
 
-export async function POST(request: Request) {
-    try {
-        const newData: ClinicData = await request.json()
-        await fs.writeFile(dataPath, JSON.stringify(newData, null, 2), 'utf-8')
-
-        // Revalidate all pages that use clinic data
-        revalidatePath('/', 'layout')
-
-        return NextResponse.json({ success: true, data: newData })
-    } catch (error) {
-        return NextResponse.json({ error: 'Failed to save data' }, { status: 500 })
-    }
+export async function POST() {
+    return NextResponse.json({
+        error: 'La configuration est maintenant statique. Modifiez les fichiers dans data/.'
+    }, { status: 405 })
 }
