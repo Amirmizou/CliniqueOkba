@@ -1,66 +1,65 @@
 import { NextResponse } from 'next/server'
-import fs from 'fs/promises'
-import path from 'path'
+import { prisma } from '@/lib/prisma'
 import { revalidateAllPages } from '@/lib/revalidate'
-
-const dataPath = path.join(process.cwd(), 'data', 'clinic.json')
 
 export async function GET() {
     try {
-        const fileContent = await fs.readFile(dataPath, 'utf-8')
-        const data = JSON.parse(fileContent)
-        return NextResponse.json(data.heroSlides || [])
+        const slides = await prisma.heroSlide.findMany({
+            orderBy: { order: 'asc' }
+        })
+        return NextResponse.json(slides)
     } catch (error) {
+        console.error('Failed to fetch slides:', error)
         return NextResponse.json({ error: 'Failed to load hero slides' }, { status: 500 })
     }
 }
 
 export async function POST(request: Request) {
     try {
-        const fileContent = await fs.readFile(dataPath, 'utf-8')
-        const data = JSON.parse(fileContent)
-        const newSlide = await request.json()
+        const data = await request.json()
 
-        // Generate ID if not provided
-        if (!newSlide.id) {
-            const maxId = data.heroSlides?.reduce((max: number, slide: any) =>
-                Math.max(max, parseInt(slide.id) || 0), 0) || 0
-            newSlide.id = String(maxId + 1)
-        }
+        // Get max order
+        const lastSlide = await prisma.heroSlide.findFirst({
+            orderBy: { order: 'desc' }
+        })
+        const newOrder = (lastSlide?.order ?? 0) + 1
 
-        // Set order if not provided
-        if (!newSlide.order) {
-            const maxOrder = data.heroSlides?.reduce((max: number, slide: any) =>
-                Math.max(max, slide.order || 0), 0) || 0
-            newSlide.order = maxOrder + 1
-        }
+        const newSlide = await prisma.heroSlide.create({
+            data: {
+                image: data.image,
+                title: data.title,
+                subtitle: data.subtitle || '',
+                order: newOrder,
+                active: data.active ?? true
+            }
+        })
 
-        data.heroSlides = data.heroSlides || []
-        data.heroSlides.push(newSlide)
-
-        await fs.writeFile(dataPath, JSON.stringify(data, null, 2), 'utf-8')
         revalidateAllPages()
         return NextResponse.json({ success: true, slide: newSlide })
     } catch (error) {
+        console.error('Failed to create slide:', error)
         return NextResponse.json({ error: 'Failed to add slide' }, { status: 500 })
     }
 }
 
 export async function PUT(request: Request) {
     try {
-        const fileContent = await fs.readFile(dataPath, 'utf-8')
-        const data = JSON.parse(fileContent)
-        const updatedSlide = await request.json()
+        const data = await request.json()
+        const { id, ...updateData } = data
 
-        const index = data.heroSlides?.findIndex((slide: any) => slide.id === updatedSlide.id)
-        if (index === -1) {
-            return NextResponse.json({ error: 'Slide not found' }, { status: 404 })
+        if (!id) {
+            return NextResponse.json({ error: 'Slide ID required' }, { status: 400 })
         }
 
-        data.heroSlides[index] = updatedSlide
-        await fs.writeFile(dataPath, JSON.stringify(data, null, 2), 'utf-8')
+        const updatedSlide = await prisma.heroSlide.update({
+            where: { id },
+            data: updateData
+        })
+
+        revalidateAllPages()
         return NextResponse.json({ success: true, slide: updatedSlide })
     } catch (error) {
+        console.error('Failed to update slide:', error)
         return NextResponse.json({ error: 'Failed to update slide' }, { status: 500 })
     }
 }
@@ -74,14 +73,14 @@ export async function DELETE(request: Request) {
             return NextResponse.json({ error: 'Slide ID required' }, { status: 400 })
         }
 
-        const fileContent = await fs.readFile(dataPath, 'utf-8')
-        const data = JSON.parse(fileContent)
+        await prisma.heroSlide.delete({
+            where: { id }
+        })
 
-        data.heroSlides = data.heroSlides?.filter((slide: any) => slide.id !== id) || []
-
-        await fs.writeFile(dataPath, JSON.stringify(data, null, 2), 'utf-8')
+        revalidateAllPages()
         return NextResponse.json({ success: true })
     } catch (error) {
+        console.error('Failed to delete slide:', error)
         return NextResponse.json({ error: 'Failed to delete slide' }, { status: 500 })
     }
 }
