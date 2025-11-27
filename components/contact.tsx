@@ -18,6 +18,7 @@ import {
 import { type ClinicData } from '@/lib/admin-data'
 import Map from '@/components/map'
 import clinicData from '@/data/clinic.json'
+import { siteConfig } from '@/data/site-config'
 
 export default function Contact() {
   const [formData, setFormData] = useState({
@@ -287,7 +288,7 @@ export default function Contact() {
               <p className='text-foreground mb-4 font-semibold'>Suivez-nous</p>
               <div className='flex gap-4'>
                 <a
-                  href={clinicData.socialMedia.facebook}
+                  href={siteConfig.social.facebook}
                   target='_blank'
                   rel='noopener noreferrer'
                   className='bg-primary/10 hover:bg-primary/20 flex h-10 w-10 items-center justify-center rounded-lg transition-colors'
@@ -295,7 +296,7 @@ export default function Contact() {
                   <span className='text-primary font-bold'>f</span>
                 </a>
                 <a
-                  href={clinicData.socialMedia.instagram}
+                  href={siteConfig.social.instagram}
                   target='_blank'
                   rel='noopener noreferrer'
                   className='bg-primary/10 hover:bg-primary/20 flex h-10 w-10 items-center justify-center rounded-lg transition-colors'

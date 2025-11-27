@@ -339,10 +339,6 @@ export default function AdminDashboard() {
                                     <Label>Instagram</Label>
                                     <Input value={data.social.instagram} disabled />
                                 </div>
-                                <div className="space-y-2">
-                                    <Label>LinkedIn</Label>
-                                    <Input value={data.social.linkedin} disabled />
-                                </div>
                             </CardContent>
                         </Card>
                     </TabsContent>
