@@ -22,7 +22,7 @@ export default function Footer() {
         const res = await fetch('/api/admin/clinic', { cache: 'no-store' })
         if (res.ok) {
           const data = await res.json()
-          setClinicData(prev => ({ ...prev, ...data }))
+          setClinicData((prev: any) => ({ ...prev, ...data }))
         }
       } catch { }
     }
