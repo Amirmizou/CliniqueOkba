@@ -44,17 +44,17 @@
   "equipment": [
     {
       "id": "1",
-      "name": "Scanner CT",
+      "name": "Scanner Somatom go.Top",
       "brand": "Siemens Healthineers",
-      "model": "SOMATOM",
+      "model": "Somatom go.Top",
       "category": "imaging",
-      "description": "Tomodensitométrie de dernière génération pour des diagnostics précis et rapides",
+      "description": "Scanner de dernière génération offrant une vitesse et une qualité d'image exceptionnelles pour tous les patients.",
       "icon": "Scan",
       "image": "/imageries/scannerCT.png",
       "features": [
-        "Haute résolution",
+        "Personnalisation en temps réel",
         "Faible dose de radiation",
-        "Acquisition rapide"
+        "Confort patient optimal"
       ]
     },
     {
@@ -76,15 +76,15 @@
       "id": "3",
       "name": "Radiologie Numérique",
       "brand": "Siemens Healthineers",
-      "model": "MULTIX",
+      "model": "Multix Impact C",
       "category": "imaging",
-      "description": "Système de radiologie numérique avancé",
+      "description": "Système de radiologie numérique au sol polyvalent et intuitif.",
       "icon": "Activity",
-      "image": "/imageries/siemens-healthineers_MULTIX_Impact_C-hero.webp",
+      "image": "/uploads/equipment/radiologie_telecommandee_siemens.png",
       "features": [
-        "Images numériques instantanées",
-        "Dose optimisée",
-        "Qualité supérieure"
+        "Interface tactile intuitive",
+        "Positionnement motorisé",
+        "Images haute résolution"
       ]
     },
     {
@@ -164,17 +164,17 @@
     },
     {
       "id": "9",
-      "name": "PET Scan",
+      "name": "Scanner SPECT-CT",
       "brand": "Siemens Healthineers",
-      "model": "Biograph Vision",
+      "model": "Symbia Pro.specta",
       "category": "imaging",
-      "description": "Tomographie par émission de positons pour une détection précise des lésions",
+      "description": "Système hybride avancé combinant TEMP et TDM pour une imagerie moléculaire de précision.",
       "icon": "Scan",
       "image": "/uploads/equipment/1764187632265-tlchargement.jpeg",
       "features": [
-        "Détection précoce",
-        "Haute sensibilité",
-        "Images fusionnées TEP/TDM"
+        "Imagerie TEMP/TDM intégrée",
+        "Correction d'atténuation",
+        "Flux de travail automatisé"
       ]
     }
   ],
