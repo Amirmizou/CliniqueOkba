@@ -3,9 +3,16 @@ import clinicData from '@/data/clinic.json'
 import ScrollAnimation from '@/components/ui/scroll-animation'
 import StaggerContainer from '@/components/ui/stagger-container'
 import { useTranslations } from 'next-intl'
+import { Check, Award, Users, Clock } from 'lucide-react'
 
 export default function About() {
   const t = useTranslations('about')
+
+  const stats = [
+    { value: '24/7', label: 'Urgences disponibles', icon: Clock },
+    { value: '30+', label: 'Médecins spécialistes', icon: Users },
+    { value: '11', label: 'Spécialités médicales', icon: Award },
+  ]
 
   return (
     <section id='about' className='bg-card py-12 sm:py-16 md:py-20'>
@@ -46,8 +53,8 @@ export default function About() {
             <StaggerContainer className='space-y-4' delayChildren={0.2}>
               <ScrollAnimation variant="fadeUp" as="div" className='flex gap-4'>
                 <div className='flex-shrink-0'>
-                  <div className='bg-primary/10 flex h-12 w-12 items-center justify-center rounded-lg'>
-                    <span className='text-primary font-bold'>✓</span>
+                  <div className='bg-primary/10 flex h-12 w-12 items-center justify-center rounded-xl'>
+                    <Check className='text-primary h-6 w-6 stroke-[3]' />
                   </div>
                 </div>
                 <div>
@@ -62,8 +69,8 @@ export default function About() {
 
               <ScrollAnimation variant="fadeUp" as="div" className='flex gap-4'>
                 <div className='flex-shrink-0'>
-                  <div className='bg-primary/10 flex h-12 w-12 items-center justify-center rounded-lg'>
-                    <span className='text-primary font-bold'>✓</span>
+                  <div className='bg-primary/10 flex h-12 w-12 items-center justify-center rounded-xl'>
+                    <Check className='text-primary h-6 w-6 stroke-[3]' />
                   </div>
                 </div>
                 <div>
@@ -78,8 +85,8 @@ export default function About() {
 
               <ScrollAnimation variant="fadeUp" as="div" className='flex gap-4'>
                 <div className='flex-shrink-0'>
-                  <div className='bg-primary/10 flex h-12 w-12 items-center justify-center rounded-lg'>
-                    <span className='text-primary font-bold'>✓</span>
+                  <div className='bg-primary/10 flex h-12 w-12 items-center justify-center rounded-xl'>
+                    <Check className='text-primary h-6 w-6 stroke-[3]' />
                   </div>
                 </div>
                 <div>
@@ -94,7 +101,32 @@ export default function About() {
             </StaggerContainer>
           </div>
         </div>
+
+        {/* Stats Section */}
+        <ScrollAnimation variant="fadeUp" className="mt-16">
+          <div className="grid grid-cols-3 gap-4 sm:gap-6 p-6 sm:p-8 bg-gradient-to-br from-primary/5 via-background to-secondary/5 rounded-2xl border border-border/50">
+            {stats.map((stat, index) => {
+              const Icon = stat.icon
+              return (
+                <div key={index} className="text-center group">
+                  <div className="flex justify-center mb-3">
+                    <div className="p-2 sm:p-3 rounded-xl bg-primary/10 group-hover:bg-primary/20 transition-colors">
+                      <Icon className="w-5 h-5 sm:w-6 sm:h-6 text-primary" />
+                    </div>
+                  </div>
+                  <p className="text-2xl sm:text-3xl md:text-4xl font-bold text-primary mb-1">
+                    {stat.value}
+                  </p>
+                  <p className="text-xs sm:text-sm text-muted-foreground">
+                    {stat.label}
+                  </p>
+                </div>
+              )
+            })}
+          </div>
+        </ScrollAnimation>
       </div>
     </section>
   )
 }
+

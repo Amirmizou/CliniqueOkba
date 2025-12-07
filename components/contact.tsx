@@ -14,6 +14,8 @@ import {
   CheckCircle,
   AlertCircle,
   Send,
+  Facebook,
+  Instagram,
 } from 'lucide-react'
 import { type ClinicData } from '@/lib/admin-data'
 import Map from '@/components/map'
@@ -265,10 +267,10 @@ export default function Contact() {
                 <div>
                   <h3 className='text-foreground font-semibold'>Horaires</h3>
                   <p className='text-muted-foreground mt-1'>
-                    Sam - jeudi: {clinicData.hours.weekdays}
+                    Dim - Jeu: {clinicData.hours.weekdays}
                   </p>
                   <p className='text-muted-foreground text-sm'>
-                    Samedi: {clinicData.hours.saturday}
+                    Vendredi: {clinicData.hours.saturday}
                   </p>
                 </div>
               </div>
@@ -286,22 +288,22 @@ export default function Contact() {
             {/* Social Links */}
             <div className='border-border border-t pt-8'>
               <p className='text-foreground mb-4 font-semibold'>Suivez-nous</p>
-              <div className='flex gap-4'>
+              <div className='flex gap-3'>
                 <a
                   href={siteConfig.social.facebook}
                   target='_blank'
                   rel='noopener noreferrer'
-                  className='bg-primary/10 hover:bg-primary/20 flex h-10 w-10 items-center justify-center rounded-lg transition-colors'
+                  className='group bg-blue-600 hover:bg-blue-700 flex h-11 w-11 items-center justify-center rounded-xl transition-all duration-300 hover:scale-110 hover:shadow-lg hover:shadow-blue-600/30'
                 >
-                  <span className='text-primary font-bold'>f</span>
+                  <Facebook className='w-5 h-5 text-white' />
                 </a>
                 <a
                   href={siteConfig.social.instagram}
                   target='_blank'
                   rel='noopener noreferrer'
-                  className='bg-primary/10 hover:bg-primary/20 flex h-10 w-10 items-center justify-center rounded-lg transition-colors'
+                  className='group bg-gradient-to-br from-purple-600 via-pink-500 to-orange-400 hover:from-purple-700 hover:via-pink-600 hover:to-orange-500 flex h-11 w-11 items-center justify-center rounded-xl transition-all duration-300 hover:scale-110 hover:shadow-lg hover:shadow-pink-500/30'
                 >
-                  <span className='text-primary font-bold'>📷</span>
+                  <Instagram className='w-5 h-5 text-white' />
                 </a>
               </div>
             </div>

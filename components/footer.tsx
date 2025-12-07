@@ -60,8 +60,8 @@ export default function Footer() {
         </svg>
       </div>
 
-      {/* Animated Background Elements */}
-      <div className='absolute inset-0 pointer-events-none overflow-hidden'>
+      {/* Animated Background Elements - Hidden on mobile for performance */}
+      <div className='absolute inset-0 pointer-events-none overflow-hidden hidden md:block'>
         <motion.div
           animate={{ scale: [1, 1.2, 1], opacity: [0.1, 0.2, 0.1] }}
           transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
@@ -72,6 +72,11 @@ export default function Footer() {
           transition={{ duration: 15, repeat: Infinity, ease: "easeInOut", delay: 2 }}
           className='absolute bottom-0 left-0 w-[600px] h-[600px] bg-secondary/20 rounded-full blur-[120px]'
         />
+      </div>
+      {/* Static gradient for mobile */}
+      <div className='absolute inset-0 pointer-events-none overflow-hidden md:hidden'>
+        <div className='absolute top-0 right-0 w-[300px] h-[300px] bg-primary/10 rounded-full blur-[80px]' />
+        <div className='absolute bottom-0 left-0 w-[300px] h-[300px] bg-secondary/10 rounded-full blur-[80px]' />
       </div>
 
       <div className='relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pb-12'>
@@ -156,11 +161,18 @@ export default function Footer() {
               {t('poles')}
             </h4>
             <ul className='space-y-3'>
-              {['Urgences 24/7', 'Chirurgie', 'Cardiologie', 'Maternité', 'Imagerie', 'Laboratoire'].map((item) => (
-                <li key={item}>
+              {[
+                { name: 'Urgences 24/7', key: 'urgences' },
+                { name: 'Chirurgie', key: 'chirurgie' },
+                { name: 'Cardiologie', key: 'cardiologie' },
+                { name: 'Maternité', key: 'maternite' },
+                { name: 'Imagerie Médicale', key: 'imagerie' },
+                { name: 'Laboratoire', key: 'laboratoire' }
+              ].map((item) => (
+                <li key={item.key}>
                   <a href="#specialties" className='group flex items-center gap-2 text-sm text-slate-400 hover:text-white transition-colors'>
                     <HeartPulse className="w-4 h-4 text-slate-600 group-hover:text-secondary transition-colors" />
-                    {item}
+                    {item.name}
                   </a>
                 </li>
               ))}

@@ -8,6 +8,7 @@ import Footer from '@/components/footer'
 import SkipLink from '@/components/skip-link'
 import BackToTop from '@/components/back-to-top'
 import ScrollProgress from '@/components/ui/scroll-progress'
+import SectionDivider from '@/components/ui/section-divider'
 // Lazy load des composants lourds (below the fold)
 import {
   LazyMedicalTechnology,
@@ -25,12 +26,16 @@ export default function Home() {
       <main id='main-content' className='min-h-screen'>
         <HeroCarousel />
         <About />
+        <SectionDivider variant="gradient" />
         <Specialties />
         <Services />
+        <SectionDivider />
         <LazyMedicalTechnology />
         <LazyHomeCare />
+        <SectionDivider variant="gradient" />
         <LazyGallery />
         <LazyTestimonials />
+        <SectionDivider />
         <Contact />
       </main>
       <Footer />
@@ -38,3 +43,4 @@ export default function Home() {
     </>
   )
 }
+

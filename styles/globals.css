@@ -122,4 +122,22 @@
   body {
     @apply bg-background text-foreground;
   }
+
+  /* Smooth scroll behavior */
+  html {
+    scroll-behavior: smooth;
+    scroll-padding-top: 100px; /* Account for fixed header */
+  }
+
+  /* Improved focus states */
+  :focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 2px;
+  }
+
+  /* Better text selection */
+  ::selection {
+    background-color: oklch(0.6 0.15 250 / 0.3);
+  }
 }
+

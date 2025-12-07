@@ -14,9 +14,32 @@ export default function Header() {
   const t = useTranslations('nav')
   const [isOpen, setIsOpen] = useState(false)
   const [hidden, setHidden] = useState(false)
-  const [activeTab, setActiveTab] = useState('')
+  const [activeTab, setActiveTab] = useState('home')
   const { scrollY } = useScroll()
   const [isScrolled, setIsScrolled] = useState(false)
+
+  // Intersection Observer for active section detection
+  useEffect(() => {
+    const sections = ['home', 'about', 'specialties', 'services', 'gallery', 'contact']
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            setActiveTab(entry.target.id)
+          }
+        })
+      },
+      { threshold: 0.3, rootMargin: '-100px 0px -50% 0px' }
+    )
+
+    sections.forEach((id) => {
+      const element = document.getElementById(id)
+      if (element) observer.observe(element)
+    })
+
+    return () => observer.disconnect()
+  }, [])
 
   useMotionValueEvent(scrollY, "change", (latest) => {
     const previous = scrollY.getPrevious() ?? 0
@@ -70,8 +93,9 @@ export default function Header() {
           >
             <motion.div
               className='relative h-9 w-9 sm:h-10 sm:w-10 overflow-hidden rounded-xl bg-white/90 p-1 shadow-sm ring-1 ring-black/5'
-              whileHover={{ scale: 1.05 }}
+              whileHover={{ scale: 1.05, rotate: [0, -3, 3, 0] }}
               whileTap={{ scale: 0.95 }}
+              transition={{ duration: 0.4 }}
             >
               <Image
                 src='/logo.png'
@@ -121,11 +145,16 @@ export default function Header() {
             <Button
               size='sm'
               className={cn(
-                "rounded-full font-medium shadow-lg shadow-primary/20 transition-all duration-300",
+                "relative rounded-full font-medium shadow-lg shadow-primary/20 transition-all duration-300 overflow-hidden",
                 isScrolled ? "h-9 px-4" : "h-10 px-5"
               )}
               onClick={() => scrollToSection('#contact')}
             >
+              {/* Pulsing badge */}
+              <span className="absolute -top-0.5 -right-0.5 flex h-3 w-3">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-3 w-3 bg-red-500 border-2 border-background"></span>
+              </span>
               <Phone className="w-4 h-4 mr-2" />
               <span className="hidden sm:inline">{t('emergency')}</span>
             </Button>

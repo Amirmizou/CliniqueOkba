@@ -5,7 +5,7 @@ import StaggerContainer from '@/components/ui/stagger-container'
 import { useTranslations } from 'next-intl'
 import {
   Heart,
-  Bug as Lung,
+  Wind,
   Brain,
   Eye,
   Smile,
@@ -28,7 +28,7 @@ export default function Specialties() {
     },
     {
       name: t('items.pneumology.name'),
-      icon: Lung,
+      icon: Wind,
       image: '/images/specialties/pneumology.png',
       description: t('items.pneumology.desc'),
     },
@@ -177,9 +177,13 @@ export default function Specialties() {
             return (
               <ScrollAnimation key={index} variant="fadeUp" as="div">
                 <Card
-                  className='glass-card group cursor-pointer border-0 hover-lift h-full overflow-hidden flex flex-col'
+                  className='glass-card group cursor-pointer border-0 hover-lift h-full overflow-hidden flex flex-col relative'
                 >
-                  <div className='relative h-48 w-full overflow-hidden'>
+                  {/* Shine effect on hover */}
+                  <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none z-10">
+                    <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ease-out bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+                  </div>
+                  <div className='relative h-40 sm:h-48 w-full overflow-hidden'>
                     {specialty.image ? (
                       <Image
                         src={specialty.image}

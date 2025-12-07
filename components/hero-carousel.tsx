@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { ChevronLeft, ChevronRight } from 'lucide-react'
+import { ChevronLeft, ChevronRight, Phone, Play } from 'lucide-react'
 import Image from 'next/image'
 
 interface HeroSlide {
@@ -18,6 +18,7 @@ export default function HeroCarousel() {
     const [slides, setSlides] = useState<HeroSlide[]>([])
     const [currentIndex, setCurrentIndex] = useState(0)
     const [isAutoPlaying, setIsAutoPlaying] = useState(true)
+    const [progress, setProgress] = useState(0)
 
     useEffect(() => {
         const loadSlides = async () => {
@@ -37,29 +38,44 @@ export default function HeroCarousel() {
         loadSlides()
     }, [])
 
-    // Auto-play carousel
+    // Auto-play carousel with progress tracking
     useEffect(() => {
         if (!isAutoPlaying || slides.length === 0) return
 
-        const interval = setInterval(() => {
-            setCurrentIndex((prev) => (prev + 1) % slides.length)
-        }, 7000) // 7 seconds
+        setProgress(0)
+        const duration = 7000 // 7 seconds
+        const interval = 50 // Update every 50ms for smooth progress
+        let elapsed = 0
 
-        return () => clearInterval(interval)
-    }, [isAutoPlaying, slides.length])
+        const timer = setInterval(() => {
+            elapsed += interval
+            setProgress((elapsed / duration) * 100)
+
+            if (elapsed >= duration) {
+                setCurrentIndex((prev) => (prev + 1) % slides.length)
+                elapsed = 0
+                setProgress(0)
+            }
+        }, interval)
+
+        return () => clearInterval(timer)
+    }, [isAutoPlaying, slides.length, currentIndex])
 
     const nextSlide = () => {
         setCurrentIndex((prev) => (prev + 1) % slides.length)
+        setProgress(0)
         setIsAutoPlaying(false)
     }
 
     const prevSlide = () => {
         setCurrentIndex((prev) => (prev === 0 ? slides.length - 1 : prev - 1))
+        setProgress(0)
         setIsAutoPlaying(false)
     }
 
     const goToSlide = (index: number) => {
         setCurrentIndex(index)
+        setProgress(0)
         setIsAutoPlaying(false)
     }
 
@@ -78,6 +94,7 @@ export default function HeroCarousel() {
 
     return (
         <section
+            id="home"
             className='relative min-h-screen flex items-center justify-center overflow-hidden'
             onMouseEnter={() => setIsAutoPlaying(false)}
             onMouseLeave={() => setIsAutoPlaying(true)}
@@ -86,10 +103,10 @@ export default function HeroCarousel() {
             <AnimatePresence mode='wait'>
                 <motion.div
                     key={currentIndex}
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
+                    initial={{ opacity: 0, scale: 1.1 }}
+                    animate={{ opacity: 1, scale: 1 }}
                     exit={{ opacity: 0 }}
-                    transition={{ duration: 1 }}
+                    transition={{ duration: 1.2, ease: "easeOut" }}
                     className='absolute inset-0 z-0'
                 >
                     {/* Main Image */}
@@ -101,7 +118,7 @@ export default function HeroCarousel() {
                             className='object-cover object-center'
                             priority
                             sizes="100vw"
-                            unoptimized={true} // Bypass optimization for large images to avoid 400 errors
+                            unoptimized={true}
                         />
                         <div className="absolute inset-0 bg-black/40" />
                     </div>
@@ -124,15 +141,19 @@ export default function HeroCarousel() {
                             initial={{ opacity: 0, x: -30 }}
                             animate={{ opacity: 1, x: 0 }}
                             transition={{ delay: 0.2, duration: 0.8 }}
-                            className="mb-3 sm:mb-4 inline-block px-3 py-1 sm:px-4 sm:py-1.5 rounded-full bg-primary/20 backdrop-blur-md border border-primary/30 text-primary-foreground text-xs sm:text-sm font-medium relative z-10"
+                            className="mb-3 sm:mb-4 inline-flex items-center gap-2 px-3 py-1.5 sm:px-4 sm:py-2 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-white text-xs sm:text-sm font-medium"
                         >
+                            <span className="relative flex h-2 w-2">
+                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                                <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
+                            </span>
                             Excellence Médicale
                         </motion.div>
                         <motion.h1
                             initial={{ opacity: 0, x: -50 }}
                             animate={{ opacity: 1, x: 0 }}
                             transition={{ delay: 0.3, duration: 0.8 }}
-                            className='text-3xl sm:text-4xl md:text-6xl lg:text-7xl font-bold mb-4 sm:mb-6 tracking-tight leading-tight drop-shadow-lg'
+                            className='text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-4 sm:mb-6 tracking-tight leading-[1.1] drop-shadow-lg'
                         >
                             {currentSlide.title}
                         </motion.h1>
@@ -141,64 +162,81 @@ export default function HeroCarousel() {
                                 initial={{ opacity: 0, x: -50 }}
                                 animate={{ opacity: 1, x: 0 }}
                                 transition={{ delay: 0.5, duration: 0.8 }}
-                                className='text-lg sm:text-xl md:text-2xl text-gray-100 mb-6 sm:mb-8 md:mb-10 font-light drop-shadow-md max-w-2xl'
+                                className='text-base sm:text-lg md:text-xl text-gray-200 mb-6 sm:mb-8 font-light drop-shadow-md max-w-2xl leading-relaxed'
                             >
                                 {currentSlide.subtitle}
                             </motion.p>
                         )}
+                        {/* Double CTA */}
                         <motion.div
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: 0.7, duration: 0.8 }}
+                            className="flex flex-col sm:flex-row gap-3 sm:gap-4"
                         >
                             <button
                                 onClick={() => document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' })}
-                                className="bg-primary hover:bg-primary/90 text-white px-6 py-3 sm:px-8 sm:py-4 rounded-full font-semibold text-base sm:text-lg transition-all duration-300 shadow-lg shadow-primary/40 hover:shadow-xl hover:shadow-primary/50 hover:scale-105 active:scale-95 flex items-center gap-2 min-h-[44px]"
+                                className="group bg-primary hover:bg-primary/90 text-white px-6 py-3 sm:px-8 sm:py-4 rounded-full font-semibold text-sm sm:text-base transition-all duration-300 shadow-lg shadow-primary/30 hover:shadow-xl hover:shadow-primary/40 hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-2"
                             >
+                                <Phone className="w-4 h-4 sm:w-5 sm:h-5" />
                                 Prendre Rendez-vous
-                                <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5" />
+                                <ChevronRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+                            </button>
+                            <button
+                                onClick={() => document.getElementById('about')?.scrollIntoView({ behavior: 'smooth' })}
+                                className="group bg-white/10 hover:bg-white/20 backdrop-blur-sm text-white px-6 py-3 sm:px-8 sm:py-4 rounded-full font-medium text-sm sm:text-base transition-all duration-300 border border-white/20 hover:border-white/40 flex items-center justify-center gap-2"
+                            >
+                                <Play className="w-4 h-4 sm:w-5 sm:h-5" />
+                                Découvrir la clinique
                             </button>
                         </motion.div>
                     </motion.div>
                 </AnimatePresence>
             </div>
 
-            {/* Navigation Arrows */}
+            {/* Navigation Arrows - Hidden on mobile */}
             {slides.length > 1 && (
                 <>
                     <button
                         onClick={prevSlide}
-                        className='absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 z-30 bg-white/10 hover:bg-white/20 active:bg-white/30 backdrop-blur-sm p-2 sm:p-3 rounded-full transition-all min-h-[44px] min-w-[44px] flex items-center justify-center'
+                        className='hidden sm:flex absolute left-4 top-1/2 -translate-y-1/2 z-30 bg-white/10 hover:bg-white/20 active:bg-white/30 backdrop-blur-sm p-3 rounded-full transition-all items-center justify-center group'
                         aria-label='Previous slide'
                     >
-                        <ChevronLeft className='h-5 w-5 sm:h-6 sm:w-6 text-white' />
+                        <ChevronLeft className='h-6 w-6 text-white transition-transform group-hover:-translate-x-0.5' />
                     </button>
                     <button
                         onClick={nextSlide}
-                        className='absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 z-30 bg-white/10 hover:bg-white/20 active:bg-white/30 backdrop-blur-sm p-2 sm:p-3 rounded-full transition-all min-h-[44px] min-w-[44px] flex items-center justify-center'
+                        className='hidden sm:flex absolute right-4 top-1/2 -translate-y-1/2 z-30 bg-white/10 hover:bg-white/20 active:bg-white/30 backdrop-blur-sm p-3 rounded-full transition-all items-center justify-center group'
                         aria-label='Next slide'
                     >
-                        <ChevronRight className='h-5 w-5 sm:h-6 sm:w-6 text-white' />
+                        <ChevronRight className='h-6 w-6 text-white transition-transform group-hover:translate-x-0.5' />
                     </button>
                 </>
             )}
 
-            {/* Dots Indicator */}
+            {/* Progress Bar Indicators */}
             {slides.length > 1 && (
-                <div className='absolute bottom-4 sm:bottom-8 left-1/2 -translate-x-1/2 z-30 flex gap-2'>
-                    {slides.map((_, index) => (
-                        <button
-                            key={index}
-                            onClick={() => goToSlide(index)}
-                            className={`h-2.5 sm:h-2 rounded-full transition-all min-h-[44px] min-w-[44px] sm:min-h-0 sm:min-w-0 flex items-center justify-center ${index === currentIndex
-                                ? 'w-2.5 sm:w-8 bg-white'
-                                : 'w-2.5 sm:w-2 bg-white/50 hover:bg-white/75 active:bg-white'
-                                }`}
-                            aria-label={`Go to slide ${index + 1}`}
-                        >
-                            <span className="sr-only">Slide {index + 1}</span>
-                        </button>
-                    ))}
+                <div className='absolute bottom-6 sm:bottom-10 left-1/2 -translate-x-1/2 z-30'>
+                    <div className="flex gap-2 bg-black/30 backdrop-blur-md px-4 py-3 rounded-full border border-white/10">
+                        {slides.map((_, index) => (
+                            <button
+                                key={index}
+                                onClick={() => goToSlide(index)}
+                                className="relative h-1.5 w-8 sm:w-12 bg-white/20 rounded-full overflow-hidden transition-all hover:bg-white/30"
+                                aria-label={`Go to slide ${index + 1}`}
+                            >
+                                {index === currentIndex && (
+                                    <motion.div
+                                        className="absolute inset-y-0 left-0 bg-white rounded-full"
+                                        style={{ width: `${progress}%` }}
+                                    />
+                                )}
+                                {index < currentIndex && (
+                                    <div className="absolute inset-0 bg-white/60 rounded-full" />
+                                )}
+                            </button>
+                        ))}
+                    </div>
                 </div>
             )}
         </section>
