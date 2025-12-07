@@ -1,37 +1,27 @@
 import { NextResponse } from 'next/server'
-import { heroSlides } from '@/data/hero-slides'
+import { client } from '@/sanity/lib/client'
+import { heroSlidesQuery } from '@/sanity/lib/queries'
+import { urlFor } from '@/sanity/lib/image'
 
-// API en lecture seule - Les slides sont configurés dans data/hero-slides.ts
-// Pour modifier, éditez ce fichier et pushez sur Git
+export const revalidate = 60 // Revalidate every 60 seconds
 
 export async function GET() {
     try {
-        const activeSlides = heroSlides
-            .filter(s => s.active)
-            .sort((a, b) => a.order - b.order)
-        return NextResponse.json(activeSlides)
+        const slides = await client.fetch(heroSlidesQuery)
+
+        // Transform Sanity data to match existing format
+        const transformedSlides = slides.map((slide: any, index: number) => ({
+            id: slide._id,
+            title: slide.title,
+            subtitle: slide.subtitle || '',
+            image: slide.image ? urlFor(slide.image).width(1920).height(1080).url() : '',
+            order: slide.order || index,
+            active: true,
+        }))
+
+        return NextResponse.json(transformedSlides)
     } catch (error) {
-        console.error('Failed to fetch slides:', error)
-        return NextResponse.json([])
+        console.error('Error fetching hero slides from Sanity:', error)
+        return NextResponse.json([], { status: 500 })
     }
-}
-
-// Les méthodes POST, PUT, DELETE ne sont plus supportées
-// Éditer directement data/hero-slides.ts pour modifier les slides
-export async function POST() {
-    return NextResponse.json({
-        error: 'Les slides sont maintenant configurés dans data/hero-slides.ts. Modifiez ce fichier et redéployez.'
-    }, { status: 405 })
-}
-
-export async function PUT() {
-    return NextResponse.json({
-        error: 'Les slides sont maintenant configurés dans data/hero-slides.ts. Modifiez ce fichier et redéployez.'
-    }, { status: 405 })
-}
-
-export async function DELETE() {
-    return NextResponse.json({
-        error: 'Les slides sont maintenant configurés dans data/hero-slides.ts. Modifiez ce fichier et redéployez.'
-    }, { status: 405 })
 }
