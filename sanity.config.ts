@@ -6,6 +6,7 @@ import { schemaTypes } from './sanity/schemas'
 export default defineConfig({
     name: 'clinique-okba-studio',
     title: 'Clinique OKBA - Gestion du Contenu',
+    basePath: '/studio',
 
     projectId: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID!,
     dataset: process.env.NEXT_PUBLIC_SANITY_DATASET!,
