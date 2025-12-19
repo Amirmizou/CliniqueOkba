@@ -36,7 +36,7 @@
     "@sanity/image-url": "^2.0.2",
     "@sanity/vision": "^4.20.3",
     "@types/bcryptjs": "^2.4.6",
-    "@vercel/analytics": "latest",
+    "@vercel/analytics": "^1.6.1",
     "@vercel/speed-insights": "^1.2.0",
     "autoprefixer": "^10.4.20",
     "bcryptjs": "^3.0.3",
