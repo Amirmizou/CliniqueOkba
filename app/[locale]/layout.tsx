@@ -2,6 +2,7 @@ import type React from 'react'
 import type { Metadata } from 'next'
 import { Poppins } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
+import { SpeedInsights } from '@vercel/speed-insights/next'
 import { ThemeProvider } from '@/components/theme-provider'
 import { GoogleAnalytics } from '@/lib/analytics'
 import { defaultMetadata } from '@/lib/seo'
@@ -47,6 +48,7 @@ export default async function LocaleLayout({
         </AuraBackground>
         <SWRegistrationComponent />
         <Analytics />
+        <SpeedInsights />
         {process.env.NEXT_PUBLIC_GA_ID && (
           <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID} />
         )}
