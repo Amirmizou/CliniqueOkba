@@ -16,7 +16,7 @@ import {
   Scan,
   Scissors,
 } from 'lucide-react'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { SpotlightCard } from '@/components/ui/spotlight-card'
 
 const iconMap: any = {
   Stethoscope,
@@ -74,19 +74,15 @@ export default function Services() {
             const Icon = iconMap[service.icon] || Activity
             return (
               <ScrollAnimation key={service.id} variant="fadeUp" as="div">
-                <Card className='glass-card group h-full border-0 hover-lift'>
-                  <CardHeader>
-                    <div className='bg-primary/10 mb-4 flex h-14 w-14 items-center justify-center rounded-2xl transition-all duration-300 group-hover:bg-primary group-hover:scale-110 group-hover:shadow-lg'>
-                      <Icon className='text-primary h-7 w-7 transition-colors group-hover:text-white' />
-                    </div>
-                    <CardTitle className='text-xl font-bold'>{service.title}</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <p className='text-muted-foreground leading-relaxed'>
-                      {service.description}
-                    </p>
-                  </CardContent>
-                </Card>
+                <SpotlightCard className='glass-card group h-full border-0 hover-lift flex flex-col p-6' spotlightColor="rgba(44, 133, 222, 0.2)">
+                  <div className='bg-primary/10 mb-6 flex h-14 w-14 items-center justify-center rounded-2xl transition-all duration-300 group-hover:bg-primary group-hover:scale-110 group-hover:shadow-lg'>
+                    <Icon className='text-primary h-7 w-7 transition-colors group-hover:text-white' />
+                  </div>
+                  <h3 className='text-xl font-bold mb-3'>{service.title}</h3>
+                  <p className='text-muted-foreground leading-relaxed'>
+                    {service.description}
+                  </p>
+                </SpotlightCard>
               </ScrollAnimation>
             )
           })}

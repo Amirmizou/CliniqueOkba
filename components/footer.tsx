@@ -1,6 +1,6 @@
 "use client"
 import Image from 'next/image'
-import Link from 'next/link'
+import { Link } from '@/navigation'
 import { motion } from 'framer-motion'
 import { useState, useEffect } from 'react'
 import { type ClinicData } from '@/lib/admin-data'
@@ -151,6 +151,25 @@ export default function Footer() {
                   </a>
                 </li>
               ))}
+              {/* Additional pages */}
+              <li>
+                <a href="/actualites" className='group flex items-center gap-2 text-sm text-slate-400 hover:text-white transition-colors'>
+                  <span className="w-1.5 h-1.5 rounded-full bg-slate-600 group-hover:bg-primary transition-colors" />
+                  Actualités
+                </a>
+              </li>
+              <li>
+                <a href="/equipe" className='group flex items-center gap-2 text-sm text-slate-400 hover:text-white transition-colors'>
+                  <span className="w-1.5 h-1.5 rounded-full bg-slate-600 group-hover:bg-primary transition-colors" />
+                  Équipe Médicale
+                </a>
+              </li>
+              <li>
+                <a href="/faq" className='group flex items-center gap-2 text-sm text-slate-400 hover:text-white transition-colors'>
+                  <span className="w-1.5 h-1.5 rounded-full bg-slate-600 group-hover:bg-primary transition-colors" />
+                  FAQ
+                </a>
+              </li>
             </ul>
           </motion.div>
 

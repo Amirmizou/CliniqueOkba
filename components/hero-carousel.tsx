@@ -1,9 +1,17 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { ChevronLeft, ChevronRight, Phone, Play } from 'lucide-react'
+import { ChevronLeft, ChevronRight, Phone, Play, Heart, Activity, Shield, Stethoscope } from 'lucide-react'
 import Image from 'next/image'
+import { gsap } from 'gsap'
+import { ScrollTrigger } from 'gsap/ScrollTrigger'
+import { useReducedMotion } from '@/hooks/use-reduced-motion'
+
+// Register GSAP plugin
+if (typeof window !== 'undefined') {
+    gsap.registerPlugin(ScrollTrigger)
+}
 
 interface HeroSlide {
     id: string
@@ -19,6 +27,13 @@ export default function HeroCarousel() {
     const [currentIndex, setCurrentIndex] = useState(0)
     const [isAutoPlaying, setIsAutoPlaying] = useState(true)
     const [progress, setProgress] = useState(0)
+    const prefersReducedMotion = useReducedMotion()
+
+    // Refs for GSAP animations
+    const heroRef = useRef<HTMLElement>(null)
+    const contentRef = useRef<HTMLDivElement>(null)
+    const ekgRef = useRef<SVGSVGElement>(null)
+    const floatingIconsRef = useRef<HTMLDivElement>(null)
 
     useEffect(() => {
         const loadSlides = async () => {
@@ -37,6 +52,62 @@ export default function HeroCarousel() {
         }
         loadSlides()
     }, [])
+
+    // GSAP Scroll Animations
+    useEffect(() => {
+        if (prefersReducedMotion || !heroRef.current) return
+
+        const ctx = gsap.context(() => {
+            // Parallax effect on content
+            if (contentRef.current) {
+                gsap.to(contentRef.current, {
+                    y: 100,
+                    opacity: 0.5,
+                    scrollTrigger: {
+                        trigger: heroRef.current,
+                        start: 'top top',
+                        end: 'bottom top',
+                        scrub: 1,
+                    },
+                })
+            }
+
+            // EKG line animation
+            if (ekgRef.current) {
+                const path = ekgRef.current.querySelector('path')
+                if (path) {
+                    gsap.to(path, {
+                        strokeDashoffset: -1000,
+                        scrollTrigger: {
+                            trigger: heroRef.current,
+                            start: 'top top',
+                            end: 'bottom top',
+                            scrub: 0.5,
+                        },
+                    })
+                }
+            }
+
+            // Floating medical icons parallax
+            if (floatingIconsRef.current) {
+                const icons = floatingIconsRef.current.querySelectorAll('.floating-icon')
+                icons.forEach((icon, index) => {
+                    gsap.to(icon, {
+                        y: -150 * (index + 1) * 0.3,
+                        rotation: 360,
+                        scrollTrigger: {
+                            trigger: heroRef.current,
+                            start: 'top top',
+                            end: 'bottom top',
+                            scrub: 1 + index * 0.2,
+                        },
+                    })
+                })
+            }
+        }, heroRef)
+
+        return () => ctx.revert()
+    }, [prefersReducedMotion, slides.length])
 
     // Auto-play carousel with progress tracking
     useEffect(() => {
@@ -94,11 +165,46 @@ export default function HeroCarousel() {
 
     return (
         <section
+            ref={heroRef}
             id="home"
             className='relative min-h-screen flex items-center justify-center overflow-hidden'
             onMouseEnter={() => setIsAutoPlaying(false)}
             onMouseLeave={() => setIsAutoPlaying(true)}
         >
+            {/* Floating Medical Icons - Background Layer */}
+            <div ref={floatingIconsRef} className="absolute inset-0 z-[5] pointer-events-none overflow-hidden">
+                <div className="floating-icon absolute top-[20%] left-[10%] opacity-10">
+                    <Heart className="w-16 h-16 text-primary animate-medical-pulse" />
+                </div>
+                <div className="floating-icon absolute top-[60%] left-[15%] opacity-10">
+                    <Activity className="w-20 h-20 text-primary animate-medical-pulse" style={{ animationDelay: '0.5s' }} />
+                </div>
+                <div className="floating-icon absolute top-[40%] right-[10%] opacity-10">
+                    <Shield className="w-24 h-24 text-primary animate-medical-pulse" style={{ animationDelay: '1s' }} />
+                </div>
+                <div className="floating-icon absolute top-[70%] right-[20%] opacity-10">
+                    <Stethoscope className="w-18 h-18 text-primary animate-medical-pulse" style={{ animationDelay: '1.5s' }} />
+                </div>
+            </div>
+
+            {/* EKG Heartbeat Line */}
+            <svg
+                ref={ekgRef}
+                className="absolute top-1/2 left-0 w-full h-32 opacity-5 z-[6] pointer-events-none"
+                preserveAspectRatio="none"
+                viewBox="0 0 1200 100"
+            >
+                <path
+                    d="M0,50 L200,50 L210,20 L220,80 L230,50 L400,50 L410,20 L420,80 L430,50 L600,50 L610,20 L620,80 L630,50 L800,50 L810,20 L820,80 L830,50 L1000,50 L1010,20 L1020,80 L1030,50 L1200,50"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    className="text-primary"
+                    strokeDasharray="1000"
+                    strokeDashoffset="0"
+                />
+            </svg>
+
             {/* Background Images with Fade Transition */}
             <AnimatePresence mode='wait'>
                 <motion.div
@@ -127,7 +233,7 @@ export default function HeroCarousel() {
             </AnimatePresence>
 
             {/* Content */}
-            <div className='relative z-20 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 h-full flex items-center'>
+            <div ref={contentRef} className='relative z-20 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 h-full flex items-center'>
                 <AnimatePresence mode='wait'>
                     <motion.div
                         key={currentIndex}
@@ -214,7 +320,6 @@ export default function HeroCarousel() {
                 </>
             )}
 
-            {/* Progress Bar Indicators */}
             {slides.length > 1 && (
                 <div className='absolute bottom-6 sm:bottom-10 left-1/2 -translate-x-1/2 z-30'>
                     <div className="flex gap-2 bg-black/30 backdrop-blur-md px-4 py-3 rounded-full border border-white/10">
@@ -239,6 +344,13 @@ export default function HeroCarousel() {
                     </div>
                 </div>
             )}
+
+            {/* Wave Divider */}
+            <div className="absolute bottom-0 left-0 w-full z-20 overflow-hidden leading-[0]">
+                <svg className="relative block w-[calc(100%+1.3px)] h-[60px] sm:h-[100px]" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 120" preserveAspectRatio="none">
+                    <path d="M321.39,56.44c58-10.79,114.16-30.13,172-41.86,82.39-16.72,168.19-17.73,250.45-.39C823.78,31,906.67,72,985.66,92.83c70.05,18.48,146.53,26.09,214.34,3V0H0V27.35A600.21,600.21,0,0,0,321.39,56.44Z" className="fill-background"></path>
+                </svg>
+            </div>
         </section>
     )
 }

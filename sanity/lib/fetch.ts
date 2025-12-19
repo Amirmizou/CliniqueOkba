@@ -7,6 +7,9 @@ import {
     articlesQuery,
     articleBySlugQuery,
     siteSettingsQuery,
+    doctorsQuery,
+    doctorBySlugQuery,
+    faqQuery,
 } from './queries'
 
 // Hero Slides
@@ -42,3 +45,18 @@ export async function getArticleBySlug(slug: string) {
 export async function getSiteSettings() {
     return client.fetch(siteSettingsQuery)
 }
+
+// Doctors
+export async function getDoctors() {
+    return client.fetch(doctorsQuery)
+}
+
+export async function getDoctorBySlug(slug: string) {
+    return client.fetch(doctorBySlugQuery, { slug })
+}
+
+// FAQ
+export async function getFaq() {
+    return client.fetch(faqQuery)
+}
+

@@ -4,6 +4,8 @@ import specialty from './specialty'
 import galleryImage from './galleryImage'
 import article from './article'
 import siteSettings from './siteSettings'
+import doctor from './doctor'
+import faq from './faq'
 
 export const schemaTypes = [
     heroSlide,
@@ -12,4 +14,7 @@ export const schemaTypes = [
     galleryImage,
     article,
     siteSettings,
+    doctor,
+    faq,
 ]
+

@@ -4,12 +4,12 @@ import { Poppins } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
 import { ThemeProvider } from '@/components/theme-provider'
 import { GoogleAnalytics } from '@/lib/analytics'
-import { defaultMetadata, generateStructuredData } from '@/lib/seo'
+import { defaultMetadata } from '@/lib/seo'
 import { NextIntlClientProvider } from 'next-intl'
 import { getMessages } from 'next-intl/server'
-import { notFound } from 'next/navigation'
-import { locales } from '@/i18n'
 import PageTransition from '@/components/page-transition'
+import { ServiceWorkerRegistration as SWRegistrationComponent } from '@/components/service-worker-registration'
+import { AuraBackground } from '@/components/ui/aura-background'
 import '../globals.css'
 
 const poppins = Poppins({
@@ -28,18 +28,9 @@ export default async function LocaleLayout({
   children: React.ReactNode
   params: Promise<{ locale: string }>
 }) {
-  const { locale } = await params
-
-  console.log('LocaleLayout params:', locale)
-  console.log('Available locales:', locales)
-
-  if (!locales.includes(locale as any)) {
-    console.log('Locale not found in locales list')
-    notFound()
-  }
-
+  // Always use French locale since app is French-only
+  const locale = 'fr'
   const messages = await getMessages({ locale })
-  // const structuredData = generateStructuredData()
 
   return (
     <NextIntlClientProvider messages={messages}>
@@ -49,9 +40,12 @@ export default async function LocaleLayout({
         enableSystem
         disableTransitionOnChange
       >
-        <PageTransition>
-          {children}
-        </PageTransition>
+        <AuraBackground>
+          <PageTransition>
+            {children}
+          </PageTransition>
+        </AuraBackground>
+        <SWRegistrationComponent />
         <Analytics />
         {process.env.NEXT_PUBLIC_GA_ID && (
           <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID} />

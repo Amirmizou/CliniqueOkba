@@ -2,5 +2,9 @@
     "i18n-ally.localesPaths": [
         "messages"
     ],
-    "codium.codeCompletion.enable": false
+    "codium.codeCompletion.enable": false,
+    "css.validate": false,
+    "scss.validate": false,
+    "less.validate": false,
+    "css.lint.unknownAtRules": "ignore"
 }

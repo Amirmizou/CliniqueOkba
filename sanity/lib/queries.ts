@@ -86,3 +86,46 @@ export const siteSettingsQuery = groq`
     social
   }
 `
+
+// Doctors
+export const doctorsQuery = groq`
+  *[_type == "doctor" && active == true] | order(order asc) {
+    _id,
+    name,
+    slug,
+    specialty,
+    title,
+    image,
+    bio,
+    qualifications,
+    languages,
+    consultationDays
+  }
+`
+
+// Single Doctor
+export const doctorBySlugQuery = groq`
+  *[_type == "doctor" && slug.current == $slug][0] {
+    _id,
+    name,
+    slug,
+    specialty,
+    title,
+    image,
+    bio,
+    qualifications,
+    languages,
+    consultationDays
+  }
+`
+
+// FAQ
+export const faqQuery = groq`
+  *[_type == "faq" && active == true] | order(order asc) {
+    _id,
+    question,
+    answer,
+    category
+  }
+`
+
