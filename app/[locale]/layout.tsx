@@ -15,9 +15,11 @@ import '../globals.css'
 
 const poppins = Poppins({
   subsets: ['latin'],
-  weight: ['300', '400', '500', '600', '700'],
+  weight: ['400', '600', '700'], // Reduced from 5 to 3 weights
   display: 'swap',
   preload: true,
+  fallback: ['system-ui', 'arial'],
+  adjustFontFallback: true, // Reduce CLS
 })
 
 export const metadata: Metadata = {
@@ -41,6 +43,19 @@ export default async function LocaleLayout({
   return (
     <html lang={locale} className={poppins.className} suppressHydrationWarning>
       <head>
+        {/* Critical CSS inline for immediate rendering */}
+        <style dangerouslySetInnerHTML={{
+          __html: `
+            *,::before,::after{box-sizing:border-box;border:0 solid}
+            *{margin:0;padding:0}
+            html{-webkit-text-size-adjust:100%;tab-size:4;font-family:Poppins,system-ui,arial}
+            body{line-height:inherit;margin:0}
+            h1,h2,h3,h4,h5,h6{font-size:inherit;font-weight:inherit}
+            img,video{max-width:100%;height:auto}
+            button{cursor:pointer}
+          `
+        }} />
+
         {/* Preconnect to critical domains */}
         <link rel="preconnect" href="https://cdn.sanity.io" />
         <link rel="preconnect" href="https://www.googletagmanager.com" />
@@ -61,13 +76,15 @@ export default async function LocaleLayout({
               </PageTransition>
             </AuraBackground>
             <SWRegistrationComponent />
-            <Analytics />
-            <SpeedInsights />
             {process.env.NEXT_PUBLIC_GA_ID && (
               <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID} />
             )}
           </ThemeProvider>
         </NextIntlClientProvider>
+
+        {/* Defer Analytics and SpeedInsights to end */}
+        <Analytics />
+        <SpeedInsights />
       </body>
     </html>
   )
