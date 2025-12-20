@@ -17,22 +17,71 @@ export default defineConfig({
                 S.list()
                     .title('Contenu')
                     .items([
+                        // 🏠 ACCUEIL
                         S.listItem()
-                            .title('🏠 Slides Hero')
-                            .child(S.documentTypeList('heroSlide').title('Slides Hero')),
-                        S.listItem()
-                            .title('🏥 Équipements Médicaux')
-                            .child(S.documentTypeList('equipment').title('Équipements')),
-                        S.listItem()
-                            .title('⚕️ Spécialités')
-                            .child(S.documentTypeList('specialty').title('Spécialités')),
-                        S.listItem()
-                            .title('🖼️ Galerie')
-                            .child(S.documentTypeList('galleryImage').title('Images Galerie')),
-                        S.listItem()
-                            .title('📰 Articles')
-                            .child(S.documentTypeList('article').title('Articles')),
+                            .title('🏠 Accueil')
+                            .child(
+                                S.list()
+                                    .title('Contenu Accueil')
+                                    .items([
+                                        S.listItem()
+                                            .title('Slides Hero')
+                                            .icon(() => '🎬')
+                                            .child(S.documentTypeList('heroSlide').title('Slides Hero')),
+                                        S.listItem()
+                                            .title('Galerie Photos')
+                                            .icon(() => '📸')
+                                            .child(S.documentTypeList('galleryImage').title('Galerie')),
+                                    ])
+                            ),
+
                         S.divider(),
+
+                        // ⚕️ MÉDICAL
+                        S.listItem()
+                            .title('⚕️ Contenu Médical')
+                            .child(
+                                S.list()
+                                    .title('Contenu Médical')
+                                    .items([
+                                        S.listItem()
+                                            .title('Spécialités')
+                                            .icon(() => '🩺')
+                                            .child(S.documentTypeList('specialty').title('Spécialités')),
+                                        S.listItem()
+                                            .title('Équipements')
+                                            .icon(() => '🏥')
+                                            .child(S.documentTypeList('equipment').title('Équipements')),
+                                        S.listItem()
+                                            .title('Équipe Médicale')
+                                            .icon(() => '👨‍⚕️')
+                                            .child(S.documentTypeList('doctor').title('Équipe Médicale')),
+                                    ])
+                            ),
+
+                        S.divider(),
+
+                        // 📰 PUBLICATIONS
+                        S.listItem()
+                            .title('📰 Publications')
+                            .child(
+                                S.list()
+                                    .title('Publications')
+                                    .items([
+                                        S.listItem()
+                                            .title('Articles')
+                                            .icon(() => '📝')
+                                            .child(S.documentTypeList('article').title('Articles')),
+                                        S.listItem()
+                                            .title('FAQ')
+                                            .icon(() => '❓')
+                                            .child(S.documentTypeList('faq').title('FAQ')),
+                                    ])
+                            ),
+
+                        S.divider(),
+
+                        // ⚙️ PARAMÈTRES
                         S.listItem()
                             .title('⚙️ Paramètres du Site')
                             .child(
@@ -47,5 +96,21 @@ export default defineConfig({
 
     schema: {
         types: schemaTypes,
+    },
+
+    document: {
+        // Preview URLs pour voir le rendu
+        productionUrl: async (prev, { document }) => {
+            const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'
+
+            if (document._type === 'article' && document.slug?.current) {
+                return `${baseUrl}/actualites/${document.slug.current}`
+            }
+            if (document._type === 'doctor' && document.slug?.current) {
+                return `${baseUrl}/equipe/${document.slug.current}`
+            }
+
+            return prev
+        },
     },
 })
