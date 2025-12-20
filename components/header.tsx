@@ -18,6 +18,18 @@ export default function Header() {
   const { scrollY } = useScroll()
   const [isScrolled, setIsScrolled] = useState(false)
 
+  // Prevent body scroll when mobile menu is open
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden'
+    } else {
+      document.body.style.overflow = 'unset'
+    }
+    return () => {
+      document.body.style.overflow = 'unset'
+    }
+  }, [isOpen])
+
   // Intersection Observer for active section detection
   useEffect(() => {
     const sections = ['home', 'about', 'specialties', 'services', 'gallery', 'contact']
@@ -232,7 +244,8 @@ export default function Header() {
 
           {/* Actions */}
           <div className='flex items-center gap-2'>
-            <div className="hidden md:flex items-center gap-1 pr-2 border-r border-border/50 mr-2">
+            {/* Theme toggle visible on all screens */}
+            <div className="flex items-center gap-1 pr-2 border-r border-border/50 mr-2">
               <ThemeToggle />
             </div>
 
@@ -357,15 +370,6 @@ export default function Header() {
                     <span className="font-medium">FAQ</span>
                   </a>
                 </div>
-              </motion.div>
-
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.5 }}
-                className="flex justify-center gap-4 mt-6 p-4 rounded-2xl bg-secondary/30"
-              >
-                <ThemeToggle />
               </motion.div>
             </motion.nav>
           </motion.div>
