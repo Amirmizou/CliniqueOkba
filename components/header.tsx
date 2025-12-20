@@ -244,9 +244,11 @@ export default function Header() {
 
           {/* Actions */}
           <div className='flex items-center gap-2'>
-            {/* Theme toggle visible on all screens */}
+            {/* Theme toggle - larger on mobile */}
             <div className="flex items-center gap-1 pr-2 border-r border-border/50 mr-2">
-              <ThemeToggle />
+              <div className="md:scale-100 scale-110">
+                <ThemeToggle />
+              </div>
             </div>
 
             {/* Modern Emergency Button with Animated Pulse Rings */}
@@ -323,14 +325,14 @@ export default function Header() {
             initial={{ opacity: 0, backdropFilter: "blur(0px)" }}
             animate={{ opacity: 1, backdropFilter: "blur(12px)" }}
             exit={{ opacity: 0, backdropFilter: "blur(0px)" }}
-            className="fixed inset-0 z-40 bg-background/60 md:hidden pt-24 px-6"
+            className="fixed inset-0 z-40 bg-background/60 md:hidden pt-24 px-6 overflow-y-auto"
           >
             <motion.nav
               initial={{ y: -20, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               exit={{ y: -20, opacity: 0 }}
               transition={{ delay: 0.1 }}
-              className="flex flex-col gap-2"
+              className="flex flex-col gap-2 pb-8"
             >
               {navItems.map((item, i) => (
                 <motion.button
