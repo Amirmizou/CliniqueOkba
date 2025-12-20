@@ -20,7 +20,12 @@ const poppins = Poppins({
   preload: true,
 })
 
-export const metadata: Metadata = defaultMetadata
+export const metadata: Metadata = {
+  ...defaultMetadata,
+  other: {
+    ...defaultMetadata.other,
+  }
+}
 
 export default async function LocaleLayout({
   children,
@@ -34,25 +39,37 @@ export default async function LocaleLayout({
   const messages = await getMessages({ locale })
 
   return (
-    <NextIntlClientProvider messages={messages}>
-      <ThemeProvider
-        attribute='class'
-        defaultTheme='system'
-        enableSystem
-        disableTransitionOnChange
-      >
-        <AuraBackground>
-          <PageTransition>
-            {children}
-          </PageTransition>
-        </AuraBackground>
-        <SWRegistrationComponent />
-        <Analytics />
-        <SpeedInsights />
-        {process.env.NEXT_PUBLIC_GA_ID && (
-          <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID} />
-        )}
-      </ThemeProvider>
-    </NextIntlClientProvider>
+    <html lang={locale} className={poppins.className} suppressHydrationWarning>
+      <head>
+        {/* Preconnect to critical domains */}
+        <link rel="preconnect" href="https://cdn.sanity.io" />
+        <link rel="preconnect" href="https://www.googletagmanager.com" />
+        <link rel="preconnect" href="https://vitals.vercel-insights.com" />
+        <link rel="dns-prefetch" href="https://cdn.sanity.io" />
+      </head>
+      <body>
+        <NextIntlClientProvider messages={messages}>
+          <ThemeProvider
+            attribute='class'
+            defaultTheme='system'
+            enableSystem
+            disableTransitionOnChange
+          >
+            <AuraBackground>
+              <PageTransition>
+                {children}
+              </PageTransition>
+            </AuraBackground>
+            <SWRegistrationComponent />
+            <Analytics />
+            <SpeedInsights />
+            {process.env.NEXT_PUBLIC_GA_ID && (
+              <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID} />
+            )}
+          </ThemeProvider>
+        </NextIntlClientProvider>
+      </body>
+    </html>
   )
 }
+

@@ -223,8 +223,8 @@ export default function HeroCarousel() {
                             fill
                             className='object-cover object-center'
                             priority
+                            quality={85}
                             sizes="100vw"
-                            unoptimized={true}
                         />
                         <div className="absolute inset-0 bg-black/40" />
                     </div>

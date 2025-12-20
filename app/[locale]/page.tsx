@@ -17,6 +17,9 @@ import {
   LazyTestimonials
 } from '@/components/lazy'
 
+// ISR: Revalidate every hour for better performance
+export const revalidate = 3600
+
 export default function Home() {
   return (
     <>
