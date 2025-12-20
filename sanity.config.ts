@@ -100,7 +100,7 @@ export default defineConfig({
 
     document: {
         // Preview URLs pour voir le rendu
-        productionUrl: async (prev, { document }) => {
+        productionUrl: async (prev, { document }: { document: any }) => {
             const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'
 
             if (document._type === 'article' && document.slug?.current) {
