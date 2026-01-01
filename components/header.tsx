@@ -10,7 +10,17 @@ import Image from 'next/image'
 import { motion, AnimatePresence, useScroll, useMotionValueEvent } from 'framer-motion'
 import { cn } from '@/lib/utils'
 
-export default function Header() {
+interface SiteSettings {
+  clinicName?: string
+  phone?: string
+  logo?: any
+}
+
+interface HeaderProps {
+  siteSettings?: SiteSettings
+}
+
+export default function Header({ siteSettings }: HeaderProps) {
   const t = useTranslations('nav')
   const [isOpen, setIsOpen] = useState(false)
   const [hidden, setHidden] = useState(false)

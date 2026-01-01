@@ -19,7 +19,17 @@ import {
   Syringe,
 } from 'lucide-react'
 
-export default function Specialties() {
+interface SectionContent {
+  badge?: string
+  title?: string
+  subtitle?: string
+}
+
+interface SpecialtiesProps {
+  sectionContent?: SectionContent
+}
+
+export default function Specialties({ sectionContent }: SpecialtiesProps) {
   const t = useTranslations('specialties')
 
   // Specialty data with colors, gradients, sizes, and animation types

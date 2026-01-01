@@ -17,12 +17,44 @@ import {
   Facebook,
   Instagram,
 } from 'lucide-react'
-import { type ClinicData } from '@/lib/admin-data'
 import Map from '@/components/map'
-import clinicData from '@/data/clinic.json'
-import { siteConfig } from '@/data/site-config'
+// Fallback to static data if Sanity data not available
+import clinicDataFallback from '@/data/clinic.json'
+import { siteConfig as siteConfigFallback } from '@/data/site-config'
 
-export default function Contact() {
+interface SiteSettings {
+  clinicName?: string
+  phone?: string
+  email?: string
+  address?: string
+  coordinates?: { lat: number; lng: number }
+  hours?: { emergency?: string; weekdays?: string; saturday?: string }
+  social?: { facebook?: string; instagram?: string }
+  description?: string
+}
+
+interface SectionContent {
+  badge?: string
+  title?: string
+  subtitle?: string
+}
+
+interface ContactProps {
+  siteSettings?: SiteSettings
+  sectionContent?: SectionContent
+}
+
+export default function Contact({ siteSettings, sectionContent }: ContactProps) {
+  // Use Sanity data or fallback to static
+  const contactData = {
+    address: siteSettings?.address || siteConfigFallback.contact.address,
+    phone: siteSettings?.phone || siteConfigFallback.contact.phone,
+    email: siteSettings?.email || siteConfigFallback.contact.email,
+    coordinates: siteSettings?.coordinates || siteConfigFallback.contact.coordinates,
+    hours: siteSettings?.hours || clinicDataFallback.hours,
+    social: siteSettings?.social || siteConfigFallback.social,
+    description: siteSettings?.description || clinicDataFallback.description,
+  }
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
@@ -194,14 +226,13 @@ export default function Contact() {
       <div className='mx-auto max-w-7xl px-4 sm:px-6 lg:px-8'>
         <ScrollAnimation variant="fadeUp" className='mb-16 space-y-4 text-center'>
           <p className='text-primary text-sm font-semibold tracking-wide uppercase'>
-            Nous contacter
+            {sectionContent?.badge || 'Nous contacter'}
           </p>
           <h2 className='text-foreground text-2xl sm:text-3xl md:text-4xl font-bold'>
-            Contact & Localisation
+            {sectionContent?.title || 'Contact & Localisation'}
           </h2>
           <p className='text-muted-foreground mx-auto max-w-2xl text-base sm:text-lg'>
-            Nous sommes à votre écoute pour toute question ou demande de
-            rendez-vous
+            {sectionContent?.subtitle || 'Nous sommes à votre écoute pour toute question ou demande de rendez-vous'}
           </p>
         </ScrollAnimation>
 
@@ -218,10 +249,10 @@ export default function Contact() {
                 <div>
                   <h3 className='text-foreground font-semibold'>Adresse</h3>
                   <p className='text-muted-foreground mt-1'>
-                    {clinicData.address}
+                    {contactData.address}
                   </p>
                   <p className='text-muted-foreground text-sm'>
-                    {clinicData.description}
+                    {contactData.description}
                   </p>
                 </div>
               </div>
@@ -234,9 +265,9 @@ export default function Contact() {
                 </div>
                 <div>
                   <h3 className='text-foreground font-semibold'>Téléphone</h3>
-                  <p className='text-muted-foreground mt-1'>{clinicData.phone}</p>
+                  <p className='text-muted-foreground mt-1'>{contactData.phone}</p>
                   <p className='text-muted-foreground text-sm'>
-                    {clinicData.hours.emergency}
+                    {contactData.hours?.emergency}
                   </p>
                 </div>
               </div>
@@ -250,7 +281,7 @@ export default function Contact() {
                 <div>
                   <h3 className='text-foreground font-semibold'>Email</h3>
                   <p className='text-muted-foreground mt-1'>
-                    {clinicData.email}
+                    {contactData.email}
                   </p>
                   <p className='text-muted-foreground text-sm'>
                     Réponse rapide garantie
@@ -267,10 +298,10 @@ export default function Contact() {
                 <div>
                   <h3 className='text-foreground font-semibold'>Horaires</h3>
                   <p className='text-muted-foreground mt-1'>
-                    Dim - Jeu: {clinicData.hours.weekdays}
+                    Dim - Jeu: {contactData.hours?.weekdays}
                   </p>
                   <p className='text-muted-foreground text-sm'>
-                    Vendredi: {clinicData.hours.saturday}
+                    Vendredi: {contactData.hours?.saturday}
                   </p>
                 </div>
               </div>
@@ -280,8 +311,8 @@ export default function Contact() {
             <div className='border-border border-t pt-8'>
               <h3 className='text-foreground mb-4 font-semibold'>Notre localisation</h3>
               <Map
-                address={clinicData.address}
-                coordinates={clinicData.coordinates}
+                address={contactData.address}
+                coordinates={contactData.coordinates}
               />
             </div>
 
@@ -290,7 +321,7 @@ export default function Contact() {
               <p className='text-foreground mb-4 font-semibold'>Suivez-nous</p>
               <div className='flex gap-3'>
                 <a
-                  href={siteConfig.social.facebook}
+                  href={contactData.social?.facebook || '#'}
                   target='_blank'
                   rel='noopener noreferrer'
                   className='group bg-blue-600 hover:bg-blue-700 flex h-11 w-11 items-center justify-center rounded-xl transition-all duration-300 hover:scale-110 hover:shadow-lg hover:shadow-blue-600/30'
@@ -298,7 +329,7 @@ export default function Contact() {
                   <Facebook className='w-5 h-5 text-white' />
                 </a>
                 <a
-                  href={siteConfig.social.instagram}
+                  href={contactData.social?.instagram || '#'}
                   target='_blank'
                   rel='noopener noreferrer'
                   className='group bg-gradient-to-br from-purple-600 via-pink-500 to-orange-400 hover:from-purple-700 hover:via-pink-600 hover:to-orange-500 flex h-11 w-11 items-center justify-center rounded-xl transition-all duration-300 hover:scale-110 hover:shadow-lg hover:shadow-pink-500/30'

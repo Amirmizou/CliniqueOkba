@@ -15,29 +15,93 @@ export default defineConfig({
         structureTool({
             structure: (S) =>
                 S.list()
-                    .title('Contenu')
+                    .title('🏥 Clinique OKBA - CMS')
                     .items([
-                        // 🏠 ACCUEIL
+                        // ⚙️ PARAMÈTRES GÉNÉRAUX
                         S.listItem()
-                            .title('🏠 Accueil')
+                            .title('⚙️ Paramètres Généraux')
                             .child(
                                 S.list()
-                                    .title('Contenu Accueil')
+                                    .title('Paramètres')
                                     .items([
                                         S.listItem()
-                                            .title('Slides Hero')
-                                            .icon(() => '🎬')
-                                            .child(S.documentTypeList('heroSlide').title('Slides Hero')),
+                                            .title('Informations du Site')
+                                            .icon(() => '🏥')
+                                            .child(
+                                                S.document()
+                                                    .schemaType('siteSettings')
+                                                    .documentId('siteSettings')
+                                            ),
                                         S.listItem()
-                                            .title('Galerie Photos')
-                                            .icon(() => '📸')
-                                            .child(S.documentTypeList('galleryImage').title('Galerie')),
+                                            .title('Contenu du Footer')
+                                            .icon(() => '🦶')
+                                            .child(
+                                                S.document()
+                                                    .schemaType('footerContent')
+                                                    .documentId('footerContent')
+                                            ),
+                                        S.listItem()
+                                            .title('SEO des Pages')
+                                            .icon(() => '🔍')
+                                            .child(S.documentTypeList('pageSeo').title('SEO des Pages')),
                                     ])
                             ),
 
                         S.divider(),
 
-                        // ⚕️ MÉDICAL
+                        // 🏠 PAGE D'ACCUEIL
+                        S.listItem()
+                            .title('🏠 Page d\'Accueil')
+                            .child(
+                                S.list()
+                                    .title('Contenu Accueil')
+                                    .items([
+                                        S.listItem()
+                                            .title('Slides Hero (Carrousel)')
+                                            .icon(() => '🎬')
+                                            .child(S.documentTypeList('heroSlide').title('Slides Hero')),
+                                        S.listItem()
+                                            .title('Section À Propos')
+                                            .icon(() => '📖')
+                                            .child(
+                                                S.document()
+                                                    .schemaType('aboutSection')
+                                                    .documentId('aboutSection')
+                                            ),
+                                        S.listItem()
+                                            .title('Titres des Sections')
+                                            .icon(() => '📝')
+                                            .child(S.documentTypeList('sectionContent').title('Contenus des Sections')),
+                                    ])
+                            ),
+
+                        S.divider(),
+
+                        // 🏥 SERVICES
+                        S.listItem()
+                            .title('🏥 Services & Prestations')
+                            .child(
+                                S.list()
+                                    .title('Services')
+                                    .items([
+                                        S.listItem()
+                                            .title('Tous les Services')
+                                            .icon(() => '🏥')
+                                            .child(S.documentTypeList('service').title('Services')),
+                                        S.listItem()
+                                            .title('Soins à Domicile')
+                                            .icon(() => '🏠')
+                                            .child(
+                                                S.document()
+                                                    .schemaType('homeCare')
+                                                    .documentId('homeCare')
+                                            ),
+                                    ])
+                            ),
+
+                        S.divider(),
+
+                        // ⚕️ CONTENU MÉDICAL
                         S.listItem()
                             .title('⚕️ Contenu Médical')
                             .child(
@@ -45,12 +109,12 @@ export default defineConfig({
                                     .title('Contenu Médical')
                                     .items([
                                         S.listItem()
-                                            .title('Spécialités')
+                                            .title('Spécialités Médicales')
                                             .icon(() => '🩺')
                                             .child(S.documentTypeList('specialty').title('Spécialités')),
                                         S.listItem()
-                                            .title('Équipements')
-                                            .icon(() => '🏥')
+                                            .title('Équipements & Technologies')
+                                            .icon(() => '🔬')
                                             .child(S.documentTypeList('equipment').title('Équipements')),
                                         S.listItem()
                                             .title('Équipe Médicale')
@@ -61,15 +125,31 @@ export default defineConfig({
 
                         S.divider(),
 
+                        // ⭐ TÉMOIGNAGES & AVIS
+                        S.listItem()
+                            .title('⭐ Témoignages Patients')
+                            .icon(() => '⭐')
+                            .child(S.documentTypeList('testimonial').title('Témoignages')),
+
+                        S.divider(),
+
+                        // 📸 MÉDIAS
+                        S.listItem()
+                            .title('📸 Galerie Photos')
+                            .icon(() => '📸')
+                            .child(S.documentTypeList('galleryImage').title('Galerie')),
+
+                        S.divider(),
+
                         // 📰 PUBLICATIONS
                         S.listItem()
-                            .title('📰 Publications')
+                            .title('📰 Publications & Blog')
                             .child(
                                 S.list()
                                     .title('Publications')
                                     .items([
                                         S.listItem()
-                                            .title('Articles')
+                                            .title('Articles de Blog')
                                             .icon(() => '📝')
                                             .child(S.documentTypeList('article').title('Articles')),
                                         S.listItem()
@@ -77,17 +157,6 @@ export default defineConfig({
                                             .icon(() => '❓')
                                             .child(S.documentTypeList('faq').title('FAQ')),
                                     ])
-                            ),
-
-                        S.divider(),
-
-                        // ⚙️ PARAMÈTRES
-                        S.listItem()
-                            .title('⚙️ Paramètres du Site')
-                            .child(
-                                S.document()
-                                    .schemaType('siteSettings')
-                                    .documentId('siteSettings')
                             ),
                     ]),
         }),
@@ -108,6 +177,9 @@ export default defineConfig({
             }
             if (document._type === 'doctor' && document.slug?.current) {
                 return `${baseUrl}/equipe/${document.slug.current}`
+            }
+            if (document._type === 'service' && document.slug?.current) {
+                return `${baseUrl}/services/${document.slug.current}`
             }
 
             return prev

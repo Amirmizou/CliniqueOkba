@@ -49,7 +49,7 @@ export default async function LocaleLayout({
         <link rel="preconnect" href="https://vitals.vercel-insights.com" />
         <link rel="dns-prefetch" href="https://cdn.sanity.io" />
       </head>
-      <body>
+      <body className={`${poppins.className} font-sans antialiased`} suppressHydrationWarning>
         <NextIntlClientProvider messages={messages}>
           <ThemeProvider
             attribute='class'

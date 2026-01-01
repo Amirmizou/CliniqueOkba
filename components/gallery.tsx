@@ -25,7 +25,17 @@ const categoryIcons = {
   other: ImageIcon,
 } as const
 
-export default function Gallery() {
+interface SectionContent {
+  badge?: string
+  title?: string
+  subtitle?: string
+}
+
+interface GalleryProps {
+  sectionContent?: SectionContent
+}
+
+export default function Gallery({ sectionContent }: GalleryProps) {
   const [selectedImage, setSelectedImage] = useState<GalleryImage | null>(null)
   const [selectedCategory, setSelectedCategory] = useState<string>('all')
   const [galleryImages, setGalleryImages] = useState<GalleryImage[]>([])

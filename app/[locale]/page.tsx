@@ -17,33 +17,79 @@ import {
   LazyTestimonials
 } from '@/components/lazy'
 
+// Sanity data fetching
+import {
+  getSiteSettings,
+  getAboutSection,
+  getServices,
+  getTestimonials,
+  getHomeCare,
+  getAllSectionContents,
+} from '@/sanity/lib/fetch'
+
 // ISR: Revalidate every hour for better performance
 export const revalidate = 3600
 
-export default function Home() {
+export default async function Home() {
+  // Fetch all data from Sanity in parallel
+  const [
+    siteSettings,
+    aboutSection,
+    services,
+    testimonials,
+    homeCare,
+    sectionContents,
+  ] = await Promise.all([
+    getSiteSettings(),
+    getAboutSection(),
+    getServices(),
+    getTestimonials(),
+    getHomeCare(),
+    getAllSectionContents(),
+  ])
+
+  // Create a map of section contents for easy access
+  const sectionContentMap = (sectionContents || []).reduce((acc: Record<string, any>, item: any) => {
+    if (item?.sectionId) {
+      acc[item.sectionId] = item
+    }
+    return acc
+  }, {})
+
   return (
     <>
       <SkipLink />
       <ScrollProgress />
-      <Header />
+      <Header siteSettings={siteSettings} />
       <main id='main-content' className='min-h-screen'>
         <HeroCarousel />
-        <About />
+        <About
+          data={aboutSection}
+          sectionContent={sectionContentMap['about']}
+        />
         <SectionDivider variant="gradient" />
-        <Specialties />
-        <Services />
+        <Specialties sectionContent={sectionContentMap['specialties']} />
+        <Services
+          data={services}
+          sectionContent={sectionContentMap['services']}
+        />
         <SectionDivider />
-        <LazyMedicalTechnology />
-        <LazyHomeCare />
+        <LazyMedicalTechnology sectionContent={sectionContentMap['technology']} />
+        <LazyHomeCare
+          data={homeCare}
+          sectionContent={sectionContentMap['homecare']}
+        />
         <SectionDivider variant="gradient" />
-        <LazyGallery />
-        <LazyTestimonials />
+        <LazyGallery sectionContent={sectionContentMap['gallery']} />
+        <LazyTestimonials
+          data={testimonials}
+          sectionContent={sectionContentMap['testimonials']}
+        />
         <SectionDivider />
-        <Contact />
+        <Contact siteSettings={siteSettings} sectionContent={sectionContentMap['contact']} />
       </main>
-      <Footer />
+      <Footer siteSettings={siteSettings} />
       <BackToTop />
     </>
   )
 }
-

@@ -3,20 +3,40 @@ import Image from 'next/image'
 import { Link } from '@/navigation'
 import { motion } from 'framer-motion'
 import { useState, useEffect } from 'react'
-import { type ClinicData } from '@/lib/admin-data'
 import { Facebook, Instagram, Mail, MapPin, Phone, ArrowRight, HeartPulse } from 'lucide-react'
 import { useTranslations } from 'next-intl'
+import { siteConfig as siteConfigFallback } from '@/data/site-config'
 
-import { siteConfig } from '@/data/site-config'
+interface SiteSettings {
+  clinicName?: string
+  phone?: string
+  email?: string
+  address?: string
+  social?: { facebook?: string; instagram?: string }
+}
 
-export default function Footer() {
+interface FooterProps {
+  siteSettings?: SiteSettings
+}
+
+export default function Footer({ siteSettings }: FooterProps) {
   const t = useTranslations('footer')
   const tNav = useTranslations('nav')
-  // Initialize with siteConfig directly for instant rendering
-  const [clinicData, setClinicData] = useState<any>(siteConfig)
+
+  // Use Sanity data if available, otherwise fallback to static config
+  const [clinicData, setClinicData] = useState<any>({
+    contact: {
+      address: siteSettings?.address || siteConfigFallback.contact.address,
+      phone: siteSettings?.phone || siteConfigFallback.contact.phone,
+      email: siteSettings?.email || siteConfigFallback.contact.email,
+    },
+    social: siteSettings?.social || siteConfigFallback.social,
+  })
 
   useEffect(() => {
-    // Optional: fetch for dynamic updates if we still support them
+    // Only fetch from API if no Sanity data provided
+    if (siteSettings) return
+
     const load = async () => {
       try {
         const res = await fetch('/api/admin/clinic', { cache: 'no-store' })
@@ -27,7 +47,7 @@ export default function Footer() {
       } catch { }
     }
     load()
-  }, [])
+  }, [siteSettings])
 
   const containerVariants = {
     hidden: { opacity: 0 },

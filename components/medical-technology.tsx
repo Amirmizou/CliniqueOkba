@@ -29,6 +29,16 @@ interface Equipment {
     features: string[]
 }
 
+interface SectionContent {
+    badge?: string
+    title?: string
+    subtitle?: string
+}
+
+interface MedicalTechnologyProps {
+    sectionContent?: SectionContent
+}
+
 const iconMap = {
     Scan,
     Brain,
@@ -40,7 +50,7 @@ const iconMap = {
     Scissors
 }
 
-export default function MedicalTechnology() {
+export default function MedicalTechnology({ sectionContent }: MedicalTechnologyProps) {
     const [equipment, setEquipment] = useState<Equipment[]>([])
 
     useEffect(() => {

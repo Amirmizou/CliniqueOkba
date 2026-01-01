@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from 'react'
 import Image from 'next/image'
-import clinicData from '@/data/clinic.json'
+import clinicDataFallback from '@/data/clinic.json'
 import { useTranslations } from 'next-intl'
 import { Check, Award, Users, Clock } from 'lucide-react'
 import { gsap } from 'gsap'
@@ -14,7 +14,28 @@ if (typeof window !== 'undefined') {
   gsap.registerPlugin(ScrollTrigger)
 }
 
-export default function About() {
+interface AboutData {
+  title?: string
+  subtitle?: string
+  description?: string
+  mission?: string
+  vision?: string
+  stats?: Array<{ value: string; label: string; icon?: string }>
+  image?: any
+}
+
+interface SectionContent {
+  badge?: string
+  title?: string
+  subtitle?: string
+}
+
+interface AboutProps {
+  data?: AboutData
+  sectionContent?: SectionContent
+}
+
+export default function About({ data, sectionContent }: AboutProps) {
   const t = useTranslations('about')
   const prefersReducedMotion = useReducedMotion()
 
@@ -191,12 +212,12 @@ export default function About() {
                 {t('title')}
               </p>
               <h2 className='text-foreground text-2xl sm:text-3xl md:text-4xl font-bold'>
-                {clinicData.name}
+                {data?.title || clinicDataFallback.name}
               </h2>
             </div>
 
             <p className='text-muted-foreground text-base sm:text-lg leading-relaxed'>
-              {clinicData.description || t('description')}
+              {data?.description || clinicDataFallback.description || t('description')}
             </p>
 
             <div ref={featuresRef} className='space-y-4'>

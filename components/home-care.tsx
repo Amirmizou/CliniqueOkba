@@ -4,7 +4,28 @@ import { Stethoscope, Home, PhoneCall, Clock, CheckCircle2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { motion } from 'framer-motion'
 
-export default function HomeCare() {
+interface SectionContent {
+  badge?: string
+  title?: string
+  subtitle?: string
+}
+
+interface HomeCareData {
+  title?: string
+  subtitle?: string
+  description?: string
+  services?: Array<{ name: string; description?: string }>
+  benefits?: string[]
+  availability?: string
+  callToAction?: { text?: string; phone?: string }
+}
+
+interface HomeCareProps {
+  data?: HomeCareData
+  sectionContent?: SectionContent
+}
+
+export default function HomeCare({ data, sectionContent }: HomeCareProps) {
   const scrollToContact = () => {
     const url = new URL(window.location.href)
     url.hash = 'contact'
