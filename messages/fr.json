@@ -106,6 +106,10 @@
       "orl": {
         "name": "ORL",
         "desc": "Oto-rhino-laryngologie et chirurgie ORL"
+      },
+      "endocrinology": {
+        "name": "Endocrinologie",
+        "desc": "Maladies hormonales et métaboliques"
       }
     }
   },

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+
 import ScrollAnimation from '@/components/ui/scroll-animation'
 import StaggerContainer from '@/components/ui/stagger-container'
 import {
@@ -10,6 +10,8 @@ import {
   Baby,
   Brain,
   Eye,
+  Ear,
+  Smile,
   Microscope,
   Syringe,
   Ambulance,
@@ -29,6 +31,8 @@ const iconMap: any = {
   Baby,
   Brain,
   Eye,
+  Ear,
+  Smile,
   Microscope,
   Syringe,
   Ambulance,
@@ -61,55 +65,108 @@ interface ServicesProps {
   sectionContent?: SectionContent
 }
 
-export default function Services({ data, sectionContent }: ServicesProps) {
-  const [services, setServices] = useState<Service[]>(data || [])
-  const [isLoading, setIsLoading] = useState(!data)
+// Services par défaut (affichés si aucune donnée Sanity n'est disponible)
+// Liste détaillée des actes, regroupant les pôles de la clinique.
+const defaultServices: Service[] = [
+  // --- Imagerie ---
+  {
+    id: 'scanner',
+    name: 'Scanner (TDM)',
+    description:
+      'Tomodensitométrie haute résolution pour explorer l’ensemble du corps en quelques secondes.',
+    icon: 'Scan',
+  },
+  {
+    id: 'irm',
+    name: 'IRM',
+    description:
+      'Imagerie par résonance magnétique, précise et sans rayons X.',
+    icon: 'Brain',
+  },
+  {
+    id: 'radiologie',
+    name: 'Radiologie & mammographie',
+    description:
+      'Radiographie numérique et dépistage du sein à faible irradiation.',
+    icon: 'Activity',
+  },
+  {
+    id: 'echographie',
+    name: 'Échographie',
+    description:
+      'Échographie et doppler en temps réel pour un diagnostic ciblé.',
+    icon: 'Heart',
+  },
+  // --- Pôle dentaire ---
+  {
+    id: 'dentaire-consultation',
+    name: 'Consultation dentaire',
+    description:
+      'Bilan bucco-dentaire, soins conservateurs et prévention.',
+    icon: 'Smile',
+  },
+  {
+    id: 'dentaire-chirurgie',
+    name: 'Chirurgie dentaire',
+    description:
+      'Extractions, implants et interventions bucco-dentaires.',
+    icon: 'Scissors',
+  },
+  {
+    id: 'dentaire-odf',
+    name: 'Orthodontie (ODF)',
+    description:
+      'Orthodontie dento-faciale pour aligner et corriger la dentition.',
+    icon: 'Smile',
+  },
+  {
+    id: 'dentaire-prothese',
+    name: 'Prothèse dentaire',
+    description:
+      'Conception de prothèses fixes et amovibles sur mesure.',
+    icon: 'Smile',
+  },
+  // --- Chirurgie spécialisée ---
+  {
+    id: 'chirurgie-ophtalmo',
+    name: 'Chirurgie ophtalmologique',
+    description:
+      'Interventions de l’œil au bloc opératoire aux normes.',
+    icon: 'Eye',
+  },
+  {
+    id: 'chirurgie-orl',
+    name: 'Chirurgie ORL',
+    description:
+      'Chirurgie de l’oreille, du nez et de la gorge.',
+    icon: 'Ear',
+  },
+  // --- Laboratoire & urgences ---
+  {
+    id: 'laboratoire',
+    name: 'Laboratoire d’analyses',
+    description:
+      'Bilans sanguins et prélèvements sur automates de dernière génération.',
+    icon: 'Microscope',
+  },
+  {
+    id: 'urgences',
+    name: 'Urgences 24h/24',
+    description:
+      'Une équipe médicale de garde, disponible jour et nuit, 7j/7.',
+    icon: 'Ambulance',
+  },
+]
 
-  // Fallback to API if no Sanity data provided
-  useEffect(() => {
-    if (data && data.length > 0) {
-      setServices(data)
-      setIsLoading(false)
-      return
-    }
-
-    const loadData = async () => {
-      try {
-        const res = await fetch('/api/admin/services', { cache: 'no-store' })
-        if (res.ok) {
-          const apiData = await res.json()
-          setServices(apiData)
-        }
-      } catch (error) {
-        console.error('Failed to load services:', error)
-      } finally {
-        setIsLoading(false)
-      }
-    }
-    loadData()
-  }, [data])
+export default function Services({ data = [], sectionContent }: ServicesProps) {
+  const services = data && data.length > 0 ? data : defaultServices
 
   // Default content if not from Sanity
   const title = sectionContent?.title || 'Nos Services Médicaux'
   const subtitle = sectionContent?.subtitle || 'Une expertise complète pour votre santé'
   const badge = sectionContent?.badge || 'Services'
 
-  if (isLoading) {
-    return (
-      <section id='services' className='bg-background py-12 sm:py-16 md:py-20'>
-        <div className='mx-auto max-w-7xl px-4 sm:px-6 lg:px-8'>
-          <div className='animate-pulse space-y-8'>
-            <div className='h-8 bg-muted rounded w-1/3 mx-auto'></div>
-            <div className='grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3'>
-              {[1, 2, 3, 4, 5, 6].map((i) => (
-                <div key={i} className='h-48 bg-muted rounded-2xl'></div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
-    )
-  }
+
 
   return (
     <section id='services' className='bg-background py-12 sm:py-16 md:py-20'>

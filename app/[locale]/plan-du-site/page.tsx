@@ -45,6 +45,16 @@ export default function PlanDuSite() {
                                 Contact
                             </Link>
                         </li>
+                        <li>
+                            <Link href="/actualites" className="text-muted-foreground hover:text-primary transition-colors">
+                                Actualités
+                            </Link>
+                        </li>
+                        <li>
+                            <Link href="/evenements" className="text-muted-foreground hover:text-primary transition-colors">
+                                Événements
+                            </Link>
+                        </li>
                     </ul>
                 </section>
 

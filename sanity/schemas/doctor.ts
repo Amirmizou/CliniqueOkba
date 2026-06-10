@@ -34,12 +34,62 @@ export default defineType({
             initialValue: 'Dr.',
         }),
         defineField({
+            name: 'subtitle',
+            title: 'Sous-titre / mention',
+            type: 'string',
+            description: 'Ex : « Ancienne Maître Assistante » ou une sous-spécialité',
+        }),
+        defineField({
             name: 'image',
-            title: 'Photo',
+            title: 'Affiche / Photo',
             type: 'image',
+            description: 'Affiche officielle du médecin (format portrait recommandé)',
             options: {
                 hotspot: true,
             },
+        }),
+        defineField({
+            name: 'experience',
+            title: 'Expérience',
+            type: 'string',
+            description: 'Ex : « Plus de 25 ans d’expérience » (optionnel)',
+        }),
+        defineField({
+            name: 'services',
+            title: 'Prestations / actes',
+            type: 'array',
+            of: [{ type: 'string' }],
+            description: 'Liste des prestations affichées sur la carte',
+        }),
+        defineField({
+            name: 'consultationHours',
+            title: 'Horaires de consultation',
+            type: 'string',
+            description: 'Ex : 08h00 – 16h00',
+        }),
+        defineField({
+            name: 'accentColor',
+            title: 'Couleur d’accent',
+            type: 'string',
+            description: 'Couleur HEX de la carte (ex : #A855F7)',
+            initialValue: '#006633',
+        }),
+        defineField({
+            name: 'iconName',
+            title: 'Icône de la spécialité',
+            type: 'string',
+            options: {
+                list: [
+                    { title: 'Gynéco / Pédiatrie (bébé)', value: 'Baby' },
+                    { title: 'Endocrino (activité)', value: 'Activity' },
+                    { title: 'Médecine interne (stéthoscope)', value: 'Stethoscope' },
+                    { title: 'ORL (oreille)', value: 'Ear' },
+                    { title: 'Cardiologie (cœur)', value: 'Heart' },
+                    { title: 'Dentaire (sourire)', value: 'Smile' },
+                    { title: 'Laboratoire (fiole)', value: 'FlaskConical' },
+                ],
+            },
+            initialValue: 'Stethoscope',
         }),
         defineField({
             name: 'bio',

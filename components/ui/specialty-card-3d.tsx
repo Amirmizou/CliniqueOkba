@@ -15,6 +15,7 @@ interface SpecialtyCard3DProps {
     size?: 'small' | 'medium' | 'large'
     index: number
     animationType?: 'heartbeat' | 'breathing' | 'synapse' | 'scan' | 'pulse' | 'playful' | 'shine'
+    comingSoon?: boolean
 }
 
 export function SpecialtyCard3D({
@@ -26,7 +27,8 @@ export function SpecialtyCard3D({
     gradient,
     size = 'medium',
     index,
-    animationType = 'pulse'
+    animationType = 'pulse',
+    comingSoon = false
 }: SpecialtyCard3DProps) {
     const [isFlipped, setIsFlipped] = useState(false)
 
@@ -61,14 +63,17 @@ export function SpecialtyCard3D({
         >
             {/* 3D Card Container */}
             <motion.div
-                className="relative w-full h-full preserve-3d cursor-pointer"
-                whileHover={{
+                className={cn(
+                    "relative w-full h-full preserve-3d",
+                    comingSoon ? "cursor-default" : "cursor-pointer"
+                )}
+                whileHover={comingSoon ? {} : {
                     rotateY: isFlipped ? 180 : 5,
                     rotateX: isFlipped ? 0 : -5,
                     scale: 1.02,
                     z: 50
                 }}
-                onClick={() => setIsFlipped(!isFlipped)}
+                onClick={() => !comingSoon && setIsFlipped(!isFlipped)}
                 transition={{ duration: 0.6, type: 'spring', stiffness: 100 }}
                 style={{
                     transformStyle: 'preserve-3d'
@@ -80,15 +85,18 @@ export function SpecialtyCard3D({
                         'absolute inset-0 backface-hidden rounded-3xl overflow-hidden',
                         'bg-gradient-to-br from-background via-card to-background',
                         'border border-border/50 shadow-2xl',
-                        isFlipped && 'invisible'
+                        isFlipped && 'invisible',
+                        comingSoon && 'grayscale opacity-90'
                     )}
                 >
                     {/* Background Image with Overlay */}
                     <div className="absolute inset-0">
-                        <div
-                            className="absolute inset-0 bg-cover bg-center opacity-20 group-hover:opacity-30 transition-opacity duration-500"
-                            style={{ backgroundImage: `url(${image})` }}
-                        />
+                        {image && (
+                            <div
+                                className="absolute inset-0 bg-cover bg-center opacity-20 group-hover:opacity-30 transition-opacity duration-500"
+                                style={{ backgroundImage: `url(${image})` }}
+                            />
+                        )}
                         <div className={cn(
                             'absolute inset-0 bg-gradient-to-br opacity-10',
                             gradient
@@ -133,8 +141,8 @@ export function SpecialtyCard3D({
 
                     {/* Content */}
                     <div className="relative h-full flex flex-col justify-between p-6 md:p-8 z-10">
-                        {/* Icon with Animation */}
-                        <div className="flex justify-start">
+                        {/* Header with Icon and Badge */}
+                        <div className="flex justify-between items-start">
                             <motion.div
                                 className={cn(
                                     'p-4 rounded-2xl backdrop-blur-md shadow-lg',
@@ -145,6 +153,15 @@ export function SpecialtyCard3D({
                             >
                                 <Icon className="w-8 h-8 md:w-10 md:h-10 text-white drop-shadow-lg" />
                             </motion.div>
+                            {comingSoon && (
+                                <div className="px-3 py-1.5 rounded-full bg-white/10 backdrop-blur-md text-[10px] sm:text-xs font-bold text-white/90 border border-white/20 shadow-lg uppercase tracking-widest flex items-center gap-1.5">
+                                    <span className="relative flex h-2 w-2">
+                                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
+                                        <span className="relative inline-flex rounded-full h-2 w-2 bg-white/80"></span>
+                                    </span>
+                                    Prochainement
+                                </div>
+                            )}
                         </div>
 
                         {/* Title */}
@@ -160,18 +177,20 @@ export function SpecialtyCard3D({
                         </div>
 
                         {/* Hover Indicator */}
-                        <motion.div
-                            className="absolute bottom-6 right-6 opacity-0 group-hover:opacity-100 transition-opacity"
-                            initial={{ scale: 0 }}
-                            whileHover={{ scale: 1 }}
-                        >
-                            <div className={cn(
-                                'px-4 py-2 rounded-full backdrop-blur-md text-xs font-semibold text-white',
-                                `bg-gradient-to-r ${gradient}`
-                            )}>
-                                Cliquer pour détails
-                            </div>
-                        </motion.div>
+                        {!comingSoon && (
+                            <motion.div
+                                className="absolute bottom-6 right-6 opacity-0 group-hover:opacity-100 transition-opacity"
+                                initial={{ scale: 0 }}
+                                whileHover={{ scale: 1 }}
+                            >
+                                <div className={cn(
+                                    'px-4 py-2 rounded-full backdrop-blur-md text-xs font-semibold text-white',
+                                    `bg-gradient-to-r ${gradient}`
+                                )}>
+                                    Cliquer pour détails
+                                </div>
+                            </motion.div>
+                        )}
                     </div>
 
                     {/* Glassmorphism Overlay on Hover */}
@@ -196,17 +215,16 @@ export function SpecialtyCard3D({
                             <Icon className="w-12 h-12 text-white" />
                         </div>
 
-                        <h3 className="text-3xl font-bold text-foreground">
-                            {title}
+                        <h3 className="text-2xl font-bold text-foreground">
+                            Prendre Rendez-vous
                         </h3>
 
-                        {description && (
-                            <p className="text-muted-foreground text-lg max-w-md">
-                                {description}
-                            </p>
-                        )}
+                        <p className="text-muted-foreground text-md max-w-md">
+                            Consultez nos experts en <span className="font-semibold text-foreground">{title.toLowerCase()}</span> pour un suivi personnalisé et de qualité.
+                        </p>
 
-                        <motion.button
+                        <motion.a
+                            href="#contact"
                             className={cn(
                                 'px-6 py-3 rounded-full font-semibold text-white shadow-lg',
                                 `bg-gradient-to-r ${gradient}`
@@ -215,7 +233,7 @@ export function SpecialtyCard3D({
                             whileTap={{ scale: 0.95 }}
                         >
                             En savoir plus
-                        </motion.button>
+                        </motion.a>
                     </div>
                 </div>
             </motion.div>

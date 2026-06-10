@@ -5,7 +5,7 @@ export const client = createClient({
     projectId,
     dataset,
     apiVersion,
-    useCdn: true, // Set to false if statically generating pages, using ISR or tag-based revalidation
+    useCdn: false, // false = données fraîches depuis l'API (recommandé avec ISR/revalidation)
 })
 
 // Client with write access (for admin operations, if needed)

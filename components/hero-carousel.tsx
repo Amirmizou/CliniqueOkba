@@ -1,161 +1,122 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
-import { ChevronLeft, ChevronRight, Phone, Play, Heart, Activity, Shield, Stethoscope } from 'lucide-react'
+import {
+    motion,
+    AnimatePresence,
+    useScroll,
+    useTransform,
+} from 'framer-motion'
+import {
+    ChevronLeft,
+    ChevronRight,
+    Phone,
+    CalendarHeart,
+} from 'lucide-react'
 import Image from 'next/image'
-import { gsap } from 'gsap'
-import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { useReducedMotion } from '@/hooks/use-reduced-motion'
+import { urlFor } from '@/sanity/lib/image'
+import { siteConfig } from '@/data/site-config'
+import { buildWhatsAppUrl } from '@/lib/whatsapp'
+import { AnimatedLogo } from '@/components/ui/animated-logo'
 
-// Register GSAP plugin
-if (typeof window !== 'undefined') {
-    gsap.registerPlugin(ScrollTrigger)
+// Courbe d'easing forte (sortie) — plus de « punch » que les easings CSS par défaut
+const EASE_OUT = [0.23, 1, 0.32, 1] as const
+
+interface HeroCarouselProps {
+    slides?: any[]
+    siteSettings?: {
+        clinicName?: string
+        whatsappNumber?: string
+        appointmentMessage?: string
+        phone?: string
+        hours?: { emergency?: string; weekdays?: string; saturday?: string }
+        heroStats?: { value?: string; label?: string }[]
+    }
+    sectionContent?: {
+        badge?: string
+        title?: string
+        subtitle?: string
+    }
 }
 
-interface HeroSlide {
-    id: string
-    image: string
-    title: string
-    subtitle: string
-    order: number
-    active: boolean
-}
+export default function HeroCarousel({ slides: rawSlides = [], siteSettings, sectionContent }: HeroCarouselProps) {
+    const slides = rawSlides
+        .map((slide, index) => ({
+            id: slide._id || String(index),
+            title: slide.title,
+            subtitle: slide.subtitle || '',
+            image: slide.image ? urlFor(slide.image).width(1920).height(1080).url() : '',
+        }))
+        .filter((slide) => slide.image !== '')
 
-export default function HeroCarousel() {
-    const [slides, setSlides] = useState<HeroSlide[]>([])
     const [currentIndex, setCurrentIndex] = useState(0)
     const [isAutoPlaying, setIsAutoPlaying] = useState(true)
     const [progress, setProgress] = useState(0)
     const prefersReducedMotion = useReducedMotion()
-
-    // Refs for GSAP animations
     const heroRef = useRef<HTMLElement>(null)
-    const contentRef = useRef<HTMLDivElement>(null)
-    const ekgRef = useRef<SVGSVGElement>(null)
-    const floatingIconsRef = useRef<HTMLDivElement>(null)
 
+    /* Parallax doux au scroll (Framer) */
+    const { scrollY } = useScroll()
+    const yImage = useTransform(scrollY, [0, 800], [0, 140])
+    const yContent = useTransform(scrollY, [0, 600], [0, 90])
+    const contentOpacity = useTransform(scrollY, [0, 480], [1, 0])
+
+    /* Téléphone pour le CTA « Appeler » (Sanity sinon config locale) */
+    const phoneDisplay = (siteSettings?.phone || siteConfig.contact.phone).split('/')[0].trim()
+    const phoneHref = `tel:${phoneDisplay.replace(/[^+\d]/g, '')}`
+
+    /* Auto-play */
     useEffect(() => {
-        const loadSlides = async () => {
-            try {
-                const res = await fetch('/api/admin/hero-slides', { cache: 'no-store' })
-                if (res.ok) {
-                    const data = await res.json()
-                    const activeSlides = data
-                        .filter((s: HeroSlide) => s.active)
-                        .sort((a: HeroSlide, b: HeroSlide) => a.order - b.order)
-                    setSlides(activeSlides)
-                }
-            } catch (error) {
-                console.error('Failed to load hero slides:', error)
-            }
-        }
-        loadSlides()
-    }, [])
-
-    // GSAP Scroll Animations
-    useEffect(() => {
-        if (prefersReducedMotion || !heroRef.current) return
-
-        const ctx = gsap.context(() => {
-            // Parallax effect on content
-            if (contentRef.current) {
-                gsap.to(contentRef.current, {
-                    y: 100,
-                    opacity: 0.5,
-                    scrollTrigger: {
-                        trigger: heroRef.current,
-                        start: 'top top',
-                        end: 'bottom top',
-                        scrub: 1,
-                    },
-                })
-            }
-
-            // EKG line animation
-            if (ekgRef.current) {
-                const path = ekgRef.current.querySelector('path')
-                if (path) {
-                    gsap.to(path, {
-                        strokeDashoffset: -1000,
-                        scrollTrigger: {
-                            trigger: heroRef.current,
-                            start: 'top top',
-                            end: 'bottom top',
-                            scrub: 0.5,
-                        },
-                    })
-                }
-            }
-
-            // Floating medical icons parallax
-            if (floatingIconsRef.current) {
-                const icons = floatingIconsRef.current.querySelectorAll('.floating-icon')
-                icons.forEach((icon, index) => {
-                    gsap.to(icon, {
-                        y: -150 * (index + 1) * 0.3,
-                        rotation: 360,
-                        scrollTrigger: {
-                            trigger: heroRef.current,
-                            start: 'top top',
-                            end: 'bottom top',
-                            scrub: 1 + index * 0.2,
-                        },
-                    })
-                })
-            }
-        }, heroRef)
-
-        return () => ctx.revert()
-    }, [prefersReducedMotion, slides.length])
-
-    // Auto-play carousel with progress tracking
-    useEffect(() => {
-        if (!isAutoPlaying || slides.length === 0) return
-
+        if (!isAutoPlaying || slides.length <= 1) return
         setProgress(0)
-        const duration = 7000 // 7 seconds
-        const interval = 50 // Update every 50ms for smooth progress
+        const duration = 7000
+        const interval = 50
         let elapsed = 0
-
         const timer = setInterval(() => {
             elapsed += interval
             setProgress((elapsed / duration) * 100)
-
             if (elapsed >= duration) {
                 setCurrentIndex((prev) => (prev + 1) % slides.length)
                 elapsed = 0
                 setProgress(0)
             }
         }, interval)
-
         return () => clearInterval(timer)
     }, [isAutoPlaying, slides.length, currentIndex])
 
-    const nextSlide = () => {
-        setCurrentIndex((prev) => (prev + 1) % slides.length)
+    const goTo = (index: number) => {
+        setCurrentIndex((index + slides.length) % slides.length)
         setProgress(0)
         setIsAutoPlaying(false)
     }
 
-    const prevSlide = () => {
-        setCurrentIndex((prev) => (prev === 0 ? slides.length - 1 : prev - 1))
-        setProgress(0)
-        setIsAutoPlaying(false)
+    const scrollToId = (id: string) =>
+        document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' })
+
+    // Prise de rendez-vous : ouvre WhatsApp si configuré, sinon scroll vers Contact
+    const handleBooking = () => {
+        const clinic = siteSettings?.clinicName || 'la Clinique OKBA'
+        const intro =
+            siteSettings?.appointmentMessage?.trim() ||
+            `Bonjour ${clinic}, je souhaite prendre un rendez-vous.`
+        const url = buildWhatsAppUrl(siteSettings?.whatsappNumber, intro)
+        if (url) {
+            window.open(url, '_blank', 'noopener,noreferrer')
+        } else {
+            scrollToId('contact')
+        }
     }
 
-    const goToSlide = (index: number) => {
-        setCurrentIndex(index)
-        setProgress(0)
-        setIsAutoPlaying(false)
-    }
-
+    /* Fallback si aucune slide */
     if (slides.length === 0) {
         return (
-            <section className='relative min-h-screen flex items-center justify-center bg-gradient-to-br from-primary/5 via-background to-primary/10'>
-                <div className='text-center px-4'>
-                    <h1 className='text-4xl md:text-6xl font-bold mb-4'>Clinique OKBA</h1>
-                    <p className='text-lg md:text-xl text-muted-foreground'>Votre santé, notre priorité</p>
+            <section className="relative flex min-h-screen items-center justify-center bg-gradient-to-br from-primary/10 via-background to-primary/5">
+                <div className="px-4 text-center">
+                    <h1 className="mb-4 text-4xl font-bold md:text-6xl">Clinique OKBA</h1>
+                    <p className="text-lg text-muted-foreground md:text-xl">
+                        Votre santé, notre priorité
+                    </p>
                 </div>
             </section>
         )
@@ -167,188 +128,284 @@ export default function HeroCarousel() {
         <section
             ref={heroRef}
             id="home"
-            className='relative min-h-screen flex items-center justify-center overflow-hidden'
+            className="relative flex min-h-[85dvh] lg:min-h-[80dvh] flex-col overflow-hidden"
             onMouseEnter={() => setIsAutoPlaying(false)}
             onMouseLeave={() => setIsAutoPlaying(true)}
+            // Accessibilité clavier : suspendre le défilement auto quand un
+            // élément du hero reçoit le focus, reprendre quand il le perd.
+            onFocusCapture={() => setIsAutoPlaying(false)}
+            onBlurCapture={(e) => {
+                if (!e.currentTarget.contains(e.relatedTarget as Node)) {
+                    setIsAutoPlaying(true)
+                }
+            }}
         >
-            {/* Floating Medical Icons - Background Layer */}
-            <div ref={floatingIconsRef} className="absolute inset-0 z-[5] pointer-events-none overflow-hidden">
-                <div className="floating-icon absolute top-[20%] left-[10%] opacity-10">
-                    <Heart className="w-16 h-16 text-primary animate-medical-pulse" />
-                </div>
-                <div className="floating-icon absolute top-[60%] left-[15%] opacity-10">
-                    <Activity className="w-20 h-20 text-primary animate-medical-pulse" style={{ animationDelay: '0.5s' }} />
-                </div>
-                <div className="floating-icon absolute top-[40%] right-[10%] opacity-10">
-                    <Shield className="w-24 h-24 text-primary animate-medical-pulse" style={{ animationDelay: '1s' }} />
-                </div>
-                <div className="floating-icon absolute top-[70%] right-[20%] opacity-10">
-                    <Stethoscope className="w-18 h-18 text-primary animate-medical-pulse" style={{ animationDelay: '1.5s' }} />
-                </div>
-            </div>
-
-            {/* EKG Heartbeat Line */}
-            <svg
-                ref={ekgRef}
-                className="absolute top-1/2 left-0 w-full h-32 opacity-5 z-[6] pointer-events-none"
-                preserveAspectRatio="none"
-                viewBox="0 0 1200 100"
+            {/* ---------------------------------------------------------- */}
+            {/*  Couche image (parallax + ken burns une direction)         */}
+            {/* ---------------------------------------------------------- */}
+            <motion.div
+                style={prefersReducedMotion ? undefined : { y: yImage }}
+                className="absolute inset-0 z-0"
             >
-                <path
-                    d="M0,50 L200,50 L210,20 L220,80 L230,50 L400,50 L410,20 L420,80 L430,50 L600,50 L610,20 L620,80 L630,50 L800,50 L810,20 L820,80 L830,50 L1000,50 L1010,20 L1020,80 L1030,50 L1200,50"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    className="text-primary"
-                    strokeDasharray="1000"
-                    strokeDashoffset="0"
-                />
-            </svg>
-
-            {/* Background Images with Fade Transition */}
-            <AnimatePresence mode='wait'>
-                <motion.div
-                    key={currentIndex}
-                    initial={{ opacity: 0, scale: 1.1 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0 }}
-                    transition={{ duration: 1.2, ease: "easeOut" }}
-                    className='absolute inset-0 z-0'
-                >
-                    {/* Main Image */}
-                    <div className='relative w-full h-full'>
-                        <Image
-                            src={currentSlide.image}
-                            alt={currentSlide.title}
-                            fill
-                            className='object-cover object-center'
-                            priority
-                            quality={75}
-                            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 90vw, 80vw"
-                        />
-                        <div className="absolute inset-0 bg-black/40" />
-                    </div>
-                    <div className='absolute inset-0 bg-gradient-to-r from-black/80 via-black/40 to-transparent z-10' />
-                </motion.div>
-            </AnimatePresence>
-
-            {/* Content */}
-            <div ref={contentRef} className='relative z-20 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 h-full flex items-center'>
-                <AnimatePresence mode='wait'>
+                <AnimatePresence mode="wait">
                     <motion.div
                         key={currentIndex}
-                        initial={{ opacity: 0, y: 30 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: -30 }}
-                        transition={{ duration: 0.6, ease: "easeOut" }}
-                        className='text-white max-w-3xl py-8 sm:py-0'
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        transition={{ duration: 1 }}
+                        className="absolute inset-0"
                     >
                         <motion.div
-                            initial={{ opacity: 0, x: -30 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            transition={{ delay: 0.2, duration: 0.8 }}
-                            className="mb-3 sm:mb-4 inline-flex items-center gap-2 px-3 py-1.5 sm:px-4 sm:py-2 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-white text-xs sm:text-sm font-medium"
+                            initial={prefersReducedMotion ? undefined : { scale: 1.04 }}
+                            animate={prefersReducedMotion ? undefined : { scale: 1 }}
+                            transition={{ duration: 10, ease: 'easeOut' }}
+                            className="relative h-full w-full"
                         >
-                            <span className="relative flex h-2 w-2">
-                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
-                                <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
-                            </span>
-                            Excellence Médicale
-                        </motion.div>
-                        <motion.h1
-                            initial={{ opacity: 0, x: -50 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            transition={{ delay: 0.3, duration: 0.8 }}
-                            className='text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-4 sm:mb-6 tracking-tight leading-[1.1] drop-shadow-lg'
-                        >
-                            {currentSlide.title}
-                        </motion.h1>
-                        {currentSlide.subtitle && (
-                            <motion.p
-                                initial={{ opacity: 0, x: -50 }}
-                                animate={{ opacity: 1, x: 0 }}
-                                transition={{ delay: 0.5, duration: 0.8 }}
-                                className='text-base sm:text-lg md:text-xl text-gray-200 mb-6 sm:mb-8 font-light drop-shadow-md max-w-2xl leading-relaxed'
-                            >
-                                {currentSlide.subtitle}
-                            </motion.p>
-                        )}
-                        {/* Double CTA */}
-                        <motion.div
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: 0.7, duration: 0.8 }}
-                            className="flex flex-col sm:flex-row gap-3 sm:gap-4"
-                        >
-                            <button
-                                onClick={() => document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' })}
-                                className="group bg-primary hover:bg-primary/90 text-white px-6 py-3 sm:px-8 sm:py-4 rounded-full font-semibold text-sm sm:text-base transition-all duration-300 shadow-lg shadow-primary/30 hover:shadow-xl hover:shadow-primary/40 hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-2"
-                            >
-                                <Phone className="w-4 h-4 sm:w-5 sm:h-5" />
-                                Prendre Rendez-vous
-                                <ChevronRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
-                            </button>
-                            <button
-                                onClick={() => document.getElementById('about')?.scrollIntoView({ behavior: 'smooth' })}
-                                className="group bg-white/10 hover:bg-white/20 backdrop-blur-sm text-white px-6 py-3 sm:px-8 sm:py-4 rounded-full font-medium text-sm sm:text-base transition-all duration-300 border border-white/20 hover:border-white/40 flex items-center justify-center gap-2"
-                            >
-                                <Play className="w-4 h-4 sm:w-5 sm:h-5" />
-                                Découvrir la clinique
-                            </button>
+                            <Image
+                                src={currentSlide.image}
+                                alt={currentSlide.title || 'Clinique OKBA'}
+                                fill
+                                className="object-cover object-center"
+                                priority
+                                quality={80}
+                                sizes="100vw"
+                            />
                         </motion.div>
                     </motion.div>
                 </AnimatePresence>
-            </div>
 
-            {/* Navigation Arrows - Hidden on mobile */}
-            {slides.length > 1 && (
-                <>
-                    <button
-                        onClick={prevSlide}
-                        className='hidden sm:flex absolute left-4 top-1/2 -translate-y-1/2 z-30 bg-white/10 hover:bg-white/20 active:bg-white/30 backdrop-blur-sm p-3 rounded-full transition-all items-center justify-center group'
-                        aria-label='Previous slide'
-                    >
-                        <ChevronLeft className='h-6 w-6 text-white transition-transform group-hover:-translate-x-0.5' />
-                    </button>
-                    <button
-                        onClick={nextSlide}
-                        className='hidden sm:flex absolute right-4 top-1/2 -translate-y-1/2 z-30 bg-white/10 hover:bg-white/20 active:bg-white/30 backdrop-blur-sm p-3 rounded-full transition-all items-center justify-center group'
-                        aria-label='Next slide'
-                    >
-                        <ChevronRight className='h-6 w-6 text-white transition-transform group-hover:translate-x-0.5' />
-                    </button>
-                </>
-            )}
+                {/* Scrim de lisibilité (vert de marque) : fort à gauche + bas, léger en haut */}
+                <div className="absolute inset-0 bg-gradient-to-r from-[#00271a]/95 via-[#00351b]/60 to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-t from-[#001b10]/85 via-transparent to-[#001b10]/25" />
+                {/* Fondu bas vers le fond (transition vers la vague) */}
+                <div className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-background to-transparent" />
 
+                {/* Aurora de marque animée : vert profond + vert clair + ambre */}
+                <motion.div
+                    aria-hidden
+                    className="absolute -left-24 top-1/4 h-[28rem] w-[28rem] rounded-full bg-[#006633]/45 blur-[140px]"
+                    animate={prefersReducedMotion ? undefined : { scale: [1, 1.15, 1], opacity: [0.45, 0.7, 0.45] }}
+                    transition={{ duration: 9, repeat: Infinity, ease: 'easeInOut' }}
+                />
+                <motion.div
+                    aria-hidden
+                    className="absolute right-[14%] top-1/3 h-80 w-80 rounded-full bg-[#FDE68A]/15 blur-[120px]"
+                    animate={prefersReducedMotion ? undefined : { scale: [1, 1.2, 1], x: [0, 30, 0] }}
+                    transition={{ duration: 12, repeat: Infinity, ease: 'easeInOut', delay: 1.5 }}
+                />
+                <motion.div
+                    aria-hidden
+                    className="absolute -bottom-12 left-1/3 h-72 w-72 rounded-full bg-[#4caf6e]/25 blur-[130px]"
+                    animate={prefersReducedMotion ? undefined : { scale: [1, 1.1, 1], opacity: [0.25, 0.45, 0.25] }}
+                    transition={{ duration: 10, repeat: Infinity, ease: 'easeInOut', delay: 3 }}
+                />
+
+                {/* Balayage lumineux périodique (effet « scan » médical) */}
+                {!prefersReducedMotion && (
+                    <motion.div
+                        aria-hidden
+                        className="pointer-events-none absolute inset-y-0 left-0 w-1/4 -skew-x-12 bg-gradient-to-r from-transparent via-white/10 to-transparent"
+                        initial={{ x: '-130%' }}
+                        animate={{ x: ['-130%', '530%'] }}
+                        transition={{ duration: 6, repeat: Infinity, ease: 'easeInOut', repeatDelay: 5 }}
+                    />
+                )}
+
+                {/* Texture grille de points (subtile, masquée vers la zone de texte) */}
+                <div
+                    className="absolute inset-0 opacity-[0.12]"
+                    style={{
+                        backgroundImage:
+                            'radial-gradient(currentColor 1px, transparent 1px)',
+                        backgroundSize: '26px 26px',
+                        color: 'white',
+                        maskImage:
+                            'radial-gradient(ellipse 75% 60% at 28% 42%, black, transparent 72%)',
+                        WebkitMaskImage:
+                            'radial-gradient(ellipse 75% 60% at 28% 42%, black, transparent 72%)',
+                    }}
+                />
+            </motion.div>
+
+            {/* ---------------------------------------------------------- */}
+            {/*  Contenu principal                                         */}
+            {/* ---------------------------------------------------------- */}
+            <motion.div
+                style={prefersReducedMotion ? undefined : { y: yContent, opacity: contentOpacity }}
+                className="relative z-20 mx-auto flex w-full max-w-7xl flex-1 items-center px-4 pt-28 pb-16 sm:px-6 lg:px-8"
+            >
+                <div className="grid w-full items-center gap-10 lg:grid-cols-12">
+                    {/* Colonne texte */}
+                    <div className="lg:col-span-7">
+                        {/* Logo animé (motion graphic) */}
+                        <AnimatedLogo className="mb-6" size={96} />
+                        <AnimatePresence mode="wait">
+                        <motion.div
+                            key={currentIndex}
+                            initial={{ opacity: 0, y: 24 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: -16 }}
+                            transition={{ duration: 0.6, ease: EASE_OUT }}
+                        >
+                            {/* Badge */}
+                            <motion.div
+                                initial={{ opacity: 0, y: 12 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ delay: 0.15 }}
+                                className="mb-5 inline-flex items-center gap-2 rounded-full border border-emerald-400/30 bg-[#00271a]/50 px-4 py-2 text-xs font-medium text-emerald-50 shadow-lg shadow-black/20 backdrop-blur-md sm:text-sm"
+                            >
+                                <span className="relative flex h-2 w-2">
+                                    <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
+                                    <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-400" />
+                                </span>
+                                {sectionContent?.badge || 'Excellence Médicale · Ali Mendjeli, Constantine'}
+                            </motion.div>
+
+                            {/* Titre */}
+                            <motion.h1
+                                initial={{ opacity: 0, y: 18 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ delay: 0.25 }}
+                                style={{ textShadow: '0 2px 28px rgba(0,0,0,0.45), 0 1px 3px rgba(0,0,0,0.7)' }}
+                                className="text-3xl font-bold leading-[1.05] tracking-tight text-white sm:text-5xl lg:text-6xl xl:text-7xl"
+                            >
+                                {currentSlide.title}
+                            </motion.h1>
+
+                            {/* Filet dégradé signature (avec halo ambré) */}
+                            <motion.div
+                                initial={{ scaleX: 0 }}
+                                animate={{ scaleX: 1 }}
+                                transition={{ delay: 0.5, duration: 0.7, ease: EASE_OUT }}
+                                className="mt-5 h-1 w-32 origin-left rounded-full bg-gradient-to-r from-[#006633] via-[#4caf6e] to-[#FDE68A] shadow-[0_0_18px_rgba(253,230,138,0.45)]"
+                            />
+
+                            {/* Sous-titre */}
+                            {currentSlide.subtitle && (
+                                <motion.p
+                                    initial={{ opacity: 0, y: 16 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    transition={{ delay: 0.4 }}
+                                    style={{ textShadow: '0 1px 14px rgba(0,0,0,0.55)' }}
+                                    className="mt-5 max-w-xl text-base font-light leading-relaxed text-white/90 sm:text-lg"
+                                >
+                                    {currentSlide.subtitle}
+                                </motion.p>
+                            )}
+
+                            {/* CTAs */}
+                            <motion.div
+                                initial={{ opacity: 0, y: 16 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ delay: 0.55 }}
+                                className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center"
+                            >
+                                <button
+                                    onClick={handleBooking}
+                                    className="group relative inline-flex cursor-pointer items-center justify-center gap-2 overflow-hidden rounded-full bg-gradient-to-r from-[#006633] to-[#0a8a45] px-7 py-4 text-sm font-semibold text-white shadow-lg shadow-[#006633]/40 ring-1 ring-[#FDE68A]/20 transition duration-300 hover:shadow-xl hover:shadow-[#006633]/60 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#FDE68A]/60 active:scale-[0.98] sm:text-base"
+                                >
+                                    {/* Reflet qui balaie au survol */}
+                                    <span className="pointer-events-none absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/25 to-transparent transition-transform duration-700 group-hover:translate-x-full" />
+                                    <CalendarHeart className="h-5 w-5" />
+                                    Prendre Rendez-vous
+                                    <ChevronRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+                                </button>
+
+                                <a
+                                    href={phoneHref}
+                                    className="group inline-flex cursor-pointer items-center justify-center gap-2 rounded-full border border-white/25 bg-white/10 px-7 py-4 text-sm font-semibold text-white backdrop-blur-md transition duration-300 hover:border-white/50 hover:bg-white/20 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-white/30 active:scale-[0.97] sm:text-base"
+                                >
+                                    <Phone className="h-5 w-5 text-emerald-300" />
+                                    Appeler
+                                </a>
+                            </motion.div>
+
+                        </motion.div>
+                        </AnimatePresence>
+                    </div>
+                </div>
+            </motion.div>
+
+            {/* ---------------------------------------------------------- */}
+            {/*  Navigation slides (verticale, à droite)                   */}
+            {/* ---------------------------------------------------------- */}
             {slides.length > 1 && (
-                <div className='absolute bottom-6 sm:bottom-10 left-1/2 -translate-x-1/2 z-30'>
-                    <div className="flex gap-2 bg-black/30 backdrop-blur-md px-4 py-3 rounded-full border border-white/10">
+                <div className="absolute right-5 top-1/2 z-30 hidden -translate-y-1/2 flex-col items-center gap-3 md:flex">
+                    <button
+                        onClick={() => goTo(currentIndex - 1)}
+                        aria-label="Slide précédente"
+                        className="flex h-9 w-9 cursor-pointer items-center justify-center rounded-full border border-white/20 bg-white/10 text-white backdrop-blur-md transition-colors hover:bg-white/20"
+                    >
+                        <ChevronLeft className="h-5 w-5 rotate-90" />
+                    </button>
+
+                    <div className="flex flex-col gap-2">
                         {slides.map((_, index) => (
                             <button
                                 key={index}
-                                onClick={() => goToSlide(index)}
-                                className="relative h-1.5 w-8 sm:w-12 bg-white/20 rounded-full overflow-hidden transition-all hover:bg-white/30"
-                                aria-label={`Go to slide ${index + 1}`}
+                                onClick={() => goTo(index)}
+                                aria-label={`Aller à la slide ${index + 1}`}
+                                className="relative h-8 w-1.5 overflow-hidden rounded-full bg-white/25 transition-colors hover:bg-white/40"
                             >
                                 {index === currentIndex && (
-                                    <motion.div
-                                        className="absolute inset-y-0 left-0 bg-white rounded-full"
-                                        style={{ width: `${progress}%` }}
+                                    <span
+                                        className="absolute inset-x-0 top-0 rounded-full bg-gradient-to-b from-[#FDE68A] to-[#006633]"
+                                        style={{ height: `${progress}%` }}
                                     />
                                 )}
-                                {index < currentIndex && (
-                                    <div className="absolute inset-0 bg-white/60 rounded-full" />
-                                )}
                             </button>
+                        ))}
+                    </div>
+
+                    <button
+                        onClick={() => goTo(currentIndex + 1)}
+                        aria-label="Slide suivante"
+                        className="flex h-9 w-9 cursor-pointer items-center justify-center rounded-full border border-white/20 bg-white/10 text-white backdrop-blur-md transition-colors hover:bg-white/20"
+                    >
+                        <ChevronRight className="h-5 w-5 rotate-90" />
+                    </button>
+                </div>
+            )}
+
+            {/* Indicateurs mobiles (en bas) */}
+            {slides.length > 1 && (
+                <div className="absolute bottom-28 left-1/2 z-30 -translate-x-1/2 md:hidden">
+                    <div className="flex gap-2 rounded-full border border-white/10 bg-black/30 px-3 py-2 backdrop-blur-md">
+                        {slides.map((_, index) => (
+                            <button
+                                key={index}
+                                onClick={() => goTo(index)}
+                                aria-label={`Aller à la slide ${index + 1}`}
+                                className={`h-1.5 rounded-full transition-all ${
+                                    index === currentIndex
+                                        ? 'w-8 bg-gradient-to-r from-[#006633] to-[#FDE68A]'
+                                        : 'w-3 bg-white/30'
+                                }`}
+                            />
                         ))}
                     </div>
                 </div>
             )}
 
-            {/* Wave Divider */}
-            <div className="absolute bottom-0 left-0 w-full z-20 overflow-hidden leading-[0]">
-                <svg className="relative block w-[calc(100%+1.3px)] h-[60px] sm:h-[100px]" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 120" preserveAspectRatio="none">
-                    <path d="M321.39,56.44c58-10.79,114.16-30.13,172-41.86,82.39-16.72,168.19-17.73,250.45-.39C823.78,31,906.67,72,985.66,92.83c70.05,18.48,146.53,26.09,214.34,3V0H0V27.35A600.21,600.21,0,0,0,321.39,56.44Z" className="fill-background"></path>
+            {/* ---------------------------------------------------------- */}
+            {/*  Signature ECG (ligne de vie) au bas du hero               */}
+            {/* ---------------------------------------------------------- */}
+            <div className="pointer-events-none absolute bottom-0 left-0 z-10 w-full overflow-hidden leading-[0]">
+                <svg
+                    className="relative block h-10 w-full text-[#FDE68A]/45"
+                    preserveAspectRatio="none"
+                    viewBox="0 0 1200 100"
+                >
+                    <motion.path
+                        d="M0,50 L420,50 L440,20 L460,80 L480,50 L520,50 L540,35 L560,65 L580,50 L1200,50"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        initial={{ pathLength: 0, opacity: 0 }}
+                        animate={{ pathLength: 1, opacity: 1 }}
+                        transition={{ duration: 2, ease: 'easeInOut', delay: 0.6 }}
+                    />
                 </svg>
             </div>
         </section>

@@ -32,7 +32,7 @@ export default function BackToTop() {
   return (
     <Button
       onClick={scrollToTop}
-      className='bg-primary hover:bg-primary/90 text-primary-foreground focus:ring-primary fixed right-8 bottom-8 z-40 h-12 w-12 rounded-full shadow-lg transition-all duration-300 hover:scale-110 hover:shadow-xl focus:ring-2 focus:ring-offset-2 focus:outline-none'
+      className='bg-primary hover:bg-primary/90 text-primary-foreground focus:ring-primary fixed right-4 bottom-24 z-40 h-12 w-12 rounded-full shadow-lg transition-all duration-300 hover:scale-110 hover:shadow-xl focus:ring-2 focus:ring-offset-2 focus:outline-none md:right-8 md:bottom-8'
       aria-label='Retour en haut de la page'
     >
       <ArrowUp className='h-5 w-5' aria-hidden='true' />

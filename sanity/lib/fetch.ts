@@ -4,12 +4,17 @@ import {
     equipmentQuery,
     specialtiesQuery,
     galleryQuery,
+    facilityPhotosQuery,
+    polesQuery,
     articlesQuery,
     articleBySlugQuery,
+    eventsQuery,
+    eventBySlugQuery,
     siteSettingsQuery,
     doctorsQuery,
     doctorBySlugQuery,
     faqQuery,
+    insuranceSectionQuery,
     // Nouvelles queries
     aboutSectionQuery,
     servicesQuery,
@@ -25,13 +30,18 @@ import {
     allPageSeoQuery,
 } from './queries'
 
+// En développement : revalidation quasi immédiate (1 s) → les changements publiés
+// dans Sanity apparaissent au simple rafraîchissement de la page.
+// En production : ISR pour la performance.
+const isDev = process.env.NODE_ENV === 'development'
+
 // Cache options for better performance
 const cacheOptions = {
-    next: { revalidate: 3600 }, // 1 hour cache
+    next: { revalidate: isDev ? 1 : 3600 }, // 1 s en dev, 1 h en prod
 }
 
 const shortCacheOptions = {
-    next: { revalidate: 60 }, // 1 minute cache for frequently updated content
+    next: { revalidate: isDev ? 1 : 60 }, // 1 s en dev, 1 min en prod
 }
 
 // ==========================================
@@ -82,6 +92,10 @@ export async function getSpecialties() {
     return client.fetch(specialtiesQuery, {}, cacheOptions)
 }
 
+export async function getPoles() {
+    return client.fetch(polesQuery, {}, cacheOptions)
+}
+
 // ==========================================
 // TESTIMONIALS
 // ==========================================
@@ -110,6 +124,10 @@ export async function getGallery() {
     return client.fetch(galleryQuery, {}, cacheOptions)
 }
 
+export async function getFacilityPhotos() {
+    return client.fetch(facilityPhotosQuery, {}, cacheOptions)
+}
+
 // ==========================================
 // ARTICLES / BLOG
 // ==========================================
@@ -120,6 +138,18 @@ export async function getArticles() {
 
 export async function getArticleBySlug(slug: string) {
     return client.fetch(articleBySlugQuery, { slug }, cacheOptions)
+}
+
+// ==========================================
+// ÉVÉNEMENTS
+// ==========================================
+
+export async function getEvents() {
+    return client.fetch(eventsQuery, {}, shortCacheOptions)
+}
+
+export async function getEventBySlug(slug: string) {
+    return client.fetch(eventBySlugQuery, { slug }, cacheOptions)
 }
 
 // ==========================================
@@ -143,11 +173,20 @@ export async function getFaq() {
 }
 
 // ==========================================
+// CONVENTIONS & PRISE EN CHARGE
+// ==========================================
+
+export async function getInsuranceSection() {
+    return client.fetch(insuranceSectionQuery, {}, cacheOptions)
+}
+
+// ==========================================
 // SITE SETTINGS
 // ==========================================
 
 export async function getSiteSettings() {
-    return client.fetch(siteSettingsQuery, {}, cacheOptions)
+    // Config du site (numéros, WhatsApp…) : cache court pour refléter vite les changements
+    return client.fetch(siteSettingsQuery, {}, shortCacheOptions)
 }
 
 // ==========================================

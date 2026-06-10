@@ -1,19 +1,25 @@
-import Header from '@/components/header'
+import SiteHeader from '@/components/site-header'
 import HeroCarousel from '@/components/hero-carousel'
 import About from '@/components/about'
-import Specialties from '@/components/specialties'
-import Services from '@/components/services'
+import VideoPresentation from '@/components/video-presentation'
+import LogoIntro from '@/components/logo-intro'
+import TrustBand from '@/components/trust-band'
+import Poles from '@/components/poles'
+import DoctorsShowcase from '@/components/doctors-showcase'
+import FeaturedEvent from '@/components/featured-event'
+import Insurance from '@/components/insurance'
+import FaqTeaser from '@/components/faq-teaser'
 import Contact from '@/components/contact'
-import Footer from '@/components/footer'
+import SiteFooter from '@/components/site-footer'
 import SkipLink from '@/components/skip-link'
 import BackToTop from '@/components/back-to-top'
+import MobileActionBar from '@/components/mobile-action-bar'
 import ScrollProgress from '@/components/ui/scroll-progress'
 import SectionDivider from '@/components/ui/section-divider'
 // Lazy load des composants lourds (below the fold)
 import {
-  LazyMedicalTechnology,
+  LazyEquipementsGallery,
   LazyHomeCare,
-  LazyGallery,
   LazyTestimonials
 } from '@/components/lazy'
 
@@ -21,11 +27,18 @@ import {
 import {
   getSiteSettings,
   getAboutSection,
-  getServices,
   getTestimonials,
   getHomeCare,
   getAllSectionContents,
+  getHeroSlides,
+  getDoctors,
+  getFacilityPhotos,
+  getPoles,
+  getEvents,
+  getInsuranceSection,
+  getFaq,
 } from '@/sanity/lib/fetch'
+import type { ClinicEvent } from '@/lib/events'
 
 // ISR: Revalidate every hour for better performance
 export const revalidate = 3600
@@ -35,17 +48,29 @@ export default async function Home() {
   const [
     siteSettings,
     aboutSection,
-    services,
     testimonials,
     homeCare,
     sectionContents,
+    heroSlides,
+    doctors,
+    facilityPhotos,
+    poles,
+    events,
+    insurance,
+    faqs,
   ] = await Promise.all([
     getSiteSettings(),
     getAboutSection(),
-    getServices(),
     getTestimonials(),
     getHomeCare(),
     getAllSectionContents(),
+    getHeroSlides(),
+    getDoctors(),
+    getFacilityPhotos(),
+    getPoles(),
+    getEvents(),
+    getInsuranceSection(),
+    getFaq(),
   ])
 
   // Create a map of section contents for easy access
@@ -56,40 +81,58 @@ export default async function Home() {
     return acc
   }, {})
 
+  // Prochain événement publié (à venir) pour la section « À la une »
+  const now = Date.now()
+  const featuredEvent: ClinicEvent | null =
+    (events as ClinicEvent[] | undefined)?.find(
+      (e) => new Date(e.endDate || e.startDate).getTime() >= now,
+    ) || null
+
   return (
     <>
+      <LogoIntro />
       <SkipLink />
       <ScrollProgress />
-      <Header siteSettings={siteSettings} />
+      <SiteHeader siteSettings={siteSettings} />
       <main id='main-content' className='min-h-screen'>
-        <HeroCarousel />
+        <HeroCarousel slides={heroSlides} siteSettings={siteSettings} sectionContent={sectionContentMap['hero']} />
+        <TrustBand siteSettings={siteSettings} />
         <About
           data={aboutSection}
           sectionContent={sectionContentMap['about']}
         />
-        <SectionDivider variant="gradient" />
-        <Specialties sectionContent={sectionContentMap['specialties']} />
-        <Services
-          data={services}
-          sectionContent={sectionContentMap['services']}
-        />
-        <SectionDivider />
-        <LazyMedicalTechnology sectionContent={sectionContentMap['technology']} />
+        <VideoPresentation sectionContent={sectionContentMap['video']} />
+        <SectionDivider variant="ecg" />
+        <Poles data={poles} />
+        <SectionDivider variant="ecg" />
+        <DoctorsShowcase data={doctors} />
+        <SectionDivider variant="ecg" />
+        {featuredEvent && (
+          <>
+            <FeaturedEvent event={featuredEvent} />
+            <SectionDivider variant="ecg" />
+          </>
+        )}
+        <LazyEquipementsGallery data={facilityPhotos} />
         <LazyHomeCare
           data={homeCare}
           sectionContent={sectionContentMap['homecare']}
         />
         <SectionDivider variant="gradient" />
-        <LazyGallery sectionContent={sectionContentMap['gallery']} />
         <LazyTestimonials
           data={testimonials}
           sectionContent={sectionContentMap['testimonials']}
         />
+        <SectionDivider variant="ecg" />
+        <Insurance data={insurance} />
+        <SectionDivider variant="ecg" />
+        <FaqTeaser data={faqs} sectionContent={sectionContentMap['faq']} />
         <SectionDivider />
         <Contact siteSettings={siteSettings} sectionContent={sectionContentMap['contact']} />
       </main>
-      <Footer siteSettings={siteSettings} />
+      <SiteFooter siteSettings={siteSettings} />
       <BackToTop />
+      <MobileActionBar siteSettings={siteSettings} />
     </>
   )
 }

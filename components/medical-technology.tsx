@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import ScrollAnimation from '@/components/ui/scroll-animation'
 import StaggerContainer from '@/components/ui/stagger-container'
 import Image from 'next/image'
+import { urlFor } from '@/sanity/lib/image'
 import {
     Scan,
     Brain,
@@ -36,6 +37,7 @@ interface SectionContent {
 }
 
 interface MedicalTechnologyProps {
+    data?: any[]
     sectionContent?: SectionContent
 }
 
@@ -50,23 +52,18 @@ const iconMap = {
     Scissors
 }
 
-export default function MedicalTechnology({ sectionContent }: MedicalTechnologyProps) {
-    const [equipment, setEquipment] = useState<Equipment[]>([])
-
-    useEffect(() => {
-        const loadEquipment = async () => {
-            try {
-                const res = await fetch('/api/admin/clinic', { cache: 'no-store' })
-                if (res.ok) {
-                    const data = await res.json()
-                    setEquipment(data.equipment || [])
-                }
-            } catch (error) {
-                console.error('Failed to load equipment:', error)
-            }
-        }
-        loadEquipment()
-    }, [])
+export default function MedicalTechnology({ data = [], sectionContent }: MedicalTechnologyProps) {
+    const equipment: Equipment[] = data.map((item: any, index: number) => ({
+        id: item._id || String(index),
+        name: item.name,
+        brand: item.brand,
+        model: item.model,
+        category: item.category,
+        description: item.description,
+        icon: item.icon,
+        image: item.image ? urlFor(item.image).width(800).height(600).url() : '',
+        features: item.features || [],
+    }))
 
     if (equipment.length === 0) return null
 

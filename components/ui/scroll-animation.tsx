@@ -67,7 +67,7 @@ export default function ScrollAnimation({
     viewport = { once: true, margin: "-50px" },
     as: Component = "div"
 }: ScrollAnimationProps) {
-    const MotionComponent = motion(Component)
+    const MotionComponent = motion.create(Component)
 
     return (
         <MotionComponent

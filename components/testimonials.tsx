@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+
 import ScrollAnimation from '@/components/ui/scroll-animation'
 import StaggerContainer from '@/components/ui/stagger-container'
 import { Star, Quote } from 'lucide-react'
@@ -42,33 +42,8 @@ interface TestimonialsProps {
     sectionContent?: SectionContent
 }
 
-export default function Testimonials({ data, sectionContent }: TestimonialsProps) {
-    const [testimonials, setTestimonials] = useState<Testimonial[]>(data || [])
-    const [isLoading, setIsLoading] = useState(!data)
-
-    // Fallback to API if no Sanity data provided
-    useEffect(() => {
-        if (data && data.length > 0) {
-            setTestimonials(data)
-            setIsLoading(false)
-            return
-        }
-
-        const loadData = async () => {
-            try {
-                const res = await fetch('/api/admin/testimonials', { cache: 'no-store' })
-                if (res.ok) {
-                    const apiData = await res.json()
-                    setTestimonials(apiData.filter((t: Testimonial) => t.visible !== false))
-                }
-            } catch (error) {
-                console.error('Failed to load testimonials:', error)
-            } finally {
-                setIsLoading(false)
-            }
-        }
-        loadData()
-    }, [data])
+export default function Testimonials({ data = [], sectionContent }: TestimonialsProps) {
+    const testimonials = data.filter((t: Testimonial) => t.visible !== false)
 
     // Default content if not from Sanity
     const title = sectionContent?.title || 'Ce que disent nos patients'
@@ -87,22 +62,7 @@ export default function Testimonials({ data, sectionContent }: TestimonialsProps
         return null
     }
 
-    if (isLoading) {
-        return (
-            <section id='testimonials' className='bg-muted/30 py-20'>
-                <div className='mx-auto max-w-7xl px-4 sm:px-6 lg:px-8'>
-                    <div className='animate-pulse space-y-8'>
-                        <div className='h-8 bg-muted rounded w-1/3 mx-auto'></div>
-                        <div className='grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3'>
-                            {[1, 2, 3].map((i) => (
-                                <div key={i} className='h-64 bg-muted rounded-2xl'></div>
-                            ))}
-                        </div>
-                    </div>
-                </div>
-            </section>
-        )
-    }
+
 
     if (!testimonials || testimonials.length === 0) {
         return null // Don't render section if no testimonials

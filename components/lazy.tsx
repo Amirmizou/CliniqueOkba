@@ -73,29 +73,29 @@ const HomeCareComponent = dynamic<LazyComponentProps>(
     { loading: HomeCareSkeleton, ssr: false }
 )
 
-const GalleryComponent = dynamic<LazyComponentProps>(
-    () => import('@/components/gallery').then(mod => mod.default as ComponentType<LazyComponentProps>),
-    { loading: GallerySkeleton, ssr: false }
-)
-
 const TestimonialsComponent = dynamic<LazyComponentProps>(
     () => import('@/components/testimonials').then(mod => mod.default as ComponentType<LazyComponentProps>),
     { loading: TestimonialsSkeleton, ssr: false }
 )
 
+const EquipementsGalleryComponent = dynamic<{ data?: any[] }>(
+    () => import('@/components/equipements-gallery').then(mod => mod.default as ComponentType<{ data?: any[] }>),
+    { loading: GallerySkeleton, ssr: false }
+)
+
 // Export wrapper components that forward props
-export function LazyMedicalTechnology({ sectionContent }: LazyComponentProps) {
-    return <MedicalTechnologyComponent sectionContent={sectionContent} />
+export function LazyMedicalTechnology({ data, sectionContent }: LazyComponentProps) {
+    return <MedicalTechnologyComponent data={data} sectionContent={sectionContent} />
 }
 
 export function LazyHomeCare({ data, sectionContent }: LazyComponentProps) {
     return <HomeCareComponent data={data} sectionContent={sectionContent} />
 }
 
-export function LazyGallery({ sectionContent }: LazyComponentProps) {
-    return <GalleryComponent sectionContent={sectionContent} />
-}
-
 export function LazyTestimonials({ data, sectionContent }: LazyComponentProps) {
     return <TestimonialsComponent data={data} sectionContent={sectionContent} />
+}
+
+export function LazyEquipementsGallery({ data }: { data?: any[] }) {
+    return <EquipementsGalleryComponent data={data} />
 }

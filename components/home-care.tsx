@@ -3,6 +3,7 @@
 import { Stethoscope, Home, PhoneCall, Clock, CheckCircle2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { motion } from 'framer-motion'
+import Image from 'next/image'
 
 interface SectionContent {
   badge?: string
@@ -33,75 +34,113 @@ export default function HomeCare({ data, sectionContent }: HomeCareProps) {
     window.location.href = url.toString()
   }
 
+  // Contenu : Sanity prioritaire, repli sur le texte par défaut
+  const badge = sectionContent?.badge || 'Service dédié'
+  const title = sectionContent?.title || data?.title || 'Soins à domicile'
+  const subtitle =
+    sectionContent?.subtitle ||
+    data?.description ||
+    'Une équipe mobile pour des soins médicaux de qualité, chez vous, en toute sécurité.'
+  const prestations =
+    data?.services && data.services.length > 0
+      ? data.services.map((s) => s.name)
+      : [
+          'Consultations générales et de suivi',
+          'Pansements, injections, perfusions',
+          'Prélèvements et examens à domicile',
+          'Surveillance de patients chroniques',
+        ]
+  const availabilityText =
+    data?.availability || 'Interventions sur rendez-vous et urgences selon disponibilité'
+  const ctaText = data?.callToAction?.text || 'Demander une intervention à domicile'
+
   return (
     <section id='home-care' className='bg-background py-20'>
       <div className='mx-auto max-w-7xl px-4 sm:px-6 lg:px-8'>
-        <div className='mb-12 space-y-4 text-center'>
-          <p className='text-primary text-sm font-semibold tracking-wide uppercase'>
-            Service dédié
-          </p>
-          <h2 className='text-foreground text-4xl font-bold'>
-            Soins à domicile
-          </h2>
-          <p className='text-muted-foreground mx-auto max-w-2xl text-lg'>
-            Une équipe mobile pour des soins médicaux de qualité, chez vous, en toute sécurité.
-          </p>
-        </div>
-
-        <div className='grid gap-8 md:grid-cols-2'>
-          <motion.div
-            className='bg-card relative overflow-hidden rounded-2xl border p-8 shadow-sm'
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, amount: 0.3 }}
-            transition={{ duration: 0.5 }}
-          >
-            <div className='mb-6 flex items-center gap-3'>
-              <Home className='text-primary h-6 w-6' />
-              <h3 className='text-foreground text-xl font-semibold'>Prestations</h3>
-            </div>
-            <ul className='space-y-3'>
-              {[
-                'Consultations générales et de suivi',
-                'Pansements, injections, perfusions',
-                'Prélèvements et examens à domicile',
-                'Surveillance de patients chroniques',
-              ].map((item) => (
-                <li key={item} className='flex items-start gap-3'>
-                  <CheckCircle2 className='text-primary mt-0.5 h-5 w-5 flex-shrink-0' />
-                  <span className='text-foreground'>{item}</span>
-                </li>
-              ))}
-            </ul>
-          </motion.div>
-
-          <motion.div
-            className='bg-card relative overflow-hidden rounded-2xl border p-8 shadow-sm'
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, amount: 0.3 }}
-            transition={{ duration: 0.5, delay: 0.1 }}
-          >
-            <div className='mb-6 flex items-center gap-3'>
-              <Stethoscope className='text-primary h-6 w-6' />
-              <h3 className='text-foreground text-xl font-semibold'>Disponibilité</h3>
-            </div>
+        <div className='grid gap-12 lg:grid-cols-2 lg:items-center'>
+          
+          <div className='space-y-8'>
             <div className='space-y-4'>
-              <div className='flex items-center gap-3'>
-                <Clock className='text-primary h-5 w-5' />
-                <p className='text-muted-foreground'>Interventions sur rendez-vous et urgences selon disponibilité</p>
-              </div>
-              <div className='flex items-center gap-3'>
-                <PhoneCall className='text-primary h-5 w-5' />
-                <p className='text-muted-foreground'>Contactez-nous pour planifier une visite à domicile</p>
-              </div>
-              <div className='pt-2'>
-                <Button onClick={scrollToContact} className='bg-primary hover:bg-primary/90 text-primary-foreground'>
-                  Demander une intervention à domicile
-                </Button>
-              </div>
+              <p className='text-primary text-sm font-semibold tracking-wide uppercase'>
+                {badge}
+              </p>
+              <h2 className='text-foreground text-4xl font-bold'>
+                {title}
+              </h2>
+              <p className='text-muted-foreground text-lg'>
+                {subtitle}
+              </p>
             </div>
+
+            <div className='grid gap-6 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2'>
+              <motion.div
+                className='bg-card relative overflow-hidden rounded-2xl border p-6 shadow-sm'
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, amount: 0.3 }}
+                transition={{ duration: 0.5 }}
+              >
+                <div className='mb-4 flex items-center gap-3'>
+                  <Home className='text-primary h-6 w-6' />
+                  <h3 className='text-foreground text-xl font-semibold'>Prestations</h3>
+                </div>
+                <ul className='space-y-3'>
+                  {prestations.map((item) => (
+                    <li key={item} className='flex items-start gap-3'>
+                      <CheckCircle2 className='text-primary mt-0.5 h-5 w-5 flex-shrink-0' />
+                      <span className='text-foreground text-sm'>{item}</span>
+                    </li>
+                  ))}
+                </ul>
+              </motion.div>
+
+              <motion.div
+                className='bg-card relative overflow-hidden rounded-2xl border p-6 shadow-sm'
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, amount: 0.3 }}
+                transition={{ duration: 0.5, delay: 0.1 }}
+              >
+                <div className='mb-4 flex items-center gap-3'>
+                  <Stethoscope className='text-primary h-6 w-6' />
+                  <h3 className='text-foreground text-xl font-semibold'>Disponibilité</h3>
+                </div>
+                <div className='space-y-4'>
+                  <div className='flex items-center gap-3'>
+                    <Clock className='text-primary h-5 w-5' />
+                    <p className='text-muted-foreground text-sm'>{availabilityText}</p>
+                  </div>
+                  <div className='flex items-center gap-3'>
+                    <PhoneCall className='text-primary h-5 w-5' />
+                    <p className='text-muted-foreground text-sm'>Contactez-nous pour planifier une visite</p>
+                  </div>
+                  <div className='pt-2'>
+                    <Button onClick={scrollToContact} className='bg-primary hover:bg-primary/90 text-primary-foreground w-full'>
+                      {ctaText}
+                    </Button>
+                  </div>
+                </div>
+              </motion.div>
+            </div>
+          </div>
+
+          <motion.div
+            className='relative h-[400px] w-full overflow-hidden rounded-3xl lg:h-[600px] xl:h-[650px]'
+            initial={{ opacity: 0, scale: 0.95 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            viewport={{ once: true, amount: 0.3 }}
+            transition={{ duration: 0.6 }}
+          >
+            <Image
+              src="/images/spec/sad.jpeg"
+              alt="Équipe de soins à domicile"
+              fill
+              className="object-cover"
+              sizes="(max-width: 1024px) 100vw, 50vw"
+            />
+            <div className="absolute inset-0 rounded-3xl ring-1 ring-inset ring-black/10" />
           </motion.div>
+
         </div>
       </div>
     </section>

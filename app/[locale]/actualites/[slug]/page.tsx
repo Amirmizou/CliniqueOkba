@@ -1,14 +1,16 @@
 import { notFound } from 'next/navigation'
-import Header from '@/components/header'
-import Footer from '@/components/footer'
-import { getArticles, getArticleBySlug } from '@/sanity/lib/fetch'
+import SiteHeader from '@/components/site-header'
+import SiteFooter from '@/components/site-footer'
+import { getArticles, getArticleBySlug, getSiteSettings } from '@/sanity/lib/fetch'
 import { urlFor } from '@/sanity/lib/image'
 import Image from 'next/image'
 import { Link } from '@/navigation'
-import { Calendar, ArrowLeft } from 'lucide-react'
+import { Calendar, ArrowLeft, User } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
 import { PortableText } from '@portabletext/react'
 import ScrollAnimation from '@/components/ui/scroll-animation'
+import { CATEGORY_LABELS } from '@/lib/news'
 
 interface Article {
     _id: string
@@ -17,6 +19,8 @@ interface Article {
     excerpt: string
     content: any[]
     image: any
+    category?: string
+    author?: string
     publishedAt: string
 }
 
@@ -81,9 +85,11 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
         notFound()
     }
 
+    const siteSettings = await getSiteSettings()
+
     return (
         <>
-            <Header />
+            <SiteHeader siteSettings={siteSettings} />
             <main className="min-h-screen pt-24">
                 <article className="py-16">
                     <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
@@ -96,13 +102,26 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
                             </Link>
 
                             <header className="mb-8">
-                                <div className="flex items-center gap-2 text-sm text-muted-foreground mb-4">
-                                    <Calendar className="h-4 w-4" />
-                                    {new Date(article.publishedAt).toLocaleDateString('fr-FR', {
-                                        year: 'numeric',
-                                        month: 'long',
-                                        day: 'numeric',
-                                    })}
+                                {article.category && CATEGORY_LABELS[article.category] && (
+                                    <Badge className="mb-4 bg-primary text-primary-foreground">
+                                        {CATEGORY_LABELS[article.category]}
+                                    </Badge>
+                                )}
+                                <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-muted-foreground mb-4">
+                                    <span className="flex items-center gap-2">
+                                        <Calendar className="h-4 w-4" />
+                                        {new Date(article.publishedAt).toLocaleDateString('fr-FR', {
+                                            year: 'numeric',
+                                            month: 'long',
+                                            day: 'numeric',
+                                        })}
+                                    </span>
+                                    {article.author && (
+                                        <span className="flex items-center gap-1.5">
+                                            <User className="h-4 w-4" />
+                                            {article.author}
+                                        </span>
+                                    )}
                                 </div>
                                 <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4">
                                     {article.title}
@@ -150,7 +169,7 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
                     </div>
                 </article>
             </main>
-            <Footer />
+            <SiteFooter siteSettings={siteSettings} />
         </>
     )
 }

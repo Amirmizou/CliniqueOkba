@@ -17,6 +17,7 @@ import {
   Bone,
   Ear,
   Syringe,
+  Activity,
 } from 'lucide-react'
 
 interface SectionContent {
@@ -35,90 +36,129 @@ export default function Specialties({ sectionContent }: SpecialtiesProps) {
   // Specialty data with colors, gradients, sizes, and animation types
   const specialties = [
     {
-      name: t('items.cardiology.name'),
-      icon: Heart,
-      image: '/images/specialties/cardiology.png',
-      description: t('items.cardiology.desc'),
-      color: '#EF4444',
-      gradient: 'from-red-600 via-red-500 to-orange-500',
+      name: t('items.endocrinology.name'),
+      icon: Activity,
+      image: '',
+      description: t('items.endocrinology.desc'),
+      color: '#10B981',
+      gradient: 'from-emerald-500 via-emerald-400 to-teal-500',
       size: 'large' as const,
-      animationType: 'heartbeat' as const,
-    },
-    {
-      name: t('items.pneumology.name'),
-      icon: Wind,
-      image: '/images/specialties/pneumology.png',
-      description: t('items.pneumology.desc'),
-      color: '#06B6D4',
-      gradient: 'from-cyan-500 via-cyan-400 to-blue-500',
-      size: 'medium' as const,
-      animationType: 'breathing' as const,
-    },
-    {
-      name: t('items.internalMedicine.name'),
-      icon: Stethoscope,
-      image: '/images/specialties/internal-medicine.png',
-      description: t('items.internalMedicine.desc'),
-      color: '#3B82F6',
-      gradient: 'from-blue-600 via-blue-500 to-indigo-500',
-      size: 'medium' as const,
       animationType: 'scan' as const,
-    },
-    {
-      name: t('items.dermatology.name'),
-      icon: Syringe,
-      image: '/images/specialties/dermatology.png',
-      description: t('items.dermatology.desc'),
-      color: '#EC4899',
-      gradient: 'from-pink-500 via-pink-400 to-purple-500',
-      size: 'medium' as const,
-      animationType: 'scan' as const,
+      comingSoon: false,
     },
     {
       name: t('items.gynecology.name'),
       icon: Baby,
-      image: '/images/specialties/gynecology.png',
+      image: '',
       description: t('items.gynecology.desc'),
       color: '#A855F7',
       gradient: 'from-purple-500 via-purple-400 to-pink-500',
       size: 'medium' as const,
       animationType: 'pulse' as const,
+      comingSoon: false,
+    },
+    {
+      name: t('items.internalMedicine.name'),
+      icon: Stethoscope,
+      image: '',
+      description: t('items.internalMedicine.desc'),
+      color: '#3B82F6',
+      gradient: 'from-blue-600 via-blue-500 to-indigo-500',
+      size: 'medium' as const,
+      animationType: 'scan' as const,
+      comingSoon: false,
+    },
+    {
+      name: t('items.orl.name'),
+      icon: Ear,
+      image: '',
+      description: t('items.orl.desc'),
+      color: '#F97316',
+      gradient: 'from-orange-500 via-orange-400 to-yellow-500',
+      size: 'medium' as const,
+      animationType: 'breathing' as const,
+      comingSoon: false,
+    },
+    {
+      name: t('items.cardiology.name'),
+      icon: Heart,
+      image: '',
+      description: t('items.cardiology.desc'),
+      color: '#EF4444',
+      gradient: 'from-red-600 via-red-500 to-orange-500',
+      size: 'medium' as const,
+      animationType: 'heartbeat' as const,
+      comingSoon: true,
     },
     {
       name: t('items.pediatrics.name'),
       icon: Baby,
-      image: '/images/specialties/pediatrics.png',
+      image: '',
       description: t('items.pediatrics.desc'),
       color: '#FBBF24',
       gradient: 'from-yellow-400 via-yellow-300 to-orange-400',
-      size: 'small' as const,
+      size: 'large' as const,
       animationType: 'playful' as const,
+      comingSoon: false,
+    },
+    {
+      name: t('items.pneumology.name'),
+      icon: Wind,
+      image: '',
+      description: t('items.pneumology.desc'),
+      color: '#06B6D4',
+      gradient: 'from-cyan-500 via-cyan-400 to-blue-500',
+      size: 'medium' as const,
+      animationType: 'breathing' as const,
+      comingSoon: true,
+    },
+    {
+      name: t('items.dermatology.name'),
+      icon: Syringe,
+      image: '',
+      description: t('items.dermatology.desc'),
+      color: '#EC4899',
+      gradient: 'from-pink-500 via-pink-400 to-purple-500',
+      size: 'medium' as const,
+      animationType: 'scan' as const,
+      comingSoon: true,
     },
     {
       name: t('items.neurology.name'),
       icon: Brain,
-      image: '/images/specialties/neurology.png',
+      image: '',
       description: t('items.neurology.desc'),
       color: '#6366F1',
       gradient: 'from-indigo-600 via-indigo-500 to-purple-500',
       size: 'medium' as const,
       animationType: 'synapse' as const,
+      comingSoon: true,
     },
     {
       name: t('items.dentistry.name'),
       icon: Smile,
-      image: '/images/specialties/dentistry.png',
+      image: '',
       description: t('items.dentistry.desc'),
       color: '#10B981',
       gradient: 'from-emerald-500 via-emerald-400 to-teal-500',
-      size: 'small' as const,
+      size: 'medium' as const,
       animationType: 'shine' as const,
+      comingSoon: true,
     },
   ]
 
   return (
     <section id='specialties' className='bg-background py-12 sm:py-16 md:py-20 overflow-hidden'>
       <div className='mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 relative'>
+        {/* Subtle Grid Pattern */}
+        <div 
+          className="absolute inset-0 pointer-events-none opacity-[0.015] dark:opacity-5" 
+          style={{ 
+            backgroundImage: 'radial-gradient(circle at 1px 1px, black 1px, transparent 1px)', 
+            backgroundSize: '24px 24px' 
+          }}
+        />
+        
         {/* Ambient Background Glow */}
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-primary/5 rounded-full blur-[120px] pointer-events-none" />
 
@@ -134,18 +174,29 @@ export default function Specialties({ sectionContent }: SpecialtiesProps) {
             <p className='text-muted-foreground mx-auto max-w-2xl text-base sm:text-lg'>
               {t('subtitle')}
             </p>
+            {/* Légende : statut des spécialités */}
+            <div className='flex items-center justify-center gap-6 pt-3 text-sm text-muted-foreground'>
+              <span className='inline-flex items-center gap-2'>
+                <span className='h-2.5 w-2.5 rounded-full bg-primary' />
+                Disponibles
+              </span>
+              <span className='inline-flex items-center gap-2'>
+                <span className='h-2.5 w-2.5 rounded-full bg-muted-foreground/40' />
+                Prochainement
+              </span>
+            </div>
           </div>
         </AnimatedSection>
 
         {/* Modern Clinic Presentation Section - Enhanced 2025 Design */}
         <AnimatedSection animation="scale" className="mb-24 relative z-10">
-          <div className="animate-item relative overflow-hidden rounded-3xl shadow-2xl border border-white/10 bg-gradient-to-br from-primary/5 via-background to-blue-500/5">
-            {/* Animated gradient border effect */}
-            <div className="absolute inset-0 rounded-3xl bg-gradient-to-r from-primary via-blue-500 to-primary opacity-20 blur-xl animate-pulse" style={{ animationDuration: '4s' }}></div>
+          <div className="animate-item relative overflow-hidden rounded-3xl shadow-2xl border border-white/10 bg-gradient-to-br from-primary/5 via-background to-[#FDE68A]/10">
+            {/* Static gradient border accent */}
+            <div className="absolute inset-0 rounded-3xl bg-gradient-to-r from-[#006633] via-[#4caf6e] to-[#FDE68A] opacity-10 blur-xl"></div>
 
-            {/* Background Glow Effects */}
-            <div className="absolute -top-24 -right-24 h-96 w-96 rounded-full bg-primary/30 blur-[120px] opacity-40 animate-pulse" style={{ animationDuration: '6s' }} />
-            <div className="absolute -bottom-24 -left-24 h-96 w-96 rounded-full bg-blue-600/30 blur-[120px] opacity-40 animate-pulse" style={{ animationDuration: '8s', animationDelay: '1s' }} />
+            {/* Static background glow */}
+            <div className="absolute -top-24 -right-24 h-96 w-96 rounded-full bg-[#006633]/25 blur-[120px] opacity-30" />
+            <div className="absolute -bottom-24 -left-24 h-96 w-96 rounded-full bg-[#FDE68A]/20 blur-[120px] opacity-30" />
 
             {/* Main content with glassmorphism */}
             <div className="relative backdrop-blur-sm bg-white/5 dark:bg-black/20 rounded-3xl p-8 md:p-12">
@@ -168,7 +219,7 @@ export default function Specialties({ sectionContent }: SpecialtiesProps) {
                     <h3 className="text-3xl font-bold leading-tight sm:text-4xl lg:text-5xl tracking-tight">
                       <span className="text-foreground">Une Prise en Charge</span>
                       <br />
-                      <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary via-blue-500 to-primary bg-[length:200%_auto] animate-gradient">
+                      <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#006633] via-[#4caf6e] to-[#FDE68A]">
                         Globale & Personnalisée
                       </span>
                     </h3>
@@ -182,13 +233,13 @@ export default function Specialties({ sectionContent }: SpecialtiesProps) {
                   <div className="flex flex-col sm:flex-row gap-4 pt-4">
                     <div className="group flex items-center gap-3 text-sm font-medium bg-gradient-to-r from-primary/10 to-primary/5 hover:from-primary/20 hover:to-primary/10 p-4 rounded-2xl border border-primary/20 hover:border-primary/40 transition-all duration-300 shadow-lg hover:shadow-primary/20 cursor-pointer">
                       <div className="p-2.5 rounded-xl bg-primary/20 text-primary group-hover:bg-primary group-hover:text-white transition-all duration-300 shadow-lg">
-                        <Heart className="h-5 w-5 animate-medical-pulse" />
+                        <Heart className="h-5 w-5" />
                       </div>
                       <span className="font-semibold text-foreground">Soins Complets</span>
                     </div>
-                    <div className="group flex items-center gap-3 text-sm font-medium bg-gradient-to-r from-blue-500/10 to-blue-500/5 hover:from-blue-500/20 hover:to-blue-500/10 p-4 rounded-2xl border border-blue-500/20 hover:border-blue-500/40 transition-all duration-300 shadow-lg hover:shadow-blue-500/20 cursor-pointer">
-                      <div className="p-2.5 rounded-xl bg-blue-500/20 text-blue-500 group-hover:bg-blue-500 group-hover:text-white transition-all duration-300 shadow-lg">
-                        <Stethoscope className="h-5 w-5 animate-medical-pulse" style={{ animationDelay: '0.5s' }} />
+                    <div className="group flex items-center gap-3 text-sm font-medium bg-gradient-to-r from-amber-400/10 to-amber-400/5 hover:from-amber-400/20 hover:to-amber-400/10 p-4 rounded-2xl border border-amber-400/20 hover:border-amber-400/40 transition-all duration-300 shadow-lg hover:shadow-amber-400/20 cursor-pointer">
+                      <div className="p-2.5 rounded-xl bg-amber-400/20 text-amber-600 group-hover:bg-amber-400 group-hover:text-white transition-all duration-300 shadow-lg">
+                        <Stethoscope className="h-5 w-5" />
                       </div>
                       <span className="font-semibold text-foreground">Experts Dévoués</span>
                     </div>
@@ -197,8 +248,8 @@ export default function Specialties({ sectionContent }: SpecialtiesProps) {
 
                 {/* Poster Side - Enhanced 3D Showcase */}
                 <div className="relative mx-auto w-full max-w-md order-1 md:order-2">
-                  {/* Floating glow effect behind image */}
-                  <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-blue-500/20 rounded-3xl blur-2xl transform scale-110 animate-pulse" style={{ animationDuration: '5s' }}></div>
+                  {/* Static glow behind image */}
+                  <div className="absolute inset-0 bg-gradient-to-br from-primary/15 to-[#FDE68A]/20 rounded-3xl blur-2xl transform scale-110"></div>
 
                   <div className="relative">
                     <ServiceShowcase
@@ -228,6 +279,7 @@ export default function Specialties({ sectionContent }: SpecialtiesProps) {
                 size={specialty.size}
                 index={index}
                 animationType={specialty.animationType}
+                comingSoon={specialty.comingSoon}
               />
             ))}
           </div>

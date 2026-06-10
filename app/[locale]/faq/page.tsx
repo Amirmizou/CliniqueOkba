@@ -1,17 +1,14 @@
 import { Suspense } from 'react'
-import Header from '@/components/header'
-import Footer from '@/components/footer'
-import { getFaq } from '@/sanity/lib/fetch'
+import SiteHeader from '@/components/site-header'
+import SiteFooter from '@/components/site-footer'
+import { getFaq, getSiteSettings } from '@/sanity/lib/fetch'
 import { HelpCircle, Phone, MapPin } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import ScrollAnimation from '@/components/ui/scroll-animation'
+import { faqFallback, type FaqItem } from '@/data/faq'
+import { siteConfig } from '@/data/site-config'
 
-interface FAQ {
-    _id: string
-    question: string
-    answer: string
-    category: string
-}
+type FAQ = FaqItem
 
 const categoryLabels: Record<string, { label: string; icon: string }> = {
     appointment: { label: 'Rendez-vous', icon: '📅' },
@@ -27,22 +24,19 @@ export const metadata = {
 }
 
 async function FAQList() {
-    const faqs: FAQ[] = await getFaq()
+    const sanityFaqs: FAQ[] = await getFaq()
+    // Sanity prioritaire, repli sur les questions locales
+    const faqs: FAQ[] = sanityFaqs && sanityFaqs.length > 0 ? sanityFaqs : faqFallback
 
-    if (!faqs || faqs.length === 0) {
-        return (
-            <div className="text-center py-16">
-                <div className="bg-muted/30 rounded-2xl p-12 max-w-lg mx-auto">
-                    <HelpCircle className="h-16 w-16 mx-auto text-muted-foreground mb-4" />
-                    <p className="text-muted-foreground text-lg">
-                        La FAQ sera bientôt disponible.
-                    </p>
-                    <p className="text-sm text-muted-foreground mt-2">
-                        Ajoutez des questions via le Studio Sanity.
-                    </p>
-                </div>
-            </div>
-        )
+    // Données structurées FAQPage (rich snippets Google)
+    const jsonLd = {
+        '@context': 'https://schema.org',
+        '@type': 'FAQPage',
+        mainEntity: faqs.map((faq) => ({
+            '@type': 'Question',
+            name: faq.question,
+            acceptedAnswer: { '@type': 'Answer', text: faq.answer },
+        })),
     }
 
     // Group FAQs by category
@@ -57,6 +51,10 @@ async function FAQList() {
 
     return (
         <div className="space-y-12">
+            <script
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+            />
             {Object.entries(groupedFaqs).map(([category, items]) => (
                 <ScrollAnimation key={category} variant="fadeUp">
                     <div className="mb-6">
@@ -91,10 +89,15 @@ async function FAQList() {
     )
 }
 
-export default function FAQPage() {
+export default async function FAQPage() {
+    const siteSettings = await getSiteSettings()
+    const phoneDisplay = (siteSettings?.phone || siteConfig.contact.phone)
+        .split('/')[0]
+        .trim()
+    const phoneHref = `tel:${phoneDisplay.replace(/[^+\d]/g, '')}`
     return (
         <>
-            <Header />
+            <SiteHeader siteSettings={siteSettings} />
             <main className="min-h-screen pt-24">
                 <section className="py-16 md:py-24">
                     <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
@@ -129,7 +132,7 @@ export default function FAQPage() {
                                 </p>
                                 <div className="flex flex-col sm:flex-row gap-4 justify-center">
                                     <a
-                                        href="tel:+213555123456"
+                                        href={phoneHref}
                                         className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-primary text-white rounded-xl font-medium hover:bg-primary/90 transition-colors"
                                     >
                                         <Phone className="h-5 w-5" />
@@ -148,7 +151,7 @@ export default function FAQPage() {
                     </div>
                 </section>
             </main>
-            <Footer />
+            <SiteFooter siteSettings={siteSettings} />
         </>
     )
 }

@@ -18,6 +18,7 @@ import {
   Instagram,
 } from 'lucide-react'
 import Map from '@/components/map'
+import WhatsAppBooking from '@/components/whatsapp-booking'
 // Fallback to static data if Sanity data not available
 import clinicDataFallback from '@/data/clinic.json'
 import { siteConfig as siteConfigFallback } from '@/data/site-config'
@@ -25,6 +26,8 @@ import { siteConfig as siteConfigFallback } from '@/data/site-config'
 interface SiteSettings {
   clinicName?: string
   phone?: string
+  whatsappNumber?: string
+  appointmentMessage?: string
   email?: string
   address?: string
   coordinates?: { lat: number; lng: number }
@@ -236,9 +239,40 @@ export default function Contact({ siteSettings, sectionContent }: ContactProps) 
           </p>
         </ScrollAnimation>
 
+        {/* Prise de rendez-vous via WhatsApp */}
+        <ScrollAnimation variant="fadeUp" className='mb-12'>
+          <WhatsAppBooking
+            whatsappNumber={siteSettings?.whatsappNumber}
+            clinicName={siteSettings?.clinicName}
+            introMessage={siteSettings?.appointmentMessage}
+          />
+        </ScrollAnimation>
+
         <div className='grid gap-12 md:grid-cols-2'>
           {/* Contact Info */}
           <ScrollAnimation variant="fadeRight" className='space-y-8'>
+            {/* Urgences : priorité absolue d'un site médical */}
+            <a
+              href={`tel:${contactData.phone.split('/')[0].trim().replace(/[^+\d]/g, '')}`}
+              className='group flex items-center gap-4 rounded-2xl border border-red-200 bg-red-50 p-5 transition-all duration-300 hover:border-red-300 hover:shadow-lg hover:shadow-red-500/10 dark:border-red-500/30 dark:bg-red-500/10'
+            >
+              <div className='relative flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl bg-red-600 text-white shadow-md'>
+                <span className='absolute inset-0 animate-ping rounded-xl bg-red-500/40' />
+                <Phone className='relative h-6 w-6' />
+              </div>
+              <div className='min-w-0'>
+                <h3 className='font-bold text-red-700 dark:text-red-400'>
+                  Urgences {contactData.hours?.emergency}
+                </h3>
+                <p className='truncate font-semibold text-foreground' dir='ltr'>
+                  {contactData.phone.split('/')[0].trim()}
+                </p>
+                <p className='text-sm text-red-700/70 dark:text-red-400/70'>
+                  Appuyez pour appeler — prise en charge immédiate
+                </p>
+              </div>
+            </a>
+
             <div className='space-y-6'>
               <div className='flex gap-4'>
                 <div className='flex-shrink-0'>
@@ -265,9 +299,23 @@ export default function Contact({ siteSettings, sectionContent }: ContactProps) 
                 </div>
                 <div>
                   <h3 className='text-foreground font-semibold'>Téléphone</h3>
-                  <p className='text-muted-foreground mt-1'>{contactData.phone}</p>
+                  <div className='mt-1 flex flex-wrap gap-x-3 gap-y-1'>
+                    {contactData.phone.split('/').map((num) => {
+                      const display = num.trim()
+                      return (
+                        <a
+                          key={display}
+                          href={`tel:${display.replace(/[^+\d]/g, '')}`}
+                          dir='ltr'
+                          className='text-muted-foreground hover:text-primary font-medium underline-offset-4 transition-colors hover:underline'
+                        >
+                          {display}
+                        </a>
+                      )
+                    })}
+                  </div>
                   <p className='text-muted-foreground text-sm'>
-                    {contactData.hours?.emergency}
+                    Urgences : {contactData.hours?.emergency}
                   </p>
                 </div>
               </div>
@@ -280,9 +328,12 @@ export default function Contact({ siteSettings, sectionContent }: ContactProps) 
                 </div>
                 <div>
                   <h3 className='text-foreground font-semibold'>Email</h3>
-                  <p className='text-muted-foreground mt-1'>
+                  <a
+                    href={`mailto:${contactData.email}`}
+                    className='text-muted-foreground hover:text-primary mt-1 block break-all font-medium underline-offset-4 transition-colors hover:underline'
+                  >
                     {contactData.email}
-                  </p>
+                  </a>
                   <p className='text-muted-foreground text-sm'>
                     Réponse rapide garantie
                   </p>
@@ -298,10 +349,10 @@ export default function Contact({ siteSettings, sectionContent }: ContactProps) 
                 <div>
                   <h3 className='text-foreground font-semibold'>Horaires</h3>
                   <p className='text-muted-foreground mt-1'>
-                    Dim - Jeu: {contactData.hours?.weekdays}
+                    Samedi - Jeudi : {contactData.hours?.weekdays}
                   </p>
                   <p className='text-muted-foreground text-sm'>
-                    Vendredi: {contactData.hours?.saturday}
+                    Vendredi : {contactData.hours?.saturday}
                   </p>
                 </div>
               </div>
@@ -346,13 +397,17 @@ export default function Contact({ siteSettings, sectionContent }: ContactProps) 
               <form onSubmit={handleSubmit} className='space-y-6'>
                 <div className='grid grid-cols-1 gap-4 sm:grid-cols-2'>
                   <div>
-                    <label className='text-foreground mb-2 block text-sm font-medium'>
+                    <label htmlFor='contact-firstName' className='text-foreground mb-2 block text-sm font-medium'>
                       Prénom <span className='text-red-500'>*</span>
                     </label>
                     <div className='relative'>
                       <input
                         type='text'
+                        id='contact-firstName'
                         name='firstName'
+                        autoComplete='given-name'
+                        aria-invalid={Boolean(touched.firstName && errors.firstName)}
+                        aria-describedby={touched.firstName && errors.firstName ? 'error-firstName' : undefined}
                         value={formData.firstName}
                         onChange={handleChange}
                         onBlur={handleBlur}
@@ -375,20 +430,24 @@ export default function Contact({ siteSettings, sectionContent }: ContactProps) 
                       )}
                     </div>
                     {touched.firstName && errors.firstName && (
-                      <p className='mt-1 flex items-center gap-1 text-sm text-red-500'>
+                      <p id='error-firstName' className='mt-1 flex items-center gap-1 text-sm text-red-500'>
                         <AlertCircle className='h-4 w-4' />
                         {errors.firstName}
                       </p>
                     )}
                   </div>
                   <div>
-                    <label className='text-foreground mb-2 block text-sm font-medium'>
+                    <label htmlFor='contact-lastName' className='text-foreground mb-2 block text-sm font-medium'>
                       Nom <span className='text-red-500'>*</span>
                     </label>
                     <div className='relative'>
                       <input
                         type='text'
+                        id='contact-lastName'
                         name='lastName'
+                        autoComplete='family-name'
+                        aria-invalid={Boolean(touched.lastName && errors.lastName)}
+                        aria-describedby={touched.lastName && errors.lastName ? 'error-lastName' : undefined}
                         value={formData.lastName}
                         onChange={handleChange}
                         onBlur={handleBlur}
@@ -411,7 +470,7 @@ export default function Contact({ siteSettings, sectionContent }: ContactProps) 
                       )}
                     </div>
                     {touched.lastName && errors.lastName && (
-                      <p className='mt-1 flex items-center gap-1 text-sm text-red-500'>
+                      <p id='error-lastName' className='mt-1 flex items-center gap-1 text-sm text-red-500'>
                         <AlertCircle className='h-4 w-4' />
                         {errors.lastName}
                       </p>
@@ -420,13 +479,17 @@ export default function Contact({ siteSettings, sectionContent }: ContactProps) 
                 </div>
 
                 <div>
-                  <label className='text-foreground mb-2 block text-sm font-medium'>
+                  <label htmlFor='contact-email' className='text-foreground mb-2 block text-sm font-medium'>
                     Email <span className='text-red-500'>*</span>
                   </label>
                   <div className='relative'>
                     <input
                       type='email'
+                      id='contact-email'
                       name='email'
+                      autoComplete='email'
+                      aria-invalid={Boolean(touched.email && errors.email)}
+                      aria-describedby={touched.email && errors.email ? 'error-email' : undefined}
                       value={formData.email}
                       onChange={handleChange}
                       onBlur={handleBlur}
@@ -447,7 +510,7 @@ export default function Contact({ siteSettings, sectionContent }: ContactProps) 
                     )}
                   </div>
                   {touched.email && errors.email && (
-                    <p className='mt-1 flex items-center gap-1 text-sm text-red-500'>
+                    <p id='error-email' className='mt-1 flex items-center gap-1 text-sm text-red-500'>
                       <AlertCircle className='h-4 w-4' />
                       {errors.email}
                     </p>
@@ -455,7 +518,7 @@ export default function Contact({ siteSettings, sectionContent }: ContactProps) 
                 </div>
 
                 <div>
-                  <label className='text-foreground mb-2 block text-sm font-medium'>
+                  <label htmlFor='contact-phone' className='text-foreground mb-2 block text-sm font-medium'>
                     Téléphone{' '}
                     <span className='text-muted-foreground text-xs'>
                       (optionnel)
@@ -464,7 +527,11 @@ export default function Contact({ siteSettings, sectionContent }: ContactProps) 
                   <div className='relative'>
                     <input
                       type='tel'
+                      id='contact-phone'
                       name='phone'
+                      autoComplete='tel'
+                      aria-invalid={Boolean(touched.phone && errors.phone)}
+                      aria-describedby={touched.phone && errors.phone ? 'error-phone' : undefined}
                       value={formData.phone}
                       onChange={handleChange}
                       onBlur={handleBlur}
@@ -485,7 +552,7 @@ export default function Contact({ siteSettings, sectionContent }: ContactProps) 
                     )}
                   </div>
                   {touched.phone && errors.phone && (
-                    <p className='mt-1 flex items-center gap-1 text-sm text-red-500'>
+                    <p id='error-phone' className='mt-1 flex items-center gap-1 text-sm text-red-500'>
                       <AlertCircle className='h-4 w-4' />
                       {errors.phone}
                     </p>
@@ -493,12 +560,15 @@ export default function Contact({ siteSettings, sectionContent }: ContactProps) 
                 </div>
 
                 <div>
-                  <label className='text-foreground mb-2 block text-sm font-medium'>
+                  <label htmlFor='contact-message' className='text-foreground mb-2 block text-sm font-medium'>
                     Message <span className='text-red-500'>*</span>
                   </label>
                   <div className='relative'>
                     <textarea
+                      id='contact-message'
                       name='message'
+                      aria-invalid={Boolean(touched.message && errors.message)}
+                      aria-describedby={touched.message && errors.message ? 'error-message' : undefined}
                       value={formData.message}
                       onChange={handleChange}
                       onBlur={handleBlur}
@@ -520,7 +590,7 @@ export default function Contact({ siteSettings, sectionContent }: ContactProps) 
                     )}
                   </div>
                   {touched.message && errors.message && (
-                    <p className='mt-1 flex items-center gap-1 text-sm text-red-500'>
+                    <p id='error-message' className='mt-1 flex items-center gap-1 text-sm text-red-500'>
                       <AlertCircle className='h-4 w-4' />
                       {errors.message}
                     </p>
@@ -546,7 +616,7 @@ export default function Contact({ siteSettings, sectionContent }: ContactProps) 
 
                 {/* Status Messages */}
                 {submitStatus === 'success' && (
-                  <div className='animate-fade-in rounded-lg border border-green-200 bg-green-50 p-4'>
+                  <div role='status' aria-live='polite' className='animate-fade-in rounded-lg border border-green-200 bg-green-50 p-4'>
                     <div className='flex items-center gap-3'>
                       <CheckCircle className='h-5 w-5 flex-shrink-0 text-green-600' />
                       <div>
@@ -562,7 +632,7 @@ export default function Contact({ siteSettings, sectionContent }: ContactProps) 
                 )}
 
                 {submitStatus === 'error' && (
-                  <div className='animate-fade-in rounded-lg border border-red-200 bg-red-50 p-4'>
+                  <div role='alert' className='animate-fade-in rounded-lg border border-red-200 bg-red-50 p-4'>
                     <div className='flex items-center gap-3'>
                       <AlertCircle className='h-5 w-5 flex-shrink-0 text-red-600' />
                       <div>

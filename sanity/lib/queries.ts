@@ -108,6 +108,25 @@ export const equipmentQuery = groq`
 `
 
 // ==========================================
+// PÔLES D'EXCELLENCE
+// ==========================================
+
+export const polesQuery = groq`
+  *[_type == "pole" && active == true] | order(order asc) {
+    _id,
+    title,
+    "slug": slug.current,
+    description,
+    items,
+    iconName,
+    accentColor,
+    galleryCategories,
+    badge,
+    urgent
+  }
+`
+
+// ==========================================
 // SPECIALTIES
 // ==========================================
 
@@ -189,6 +208,18 @@ export const galleryQuery = groq`
   }
 `
 
+// Galerie « Plateau technique & espaces »
+export const facilityPhotosQuery = groq`
+  *[_type == "facilityPhoto" && active == true] | order(order asc) {
+    _id,
+    image,
+    title,
+    description,
+    category,
+    featured
+  }
+`
+
 // ==========================================
 // ARTICLES / BLOG
 // ==========================================
@@ -200,6 +231,8 @@ export const articlesQuery = groq`
     slug,
     excerpt,
     image,
+    category,
+    author,
     publishedAt
   }
 `
@@ -212,7 +245,46 @@ export const articleBySlugQuery = groq`
     excerpt,
     content,
     image,
+    category,
+    author,
     publishedAt
+  }
+`
+
+// ==========================================
+// ÉVÉNEMENTS
+// ==========================================
+
+export const eventsQuery = groq`
+  *[_type == "event" && published == true] | order(startDate asc) {
+    _id,
+    title,
+    slug,
+    eventType,
+    description,
+    startDate,
+    endDate,
+    location,
+    image,
+    registrationDeadline,
+    contact
+  }
+`
+
+export const eventBySlugQuery = groq`
+  *[_type == "event" && slug.current == $slug][0] {
+    _id,
+    title,
+    slug,
+    eventType,
+    description,
+    content,
+    startDate,
+    endDate,
+    location,
+    image,
+    registrationDeadline,
+    contact
   }
 `
 
@@ -227,11 +299,17 @@ export const doctorsQuery = groq`
     slug,
     specialty,
     title,
+    subtitle,
     image,
     bio,
+    experience,
+    services,
     qualifications,
     languages,
-    consultationDays
+    consultationDays,
+    consultationHours,
+    accentColor,
+    iconName
   }
 `
 
@@ -264,6 +342,25 @@ export const faqQuery = groq`
 `
 
 // ==========================================
+// CONVENTIONS & PRISE EN CHARGE
+// ==========================================
+
+export const insuranceSectionQuery = groq`
+  *[_type == "insuranceSection" && active == true][0] {
+    badge,
+    title,
+    subtitle,
+    providers[] {
+      name,
+      description,
+      logo
+    },
+    note,
+    ctaText
+  }
+`
+
+// ==========================================
 // SITE SETTINGS
 // ==========================================
 
@@ -273,6 +370,8 @@ export const siteSettingsQuery = groq`
     description,
     logo,
     phone,
+    whatsappNumber,
+    appointmentMessage,
     email,
     address,
     coordinates {
@@ -287,6 +386,10 @@ export const siteSettingsQuery = groq`
     social {
       facebook,
       instagram
+    },
+    heroStats[] {
+      value,
+      label
     }
   }
 `
@@ -303,7 +406,9 @@ export const sectionContentQuery = groq`
     subtitle,
     description,
     ctaText,
-    ctaLink
+    ctaLink,
+    "videoUrl": videoFile.asset->url,
+    videoPoster
   }
 `
 
@@ -315,7 +420,9 @@ export const allSectionContentsQuery = groq`
     subtitle,
     description,
     ctaText,
-    ctaLink
+    ctaLink,
+    "videoUrl": videoFile.asset->url,
+    videoPoster
   }
 `
 

@@ -1,11 +1,26 @@
 'use client'
 
+import { Heart } from 'lucide-react'
+import { ECGLine } from '@/components/ui/ecg-line'
+
 interface SectionDividerProps {
-    variant?: 'default' | 'gradient' | 'wave'
+    variant?: 'default' | 'gradient' | 'wave' | 'ecg'
     className?: string
 }
 
 export default function SectionDivider({ variant = 'default', className = '' }: SectionDividerProps) {
+    if (variant === 'ecg') {
+        return (
+            <div className={`relative flex h-16 items-center sm:h-20 ${className}`}>
+                <div className="mx-auto flex w-full max-w-3xl items-center gap-3 px-6">
+                    <ECGLine className="flex-1" color="#006633" height={34} />
+                    <Heart className="h-5 w-5 shrink-0 animate-pulse fill-primary/20 text-primary" />
+                    <ECGLine className="flex-1" color="#006633" height={34} duration={3.6} />
+                </div>
+            </div>
+        )
+    }
+
     if (variant === 'wave') {
         return (
             <div className={`relative h-16 sm:h-24 overflow-hidden ${className}`}>

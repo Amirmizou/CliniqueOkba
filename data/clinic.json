@@ -1,7 +1,7 @@
 {
   "name": "Clinique OKBA",
   "hero": {
-    "title": "Votre Santé Mérite L'Excellence Absolue test par mizou",
+    "title": "Votre Santé Mérite L'Excellence Absolue",
     "subtitle": "Découvrez une nouvelle ère de soins médicaux à la Clinique OKBA. Technologie de pointe, experts dévoués et confort absolu pour votre rétablissement.",
     "stats": {
       "patients": "5000+"
@@ -18,25 +18,25 @@
     },
     {
       "image": "/uploads/hero/1763826628906-Gemini_Generated_Image_ubdtr0ubdtr0ubdt.png",
-      "title": "Clinique Okba L'Excellence Médicale",
-      "subtitle": "",
-      "order": 1,
+      "title": "Clinique Okba, L'Excellence Médicale",
+      "subtitle": "Un engagement quotidien pour votre santé",
+      "order": 2,
       "active": true,
       "id": "2"
     },
     {
       "image": "/uploads/hero/1763826354545-Gemini_Generated_Image_x461z6x461z6x461.png",
-      "title": "Okba",
-      "subtitle": "",
-      "order": 1,
+      "title": "Des Soins de Haute Précision",
+      "subtitle": "Grâce à notre plateau technique de dernière génération",
+      "order": 3,
       "active": true,
       "id": "3"
     },
     {
       "image": "/uploads/hero/1763975074979-GeminiGeneratedImagecv1y7ncv1y7ncv1y.png",
-      "title": "Excelent test",
-      "subtitle": "by mizou",
-      "order": 1,
+      "title": "Prise en Charge Personnalisée",
+      "subtitle": "Parce que chaque patient est unique",
+      "order": 4,
       "active": true,
       "id": "4"
     }
@@ -179,13 +179,13 @@
     }
   ],
   "contact": {
-    "email": "contact@cliniqueokba.com",
-    "phone": "+213 555 123 456",
-    "address": "Nouvelle ville Ali Mendjeli, Constantine, Algérie"
+    "email": "Cliniqueokba2025@gmail.com",
+    "phone": "+213 770 88 42 42 / +213 770 88 43 43",
+    "address": "Nouvelle ville Ali Mendjeli, extension ouest en mitoyenneté avec la pompe à essence Boudersa, Constantine, Algérie"
   },
   "social": {
-    "facebook": "https://facebook.com",
-    "instagram": "https://instagram.com",
+    "facebook": "https://www.facebook.com/p/Clinique-OKBA-61576965629601/",
+    "instagram": "https://www.instagram.com/clinique_okba/",
     "linkedin": "https://linkedin.com"
   },
   "hours": {
@@ -194,17 +194,17 @@
     "weekdays": "08:00 - 18:00",
     "saturday": "08:00 - 14:00"
   },
-  "address": "Nouvelle ville Ali Mendjeli, Constantine, Algérie",
+  "address": "Nouvelle ville Ali Mendjeli, extension ouest en mitoyenneté avec la pompe à essence Boudersa, Constantine, Algérie",
   "description": "Clinique privée moderne",
-  "email": "contact@cliniqueokba.com",
-  "phone": "+213 555 123 456",
+  "email": "Cliniqueokba2025@gmail.com",
+  "phone": "+213 770 88 42 42 / +213 770 88 43 43",
   "coordinates": {
     "lat": 36.241485,
     "lng": 6.550478
   },
   "socialMedia": {
-    "facebook": "https://facebook.com",
-    "instagram": "https://instagram.com"
+    "facebook": "https://www.facebook.com/p/Clinique-OKBA-61576965629601/",
+    "instagram": "https://www.instagram.com/clinique_okba/"
   },
   "articles": [
     {
@@ -220,25 +220,25 @@
   "gallery": [
     {
       "image": "/uploads/gallery/1763815720550-images-(1).jpg",
-      "caption": "hhhh",
+      "caption": "Chambre patient tout confort",
       "category": "infrastructure",
       "id": "3"
     },
     {
       "image": "/uploads/gallery/1763815971677-images-(1).jpg",
-      "caption": "test",
+      "caption": "Infrastructure moderne et accueillante",
       "category": "infrastructure",
       "id": "4"
     },
     {
       "image": "/uploads/gallery/1763816789310-hero-dental-2.jpg",
-      "caption": "AN",
+      "caption": "Plateau technique spécialisé",
       "category": "infrastructure",
       "id": "5"
     },
     {
       "image": "/uploads/gallery/1763827420029-Gemini_Generated_Image_gzjk7ygzjk7ygzjk.png",
-      "caption": "",
+      "caption": "Façade extérieure de la clinique",
       "category": "exterior",
       "id": "6"
     }

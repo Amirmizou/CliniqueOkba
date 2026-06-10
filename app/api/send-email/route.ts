@@ -1,8 +1,26 @@
 import { NextResponse } from 'next/server';
 import { Resend } from 'resend';
 import { emailRateLimiter } from '@/lib/rate-limit';
+import { z } from 'zod';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
+
+const contactSchema = z.object({
+  firstName: z.string().min(2).max(50),
+  lastName: z.string().min(2).max(50),
+  email: z.string().email(),
+  phone: z.string().optional(),
+  message: z.string().min(10).max(5000),
+});
+
+function escapeHtml(unsafe: string) {
+  return unsafe
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
 
 export async function POST(request: Request) {
   try {
@@ -24,21 +42,28 @@ export async function POST(request: Request) {
       );
     }
 
-    const { firstName, lastName, email, phone, message } = await request.json();
+    const body = await request.json();
+    
+    // Validate with Zod
+    const validationResult = contactSchema.safeParse(body);
+    if (!validationResult.success) {
+      return NextResponse.json({ error: 'Données invalides', details: validationResult.error.errors }, { status: 400 });
+    }
+    
+    const { firstName, lastName, email, phone, message } = validationResult.data;
 
-    // Ensure 'from' email is a verified domain in your Resend account
-    // For testing, you can use 'onboarding@resend.dev'
-    const fromEmail = 'onboarding@resend.dev'; // Replace with your verified sender email
+    const fromEmail = 'onboarding@resend.dev';
+    const toEmail = process.env.CLINIC_EMAIL || 'contact@cliniqueokba.com';
 
     const { data, error } = await resend.emails.send({
       from: `Clinique Okba <${fromEmail}>`,
-      to: ['denzbahi@gmail.com'], // Replace with your own email address
+      to: [toEmail],
       subject: 'Nouveau message depuis le formulaire de contact',
-      html: `<p>Vous avez reçu un nouveau message de <strong>${firstName} ${lastName}</strong>.</p>
-             <p><strong>Email:</strong> ${email}</p>
-             <p><strong>Téléphone:</strong> ${phone}</p>
+      html: `<p>Vous avez reçu un nouveau message de <strong>${escapeHtml(firstName)} ${escapeHtml(lastName)}</strong>.</p>
+             <p><strong>Email:</strong> ${escapeHtml(email)}</p>
+             <p><strong>Téléphone:</strong> ${escapeHtml(phone || 'Non renseigné')}</p>
              <p><strong>Message:</strong></p>
-             <p>${message}</p>`,
+             <p>${escapeHtml(message).replace(/\n/g, '<br/>')}</p>`,
     });
 
     if (error) {

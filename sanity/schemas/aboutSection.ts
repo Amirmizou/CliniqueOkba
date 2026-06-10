@@ -43,6 +43,7 @@ export default defineType({
             type: 'array',
             of: [
                 {
+                    name: 'valueItem',
                     type: 'object',
                     fields: [
                         { name: 'title', title: 'Titre', type: 'string' },
@@ -58,6 +59,7 @@ export default defineType({
             type: 'array',
             of: [
                 {
+                    name: 'statItem',
                     type: 'object',
                     fields: [
                         { name: 'value', title: 'Valeur', type: 'string' },

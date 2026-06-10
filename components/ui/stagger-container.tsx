@@ -35,7 +35,7 @@ export default function StaggerContainer({
     viewport = { once: true, margin: "-50px" },
     as: Component = "div"
 }: StaggerContainerProps) {
-    const MotionComponent = motion(Component)
+    const MotionComponent = motion.create(Component)
 
     return (
         <MotionComponent

@@ -1,0 +1,24 @@
+{
+  "name": "clinique-okba-video",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Vidéos promotionnelles Clinique OKBA (Remotion)",
+  "scripts": {
+    "dev": "remotion studio",
+    "render": "remotion render ClinicPromo out/clinique-okba-promo.mp4",
+    "still": "remotion still ClinicPromo out/preview.png --frame=40"
+  },
+  "dependencies": {
+    "@remotion/cli": "4.0.473",
+    "@remotion/fonts": "4.0.473",
+    "@remotion/transitions": "4.0.473",
+    "react": "19.2.1",
+    "react-dom": "19.2.1",
+    "remotion": "4.0.473"
+  },
+  "devDependencies": {
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "typescript": "^5"
+  }
+}

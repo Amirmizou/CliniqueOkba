@@ -6,7 +6,7 @@ import { schemaTypes } from './sanity/schemas'
 export default defineConfig({
     name: 'clinique-okba-studio',
     title: 'Clinique OKBA - Gestion du Contenu',
-    basePath: '/studio',
+    basePath: '/admin/dashboard',
 
     projectId: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID!,
     dataset: process.env.NEXT_PUBLIC_SANITY_DATASET!,
@@ -96,6 +96,14 @@ export default defineConfig({
                                                     .schemaType('homeCare')
                                                     .documentId('homeCare')
                                             ),
+                                        S.listItem()
+                                            .title('Conventions & Prise en charge')
+                                            .icon(() => '🛡️')
+                                            .child(
+                                                S.document()
+                                                    .schemaType('insuranceSection')
+                                                    .documentId('insuranceSection')
+                                            ),
                                     ])
                             ),
 
@@ -143,15 +151,19 @@ export default defineConfig({
 
                         // 📰 PUBLICATIONS
                         S.listItem()
-                            .title('📰 Publications & Blog')
+                            .title('📰 Publications & Événements')
                             .child(
                                 S.list()
                                     .title('Publications')
                                     .items([
                                         S.listItem()
-                                            .title('Articles de Blog')
+                                            .title('Actualités')
                                             .icon(() => '📝')
-                                            .child(S.documentTypeList('article').title('Articles')),
+                                            .child(S.documentTypeList('article').title('Actualités')),
+                                        S.listItem()
+                                            .title('Événements')
+                                            .icon(() => '📅')
+                                            .child(S.documentTypeList('event').title('Événements')),
                                         S.listItem()
                                             .title('FAQ')
                                             .icon(() => '❓')
@@ -174,6 +186,9 @@ export default defineConfig({
 
             if (document._type === 'article' && document.slug?.current) {
                 return `${baseUrl}/actualites/${document.slug.current}`
+            }
+            if (document._type === 'event' && document.slug?.current) {
+                return `${baseUrl}/evenements/${document.slug.current}`
             }
             if (document._type === 'doctor' && document.slug?.current) {
                 return `${baseUrl}/equipe/${document.slug.current}`

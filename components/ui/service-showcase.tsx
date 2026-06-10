@@ -60,9 +60,9 @@ export function ServiceShowcase({ imageSrc, className }: ServiceShowcaseProps) {
                 transformStyle: "preserve-3d",
             }}
         >
-            {/* Animated Floating Elements behind */}
-            <div className="absolute top-10 -left-10 w-20 h-20 bg-primary/20 rounded-full blur-xl animate-pulse" />
-            <div className="absolute bottom-10 -right-10 w-32 h-32 bg-blue-500/20 rounded-full blur-xl animate-pulse delay-700" />
+            {/* Static glow elements behind */}
+            <div className="absolute top-10 -left-10 w-20 h-20 bg-primary/20 rounded-full blur-xl" />
+            <div className="absolute bottom-10 -right-10 w-32 h-32 bg-blue-500/20 rounded-full blur-xl" />
 
             <motion.div
                 style={{
@@ -83,17 +83,8 @@ export function ServiceShowcase({ imageSrc, className }: ServiceShowcaseProps) {
                         priority
                     />
 
-                    {/* Holographic Scan Effect */}
+                    {/* Subtle highlight on hover */}
                     <div className="absolute inset-0 bg-gradient-to-tr from-primary/0 via-primary/5 to-blue-500/0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none mix-blend-overlay" />
-
-                    {/* Scanning Line */}
-                    <motion.div
-                        animate={{ top: ["0%", "100%", "0%"] }}
-                        transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
-                        className="absolute left-0 w-full h-[2px] bg-primary/50 shadow-[0_0_20px_rgba(44,133,222,0.8)] z-20 pointer-events-none opacity-50"
-                    >
-                        <div className="absolute right-0 -top-1 px-1 bg-primary text-[8px] text-white font-mono">SCANNING</div>
-                    </motion.div>
                 </div>
 
                 {/* Floating 3D Elements (Badges that pop out) */}

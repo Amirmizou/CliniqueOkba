@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
-import Header from '@/components/header'
-import Footer from '@/components/footer'
+import SiteHeader from '@/components/site-header'
+import SiteFooter from '@/components/site-footer'
 import { defaultMetadata } from '@/lib/seo'
 
 export const dynamic = 'force-dynamic'
@@ -19,7 +19,7 @@ export const metadata: Metadata = {
 export default function PolitiqueConfidentialite() {
   return (
     <>
-      <Header />
+      <SiteHeader />
       <main className='min-h-screen pt-20'>
         <div className='mx-auto max-w-4xl px-4 py-12 sm:px-6 lg:px-8'>
           <h1 className='text-foreground mb-8 text-4xl font-bold'>
@@ -216,7 +216,7 @@ export default function PolitiqueConfidentialite() {
           </div>
         </div>
       </main>
-      <Footer />
+      <SiteFooter />
     </>
   )
 }

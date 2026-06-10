@@ -11,10 +11,6 @@ const LoadingFallback = ({ height = 'h-96' }: { height?: string }) => (
 )
 
 // Lazy load des composants lourds (below the fold)
-export const LazyGallery = dynamic(() => import('@/components/gallery'), {
-    loading: () => <LoadingFallback />,
-})
-
 export const LazyTestimonials = dynamic(() => import('@/components/testimonials'), {
     loading: () => <LoadingFallback height="h-64" />,
 })

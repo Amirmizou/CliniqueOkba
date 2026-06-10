@@ -2,10 +2,11 @@
 import Image from 'next/image'
 import { Link } from '@/navigation'
 import { motion } from 'framer-motion'
-import { useState, useEffect } from 'react'
 import { Facebook, Instagram, Mail, MapPin, Phone, ArrowRight, HeartPulse } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import { siteConfig as siteConfigFallback } from '@/data/site-config'
+import { poles } from '@/data/poles'
+import { cn } from '@/lib/utils'
 
 interface SiteSettings {
   clinicName?: string
@@ -15,39 +16,29 @@ interface SiteSettings {
   social?: { facebook?: string; instagram?: string }
 }
 
-interface FooterProps {
-  siteSettings?: SiteSettings
+interface FooterContent {
+  description?: string
+  copyright?: string
 }
 
-export default function Footer({ siteSettings }: FooterProps) {
+interface FooterProps {
+  siteSettings?: SiteSettings
+  footerContent?: FooterContent
+}
+
+export default function Footer({ siteSettings, footerContent }: FooterProps) {
   const t = useTranslations('footer')
   const tNav = useTranslations('nav')
 
   // Use Sanity data if available, otherwise fallback to static config
-  const [clinicData, setClinicData] = useState<any>({
+  const clinicData = {
     contact: {
       address: siteSettings?.address || siteConfigFallback.contact.address,
       phone: siteSettings?.phone || siteConfigFallback.contact.phone,
       email: siteSettings?.email || siteConfigFallback.contact.email,
     },
     social: siteSettings?.social || siteConfigFallback.social,
-  })
-
-  useEffect(() => {
-    // Only fetch from API if no Sanity data provided
-    if (siteSettings) return
-
-    const load = async () => {
-      try {
-        const res = await fetch('/api/admin/clinic', { cache: 'no-store' })
-        if (res.ok) {
-          const data = await res.json()
-          setClinicData((prev: any) => ({ ...prev, ...data }))
-        }
-      } catch { }
-    }
-    load()
-  }, [siteSettings])
+  }
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -109,23 +100,25 @@ export default function Footer({ siteSettings }: FooterProps) {
         >
           {/* Brand Section */}
           <motion.div variants={itemVariants} className='space-y-6'>
-            <div className='flex items-center gap-3'>
-              <div className='relative h-12 w-12 bg-white rounded-xl p-1 flex items-center justify-center shadow-lg shadow-primary/20'>
+            <div className='flex items-center gap-4'>
+              <div className='relative h-14 w-14 bg-white/10 backdrop-blur-md rounded-2xl p-2 flex items-center justify-center shadow-xl shadow-primary/20 border border-white/10 group-hover:border-primary/50 transition-colors'>
                 <Image
                   src='/logo.png'
                   alt='Clinique OKBA'
-                  width={40}
-                  height={40}
-                  className='object-contain'
+                  width={44}
+                  height={44}
+                  className='object-contain drop-shadow-lg'
                 />
               </div>
-              <div>
-                <span className='block text-xl font-bold tracking-tight'>Clinique OKBA</span>
-                <span className='text-xs text-primary font-medium tracking-wider uppercase bg-primary/10 px-2 py-0.5 rounded-full'>Excellence Médicale</span>
+              <div className="flex flex-col gap-1.5">
+                <span className='block text-2xl font-bold tracking-tight text-white drop-shadow-md'>Clinique <span className="text-primary">OKBA</span></span>
+                <span className='text-[10px] w-fit text-primary font-bold tracking-widest uppercase bg-primary/10 px-2.5 py-0.5 rounded-full border border-primary/20'>
+                  Excellence Médicale
+                </span>
               </div>
             </div>
             <p className='text-slate-400 leading-relaxed text-sm'>
-              {t('brandDescription')}
+              {footerContent?.description || t('brandDescription')}
             </p>
             <div className='flex gap-3'>
               <motion.a
@@ -160,36 +153,30 @@ export default function Footer({ siteSettings }: FooterProps) {
                 { key: 'home', href: '#home' },
                 { key: 'about', href: '#about' },
                 { key: 'specialties', href: '#specialties' },
-                { key: 'services', href: '#services' },
-                { key: 'gallery', href: '#gallery' },
+                { key: 'gallery', href: '#equipements' },
                 { key: 'contact', href: '#contact' }
               ].map((item) => (
                 <li key={item.key}>
-                  <a href={item.href} className='group flex items-center gap-2 text-sm text-slate-400 hover:text-white transition-colors'>
-                    <span className="w-1.5 h-1.5 rounded-full bg-slate-600 group-hover:bg-primary transition-colors" />
+                  <a href={item.href} className='group flex items-center gap-3 text-sm text-slate-400 hover:text-white transition-all duration-300 hover:translate-x-1.5'>
+                    <span className="w-1.5 h-1.5 rounded-full bg-slate-600 group-hover:bg-primary group-hover:w-3 transition-all duration-300" />
                     {tNav(item.key)}
                   </a>
                 </li>
               ))}
               {/* Additional pages */}
-              <li>
-                <a href="/actualites" className='group flex items-center gap-2 text-sm text-slate-400 hover:text-white transition-colors'>
-                  <span className="w-1.5 h-1.5 rounded-full bg-slate-600 group-hover:bg-primary transition-colors" />
-                  Actualités
-                </a>
-              </li>
-              <li>
-                <a href="/equipe" className='group flex items-center gap-2 text-sm text-slate-400 hover:text-white transition-colors'>
-                  <span className="w-1.5 h-1.5 rounded-full bg-slate-600 group-hover:bg-primary transition-colors" />
-                  Équipe Médicale
-                </a>
-              </li>
-              <li>
-                <a href="/faq" className='group flex items-center gap-2 text-sm text-slate-400 hover:text-white transition-colors'>
-                  <span className="w-1.5 h-1.5 rounded-full bg-slate-600 group-hover:bg-primary transition-colors" />
-                  FAQ
-                </a>
-              </li>
+              {[
+                { name: 'Actualités', href: '/actualites' },
+                { name: 'Événements', href: '/evenements' },
+                { name: 'Équipe Médicale', href: '/equipe' },
+                { name: 'FAQ', href: '/faq' },
+              ].map((item) => (
+                <li key={item.name}>
+                  <a href={item.href} className='group flex items-center gap-3 text-sm text-slate-400 hover:text-white transition-all duration-300 hover:translate-x-1.5'>
+                    <span className="w-1.5 h-1.5 rounded-full bg-slate-600 group-hover:bg-primary group-hover:w-3 transition-all duration-300" />
+                    {item.name}
+                  </a>
+                </li>
+              ))}
             </ul>
           </motion.div>
 
@@ -200,19 +187,12 @@ export default function Footer({ siteSettings }: FooterProps) {
               {t('poles')}
             </h4>
             <ul className='space-y-3'>
-              {[
-                { name: 'Urgences 24/7', key: 'urgences' },
-                { name: 'Chirurgie', key: 'chirurgie' },
-                { name: 'Cardiologie', key: 'cardiologie' },
-                { name: 'Maternité', key: 'maternite' },
-                { name: 'Imagerie Médicale', key: 'imagerie' },
-                { name: 'Laboratoire', key: 'laboratoire' }
-              ].map((item) => (
-                <li key={item.key}>
-                  <a href="#specialties" className='group flex items-center gap-2 text-sm text-slate-400 hover:text-white transition-colors'>
-                    <HeartPulse className="w-4 h-4 text-slate-600 group-hover:text-secondary transition-colors" />
-                    {item.name}
-                  </a>
+              {poles.map((pole) => (
+                <li key={pole.slug}>
+                  <Link href={`/poles/${pole.slug}`} className='group flex items-center gap-3 text-sm text-slate-400 hover:text-white transition-all duration-300 hover:translate-x-1.5'>
+                    <HeartPulse className={cn("w-4 h-4 transition-colors", pole.urgent ? "text-red-500" : "text-slate-600 group-hover:text-secondary")} />
+                    <span className={pole.urgent ? "text-red-400 font-medium" : ""}>{pole.title}</span>
+                  </Link>
                 </li>
               ))}
             </ul>
@@ -224,32 +204,32 @@ export default function Footer({ siteSettings }: FooterProps) {
               <span className="w-1.5 h-6 bg-red-500 rounded-full" />
               {t('contact')}
             </h4>
-            <ul className='space-y-5'>
-              <li className='flex gap-4 group'>
-                <div className="bg-white/5 p-2.5 h-fit rounded-lg group-hover:bg-primary/20 transition-colors">
+            <ul className='space-y-4 mt-2'>
+              <li className='flex gap-4 group p-3 -ml-3 rounded-xl hover:bg-white/5 transition-colors duration-300'>
+                <div className="bg-white/5 p-3 h-fit rounded-xl group-hover:bg-primary/20 transition-colors shadow-inner shadow-white/5">
                   <MapPin className='w-5 h-5 text-primary' />
                 </div>
                 <div>
-                  <p className="text-xs text-slate-500 font-medium uppercase mb-1">{t('address')}</p>
-                  <p className="text-sm text-slate-300 leading-relaxed">{clinicData?.contact.address || 'Nouvelle ville Ali Mendjeli, Constantine'}</p>
+                  <p className="text-[11px] text-slate-500 font-bold uppercase mb-1 tracking-widest">{t('address')}</p>
+                  <p className="text-sm text-slate-300 leading-relaxed font-medium">{clinicData?.contact.address || 'Nouvelle ville Ali Mendjeli, Constantine'}</p>
                 </div>
               </li>
-              <li className='flex gap-4 group'>
-                <div className="bg-white/5 p-2.5 h-fit rounded-lg group-hover:bg-primary/20 transition-colors">
+              <li className='flex gap-4 group p-3 -ml-3 rounded-xl hover:bg-white/5 transition-colors duration-300'>
+                <div className="bg-white/5 p-3 h-fit rounded-xl group-hover:bg-primary/20 transition-colors shadow-inner shadow-white/5">
                   <Phone className='w-5 h-5 text-primary' />
                 </div>
                 <div>
-                  <p className="text-xs text-slate-500 font-medium uppercase mb-1">{t('phone')}</p>
-                  <p className="text-sm text-slate-300 ltr:text-left rtl:text-right" dir="ltr">{clinicData?.contact.phone || '+213 555 123 456'}</p>
+                  <p className="text-[11px] text-slate-500 font-bold uppercase mb-1 tracking-widest">{t('phone')}</p>
+                  <p className="text-sm text-slate-300 ltr:text-left rtl:text-right font-medium" dir="ltr">{clinicData?.contact.phone || '+213 555 123 456'}</p>
                 </div>
               </li>
-              <li className='flex gap-4 group'>
-                <div className="bg-white/5 p-2.5 h-fit rounded-lg group-hover:bg-primary/20 transition-colors">
+              <li className='flex gap-4 group p-3 -ml-3 rounded-xl hover:bg-white/5 transition-colors duration-300'>
+                <div className="bg-white/5 p-3 h-fit rounded-xl group-hover:bg-primary/20 transition-colors shadow-inner shadow-white/5">
                   <Mail className='w-5 h-5 text-primary' />
                 </div>
                 <div>
-                  <p className="text-xs text-slate-500 font-medium uppercase mb-1">{t('email')}</p>
-                  <p className="text-sm text-slate-300">{clinicData?.contact.email || 'contact@cliniqueokba.com'}</p>
+                  <p className="text-[11px] text-slate-500 font-bold uppercase mb-1 tracking-widest">{t('email')}</p>
+                  <p className="text-sm text-slate-300 font-medium">{clinicData?.contact.email || 'contact@cliniqueokba.com'}</p>
                 </div>
               </li>
             </ul>
@@ -259,7 +239,7 @@ export default function Footer({ siteSettings }: FooterProps) {
         {/* Bottom Bar */}
         <div className='mt-16 pt-8 border-t border-white/5 flex flex-col md:flex-row items-center justify-between gap-4'>
           <p className='text-xs text-slate-500'>
-            © {currentYear} Clinique OKBA. {t('rights')}.
+            {footerContent?.copyright || `© ${currentYear} Clinique OKBA. ${t('rights')}.`}
           </p>
           <div className='flex gap-6 text-xs text-slate-500'>
             <Link href="/legal/mentions-legales" className='hover:text-white transition-colors'>{t('terms')}</Link>

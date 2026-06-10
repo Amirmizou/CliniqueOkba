@@ -50,11 +50,33 @@ export default defineType({
         }),
         defineField({
             name: 'image',
-            title: 'Image principale',
+            title: 'Image de couverture',
             type: 'image',
             options: {
                 hotspot: true,
             },
+        }),
+        defineField({
+            name: 'category',
+            title: 'Catégorie',
+            type: 'string',
+            options: {
+                list: [
+                    { title: 'Nouveau médecin', value: 'nouveau-medecin' },
+                    { title: 'Nouvel équipement', value: 'nouvel-equipement' },
+                    { title: 'Nouvelle convention', value: 'convention' },
+                    { title: "Changement d'horaires", value: 'horaires' },
+                    { title: 'Ouverture de service', value: 'nouveau-service' },
+                    { title: 'Certification / Accréditation', value: 'certification' },
+                    { title: 'Communiqué officiel', value: 'communique' },
+                ],
+            },
+        }),
+        defineField({
+            name: 'author',
+            title: 'Auteur',
+            type: 'string',
+            description: 'Nom de l’auteur ou du service émetteur',
         }),
         defineField({
             name: 'publishedAt',

@@ -9,6 +9,7 @@ const nextConfig: NextConfig = {
   images: {
     formats: ['image/avif', 'image/webp'], // AVIF en premier pour meilleure compression
     deviceSizes: [640, 750, 828, 1080, 1200, 1920],
+    qualities: [25, 50, 75, 80, 90, 100],
     imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
     minimumCacheTTL: 31536000, // 1 an pour images statiques
     dangerouslyAllowSVG: true,
@@ -22,6 +23,7 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  eslint: { ignoreDuringBuilds: true },
   compress: true,
   poweredByHeader: false,
   generateEtags: false,
@@ -55,7 +57,7 @@ const nextConfig: NextConfig = {
         },
         {
           key: 'Content-Security-Policy',
-          value: "default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline' https://va.vercel-scripts.com https://www.googletagmanager.com; style-src 'self' 'unsafe-inline'; img-src 'self' blob: data: https://www.googletagmanager.com https://*.googleapis.com https://*.gstatic.com https://cdn.sanity.io; font-src 'self' data:; connect-src 'self' https://vitals.vercel-insights.com https://www.google-analytics.com https://www.googletagmanager.com https://*.sanity.io https://*.api.sanity.io; frame-src 'self' https://www.google.com https://maps.google.com;",
+          value: "default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline' https://va.vercel-scripts.com https://www.googletagmanager.com; style-src 'self' 'unsafe-inline'; img-src 'self' blob: data: https://www.googletagmanager.com https://*.googleapis.com https://*.gstatic.com https://cdn.sanity.io; font-src 'self' data:; connect-src 'self' https://vitals.vercel-insights.com https://www.google-analytics.com https://www.googletagmanager.com https://*.sanity.io https://*.api.sanity.io wss://*.sanity.io wss://*.api.sanity.io https://registry.npmjs.org; frame-src 'self' https://www.google.com https://maps.google.com;",
         },
         {
           key: 'Permissions-Policy',

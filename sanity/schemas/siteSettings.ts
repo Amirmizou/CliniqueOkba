@@ -28,6 +28,21 @@ export default defineType({
             type: 'string',
         }),
         defineField({
+            name: 'whatsappNumber',
+            title: 'Numéro WhatsApp (Rendez-vous)',
+            description:
+                'Numéro qui recevra les demandes de rendez-vous via WhatsApp. Format international sans + ni espaces, ex : 213770884242. Un 0 initial sera converti en 213.',
+            type: 'string',
+        }),
+        defineField({
+            name: 'appointmentMessage',
+            title: 'Message WhatsApp pré-rempli (Rendez-vous)',
+            description:
+                'Phrase d’introduction du message de demande de rendez-vous. Laisser vide pour utiliser le message par défaut.',
+            type: 'text',
+            rows: 2,
+        }),
+        defineField({
             name: 'email',
             title: 'Email',
             type: 'string',
@@ -64,6 +79,24 @@ export default defineType({
             fields: [
                 { name: 'facebook', title: 'Facebook', type: 'url' },
                 { name: 'instagram', title: 'Instagram', type: 'url' },
+            ],
+        }),
+        defineField({
+            name: 'heroStats',
+            title: 'Statistiques (bandeau Accueil)',
+            description: 'Chiffres-clés affichés sous le hero (ex : 8 Spécialités, 24/7 Urgences)',
+            type: 'array',
+            of: [
+                {
+                    type: 'object',
+                    fields: [
+                        { name: 'value', title: 'Valeur', type: 'string' },
+                        { name: 'label', title: 'Libellé', type: 'string' },
+                    ],
+                    preview: {
+                        select: { title: 'value', subtitle: 'label' },
+                    },
+                },
             ],
         }),
     ],

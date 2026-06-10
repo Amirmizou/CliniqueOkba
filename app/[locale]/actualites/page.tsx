@@ -1,14 +1,15 @@
 import { Suspense } from 'react'
-import Header from '@/components/header'
-import Footer from '@/components/footer'
-import { getArticles } from '@/sanity/lib/fetch'
+import SiteHeader from '@/components/site-header'
+import SiteFooter from '@/components/site-footer'
+import { getArticles, getSiteSettings } from '@/sanity/lib/fetch'
 import { urlFor } from '@/sanity/lib/image'
 import Image from 'next/image'
 import { Link } from '@/navigation'
-import { Calendar, ArrowRight, Newspaper } from 'lucide-react'
+import { Calendar, ArrowRight, Newspaper, User } from 'lucide-react'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import ScrollAnimation from '@/components/ui/scroll-animation'
+import { CATEGORY_LABELS } from '@/lib/news'
 
 interface Article {
     _id: string
@@ -16,6 +17,8 @@ interface Article {
     slug: { current: string }
     excerpt: string
     image: any
+    category?: string
+    author?: string
     publishedAt: string
 }
 
@@ -60,16 +63,29 @@ async function ArticlesList() {
                                             className="object-cover transition-transform duration-500 group-hover:scale-110"
                                         />
                                         <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
+                                        {article.category && CATEGORY_LABELS[article.category] && (
+                                            <Badge className="absolute top-3 left-3 bg-primary text-primary-foreground shadow-md">
+                                                {CATEGORY_LABELS[article.category]}
+                                            </Badge>
+                                        )}
                                     </div>
                                 )}
                                 <CardHeader className="pb-2">
-                                    <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2">
-                                        <Calendar className="h-4 w-4" />
-                                        {new Date(article.publishedAt).toLocaleDateString('fr-FR', {
-                                            year: 'numeric',
-                                            month: 'long',
-                                            day: 'numeric',
-                                        })}
+                                    <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-muted-foreground mb-2">
+                                        <span className="flex items-center gap-2">
+                                            <Calendar className="h-4 w-4" />
+                                            {new Date(article.publishedAt).toLocaleDateString('fr-FR', {
+                                                year: 'numeric',
+                                                month: 'long',
+                                                day: 'numeric',
+                                            })}
+                                        </span>
+                                        {article.author && (
+                                            <span className="flex items-center gap-1.5">
+                                                <User className="h-4 w-4" />
+                                                {article.author}
+                                            </span>
+                                        )}
                                     </div>
                                     <h3 className="text-xl font-bold line-clamp-2 group-hover:text-primary transition-colors">
                                         {article.title}
@@ -107,10 +123,11 @@ async function ArticlesList() {
     }
 }
 
-export default function ActualitesPage() {
+export default async function ActualitesPage() {
+    const siteSettings = await getSiteSettings()
     return (
         <>
-            <Header />
+            <SiteHeader siteSettings={siteSettings} />
             <main className="min-h-screen pt-24">
                 <section className="py-16 md:py-24">
                     <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -134,7 +151,7 @@ export default function ActualitesPage() {
                     </div>
                 </section>
             </main>
-            <Footer />
+            <SiteFooter siteSettings={siteSettings} />
         </>
     )
 }

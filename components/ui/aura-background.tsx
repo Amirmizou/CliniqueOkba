@@ -31,18 +31,8 @@ export function AuraBackground({ className, children, ...props }: AuraBackground
                     className="absolute bottom-[20%] -right-[10%] w-[40vw] h-[40vw] bg-accent/30 rounded-full blur-[100px] mix-blend-multiply filter opacity-30 animate-blob animation-delay-2000"
                 />
 
-                {/* Center Floating Blob */}
-                <motion.div
-                    animate={{
-                        x: [0, 30, -20, 0],
-                        y: [0, -50, 20, 0],
-                        scale: [1, 1.1, 0.9, 1]
-                    }}
-                    transition={{
-                        duration: 20,
-                        repeat: Infinity,
-                        repeatType: "reverse"
-                    }}
+                {/* Center Blob — statique (profondeur sans mouvement perpétuel) */}
+                <div
                     className="absolute top-[40%] left-[30%] w-[30vw] h-[30vw] bg-secondary/40 rounded-full blur-[80px] mix-blend-multiply filter opacity-20"
                 />
 

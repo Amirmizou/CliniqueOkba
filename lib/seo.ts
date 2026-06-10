@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import { siteConfig } from '@/data/site-config'
 
 const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://cliniqueokba.com'
 const siteName = 'Clinique OKBA'
@@ -98,35 +99,35 @@ export const generateStructuredData = () => {
     url: baseUrl,
     logo: `${baseUrl}/logo.png`,
     image: `${baseUrl}/uploads/hero/1763825620251-Gemini_Generated_Image_gzjk7ygzjk7ygzjk.png`,
-    telephone: process.env.NEXT_PUBLIC_CONTACT_PHONE || '+213 555 123 456',
-    email: process.env.NEXT_PUBLIC_CONTACT_EMAIL || 'contact@cliniqueokba.com',
+    telephone:
+      process.env.NEXT_PUBLIC_CONTACT_PHONE ||
+      siteConfig.contact.phone.split('/')[0].trim(),
+    email: process.env.NEXT_PUBLIC_CONTACT_EMAIL || siteConfig.contact.email,
     address: {
       '@type': 'PostalAddress',
-      streetAddress: 'Nouvelle ville Ali Mendjeli',
+      streetAddress: 'Nouvelle ville Ali Mendjeli, extension ouest',
       addressLocality: 'Constantine',
       addressCountry: 'DZ',
       postalCode: '25000',
     },
     geo: {
       '@type': 'GeoCoordinates',
-      latitude: 36.3651,
-      longitude: 6.6144,
+      latitude: siteConfig.contact.coordinates.lat,
+      longitude: siteConfig.contact.coordinates.lng,
     },
-    openingHours: ['Mo-Fr 08:00-18:00', 'Sa 08:00-14:00'],
+    // Semaine de travail algérienne : samedi au jeudi, urgences 24h/24
     openingHoursSpecification: [
       {
         '@type': 'OpeningHoursSpecification',
-        dayOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'],
+        dayOfWeek: ['Saturday', 'Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday'],
         opens: '08:00',
         closes: '18:00',
       },
-      {
-        '@type': 'OpeningHoursSpecification',
-        dayOfWeek: 'Saturday',
-        opens: '08:00',
-        closes: '14:00',
-      },
     ],
+    availableService: {
+      '@type': 'EmergencyService',
+      name: 'Urgences médicales 24h/24 - 7j/7',
+    },
     medicalSpecialty: [
       'Cardiologie',
       'Pneumologie',
@@ -183,5 +184,56 @@ export const generateStructuredData = () => {
       'https://www.facebook.com/p/Clinique-OKBA-61576965629601/',
       'https://instagram.com/clinique_okba',
     ],
+  }
+}
+
+/**
+ * Données structurées schema.org « Physician » pour la page Équipe.
+ * Génère une liste (ItemList) de médecins rattachés à la clinique, à partir
+ * des données Sanity. Les URLs d'image doivent être pré-résolues par l'appelant
+ * (via urlFor) pour éviter une dépendance Sanity dans ce module.
+ */
+interface PhysicianInput {
+  name?: string
+  title?: string
+  specialty?: string
+  imageUrl?: string
+  slug?: string
+  languages?: string[]
+}
+
+export const generatePhysiciansStructuredData = (doctors: PhysicianInput[]) => {
+  const list = (doctors || []).filter((d) => d?.name)
+  if (list.length === 0) return null
+
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    itemListElement: list.map((doc, index) => {
+      const fullName = [doc.title, doc.name].filter(Boolean).join(' ').trim()
+      return {
+        '@type': 'ListItem',
+        position: index + 1,
+        item: {
+          '@type': 'Physician',
+          name: fullName,
+          ...(doc.specialty ? { medicalSpecialty: doc.specialty } : {}),
+          ...(doc.imageUrl ? { image: doc.imageUrl } : {}),
+          ...(doc.languages && doc.languages.length > 0
+            ? { knowsLanguage: doc.languages }
+            : {}),
+          worksFor: {
+            '@type': 'MedicalOrganization',
+            name: siteName,
+            url: baseUrl,
+          },
+          address: {
+            '@type': 'PostalAddress',
+            addressLocality: 'Constantine',
+            addressCountry: 'DZ',
+          },
+        },
+      }
+    }),
   }
 }

@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react'
-import { inter } from './fonts'
+import { inter, lemonMilk, poppins } from './fonts'
 import './globals.css'
 
 export default function RootLayout({
@@ -8,13 +8,15 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html suppressHydrationWarning className={inter.variable}>
+    <html lang="fr" suppressHydrationWarning className={`${lemonMilk.variable} ${poppins.variable} ${inter.variable}`} data-scroll-behavior="smooth">
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
+        <link rel="preconnect" href="https://cdn.sanity.io" />
+        <link rel="dns-prefetch" href="https://cdn.sanity.io" />
         <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
       </head>
-      <body className={`${inter.className} font-sans antialiased`}>
+      <body className="font-sans antialiased">
         {children}
       </body>
     </html>

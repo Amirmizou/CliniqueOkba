@@ -1,0 +1,244 @@
+{
+  "about": {
+    "title": "Clinique OKBA",
+    "subtitle": "À propos de nous",
+    "description": "La Clinique OKBA est un établissement privé pluridisciplinaire situé à Ali Mendjeli, Constantine. Nous réunissons un plateau technique de pointe — imagerie, laboratoire, bloc opératoire — et une équipe de spécialistes dévoués, pour vous offrir des soins complets et de qualité, dans un cadre moderne et accueillant.",
+    "values": [
+      { "title": "Équipements modernes", "description": "Dernières technologies médicales", "icon": "Check" },
+      { "title": "Équipe expérimentée", "description": "Spécialistes qualifiés et dévoués", "icon": "Check" },
+      { "title": "Soins de qualité", "description": "Approche centrée sur le patient", "icon": "Check" }
+    ],
+    "stats": [
+      { "value": "24/7", "label": "Urgences disponibles", "icon": "Clock" },
+      { "value": "30+", "label": "Médecins spécialistes", "icon": "Users" },
+      { "value": "11", "label": "Spécialités médicales", "icon": "Award" }
+    ]
+  },
+  "siteSettings": {
+    "clinicName": "Clinique OKBA",
+    "description": "Clinique privée pluridisciplinaire moderne à Ali Mendjeli, Constantine.",
+    "phone": "+213 770 88 42 42 / +213 770 88 43 43",
+    "whatsappNumber": "213770884242",
+    "appointmentMessage": "Bonjour la Clinique OKBA, je souhaite prendre un rendez-vous.",
+    "email": "Cliniqueokba2025@gmail.com",
+    "address": "Nouvelle ville Ali Mendjeli, extension ouest, à proximité du grand rond-point en allant vers Aïn Smara, Constantine, Algérie",
+    "coordinates": { "lat": 36.241485, "lng": 6.550478 },
+    "hours": { "emergency": "24h/24 - 7j/7", "weekdays": "08:00 - 18:00", "saturday": "08:00 - 14:00" },
+    "social": {
+      "facebook": "https://www.facebook.com/p/Clinique-OKBA-61576965629601/",
+      "instagram": "https://www.instagram.com/clinique_okba/"
+    },
+    "heroStats": [
+      { "value": "6", "label": "Pôles d’excellence" },
+      { "value": "24/7", "label": "Urgences" },
+      { "value": "30+", "label": "Médecins" }
+    ]
+  },
+  "footerContent": {
+    "description": "Clinique privée pluridisciplinaire à Ali Mendjeli, Constantine. Imagerie de pointe, pôle dentaire, laboratoire, urgences 24h/24 et consultations spécialisées réunis dans un cadre moderne et accueillant."
+  },
+  "homeCare": {
+    "title": "Soins à domicile",
+    "subtitle": "Service dédié",
+    "description": "Une équipe mobile pour des soins médicaux de qualité, chez vous, en toute sécurité.",
+    "services": [
+      { "name": "Consultations générales et de suivi" },
+      { "name": "Pansements, injections, perfusions" },
+      { "name": "Prélèvements et examens à domicile" },
+      { "name": "Surveillance de patients chroniques" }
+    ],
+    "availability": "Interventions sur rendez-vous et urgences selon disponibilité",
+    "callToAction": { "text": "Demander une intervention à domicile", "phone": "+213770884242" }
+  },
+  "sectionContent": [
+    { "sectionId": "hero", "badge": "Excellence Médicale · Ali Mendjeli, Constantine" },
+    { "sectionId": "video", "badge": "En vidéo", "title": "Découvrez la Clinique OKBA", "subtitle": "Une présentation de notre établissement : nos spécialités, nos urgences 24h/24 et notre engagement à vos côtés." },
+    { "sectionId": "homecare", "badge": "Service dédié", "title": "Soins à domicile", "subtitle": "Une équipe mobile pour des soins médicaux de qualité, chez vous, en toute sécurité." },
+    { "sectionId": "testimonials", "badge": "Témoignages", "title": "Ce que disent nos patients", "subtitle": "Votre satisfaction est notre priorité" },
+    { "sectionId": "contact", "badge": "Nous contacter", "title": "Contact & Localisation", "subtitle": "Nous sommes à votre écoute pour toute question ou demande de rendez-vous" }
+  ],
+  "testimonials": [
+    { "name": "Amel B.", "rating": 5, "comment": "Accueil chaleureux et personnel très professionnel. Le scanner a été réalisé rapidement et les résultats étaient clairs.", "service": "Imagerie", "verified": true, "featured": true },
+    { "name": "Karim M.", "rating": 5, "comment": "Excellente prise en charge au service des urgences, de jour comme de nuit. Une équipe à l'écoute et réactive.", "service": "Urgences", "verified": true, "featured": true },
+    { "name": "Nadia S.", "rating": 5, "comment": "Suivi de grossesse impeccable, médecins attentionnés et plateau technique moderne. Je recommande vivement.", "service": "Gynécologie", "verified": true, "featured": true }
+  ],
+  "poles": [
+    { "slug": "imagerie", "title": "Imagerie médicale de pointe", "description": "Un plateau d’imagerie complet pour des diagnostics rapides et précis.", "items": ["Scanner (TDM)", "IRM", "Mammographie", "Radiologie numérique", "Échographie", "Scintigraphie"], "iconName": "ScanLine", "accentColor": "#3B82F6", "galleryCategories": ["imagerie"] },
+    { "slug": "dentaire", "title": "Pôle dentaire", "description": "Toutes les spécialités dentaires réunies sous un même toit.", "items": ["Consultation dentaire", "Chirurgie dentaire", "Orthodontie (ODF)", "Prothèse dentaire"], "iconName": "Smile", "accentColor": "#06B6D4", "galleryCategories": [] },
+    { "slug": "consultations", "title": "Consultations spécialisées", "description": "Des médecins spécialistes à votre écoute pour un suivi personnalisé.", "items": ["Gynécologie-obstétrique", "Endocrinologie", "Pédiatrie", "Médecine interne", "ORL"], "iconName": "Stethoscope", "accentColor": "#A855F7", "galleryCategories": ["consultation"] },
+    { "slug": "urgences", "title": "Urgences 24h/24", "description": "Une équipe médicale de garde, disponible jour et nuit, 7j/7.", "items": ["Accueil permanent", "Équipe de garde", "Prise en charge immédiate"], "iconName": "Siren", "accentColor": "#EF4444", "badge": "24h/24 · 7j/7", "urgent": true, "galleryCategories": ["accueil"] },
+    { "slug": "laboratoire", "title": "Laboratoire d’analyses médicales", "description": "Analyses biologiques fiables grâce à des automates de dernière génération.", "items": ["Bilans sanguins", "Prélèvements", "Biochimie", "Sérologie", "Hématologie"], "iconName": "FlaskConical", "accentColor": "#8B5CF6", "galleryCategories": ["laboratoire"] },
+    { "slug": "chirurgie", "title": "Chirurgie spécialisée", "description": "Bloc opératoire aux normes pour la chirurgie ophtalmologique et ORL.", "items": ["Chirurgie ophtalmologique", "Chirurgie ORL"], "iconName": "Eye", "accentColor": "#10B981", "galleryCategories": ["bloc"] }
+  ],
+  "doctors": [
+    {
+      "slug": "meskaldji-rima",
+      "title": "Dr.",
+      "name": "Meskaldji Rima ep. Benabdi",
+      "specialty": "Gynécologie Obstétrique",
+      "subtitle": "Ancienne Maître Assistante",
+      "services": [
+        "Suivi de grossesse",
+        "Accouchement normal",
+        "Césarienne",
+        "Échographie 3D / 4D",
+        "Doppler – ERCF",
+        "Colposcopie",
+        "Hystéroscopie",
+        "Infertilité du couple",
+        "Sénologie",
+        "Cœlioscopie",
+        "Chirurgie gynécologique"
+      ],
+      "consultationDays": "Du samedi au jeudi",
+      "consultationHours": "08h00 – 16h00",
+      "poster": "public/images/spec/portrait-meskaldji-rima.jpeg",
+      "iconName": "Baby",
+      "accentColor": "#A855F7",
+      "order": 1
+    },
+    {
+      "slug": "ameziane-leila",
+      "title": "Dr.",
+      "name": "Ameziane Leila",
+      "specialty": "Endocrinologue",
+      "subtitle": "Diabétologue",
+      "experience": "Plus de 25 ans d’expérience",
+      "services": ["Diabétologie", "Métabolisme", "Maladies nutritionnelles"],
+      "consultationDays": "Du samedi au jeudi",
+      "consultationHours": "08h00 – 16h00",
+      "poster": "public/images/spec/portrait-ameziane-leila.jpeg",
+      "iconName": "Activity",
+      "accentColor": "#10B981",
+      "order": 2
+    },
+    {
+      "slug": "boukredera-amira",
+      "title": "Dr.",
+      "name": "Boukredera Amira",
+      "specialty": "Pédiatre",
+      "services": [
+        "Consultation",
+        "Suivi des maladies chroniques",
+        "Suivi du développement de l’enfant"
+      ],
+      "consultationDays": "Du samedi au jeudi",
+      "consultationHours": "08h00 – 16h00",
+      "poster": "public/images/spec/portrait-boukredera-amira.jpeg",
+      "iconName": "Baby",
+      "accentColor": "#F59E0B",
+      "order": 3
+    },
+    {
+      "slug": "zerizer-loubna",
+      "title": "Dr.",
+      "name": "Zerizer Loubna",
+      "specialty": "Médecine interne",
+      "services": [
+        "Diabète & glande thyroïde",
+        "Maladies de l’appareil digestif & du foie",
+        "Maladies auto-immunes & rhumatismes",
+        "Maladies rares",
+        "Cholestérol élevé",
+        "Anémie"
+      ],
+      "consultationDays": "Du samedi au jeudi",
+      "consultationHours": "08h00 – 16h00",
+      "poster": "public/images/spec/portrait-zerizer-loubna.jpeg",
+      "iconName": "Stethoscope",
+      "accentColor": "#3B82F6",
+      "order": 4
+    },
+    {
+      "slug": "boughanout-seyfeddine",
+      "title": "Dr.",
+      "name": "Boughanout Seyfeddine",
+      "specialty": "ORL",
+      "subtitle": "Chirurgie de l’oreille, du nez, de la gorge, de la face & du cou",
+      "services": [
+        "Traitement des allergies & vertiges",
+        "Audiométrie & tympanométrie",
+        "Endoscopie de l’oreille & du nez",
+        "Chirurgie des amygdales & végétations",
+        "Chirurgie de la thyroïde, glandes salivaires & lymphatiques",
+        "Chirurgie endoscopique"
+      ],
+      "consultationDays": "Du samedi au mercredi",
+      "consultationHours": "08h00 – 16h00",
+      "poster": "public/images/spec/portrait-boughanout-seyfeddine.jpeg",
+      "iconName": "Ear",
+      "accentColor": "#F97316",
+      "order": 5
+    },
+    {
+      "slug": "aissaoui-laboratoire",
+      "title": "Pr.",
+      "name": "Aissaoui",
+      "specialty": "Responsable laboratoire",
+      "subtitle": "Biologie médicale",
+      "services": [
+        "Analyses biologiques",
+        "Hématologie",
+        "Biochimie",
+        "Sérologie & immunologie",
+        "Bactériologie"
+      ],
+      "consultationDays": "Du samedi au jeudi",
+      "consultationHours": "08h00 – 16h00",
+      "poster": "public/images/spec/portrait-aissaoui.jpeg",
+      "iconName": "FlaskConical",
+      "accentColor": "#0EA5E9",
+      "order": 6
+    }
+  ],
+  "facilityPhotos": [
+    { "file": "eq-03", "title": "Scanner Siemens SOMATOM go.Top", "description": "Scanner haute définition pour des images en coupes ultra-précises, en quelques secondes.", "category": "imagerie", "featured": true },
+    { "file": "eq-33", "title": "IRM Siemens", "description": "Imagerie par résonance magnétique dans un environnement apaisant (plafond panoramique).", "category": "imagerie", "featured": true },
+    { "file": "eq-02", "title": "Gamma caméra – Scintigraphie", "description": "Médecine nucléaire : exploration fonctionnelle des organes par imagerie isotopique.", "category": "imagerie", "featured": true },
+    { "file": "eq-35", "title": "Mammographe numérique", "description": "Dépistage et diagnostic du sein avec un faible niveau d’irradiation.", "category": "imagerie", "featured": false },
+    { "file": "eq-40", "title": "Salle de radiologie", "description": "Radiographie numérique pour os, thorax et explorations courantes.", "category": "imagerie", "featured": false },
+    { "file": "eq-43", "title": "Capteur de radiographie numérique", "description": "Tube et capteur plan dynamique pour des clichés nets et immédiats.", "category": "imagerie", "featured": false },
+    { "file": "eq-32", "title": "IRM – salle de commande", "description": "Poste de pilotage et de reconstruction des images IRM.", "category": "imagerie", "featured": false },
+    { "file": "eq-37", "title": "IRM – poste de contrôle", "description": "Supervision de l’examen depuis la salle technique vitrée.", "category": "imagerie", "featured": false },
+    { "file": "eq-04", "title": "Scanner – vue de la salle", "description": "Salle de scanner spacieuse et entièrement aux normes radioprotection.", "category": "imagerie", "featured": false },
+    { "file": "eq-31", "title": "Scanner – salle d’examen", "description": "Environnement lumineux pensé pour le confort du patient.", "category": "imagerie", "featured": false },
+    { "file": "eq-08", "title": "Médecine nucléaire", "description": "Détecteurs double tête de la gamma caméra pour la scintigraphie.", "category": "imagerie", "featured": false },
+
+    { "file": "eq-09", "title": "Bloc opératoire", "description": "Table chirurgicale, bras plafonniers et éclairage scialytique de haute précision.", "category": "bloc", "featured": true },
+    { "file": "eq-11", "title": "Salle d’opération", "description": "Salle aux normes d’asepsie, équipée pour la chirurgie spécialisée.", "category": "bloc", "featured": false },
+    { "file": "eq-12", "title": "Bloc – plateau technique", "description": "Bras de distribution des fluides médicaux et colonnes opératoires.", "category": "bloc", "featured": false },
+    { "file": "eq-10", "title": "Bloc opératoire", "description": "Éclairage opératoire LED et surfaces facilement décontaminables.", "category": "bloc", "featured": false },
+    { "file": "eq-13", "title": "Salle chirurgicale", "description": "Espace dédié aux interventions, ventilation et hygiène maîtrisées.", "category": "bloc", "featured": false },
+
+    { "file": "eq-27", "title": "Laboratoire d’analyses", "description": "Plateau d’analyses médicales automatisé pour des résultats fiables et rapides.", "category": "laboratoire", "featured": true },
+    { "file": "eq-23", "title": "Automate Alegria", "description": "Analyseur immunologique à écran tactile pour les bilans sanguins.", "category": "laboratoire", "featured": false },
+    { "file": "eq-26", "title": "Automate de biochimie", "description": "Traitement des échantillons sous contrôle informatique permanent.", "category": "laboratoire", "featured": false },
+    { "file": "eq-25", "title": "Paillasses techniques", "description": "Postes de travail ergonomiques et lumineux pour les biologistes.", "category": "laboratoire", "featured": false },
+    { "file": "eq-30", "title": "Salle technique", "description": "Espace d’analyse organisé pour un flux d’échantillons optimisé.", "category": "laboratoire", "featured": false },
+    { "file": "eq-28", "title": "Salle de prélèvement", "description": "Accueil confortable des patients pour les prises de sang.", "category": "laboratoire", "featured": false },
+    { "file": "eq-24", "title": "Accueil du laboratoire", "description": "Réception dédiée aux analyses, claire et accessible.", "category": "laboratoire", "featured": false },
+
+    { "file": "eq-05", "title": "Chambre d’hospitalisation", "description": "Lits médicalisés et espace baigné de lumière naturelle.", "category": "hospitalisation", "featured": true },
+    { "file": "eq-41", "title": "Unité de soins", "description": "Salle de surveillance avec chariot d’urgence et poste infirmier.", "category": "hospitalisation", "featured": false },
+    { "file": "eq-06", "title": "Chambre confortable", "description": "Mobilier médical complet pour un séjour serein.", "category": "hospitalisation", "featured": false },
+    { "file": "eq-19", "title": "Chambre collective", "description": "Lits réglables et chevets dédiés à chaque patient.", "category": "hospitalisation", "featured": false },
+    { "file": "eq-20", "title": "Salle d’hospitalisation", "description": "Espace propre, spacieux et facile d’accès pour le personnel.", "category": "hospitalisation", "featured": false },
+    { "file": "eq-07", "title": "Salle de surveillance", "description": "Lits de soins et poste de suivi rapproché des patients.", "category": "hospitalisation", "featured": false },
+    { "file": "eq-14", "title": "Chambre d’hospitalisation", "description": "Confort, hygiène et luminosité au service du repos.", "category": "hospitalisation", "featured": false },
+    { "file": "eq-15", "title": "Chambre patient", "description": "Lits médicalisés modernes dans un cadre apaisant.", "category": "hospitalisation", "featured": false },
+    { "file": "eq-16", "title": "Chambre double", "description": "Aménagement équilibré pour le confort de deux patients.", "category": "hospitalisation", "featured": false },
+    { "file": "eq-22", "title": "Chambre lumineuse", "description": "Grandes ouvertures et finitions soignées.", "category": "hospitalisation", "featured": false },
+
+    { "file": "eq-29", "title": "Salle d’échographie", "description": "Échographe performant pour l’imagerie en temps réel.", "category": "consultation", "featured": true },
+    { "file": "eq-01", "title": "Salle d’exploration gynécologique", "description": "Table d’examen et échographe dédiés au suivi de la femme.", "category": "consultation", "featured": false },
+    { "file": "eq-42", "title": "Salle d’examen", "description": "Espace d’examen équipé et préservant l’intimité du patient.", "category": "consultation", "featured": false },
+    { "file": "eq-21", "title": "Cabinet médical", "description": "Cabinet de consultation moderne et accueillant.", "category": "consultation", "featured": false },
+    { "file": "eq-17", "title": "Salle de consultation", "description": "Espace de dialogue avec le médecin et table d’examen.", "category": "consultation", "featured": false },
+    { "file": "eq-36", "title": "Cabinet de consultation", "description": "Environnement clair, pensé pour le confort de l’échange.", "category": "consultation", "featured": false },
+
+    { "file": "eq-34", "title": "Réception principale", "description": "Un hall spacieux et lumineux pour vous orienter dès l’arrivée.", "category": "accueil", "featured": true },
+    { "file": "eq-38", "title": "Accueil pédiatrie", "description": "Un espace coloré et rassurant, pensé pour les enfants.", "category": "accueil", "featured": false },
+    { "file": "eq-39", "title": "Espace d’attente", "description": "Salles d’attente confortables réparties à chaque étage.", "category": "accueil", "featured": false },
+    { "file": "eq-18", "title": "Hall & ascenseur", "description": "Circulation fluide et accessible entre les services.", "category": "accueil", "featured": false }
+  ]
+}

@@ -59,6 +59,19 @@ export default defineType({
             title: 'Lien du bouton CTA',
             type: 'string',
         }),
+        defineField({
+            name: 'videoFile',
+            title: 'Fichier vidéo (section « Vidéo » uniquement)',
+            type: 'file',
+            options: { accept: 'video/*' },
+            description: 'Vidéo de présentation. Laisser vide pour conserver la vidéo par défaut.',
+        }),
+        defineField({
+            name: 'videoPoster',
+            title: 'Image de couverture de la vidéo',
+            type: 'image',
+            options: { hotspot: true },
+        }),
     ],
     preview: {
         select: { title: 'sectionId', subtitle: 'title' },

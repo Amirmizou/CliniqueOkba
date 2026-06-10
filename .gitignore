@@ -10,11 +10,15 @@ dev.db
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
 # dependencies
-/node_modules
+node_modules/
 
 # next.js
 /.next/
 /out/
+
+# remotion video sub-project build output
+/video/out/
+/video/.remotion/
 
 # production
 /build
