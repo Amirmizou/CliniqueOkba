@@ -41,8 +41,7 @@ export default async function LocaleLayout({
       />
       <ThemeProvider
         attribute='class'
-        defaultTheme='system'
-        enableSystem
+        defaultTheme='light'
         disableTransitionOnChange
       >
         <AuraBackground>
