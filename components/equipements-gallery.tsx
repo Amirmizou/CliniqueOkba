@@ -30,7 +30,7 @@ const VALID_CATEGORIES = new Set<EquipementCategoryId>(
 /** Convertit les photos Sanity en items de galerie (avec repli sur les données locales) */
 function resolveItems(data?: any[]): EquipementItem[] {
   if (!data || data.length === 0) return equipements
-  return data
+  const items = data
     .filter((d) => d?.image && VALID_CATEGORIES.has(d.category))
     .map((d, i) => ({
       id: d._id || String(i),
@@ -40,6 +40,7 @@ function resolveItems(data?: any[]): EquipementItem[] {
       description: d.description || '',
       featured: d.featured ?? false,
     }))
+  return items.length > 0 ? items : equipements
 }
 
 const categoryById = Object.fromEntries(
