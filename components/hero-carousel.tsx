@@ -322,12 +322,12 @@ export default function HeroCarousel({ slides: rawSlides = [], siteSettings, sec
                                 initial={{ opacity: 0, y: 16 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{ delay: 0.55 }}
-                                className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center"
+                                className="mt-8 flex w-full flex-col gap-4 sm:w-auto sm:flex-row sm:items-center"
                             >
-                                <Magnetic className="w-fit">
+                                <Magnetic className="w-full sm:w-fit">
                                     <button
                                         onClick={handleBooking}
-                                        className="group relative inline-flex cursor-pointer items-center justify-center gap-2 overflow-hidden rounded-full bg-gradient-to-r from-[#006633] to-[#0a8a45] px-7 py-4 text-sm font-semibold text-white shadow-lg shadow-[#006633]/40 ring-1 ring-[#FDE68A]/20 transition duration-300 hover:shadow-xl hover:shadow-[#006633]/60 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#FDE68A]/60 active:scale-[0.98] sm:text-base"
+                                        className="group relative inline-flex w-full cursor-pointer items-center justify-center gap-2 overflow-hidden rounded-full bg-gradient-to-r from-[#006633] to-[#0a8a45] px-7 py-4 text-sm font-semibold text-white shadow-lg shadow-[#006633]/40 ring-1 ring-[#FDE68A]/20 transition duration-300 hover:shadow-xl hover:shadow-[#006633]/60 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#FDE68A]/60 active:scale-[0.98] sm:w-auto sm:text-base touch-target"
                                     >
                                         {/* Reflet qui balaie au survol */}
                                         <span className="pointer-events-none absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/25 to-transparent transition-transform duration-700 group-hover:translate-x-full" />
@@ -339,7 +339,7 @@ export default function HeroCarousel({ slides: rawSlides = [], siteSettings, sec
 
                                 <a
                                     href={phoneHref}
-                                    className="group inline-flex cursor-pointer items-center justify-center gap-2 rounded-full border border-white/25 bg-white/10 px-7 py-4 text-sm font-semibold text-white backdrop-blur-md transition duration-300 hover:border-white/50 hover:bg-white/20 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-white/30 active:scale-[0.97] sm:text-base"
+                                    className="group inline-flex w-full cursor-pointer items-center justify-center gap-2 rounded-full border border-white/25 bg-white/10 px-7 py-4 text-sm font-semibold text-white backdrop-blur-md transition duration-300 hover:border-white/50 hover:bg-white/20 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-white/30 active:scale-[0.97] sm:w-auto sm:text-base touch-target"
                                 >
                                     <Phone className="h-5 w-5 text-emerald-300" />
                                     {t('cta.call')}

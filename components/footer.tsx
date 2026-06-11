@@ -134,7 +134,7 @@ export default function Footer({ siteSettings, footerContent }: FooterProps) {
                 target="_blank"
                 rel="noopener noreferrer"
                 whileHover={{ y: -3, backgroundColor: 'rgba(59, 130, 246, 0.2)' }}
-                className='bg-white/5 p-2.5 rounded-full text-slate-400 hover:text-primary transition-colors border border-white/5'
+                className='bg-white/5 p-3 rounded-full text-slate-400 hover:text-primary transition-colors border border-white/5 touch-target flex items-center justify-center'
               >
                 <Facebook size={18} />
               </motion.a>
@@ -143,7 +143,7 @@ export default function Footer({ siteSettings, footerContent }: FooterProps) {
                 target="_blank"
                 rel="noopener noreferrer"
                 whileHover={{ y: -3, backgroundColor: 'rgba(59, 130, 246, 0.2)' }}
-                className='bg-white/5 p-2.5 rounded-full text-slate-400 hover:text-primary transition-colors border border-white/5'
+                className='bg-white/5 p-3 rounded-full text-slate-400 hover:text-primary transition-colors border border-white/5 touch-target flex items-center justify-center'
               >
                 <Instagram size={18} />
               </motion.a>
@@ -165,7 +165,7 @@ export default function Footer({ siteSettings, footerContent }: FooterProps) {
                 { key: 'contact', href: '#contact' }
               ].map((item) => (
                 <li key={item.key}>
-                  <a href={item.href} className='group flex items-center gap-3 text-sm text-slate-400 hover:text-white transition-all duration-300 hover:translate-x-1.5'>
+                  <a href={item.href} className='group flex items-center gap-3 text-base md:text-sm text-slate-400 hover:text-white transition-all duration-300 hover:translate-x-1.5 py-2 touch-target'>
                     <span className="w-1.5 h-1.5 rounded-full bg-slate-600 group-hover:bg-primary group-hover:w-3 transition-all duration-300" />
                     {tNav(item.key)}
                   </a>
@@ -179,7 +179,7 @@ export default function Footer({ siteSettings, footerContent }: FooterProps) {
                 { key: 'faq', href: '/faq' },
               ].map((item) => (
                 <li key={item.key}>
-                  <a href={item.href} className='group flex items-center gap-3 text-sm text-slate-400 hover:text-white transition-all duration-300 hover:translate-x-1.5'>
+                  <a href={item.href} className='group flex items-center gap-3 text-base md:text-sm text-slate-400 hover:text-white transition-all duration-300 hover:translate-x-1.5 py-2 touch-target'>
                     <span className="w-1.5 h-1.5 rounded-full bg-slate-600 group-hover:bg-primary group-hover:w-3 transition-all duration-300" />
                     {tNav(item.key)}
                   </a>
@@ -197,7 +197,7 @@ export default function Footer({ siteSettings, footerContent }: FooterProps) {
             <ul className='space-y-3'>
               {poles.map((pole) => (
                 <li key={pole.slug}>
-                  <Link href={`/poles/${pole.slug}`} className='group flex items-center gap-3 text-sm text-slate-400 hover:text-white transition-all duration-300 hover:translate-x-1.5'>
+                  <Link href={`/poles/${pole.slug}`} className='group flex items-center gap-3 text-base md:text-sm text-slate-400 hover:text-white transition-all duration-300 hover:translate-x-1.5 py-2 touch-target'>
                     <HeartPulse className={cn("w-4 h-4 transition-colors", pole.urgent ? "text-red-500" : "text-slate-600 group-hover:text-secondary")} />
                     <span className={pole.urgent ? "text-red-400 font-medium" : ""}>{locale === 'ar' && pole.title_ar ? pole.title_ar : pole.title}</span>
                   </Link>
@@ -249,11 +249,11 @@ export default function Footer({ siteSettings, footerContent }: FooterProps) {
           <p className='text-xs text-slate-500'>
             {footerContent?.copyright || (isAr ? `© ${currentYear} المصحة الطبية عقبة. ${t('rights')}.` : `© ${currentYear} Clinique OKBA. ${t('rights')}.`)}
           </p>
-          <div className='flex gap-6 text-xs text-slate-500'>
-            <Link href="/legal/mentions-legales" className='hover:text-white transition-colors'>{t('terms')}</Link>
-            <Link href="/legal/confidentialite" className='hover:text-white transition-colors'>{t('privacy')}</Link>
-            <Link href="/legal/cookies" className='hover:text-white transition-colors'>{t('cookies')}</Link>
-            <Link href="/plan-du-site" className='hover:text-white transition-colors'>{t('sitemap')}</Link>
+          <div className='flex flex-wrap justify-center gap-x-6 gap-y-4 text-xs md:text-sm text-slate-500'>
+            <Link href="/legal/mentions-legales" className='hover:text-white transition-colors py-2 px-1 touch-target'>{t('terms')}</Link>
+            <Link href="/legal/confidentialite" className='hover:text-white transition-colors py-2 px-1 touch-target'>{t('privacy')}</Link>
+            <Link href="/legal/cookies" className='hover:text-white transition-colors py-2 px-1 touch-target'>{t('cookies')}</Link>
+            <Link href="/plan-du-site" className='hover:text-white transition-colors py-2 px-1 touch-target'>{t('sitemap')}</Link>
           </div>
         </div>
       </div>

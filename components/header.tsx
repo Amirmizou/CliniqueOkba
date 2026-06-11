@@ -394,7 +394,7 @@ export default function Header({ siteSettings, poles }: HeaderProps) {
                   "relative rounded-full font-semibold shadow-2xl transition-all duration-300 overflow-hidden group border-0 z-10",
                   "bg-gradient-to-r from-red-600 via-red-500 to-orange-500",
                   "hover:from-red-500 hover:via-red-400 hover:to-orange-400",
-                  "hover:shadow-red-500/50 hover:shadow-2xl h-10 px-5"
+                  "hover:shadow-red-500/50 hover:shadow-2xl h-11 px-4 sm:px-5 touch-target"
                 )}
                 onClick={() => scrollToSection('#contact')}
               >
@@ -414,8 +414,9 @@ export default function Header({ siteSettings, poles }: HeaderProps) {
 
             {/* Mobile Menu Toggle */}
             <button
-              className='md:hidden p-2 rounded-full hover:bg-secondary transition-colors'
+              className='md:hidden flex h-11 w-11 items-center justify-center rounded-full hover:bg-secondary transition-colors touch-target'
               onClick={() => setIsOpen(!isOpen)}
+              aria-label="Toggle menu"
             >
               <div className='relative w-6 h-6'>
                 <Menu className={cn("absolute inset-0 transition-all duration-300", isOpen ? "opacity-0 rotate-90" : "opacity-100 rotate-0")} />
@@ -449,9 +450,9 @@ export default function Header({ siteSettings, poles }: HeaderProps) {
                   animate={{ x: 0, opacity: 1 }}
                   transition={{ delay: 0.1 + (i * 0.05) }}
                   onClick={() => scrollToSection(item.href)}
-                  className="flex items-center justify-between p-4 rounded-2xl bg-card/50 border border-border/50 hover:bg-primary/5 hover:border-primary/20 transition-all group"
+                  className="flex items-center justify-between p-4 rounded-2xl bg-card/50 border border-border/50 hover:bg-primary/5 hover:border-primary/20 transition-all group touch-friendly"
                 >
-                  <span className="text-lg font-medium group-hover:text-primary transition-colors">{item.label}</span>
+                  <span className="text-xl font-medium group-hover:text-primary transition-colors">{item.label}</span>
                   <div className="w-8 h-8 rounded-full bg-background flex items-center justify-center group-hover:scale-110 transition-transform">
                     <div className="w-2 h-2 rounded-full bg-primary/20 group-hover:bg-primary transition-colors" />
                   </div>
@@ -474,15 +475,15 @@ export default function Header({ siteSettings, poles }: HeaderProps) {
                         key={pole.slug}
                         href={`/poles/${pole.slug}`}
                         onClick={() => setIsOpen(false)}
-                        className="flex items-center gap-3 p-3 rounded-xl bg-card/50 border border-border/50 hover:bg-primary/5 hover:border-primary/20 transition-all"
+                        className="flex items-center gap-4 p-3 rounded-xl bg-card/50 border border-border/50 hover:bg-primary/5 hover:border-primary/20 transition-all touch-friendly"
                       >
                         <div
-                          className="flex h-8 w-8 items-center justify-center rounded-lg text-white shadow-sm"
+                          className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg text-white shadow-sm"
                           style={{ backgroundColor: pole.accent }}
                         >
-                          <Icon className="h-4 w-4" />
+                          <Icon className="h-5 w-5" />
                         </div>
-                        <span className="font-medium">{pole.title}</span>
+                        <span className="font-medium text-lg">{pole.title}</span>
                       </a>
                     )
                   })}
@@ -522,7 +523,7 @@ export default function Header({ siteSettings, poles }: HeaderProps) {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.45 }}
-                className="pt-4 border-t border-border/30 pb-10"
+                className="pt-4 border-t border-border/30 pb-10 safe-area-inset-bottom"
               >
                 <p className="text-xs text-muted-foreground uppercase tracking-wider mb-2 px-2">{t('settings')}</p>
                 <div className="flex items-center justify-between p-4 rounded-xl bg-card/50 border border-border/50">

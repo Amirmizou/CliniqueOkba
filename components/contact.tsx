@@ -415,7 +415,7 @@ export default function Contact({ siteSettings, sectionContent }: ContactProps) 
                         value={formData.firstName}
                         onChange={handleChange}
                         onBlur={handleBlur}
-                        className={`bg-background w-full rounded-lg border px-4 py-3 transition-all duration-300 focus:outline-none ${touched.firstName && errors.firstName
+                        className={`bg-background w-full rounded-lg border px-4 py-3 text-base md:text-sm transition-all duration-300 focus:outline-none ${touched.firstName && errors.firstName
                           ? 'border-red-500 focus:ring-red-500/50'
                           : touched.firstName && !errors.firstName
                             ? 'border-green-500 focus:ring-green-500/50'
@@ -455,7 +455,7 @@ export default function Contact({ siteSettings, sectionContent }: ContactProps) 
                         value={formData.lastName}
                         onChange={handleChange}
                         onBlur={handleBlur}
-                        className={`bg-background w-full rounded-lg border px-4 py-3 transition-all duration-300 focus:outline-none ${touched.lastName && errors.lastName
+                        className={`bg-background w-full rounded-lg border px-4 py-3 text-base md:text-sm transition-all duration-300 focus:outline-none ${touched.lastName && errors.lastName
                           ? 'border-red-500 focus:ring-red-500/50'
                           : touched.lastName && !errors.lastName
                             ? 'border-green-500 focus:ring-green-500/50'
@@ -497,7 +497,7 @@ export default function Contact({ siteSettings, sectionContent }: ContactProps) 
                       value={formData.email}
                       onChange={handleChange}
                       onBlur={handleBlur}
-                      className={`bg-background w-full rounded-lg border px-4 py-3 transition-all duration-300 focus:outline-none ${touched.email && errors.email
+                      className={`bg-background w-full rounded-lg border px-4 py-3 text-base md:text-sm transition-all duration-300 focus:outline-none ${touched.email && errors.email
                         ? 'border-red-500 focus:ring-red-500/50'
                         : touched.email && !errors.email
                           ? 'border-green-500 focus:ring-green-500/50'
@@ -539,7 +539,7 @@ export default function Contact({ siteSettings, sectionContent }: ContactProps) 
                       value={formData.phone}
                       onChange={handleChange}
                       onBlur={handleBlur}
-                      className={`bg-background w-full rounded-lg border px-4 py-3 transition-all duration-300 focus:outline-none ${touched.phone && errors.phone
+                      className={`bg-background w-full rounded-lg border px-4 py-3 text-base md:text-sm transition-all duration-300 focus:outline-none ${touched.phone && errors.phone
                         ? 'border-red-500 focus:ring-red-500/50'
                         : touched.phone && !errors.phone && formData.phone
                           ? 'border-green-500 focus:ring-green-500/50'
@@ -577,7 +577,7 @@ export default function Contact({ siteSettings, sectionContent }: ContactProps) 
                       onChange={handleChange}
                       onBlur={handleBlur}
                       rows={4}
-                      className={`bg-background w-full resize-none rounded-lg border px-4 py-3 transition-all duration-300 focus:outline-none ${touched.message && errors.message
+                      className={`bg-background w-full resize-none rounded-lg border px-4 py-3 text-base md:text-sm transition-all duration-300 focus:outline-none ${touched.message && errors.message
                         ? 'border-red-500 focus:ring-red-500/50'
                         : touched.message && !errors.message
                           ? 'border-green-500 focus:ring-green-500/50'
@@ -653,7 +653,7 @@ export default function Contact({ siteSettings, sectionContent }: ContactProps) 
 
                 <Button
                   type='submit'
-                  className='bg-primary hover:bg-primary/90 text-primary-foreground group w-full shadow-lg transition-all duration-300 hover:scale-105 hover:shadow-xl disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:scale-100'
+                  className='bg-primary hover:bg-primary/90 text-primary-foreground group w-full h-12 shadow-lg transition-all duration-300 hover:scale-105 hover:shadow-xl disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:scale-100 touch-target'
                   disabled={
                     isSubmitting || Object.values(errors).some((error) => error)
                   }

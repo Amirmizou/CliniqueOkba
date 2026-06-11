@@ -292,7 +292,7 @@ function DoctorCard({
               href={`https://wa.me/${CLINIC_WHATSAPP}?text=${waMessage}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex flex-1 items-center justify-center gap-1.5 rounded-xl px-3 py-2.5 text-sm font-semibold text-white shadow-md transition-transform duration-200 hover:scale-[1.03] active:scale-95"
+              className="inline-flex flex-1 items-center justify-center gap-1.5 rounded-xl px-3 py-2.5 text-sm font-semibold text-white shadow-md transition-transform duration-200 hover:scale-[1.03] active:scale-95 touch-target"
               style={{ backgroundColor: doctor.accent }}
             >
               <MessageCircle className="h-4 w-4" />
@@ -301,7 +301,7 @@ function DoctorCard({
             <a
               href={`tel:${CLINIC_PHONE}`}
               aria-label={t('callFor', { name: doctor.name })}
-              className="inline-flex items-center justify-center rounded-xl border px-3 py-2.5 text-foreground/80 transition-colors hover:bg-foreground/5"
+              className="inline-flex items-center justify-center rounded-xl border px-3 py-2.5 text-foreground/80 transition-colors hover:bg-foreground/5 touch-target min-w-[48px]"
               style={{ borderColor: `${doctor.accent}55` }}
             >
               <Phone className="h-4 w-4" />
@@ -401,11 +401,11 @@ export default function DoctorsShowcase({ data }: { data?: any[] }) {
         </AnimatedSection>
 
         {/* Grille (flex centré : s'équilibre quel que soit le nombre de médecins) */}
-        <div className="flex flex-wrap justify-center gap-6">
+        <div className="flex flex-nowrap overflow-x-auto pb-8 snap-x snap-mandatory gap-4 sm:gap-6 sm:flex-wrap sm:justify-center sm:overflow-visible sm:pb-0 sm:snap-none [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
           {list.map((doctor, i) => (
             <div
               key={doctor.id}
-              className="w-full sm:w-[calc(50%-0.75rem)] lg:w-[calc(33.333%-1rem)] xl:w-[calc(25%-1.125rem)]"
+              className="w-[85vw] shrink-0 snap-center sm:w-[calc(50%-0.75rem)] sm:shrink lg:w-[calc(33.333%-1rem)] xl:w-[calc(25%-1.125rem)]"
             >
               <DoctorCard doctor={doctor} index={i} onOpen={setActive} />
             </div>
