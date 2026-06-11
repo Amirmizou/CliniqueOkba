@@ -140,10 +140,42 @@
   }
 
   /* Titres en Lemon Milk (police d'affichage tout en majuscules).
-     Légère réduction du tracking : Lemon Milk est large par nature. */
+     Légère réduction du tracking : Lemon Milk est large par nature.
+     text-wrap: balance — évite les mots orphelins sur la dernière ligne. */
   h1, h2, h3, h4, h5, h6 {
     font-family: var(--font-heading);
     letter-spacing: -0.01em;
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  /* Sélection de texte aux couleurs de la marque */
+  ::selection {
+    background: oklch(0.48 0.16 145 / 0.25);
+    color: inherit;
+  }
+
+  /* Chiffres tabulaires pour les statistiques (alignement stable pendant
+     les compteurs animés) */
+  .stat-number {
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Coupe-circuit global : neutralise toute animation/transition CSS pour
+     les utilisateurs préférant un mouvement réduit (framer-motion est déjà
+     géré composant par composant via useReducedMotion). */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
   }
 
   [dir="rtl"] h1, [dir="rtl"] h2, [dir="rtl"] h3, [dir="rtl"] h4, [dir="rtl"] h5, [dir="rtl"] h6 {

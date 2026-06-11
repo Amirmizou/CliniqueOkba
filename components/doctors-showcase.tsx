@@ -31,6 +31,7 @@ import {
 import { doctors, CLINIC_WHATSAPP, CLINIC_PHONE, type Doctor } from '@/data/doctors'
 import { urlFor } from '@/sanity/lib/image'
 import { AnimatedSection } from '@/components/ui/animated-section'
+import { LineReveal } from '@/components/ui/reveal-text'
 
 // Résolution des icônes Sanity (chaîne -> composant Lucide)
 const ICONS: Record<string, LucideIcon> = {
@@ -389,9 +390,9 @@ export default function DoctorsShowcase({ data }: { data?: any[] }) {
               {t('badge')}
             </span>
             <h2 className="mb-4 text-3xl font-bold sm:text-4xl md:text-5xl">
-              <span className="text-gradient">{t('titleLine1')}</span>
+              <LineReveal className="text-gradient">{t('titleLine1')}</LineReveal>
               <br />
-              <span className="text-foreground">{t('titleLine2')}</span>
+              <LineReveal className="text-foreground" delay={0.12}>{t('titleLine2')}</LineReveal>
             </h2>
             <p className="mx-auto max-w-2xl text-base text-muted-foreground sm:text-lg">
               {t('subtitle')}

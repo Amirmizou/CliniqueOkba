@@ -24,6 +24,7 @@ import { poles, CLINIC_PHONE, type Pole } from '@/data/poles'
 import { Link } from '@/navigation'
 import { AnimatedSection } from '@/components/ui/animated-section'
 import { ECGLine, ecgVariantForIcon } from '@/components/ui/ecg-line'
+import { LineReveal } from '@/components/ui/reveal-text'
 import { PoleMotif, motifVariantForIcon } from '@/components/ui/pole-motif'
 
 import {
@@ -316,9 +317,9 @@ export default function Poles({ data }: { data?: any[] }) {
               {t('badge')}
             </span>
             <h2 className="mb-4 text-3xl font-bold sm:text-4xl md:text-5xl">
-              <span className="text-gradient">{t('titleLine1')}</span>
+              <LineReveal className="text-gradient">{t('titleLine1')}</LineReveal>
               <br />
-              <span className="text-foreground">{t('titleLine2')}</span>
+              <LineReveal className="text-foreground" delay={0.12}>{t('titleLine2')}</LineReveal>
             </h2>
             {/* Ligne ECG sous le titre */}
             <div className="mx-auto mb-4 h-8 max-w-md">

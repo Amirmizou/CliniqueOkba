@@ -1,6 +1,8 @@
 'use client'
 
-import { motion } from 'framer-motion'
+import { useRef } from 'react'
+import { motion, useInView } from 'framer-motion'
+import { useReducedMotion } from '@/hooks/use-reduced-motion'
 
 // Tracés ECG par « nature » de pôle (viewBox 0..300, ligne de base y=20)
 const PATHS = {
@@ -92,9 +94,14 @@ export function ECGLine({
 }: ECGLineProps) {
   const d = PATHS[variant]
   const dur = duration ?? DURATIONS[variant]
+  // Balayage actif uniquement à l'écran (économie GPU hors viewport)
+  const ref = useRef<SVGSVGElement>(null)
+  const inView = useInView(ref, { margin: '-5% 0px' })
+  const reduce = useReducedMotion()
 
   return (
     <svg
+      ref={ref}
       className={className}
       width="100%"
       height={height}
@@ -106,23 +113,29 @@ export function ECGLine({
       <path
         d={d}
         stroke={color}
-        strokeOpacity={0.15}
+        strokeOpacity={reduce ? 0.4 : 0.15}
         strokeWidth={1.5}
         vectorEffect="non-scaling-stroke"
       />
-      <motion.path
-        d={d}
-        stroke={color}
-        strokeWidth={2.4}
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        vectorEffect="non-scaling-stroke"
-        pathLength={1}
-        strokeDasharray="0.16 0.84"
-        style={{ filter: `drop-shadow(0 0 5px ${color})` }}
-        animate={{ strokeDashoffset: [1, 0] }}
-        transition={{ duration: dur, repeat: Infinity, ease: 'linear' }}
-      />
+      {!reduce && (
+        <motion.path
+          d={d}
+          stroke={color}
+          strokeWidth={2.4}
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          vectorEffect="non-scaling-stroke"
+          pathLength={1}
+          strokeDasharray="0.16 0.84"
+          style={{ filter: `drop-shadow(0 0 5px ${color})` }}
+          animate={inView ? { strokeDashoffset: [1, 0] } : { strokeDashoffset: 1 }}
+          transition={
+            inView
+              ? { duration: dur, repeat: Infinity, ease: 'linear' }
+              : { duration: 0 }
+          }
+        />
+      )}
     </svg>
   )
 }

@@ -20,6 +20,8 @@ import { urlFor } from '@/sanity/lib/image'
 import { siteConfig } from '@/data/site-config'
 import { buildWhatsAppUrl } from '@/lib/whatsapp'
 import { AnimatedLogo } from '@/components/ui/animated-logo'
+import { WordReveal } from '@/components/ui/reveal-text'
+import { Magnetic } from '@/components/ui/magnetic'
 
 // Courbe d'easing forte (sortie) — plus de « punch » que les easings CSS par défaut
 const EASE_OUT = [0.23, 1, 0.32, 1] as const
@@ -264,16 +266,18 @@ export default function HeroCarousel({ slides: rawSlides = [], siteSettings, sec
                                 {sectionContent?.badge || t('badge')}
                             </motion.div>
 
-                            {/* Titre */}
-                            <motion.h1
-                                initial={{ opacity: 0, y: 18 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{ delay: 0.25 }}
+                            {/* Titre — révélation mot à mot (masque + montée) */}
+                            <h1
                                 style={{ textShadow: '0 2px 28px rgba(0,0,0,0.45), 0 1px 3px rgba(0,0,0,0.7)' }}
-                                className="text-3xl font-bold leading-[1.05] tracking-tight text-white sm:text-5xl lg:text-6xl xl:text-7xl"
+                                className="text-3xl font-bold leading-[1.12] tracking-tight text-white sm:text-5xl lg:text-6xl xl:text-7xl"
                             >
-                                {currentSlide.title}
-                            </motion.h1>
+                                <WordReveal
+                                    key={currentIndex}
+                                    text={currentSlide.title || ''}
+                                    mode="mount"
+                                    delay={0.25}
+                                />
+                            </h1>
 
                             {/* Filet dégradé signature (avec halo ambré) */}
                             <motion.div
@@ -303,16 +307,18 @@ export default function HeroCarousel({ slides: rawSlides = [], siteSettings, sec
                                 transition={{ delay: 0.55 }}
                                 className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center"
                             >
-                                <button
-                                    onClick={handleBooking}
-                                    className="group relative inline-flex cursor-pointer items-center justify-center gap-2 overflow-hidden rounded-full bg-gradient-to-r from-[#006633] to-[#0a8a45] px-7 py-4 text-sm font-semibold text-white shadow-lg shadow-[#006633]/40 ring-1 ring-[#FDE68A]/20 transition duration-300 hover:shadow-xl hover:shadow-[#006633]/60 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#FDE68A]/60 active:scale-[0.98] sm:text-base"
-                                >
-                                    {/* Reflet qui balaie au survol */}
-                                    <span className="pointer-events-none absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/25 to-transparent transition-transform duration-700 group-hover:translate-x-full" />
-                                    <CalendarHeart className="h-5 w-5" />
-                                    {t('cta.appointment')}
-                                    <ChevronRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
-                                </button>
+                                <Magnetic className="w-fit">
+                                    <button
+                                        onClick={handleBooking}
+                                        className="group relative inline-flex cursor-pointer items-center justify-center gap-2 overflow-hidden rounded-full bg-gradient-to-r from-[#006633] to-[#0a8a45] px-7 py-4 text-sm font-semibold text-white shadow-lg shadow-[#006633]/40 ring-1 ring-[#FDE68A]/20 transition duration-300 hover:shadow-xl hover:shadow-[#006633]/60 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#FDE68A]/60 active:scale-[0.98] sm:text-base"
+                                    >
+                                        {/* Reflet qui balaie au survol */}
+                                        <span className="pointer-events-none absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/25 to-transparent transition-transform duration-700 group-hover:translate-x-full" />
+                                        <CalendarHeart className="h-5 w-5" />
+                                        {t('cta.appointment')}
+                                        <ChevronRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+                                    </button>
+                                </Magnetic>
 
                                 <a
                                     href={phoneHref}

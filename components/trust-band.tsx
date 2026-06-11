@@ -87,7 +87,7 @@ export default function TrustBand({ siteSettings }: TrustBandProps) {
                 key={s.label}
                 className="px-3 py-5 text-center sm:px-5 sm:py-6"
               >
-                <p className="bg-gradient-to-br from-[#006633] to-[#4caf6e] bg-clip-text text-2xl font-bold tracking-tight text-transparent sm:text-3xl md:text-4xl">
+                <p className="stat-number bg-gradient-to-br from-[#006633] to-[#4caf6e] bg-clip-text text-2xl font-bold tracking-tight text-transparent sm:text-3xl md:text-4xl">
                   <StatValue raw={s.value || ''} />
                 </p>
                 <p className="mt-1 text-[11px] font-medium uppercase tracking-wider text-muted-foreground sm:text-xs">

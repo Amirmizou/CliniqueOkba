@@ -36,8 +36,15 @@ export function AuraBackground({ className, children, ...props }: AuraBackground
                     className="absolute top-[40%] left-[30%] w-[30vw] h-[30vw] bg-secondary/40 rounded-full blur-[80px] mix-blend-multiply filter opacity-20"
                 />
 
-                {/* Subtle Noise Texture Overlay */}
-                <div className="absolute inset-0 bg-[url('/noise.png')] opacity-[0.03] mix-blend-overlay"></div>
+                {/* Grain SVG inline (aucune requête réseau) — brise la platitude numérique */}
+                <div
+                    className="absolute inset-0 opacity-[0.04] mix-blend-overlay"
+                    style={{
+                        backgroundImage:
+                            "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E\")",
+                        backgroundSize: '160px 160px',
+                    }}
+                ></div>
             </div>
 
             <div className="relative z-10">
