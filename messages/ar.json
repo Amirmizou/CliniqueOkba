@@ -416,9 +416,12 @@
     }
   },
   "polePage": {
-    "backHome": "العودة إلى الرئيسية",
-    "bookAppointment": "حجز موعد",
+    "backHome": "العودة للرئيسية",
+    "bookAppointment": "احجز موعداً",
     "locate": "موقعنا",
-    "inImages": "بالصور"
+    "inImages": "في صور",
+    "equipments": "أحدث معداتنا الطبية",
+    "capabilities": "القدرات والتقنيات",
+    "viewMore": "عرض المزيد من التفاصيل"
   }
 }

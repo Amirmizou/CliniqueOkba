@@ -126,7 +126,8 @@ export const equipmentQuery = groq`
     description_ar,
     icon,
     image,
-    features
+    features,
+    features_ar
   }
 `
 

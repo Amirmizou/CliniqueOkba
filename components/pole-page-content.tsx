@@ -23,6 +23,7 @@ import {
 import { Link } from '@/navigation'
 import { ECGLine, ecgVariantForIcon } from '@/components/ui/ecg-line'
 import { PoleMotif, motifVariantForIcon } from '@/components/ui/pole-motif'
+import { urlFor } from '@/sanity/lib/image'
 
 const ICONS: Record<string, LucideIcon> = {
   ScanLine,
@@ -57,10 +58,12 @@ export default function PolePageContent({
   pole,
   photos,
   phone,
+  equipments,
 }: {
   pole: PolePageData
   photos: PolePhoto[]
   phone: string
+  equipments?: any[]
 }) {
   const t = useTranslations('polePage')
   const tc = useTranslations('common')
@@ -232,6 +235,98 @@ export default function PolePageContent({
                     </div>
                   </div>
                 </motion.button>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* --------------------------- EQUIPEMENTS --------------------------- */}
+      {equipments && equipments.length > 0 && (
+        <section className="relative overflow-hidden bg-background py-16 sm:py-24">
+          <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+            <div className="mb-12">
+              <h2 className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
+                {t('equipments')}
+              </h2>
+              <p className="mt-4 max-w-2xl text-lg text-muted-foreground">
+                {t('capabilities')}
+              </p>
+            </div>
+
+            <div className="space-y-16">
+              {equipments.map((eq, i) => (
+                <div
+                  key={eq._id || i}
+                  className={`flex flex-col gap-8 md:items-center ${
+                    i % 2 === 1 ? 'md:flex-row-reverse' : 'md:flex-row'
+                  }`}
+                >
+                  {/* Photo */}
+                  <div className="w-full md:w-1/2">
+                    {eq.image || eq.imageUrl ? (
+                      <div className="relative aspect-[4/3] w-full overflow-hidden rounded-3xl bg-muted shadow-2xl ring-1 ring-border/50">
+                        <Image
+                          src={eq.image ? urlFor(eq.image).width(800).height(600).url() : eq.imageUrl}
+                          alt={eq.name}
+                          fill
+                          sizes="(max-width: 768px) 100vw, 50vw"
+                          className="object-cover transition-transform duration-700 hover:scale-105"
+                        />
+                      </div>
+                    ) : (
+                      <div className="flex aspect-[4/3] w-full items-center justify-center rounded-3xl bg-muted/50 ring-1 ring-border/50">
+                        <ScanLine className="h-20 w-20 text-muted-foreground/30" />
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Contenu */}
+                  <div className="flex w-full flex-col justify-center md:w-1/2 md:px-6">
+                    <div className="mb-4">
+                      {eq.brand && (
+                        <span className="mb-2 block text-sm font-semibold tracking-wider text-muted-foreground uppercase">
+                          {eq.brand}
+                        </span>
+                      )}
+                      <h3 className="text-2xl font-bold text-foreground sm:text-3xl">
+                        {eq.name}
+                      </h3>
+                      {eq.model && eq.model !== eq.name && (
+                        <p className="mt-1 text-lg font-medium text-foreground/80">
+                          Modèle : {eq.model}
+                        </p>
+                      )}
+                    </div>
+                    
+                    <p className="mb-8 leading-relaxed text-muted-foreground">
+                      {eq.description}
+                    </p>
+
+                    {eq.features && eq.features.length > 0 && (
+                      <div>
+                        <h4 className="mb-4 font-semibold text-foreground">
+                          {t('capabilities')}
+                        </h4>
+                        <ul className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                          {eq.features.map((feat: string, idx: number) => (
+                            <li key={idx} className="flex items-start gap-2.5">
+                              <div 
+                                className="mt-1 flex h-5 w-5 shrink-0 items-center justify-center rounded-full"
+                                style={{ backgroundColor: `${pole.accent}20`, color: pole.accent }}
+                              >
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                                  <polyline points="20 6 9 17 4 12"></polyline>
+                                </svg>
+                              </div>
+                              <span className="text-sm font-medium text-foreground/90">{feat}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                  </div>
+                </div>
               ))}
             </div>
           </div>

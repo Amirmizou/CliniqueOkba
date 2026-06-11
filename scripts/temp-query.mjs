@@ -11,4 +11,4 @@ const client = createClient({
   apiVersion: '2024-03-20',
 })
 
-client.fetch(`*[_type == "pole"]{_id, title, title_ar}`).then(console.log)
+client.fetch(`*[_type == "equipment"]{name, brand, model, category, "imageUrl": image.asset->url}`).then(console.log)

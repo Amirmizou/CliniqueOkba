@@ -5,7 +5,7 @@ import PolePageContent, {
     type PolePhoto,
     type PolePageData,
 } from '@/components/pole-page-content'
-import { getSiteSettings, getPoles, getFacilityPhotos } from '@/sanity/lib/fetch'
+import { getSiteSettings, getPoles, getFacilityPhotos, getEquipment } from '@/sanity/lib/fetch'
 import { localizeSanityData } from '@/sanity/lib/localize'
 import { urlFor } from '@/sanity/lib/image'
 import { poles as localPoles, getPoleBySlug, CLINIC_PHONE } from '@/data/poles'
@@ -98,16 +98,18 @@ export default async function PolePage({
 }) {
     const { slug, locale } = await params
 
-    const [siteSettingsRaw, sanityPolesRaw, facilityPhotosRaw] = await Promise.all([
+    const [siteSettingsRaw, sanityPolesRaw, facilityPhotosRaw, equipmentsRaw] = await Promise.all([
         getSiteSettings(),
         getPoles(),
         getFacilityPhotos(),
+        getEquipment(),
     ])
 
     // Localisation FR/AR du contenu Sanity (repli sur le français)
     const siteSettings = localizeSanityData(siteSettingsRaw, locale)
     const sanityPoles = localizeSanityData(sanityPolesRaw, locale)
     const facilityPhotos = localizeSanityData(facilityPhotosRaw, locale)
+    const equipments = localizeSanityData(equipmentsRaw, locale)
 
     const resolved = resolvePole(slug, locale, sanityPoles)
     if (!resolved) notFound()
@@ -115,11 +117,30 @@ export default async function PolePage({
     const photos = buildPhotos(resolved.categories, facilityPhotos)
     const phone = siteSettings?.phone || CLINIC_PHONE
 
+    // Filter equipments if the pole has an equipment category match
+    // 'imagerie' -> 'imaging', 'laboratoire' -> 'laboratory', etc.
+    let poleEquipments: any[] = []
+    if (slug === 'imagerie' || slug === 'urgences' || slug === 'chirurgie' || slug === 'laboratoire') {
+        const catMap: Record<string, string> = {
+            'imagerie': 'imaging',
+            'laboratoire': 'laboratory',
+            'chirurgie': 'surgery',
+            'urgences': 'facility'
+        }
+        const mappedCat = catMap[slug]
+        poleEquipments = equipments?.filter((eq: any) => eq.category === mappedCat) || []
+    }
+
     return (
         <>
             <SiteHeader siteSettings={siteSettings} />
             <main className="min-h-screen pt-20">
-                <PolePageContent pole={resolved.pole} photos={photos} phone={phone} />
+                <PolePageContent 
+                    pole={resolved.pole} 
+                    photos={photos} 
+                    phone={phone} 
+                    equipments={poleEquipments}
+                />
             </main>
             <SiteFooter siteSettings={siteSettings} />
         </>

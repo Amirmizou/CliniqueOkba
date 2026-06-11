@@ -85,6 +85,12 @@ export default defineType({
             of: [{ type: 'string' }],
         }),
         defineField({
+            name: 'features_ar',
+            title: 'Caractéristiques (AR)',
+            type: 'array',
+            of: [{ type: 'string' }],
+        }),
+        defineField({
             name: 'order',
             title: 'Ordre d\'affichage',
             type: 'number',
