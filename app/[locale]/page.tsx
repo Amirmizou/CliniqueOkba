@@ -2,6 +2,7 @@ import SiteHeader from '@/components/site-header'
 import HeroCarousel from '@/components/hero-carousel'
 import About from '@/components/about'
 import VideoPresentation from '@/components/video-presentation'
+import VideosGallery from '@/components/videos-gallery'
 import LogoIntro from '@/components/logo-intro'
 import TrustBand from '@/components/trust-band'
 import Poles from '@/components/poles'
@@ -37,6 +38,7 @@ import {
   getEvents,
   getInsuranceSection,
   getFaq,
+  getVideos,
 } from '@/sanity/lib/fetch'
 import { localizeSanityData } from '@/sanity/lib/localize'
 import type { ClinicEvent } from '@/lib/events'
@@ -59,6 +61,7 @@ export default async function Home(props: { params: Promise<{ locale: string }> 
     events,
     insurance,
     faqs,
+    videos,
   ] = await Promise.all([
     getSiteSettings(),
     getAboutSection(),
@@ -72,6 +75,7 @@ export default async function Home(props: { params: Promise<{ locale: string }> 
     getEvents(),
     getInsuranceSection(),
     getFaq(),
+    getVideos(),
   ])
 
   // Get current locale
@@ -91,6 +95,7 @@ export default async function Home(props: { params: Promise<{ locale: string }> 
     events: localizeSanityData(events, locale),
     insurance: localizeSanityData(insurance, locale),
     faqs: localizeSanityData(faqs, locale),
+    videos: localizeSanityData(videos, locale),
   }
 
   // Create a map of section contents for easy access
@@ -122,6 +127,7 @@ export default async function Home(props: { params: Promise<{ locale: string }> 
           sectionContent={sectionContentMap['about']}
         />
         <VideoPresentation sectionContent={sectionContentMap['video']} />
+        <VideosGallery data={localizedData.videos} />
         <SectionDivider variant="ecg" />
         <Poles data={localizedData.poles} />
         <SectionDivider variant="ecg" />

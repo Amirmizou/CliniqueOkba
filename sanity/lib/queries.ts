@@ -424,6 +424,7 @@ export const videosQuery = groq`
     title_ar,
     description,
     description_ar,
+    category,
     "videoUrl": videoFile.asset->url,
     poster
   }

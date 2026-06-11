@@ -55,6 +55,26 @@ export default defineType({
             initialValue: 0,
         }),
         defineField({
+            name: 'category',
+            title: 'Catégorie / Service',
+            type: 'string',
+            options: {
+                list: [
+                    { title: 'Général', value: 'general' },
+                    { title: 'Podcast / Interview', value: 'podcast' },
+                    { title: 'Imagerie Médicale', value: 'imagerie' },
+                    { title: 'Médecine Nucléaire', value: 'nucleaire' },
+                    { title: 'Pôle Dentaire', value: 'dentaire' },
+                    { title: 'Maternité & Pédiatrie', value: 'maternite' },
+                    { title: 'Urgences & Réanimation', value: 'urgences' },
+                    { title: 'Chirurgie', value: 'chirurgie' },
+                    { title: 'Laboratoire', value: 'laboratoire' },
+                    { title: 'Autre (Préciser dans le titre)', value: 'autre' }
+                ],
+            },
+            initialValue: 'general',
+        }),
+        defineField({
             name: 'active',
             title: 'Active',
             type: 'boolean',
@@ -69,10 +89,12 @@ export default defineType({
         },
     ],
     preview: {
-        select: { title: 'title', media: 'poster', active: 'active' },
-        prepare({ title, media, active }) {
+        select: { title: 'title', media: 'poster', active: 'active', category: 'category' },
+        prepare({ title, media, active, category }) {
+            const catEmoji = category === 'podcast' ? '🎙️ ' : '🎬 '
             return {
-                title: `${active === false ? '🚫 ' : '🎬 '}${title}`,
+                title: `${active === false ? '🚫 ' : catEmoji}${title}`,
+                subtitle: category || 'general',
                 media,
             }
         },

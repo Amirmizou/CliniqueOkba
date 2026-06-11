@@ -24,6 +24,7 @@ interface VideoItem {
   title?: string
   description?: string
   videoUrl?: string
+  category?: string
   poster?: any
 }
 
@@ -32,14 +33,28 @@ export default function VideosGallery({ data }: { data?: VideoItem[] }) {
   const prefersReducedMotion = useReducedMotion()
   const videoRef = useRef<HTMLVideoElement>(null)
 
-  const videos = (data || []).filter((v) => v.videoUrl)
   const [activeIndex, setActiveIndex] = useState(0)
   const [isPlaying, setIsPlaying] = useState(false)
+  const [selectedCategory, setSelectedCategory] = useState<string>('all')
+
+  // Filtrer uniquement les vidéos publiées avec URL + correspondant à la catégorie
+  const availableVideos = (data || []).filter((v) => v.videoUrl)
+  const videos = availableVideos.filter(
+    (v) => selectedCategory === 'all' || v.category === selectedCategory
+  )
+
+  // Extraire les catégories uniques pour créer les boutons
+  const uniqueCategories = Array.from(
+    new Set(availableVideos.map((v) => v.category).filter(Boolean))
+  ) as string[]
+  const categoriesList = ['all', ...uniqueCategories]
 
   // Sanity-first strict : pas de vidéos publiées → pas de section
-  if (videos.length === 0) return null
+  if (availableVideos.length === 0) return null
 
-  const active = videos[activeIndex]
+  // Sécurité si on filtre et que l'index sort des limites
+  const active = videos[activeIndex] || videos[0]
+
   const posterUrl = (v: VideoItem, w = 1600, h = 900) =>
     v.poster ? urlFor(v.poster).width(w).height(h).url() : undefined
 
@@ -79,6 +94,30 @@ export default function VideosGallery({ data }: { data?: VideoItem[] }) {
             </p>
           </div>
         </AnimatedSection>
+
+        {/* Filtres de catégorie (s'il y a plus d'une catégorie en plus de "all") */}
+        {categoriesList.length > 2 && (
+          <div className="mb-10 flex flex-wrap justify-center gap-2">
+            {categoriesList.map((cat) => (
+              <button
+                key={cat}
+                type="button"
+                onClick={() => {
+                  setSelectedCategory(cat)
+                  setActiveIndex(0)
+                  setIsPlaying(false)
+                }}
+                className={`rounded-full px-5 py-2.5 text-sm font-semibold transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 ${
+                  selectedCategory === cat
+                    ? 'bg-primary text-white shadow-lg shadow-primary/25'
+                    : 'bg-muted text-muted-foreground hover:bg-muted/80 hover:text-foreground'
+                }`}
+              >
+                {t(`categories.${cat}`)}
+              </button>
+            ))}
+          </div>
+        )}
 
         {/* Lecteur principal — cadre à bordure conique animée (signature du site) */}
         <div className="group relative overflow-hidden rounded-[2rem] p-[2px]">

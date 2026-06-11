@@ -369,7 +369,20 @@
     "titleLine2": "en vidéos",
     "subtitle": "Visites guidées, équipements et moments forts de la Clinique OKBA.",
     "play": "Lire la vidéo",
-    "nowPlaying": "En lecture"
+    "nowPlaying": "En lecture",
+    "categories": {
+      "all": "Toutes",
+      "general": "Général",
+      "podcast": "Podcast",
+      "imagerie": "Imagerie Médicale",
+      "nucleaire": "Médecine Nucléaire",
+      "dentaire": "Dentaire",
+      "maternite": "Maternité",
+      "urgences": "Urgences",
+      "chirurgie": "Chirurgie",
+      "laboratoire": "Laboratoire",
+      "autre": "Autres"
+    }
   },
   "whatsappBooking": {
     "title": "Rendez-vous express sur WhatsApp",

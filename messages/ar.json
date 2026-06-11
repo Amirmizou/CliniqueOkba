@@ -369,7 +369,20 @@
     "titleLine2": "بالفيديو",
     "subtitle": "جولات إرشادية، تجهيزات ولحظات مميزة من المصحة الطبية عقبة.",
     "play": "تشغيل الفيديو",
-    "nowPlaying": "قيد التشغيل"
+    "nowPlaying": "قيد التشغيل",
+    "categories": {
+      "all": "الكل",
+      "general": "عام",
+      "podcast": "بودكاست",
+      "imagerie": "تصوير طبي",
+      "nucleaire": "طب نووي",
+      "dentaire": "طب الأسنان",
+      "maternite": "أمومة",
+      "urgences": "طوارئ",
+      "chirurgie": "جراحة",
+      "laboratoire": "مخبر",
+      "autre": "أخرى"
+    }
   },
   "whatsappBooking": {
     "title": "حجز موعد سريع عبر واتساب",
