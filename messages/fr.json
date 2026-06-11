@@ -363,6 +363,14 @@
     "titlePrefix": "Découvrez la",
     "subtitle": "Une présentation de notre établissement : nos spécialités, nos urgences 24h/24 et notre engagement à vos côtés."
   },
+  "videosGallery": {
+    "badge": "Vidéothèque",
+    "titleLine1": "La clinique",
+    "titleLine2": "en vidéos",
+    "subtitle": "Visites guidées, équipements et moments forts de la Clinique OKBA.",
+    "play": "Lire la vidéo",
+    "nowPlaying": "En lecture"
+  },
   "whatsappBooking": {
     "title": "Rendez-vous express sur WhatsApp",
     "subtitle": "Réponse rapide — confirmation directe par message.",

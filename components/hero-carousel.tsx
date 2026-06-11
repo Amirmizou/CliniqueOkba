@@ -14,7 +14,7 @@ import {
     CalendarHeart,
 } from 'lucide-react'
 import Image from 'next/image'
-import { useTranslations } from 'next-intl'
+import { useTranslations, useLocale } from 'next-intl'
 import { useReducedMotion } from '@/hooks/use-reduced-motion'
 import { urlFor } from '@/sanity/lib/image'
 import { siteConfig } from '@/data/site-config'
@@ -30,26 +30,34 @@ interface HeroCarouselProps {
     slides?: any[]
     siteSettings?: {
         clinicName?: string
+        clinicName_ar?: string
         whatsappNumber?: string
         appointmentMessage?: string
+        appointmentMessage_ar?: string
         phone?: string
         hours?: { emergency?: string; weekdays?: string; saturday?: string }
         heroStats?: { value?: string; label?: string }[]
     }
     sectionContent?: {
         badge?: string
+        badge_ar?: string
         title?: string
+        title_ar?: string
         subtitle?: string
+        subtitle_ar?: string
     }
 }
 
 export default function HeroCarousel({ slides: rawSlides = [], siteSettings, sectionContent }: HeroCarouselProps) {
     const t = useTranslations('hero')
+    const locale = useLocale()
+    const isAr = locale === 'ar'
+
     const slides = rawSlides
         .map((slide, index) => ({
             id: slide._id || String(index),
-            title: slide.title,
-            subtitle: slide.subtitle || '',
+            title: isAr ? (slide.title_ar || slide.title) : slide.title,
+            subtitle: isAr ? (slide.subtitle_ar || slide.subtitle) : (slide.subtitle || ''),
             image: slide.image ? urlFor(slide.image).width(1920).height(1080).url() : '',
         }))
         .filter((slide) => slide.image !== '')
@@ -100,11 +108,18 @@ export default function HeroCarousel({ slides: rawSlides = [], siteSettings, sec
 
     // Prise de rendez-vous : ouvre WhatsApp si configuré, sinon scroll vers Contact
     const handleBooking = () => {
-        const clinic = siteSettings?.clinicName || 'la Clinique OKBA'
-        const intro =
-            siteSettings?.appointmentMessage?.trim() ||
-            `Bonjour ${clinic}, je souhaite prendre un rendez-vous.`
-        const url = buildWhatsAppUrl(siteSettings?.whatsappNumber, intro)
+        const defaultClinicName = isAr ? 'المصحة الطبية عقبة' : 'la Clinique OKBA'
+        const clinicName = isAr ? (siteSettings?.clinicName_ar || siteSettings?.clinicName) : siteSettings?.clinicName
+        const clinic = clinicName || defaultClinicName
+        const defaultIntro = isAr 
+            ? `مرحباً ${clinic}، أرغب في حجز موعد.`
+            : `Bonjour ${clinic}, je souhaite prendre un rendez-vous.`
+        const intro = isAr
+            ? (siteSettings?.appointmentMessage_ar || siteSettings?.appointmentMessage?.trim())
+            : (siteSettings?.appointmentMessage?.trim())
+        
+        const finalIntro = intro || defaultIntro
+        const url = buildWhatsAppUrl(siteSettings?.whatsappNumber, finalIntro)
         if (url) {
             window.open(url, '_blank', 'noopener,noreferrer')
         } else {
@@ -117,9 +132,11 @@ export default function HeroCarousel({ slides: rawSlides = [], siteSettings, sec
         return (
             <section className="relative flex min-h-screen items-center justify-center bg-gradient-to-br from-primary/10 via-background to-primary/5">
                 <div className="px-4 text-center">
-                    <h1 className="mb-4 text-4xl font-bold md:text-6xl">{siteSettings?.clinicName || 'Clinique OKBA'}</h1>
+                    <h1 className="mb-4 text-4xl font-bold md:text-6xl">
+                        {isAr ? (siteSettings?.clinicName_ar || siteSettings?.clinicName || 'المصحة الطبية عقبة') : (siteSettings?.clinicName || 'Clinique OKBA')}
+                    </h1>
                     <p className="text-lg text-muted-foreground md:text-xl">
-                        {sectionContent?.subtitle || 'Votre santé, notre priorité'}
+                        {isAr ? (sectionContent?.subtitle_ar || sectionContent?.subtitle || 'صحتك، أولويتنا') : (sectionContent?.subtitle || 'Votre santé, notre priorité')}
                     </p>
                 </div>
             </section>
@@ -263,7 +280,7 @@ export default function HeroCarousel({ slides: rawSlides = [], siteSettings, sec
                                     <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
                                     <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-400" />
                                 </span>
-                                {sectionContent?.badge || t('badge')}
+                                {isAr ? (sectionContent?.badge_ar || sectionContent?.badge || t('badge')) : (sectionContent?.badge || t('badge'))}
                             </motion.div>
 
                             {/* Titre — révélation mot à mot (masque + montée) */}

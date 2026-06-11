@@ -414,6 +414,22 @@ export const faqQuery = groq`
 `
 
 // ==========================================
+// VIDÉOTHÈQUE
+// ==========================================
+
+export const videosQuery = groq`
+  *[_type == "video" && active == true] | order(order asc) {
+    _id,
+    title,
+    title_ar,
+    description,
+    description_ar,
+    "videoUrl": videoFile.asset->url,
+    poster
+  }
+`
+
+// ==========================================
 // CONVENTIONS & PRISE EN CHARGE
 // ==========================================
 

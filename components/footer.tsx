@@ -13,6 +13,7 @@ interface SiteSettings {
   phone?: string
   email?: string
   address?: string
+  address_ar?: string
   social?: { facebook?: string; instagram?: string }
 }
 
@@ -31,10 +32,12 @@ export default function Footer({ siteSettings, footerContent }: FooterProps) {
   const tNav = useTranslations('nav')
   const locale = useLocale()
 
+  const isAr = locale === 'ar'
+
   // Use Sanity data if available, otherwise fallback to static config
   const clinicData = {
     contact: {
-      address: siteSettings?.address || siteConfigFallback.contact.address,
+      address: isAr ? (siteSettings?.address_ar || siteSettings?.address || siteConfigFallback.contact.address) : (siteSettings?.address || siteConfigFallback.contact.address),
       phone: siteSettings?.phone || siteConfigFallback.contact.phone,
       email: siteSettings?.email || siteConfigFallback.contact.email,
     },
@@ -112,7 +115,11 @@ export default function Footer({ siteSettings, footerContent }: FooterProps) {
                 />
               </div>
               <div className="flex flex-col gap-1.5">
-                <span className='block text-2xl font-bold tracking-tight text-white drop-shadow-md'>Clinique <span className="text-primary">OKBA</span></span>
+                {isAr ? (
+                    <span className='block text-2xl font-bold tracking-tight text-white drop-shadow-md'>المصحة الطبية <span className="text-primary">عقبة</span></span>
+                ) : (
+                    <span className='block text-2xl font-bold tracking-tight text-white drop-shadow-md'>Clinique <span className="text-primary">OKBA</span></span>
+                )}
                 <span className='text-[10px] w-fit text-primary font-bold tracking-widest uppercase bg-primary/10 px-2.5 py-0.5 rounded-full border border-primary/20'>
                   {tNav('tagline')}
                 </span>
@@ -212,7 +219,7 @@ export default function Footer({ siteSettings, footerContent }: FooterProps) {
                 </div>
                 <div>
                   <p className="text-[11px] text-slate-500 font-bold uppercase mb-1 tracking-widest">{t('address')}</p>
-                  <p className="text-sm text-slate-300 leading-relaxed font-medium">{clinicData?.contact.address || 'Nouvelle ville Ali Mendjeli, Constantine'}</p>
+                  <p className="text-sm text-slate-300 leading-relaxed font-medium">{clinicData?.contact.address || (isAr ? 'المدينة الجديدة علي منجلي، قسنطينة' : 'Nouvelle ville Ali Mendjeli, Constantine')}</p>
                 </div>
               </li>
               <li className='flex gap-4 group p-3 -ml-3 rounded-xl hover:bg-white/5 transition-colors duration-300'>
@@ -240,7 +247,7 @@ export default function Footer({ siteSettings, footerContent }: FooterProps) {
         {/* Bottom Bar */}
         <div className='mt-16 pt-8 border-t border-white/5 flex flex-col md:flex-row items-center justify-between gap-4'>
           <p className='text-xs text-slate-500'>
-            {footerContent?.copyright || `© ${currentYear} Clinique OKBA. ${t('rights')}.`}
+            {footerContent?.copyright || (isAr ? `© ${currentYear} المصحة الطبية عقبة. ${t('rights')}.` : `© ${currentYear} Clinique OKBA. ${t('rights')}.`)}
           </p>
           <div className='flex gap-6 text-xs text-slate-500'>
             <Link href="/legal/mentions-legales" className='hover:text-white transition-colors'>{t('terms')}</Link>

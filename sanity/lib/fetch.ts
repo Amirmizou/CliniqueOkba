@@ -15,6 +15,7 @@ import {
     doctorBySlugQuery,
     faqQuery,
     insuranceSectionQuery,
+    videosQuery,
     // Nouvelles queries
     aboutSectionQuery,
     servicesQuery,
@@ -50,6 +51,10 @@ const shortCacheOptions = {
 
 export async function getHeroSlides() {
     return client.fetch(heroSlidesQuery, {}, cacheOptions)
+}
+
+export async function getVideos() {
+    return client.fetch(videosQuery, {}, cacheOptions)
 }
 
 // ==========================================

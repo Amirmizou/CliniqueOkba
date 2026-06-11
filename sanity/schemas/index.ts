@@ -18,6 +18,7 @@ import sectionContent from './sectionContent'
 import footerContent from './footerContent'
 import pageSeo from './pageSeo'
 import insuranceSection from './insurance'
+import video from './video'
 
 export const schemaTypes = [
     // Configuration Générale
@@ -44,6 +45,7 @@ export const schemaTypes = [
     // Média & Contenu
     galleryImage,
     facilityPhoto,
+    video,
     article,
     event,
     faq,
