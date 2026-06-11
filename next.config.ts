@@ -28,7 +28,7 @@ const nextConfig: NextConfig = {
   poweredByHeader: false,
   generateEtags: false,
   experimental: {
-    optimizePackageImports: ['lucide-react', 'framer-motion', '@radix-ui/react-icons', 'date-fns', 'next-intl'],
+    optimizePackageImports: ['lucide-react', 'framer-motion', 'next-intl'],
   },
   compiler: {
     removeConsole: process.env.NODE_ENV === 'production' ? {

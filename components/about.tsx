@@ -3,7 +3,7 @@
 import { useEffect, useRef } from 'react'
 import Image from 'next/image'
 import clinicDataFallback from '@/data/clinic.json'
-import { useTranslations } from 'next-intl'
+import { useTranslations, useLocale } from 'next-intl'
 import * as LucideIcons from 'lucide-react'
 import { urlFor } from '@/sanity/lib/image'
 import { gsap } from 'gsap'
@@ -47,10 +47,13 @@ export default function About({ data, sectionContent }: AboutProps) {
   const statsRef = useRef<HTMLDivElement>(null)
   const featuresRef = useRef<HTMLDivElement>(null)
 
+  const locale = useLocale()
+  const isAr = locale === 'ar'
+
   const statsFallback = [
-    { value: '24/7', label: 'Urgences disponibles', icon: 'Clock' },
-    { value: '30+', label: 'Médecins spécialistes', icon: 'Users' },
-    { value: '11', label: 'Spécialités médicales', icon: 'Award' },
+    { value: '24/7', label: isAr ? 'طوارئ متاحة' : 'Urgences disponibles', icon: 'Clock' },
+    { value: '30+', label: isAr ? 'أطباء أخصائيون' : 'Médecins spécialistes', icon: 'Users' },
+    { value: '11', label: isAr ? 'تخصصات طبية' : 'Spécialités médicales', icon: 'Award' },
   ]
   const stats = data?.stats?.length ? data.stats : statsFallback
 

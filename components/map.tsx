@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { MapPin, Navigation, ExternalLink } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 import { cn } from '@/lib/utils'
 
 interface MapComponentProps {
@@ -19,6 +20,7 @@ export default function MapComponent({
   className = '',
 }: MapComponentProps) {
   const [isLoaded, setIsLoaded] = useState(false)
+  const t = useTranslations('map')
 
   // URLs Google Maps
   const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${coordinates.lat},${coordinates.lng}`
@@ -40,7 +42,7 @@ export default function MapComponent({
                 <div className='h-12 w-12 rounded-full border-4 border-emerald-200 dark:border-emerald-800'></div>
                 <div className='absolute inset-0 h-12 w-12 animate-spin rounded-full border-4 border-transparent border-t-emerald-500'></div>
               </div>
-              <p className='text-emerald-700 dark:text-emerald-300 font-medium'>Chargement de la carte...</p>
+              <p className='text-emerald-700 dark:text-emerald-300 font-medium'>{t('loading')}</p>
             </div>
           </div>
         )}
@@ -74,7 +76,7 @@ export default function MapComponent({
             className='bg-white dark:bg-gray-800 text-emerald-700 dark:text-emerald-300 hover:bg-emerald-500 hover:text-white dark:hover:bg-emerald-600 flex items-center gap-2 rounded-xl px-4 py-2.5 shadow-xl transition-all duration-300 hover:scale-105 hover:shadow-2xl border border-emerald-200 dark:border-emerald-700 font-medium backdrop-blur-sm'
           >
             <Navigation className='h-5 w-5' />
-            <span className='hidden sm:inline'>Itinéraire</span>
+            <span className='hidden sm:inline'>{t('directions')}</span>
           </a>
           <a
             href={googleMapsUrl}
@@ -83,7 +85,7 @@ export default function MapComponent({
             className='bg-gradient-to-r from-emerald-500 to-teal-600 text-white hover:from-emerald-600 hover:to-teal-700 flex items-center gap-2 rounded-xl px-4 py-2.5 shadow-xl transition-all duration-300 hover:scale-105 hover:shadow-2xl font-medium'
           >
             <ExternalLink className='h-5 w-5' />
-            <span className='hidden sm:inline'>Ouvrir</span>
+            <span className='hidden sm:inline'>{t('open')}</span>
           </a>
         </div>
       </div>
@@ -97,7 +99,7 @@ export default function MapComponent({
               <MapPin className='h-7 w-7 text-white' />
             </div>
             <div>
-              <h4 className='font-bold text-emerald-800 dark:text-emerald-200 mb-1 text-lg'>Adresse</h4>
+              <h4 className='font-bold text-emerald-800 dark:text-emerald-200 mb-1 text-lg'>{t('address')}</h4>
               <p className='text-sm text-emerald-700 dark:text-emerald-300 leading-relaxed'>{address}</p>
               <p className='text-xs text-emerald-600/70 dark:text-emerald-400/70 mt-1 font-mono'>
                 📍 {coordinates.lat.toFixed(4)}°N, {coordinates.lng.toFixed(4)}°E
@@ -119,10 +121,10 @@ export default function MapComponent({
             </div>
             <div>
               <h4 className='font-bold text-teal-800 dark:text-teal-200 mb-1 text-lg flex items-center gap-2'>
-                Obtenir l'itinéraire
+                {t('getDirections')}
                 <ExternalLink className='h-4 w-4 opacity-0 group-hover/card:opacity-100 transition-opacity' />
               </h4>
-              <p className='text-sm text-teal-700 dark:text-teal-300'>Ouvrir dans Google Maps pour vous guider</p>
+              <p className='text-sm text-teal-700 dark:text-teal-300'>{t('getDirectionsSub')}</p>
             </div>
           </div>
         </a>

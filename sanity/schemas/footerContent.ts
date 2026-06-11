@@ -7,13 +7,33 @@ export default defineType({
     fields: [
         defineField({
             name: 'description',
-            title: 'Description',
+            title: 'Description (FR)',
+            type: 'text',
+            rows: 3,
+        }),
+        defineField({
+            name: 'description_ar',
+            title: 'Description (AR)',
             type: 'text',
             rows: 3,
         }),
         defineField({
             name: 'quickLinks',
-            title: 'Liens Rapides',
+            title: 'Liens Rapides (FR)',
+            type: 'array',
+            of: [
+                {
+                    type: 'object',
+                    fields: [
+                        { name: 'label', title: 'Label', type: 'string' },
+                        { name: 'href', title: 'Lien', type: 'string' },
+                    ],
+                },
+            ],
+        }),
+        defineField({
+            name: 'quickLinks_ar',
+            title: 'Liens Rapides (AR)',
             type: 'array',
             of: [
                 {
@@ -27,7 +47,21 @@ export default defineType({
         }),
         defineField({
             name: 'servicesLinks',
-            title: 'Liens Services',
+            title: 'Liens Services (FR)',
+            type: 'array',
+            of: [
+                {
+                    type: 'object',
+                    fields: [
+                        { name: 'label', title: 'Label', type: 'string' },
+                        { name: 'href', title: 'Lien', type: 'string' },
+                    ],
+                },
+            ],
+        }),
+        defineField({
+            name: 'servicesLinks_ar',
+            title: 'Liens Services (AR)',
             type: 'array',
             of: [
                 {
@@ -41,7 +75,21 @@ export default defineType({
         }),
         defineField({
             name: 'legalLinks',
-            title: 'Liens Légaux',
+            title: 'Liens Légaux (FR)',
+            type: 'array',
+            of: [
+                {
+                    type: 'object',
+                    fields: [
+                        { name: 'label', title: 'Label', type: 'string' },
+                        { name: 'href', title: 'Lien', type: 'string' },
+                    ],
+                },
+            ],
+        }),
+        defineField({
+            name: 'legalLinks_ar',
+            title: 'Liens Légaux (AR)',
             type: 'array',
             of: [
                 {
@@ -55,19 +103,34 @@ export default defineType({
         }),
         defineField({
             name: 'copyright',
-            title: 'Copyright',
+            title: 'Copyright (FR)',
             type: 'string',
             description: 'Utilisez {year} pour l\'année dynamique',
             initialValue: '© {year} Clinique OKBA. Tous droits réservés.',
         }),
         defineField({
+            name: 'copyright_ar',
+            title: 'Copyright (AR)',
+            type: 'string',
+        }),
+        defineField({
             name: 'newsletterTitle',
-            title: 'Titre Newsletter',
+            title: 'Titre Newsletter (FR)',
+            type: 'string',
+        }),
+        defineField({
+            name: 'newsletterTitle_ar',
+            title: 'Titre Newsletter (AR)',
             type: 'string',
         }),
         defineField({
             name: 'newsletterDescription',
-            title: 'Description Newsletter',
+            title: 'Description Newsletter (FR)',
+            type: 'string',
+        }),
+        defineField({
+            name: 'newsletterDescription_ar',
+            title: 'Description Newsletter (AR)',
             type: 'string',
         }),
         defineField({

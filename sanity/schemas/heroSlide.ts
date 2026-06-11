@@ -12,8 +12,18 @@ export default defineType({
             validation: (Rule) => Rule.required(),
         }),
         defineField({
+            name: 'title_ar',
+            title: 'Titre (AR)',
+            type: 'string',
+            }),
+        defineField({
             name: 'subtitle',
             title: 'Sous-titre',
+            type: 'string',
+        }),
+        defineField({
+            name: 'subtitle_ar',
+            title: 'Sous-titre (AR)',
             type: 'string',
         }),
         defineField({

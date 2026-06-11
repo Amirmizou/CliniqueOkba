@@ -7,9 +7,14 @@ export default defineType({
     fields: [
         defineField({
             name: 'title',
-            title: 'Titre du pôle',
+            title: 'Titre du pôle (FR)',
             type: 'string',
             validation: (Rule) => Rule.required(),
+        }),
+        defineField({
+            name: 'title_ar',
+            title: 'Titre du pôle (AR)',
+            type: 'string',
         }),
         defineField({
             name: 'slug',
@@ -21,16 +26,28 @@ export default defineType({
         }),
         defineField({
             name: 'description',
-            title: 'Description',
+            title: 'Description (FR)',
+            type: 'text',
+            rows: 2,
+        }),
+        defineField({
+            name: 'description_ar',
+            title: 'Description (AR)',
             type: 'text',
             rows: 2,
         }),
         defineField({
             name: 'items',
-            title: 'Sous-spécialités / prestations',
+            title: 'Sous-spécialités / prestations (FR)',
             type: 'array',
             of: [{ type: 'string' }],
             description: 'Ex pôle dentaire : Consultation, Chirurgie, Orthodontie (ODF), Prothèse',
+        }),
+        defineField({
+            name: 'items_ar',
+            title: 'Sous-spécialités / prestations (AR)',
+            type: 'array',
+            of: [{ type: 'string' }],
         }),
         defineField({
             name: 'iconName',
@@ -39,6 +56,7 @@ export default defineType({
             options: {
                 list: [
                     { title: 'Imagerie — balayage (scanner)', value: 'ScanLine' },
+                    { title: 'Médecine nucléaire — atome (radiation)', value: 'Radiation' },
                     { title: 'Dentaire — dent cristalline (sourire)', value: 'Smile' },
                     { title: 'Consultations — ondes cardiaques (stéthoscope)', value: 'Stethoscope' },
                     { title: 'Urgences — flash + ECG rapide (sirène)', value: 'Siren' },
@@ -67,6 +85,7 @@ export default defineType({
             options: {
                 list: [
                     { title: 'Imagerie médicale', value: 'imagerie' },
+                    { title: 'Médecine nucléaire', value: 'nucleaire' },
                     { title: 'Bloc opératoire', value: 'bloc' },
                     { title: 'Laboratoire d’analyses', value: 'laboratoire' },
                     { title: 'Hospitalisation', value: 'hospitalisation' },
@@ -78,13 +97,24 @@ export default defineType({
         }),
         defineField({
             name: 'badge',
-            title: 'Badge (optionnel)',
+            title: 'Badge (FR) (optionnel)',
             type: 'string',
             description: 'Ex : 24h/24 · 7j/7',
         }),
         defineField({
+            name: 'badge_ar',
+            title: 'Badge (AR) (optionnel)',
+            type: 'string',
+        }),
+        defineField({
             name: 'urgent',
             title: 'Pôle urgences (style distinct + bouton d’appel)',
+            type: 'boolean',
+            initialValue: false,
+        }),
+        defineField({
+            name: 'featured',
+            title: 'Pôle vedette (carte mise en évidence + ruban « À la une »)',
             type: 'boolean',
             initialValue: false,
         }),

@@ -2,6 +2,7 @@ import { notFound } from 'next/navigation'
 import SiteHeader from '@/components/site-header'
 import SiteFooter from '@/components/site-footer'
 import { getEvents, getEventBySlug, getSiteSettings } from '@/sanity/lib/fetch'
+import { localizeSanityData } from '@/sanity/lib/localize'
 import { urlFor } from '@/sanity/lib/image'
 import Image from 'next/image'
 import { Link } from '@/navigation'
@@ -10,16 +11,17 @@ import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { PortableText } from '@portabletext/react'
 import ScrollAnimation from '@/components/ui/scroll-animation'
-import { EVENT_TYPE_LABELS, type ClinicEvent } from '@/lib/events'
+import { type ClinicEvent } from '@/lib/events'
+import { getTranslations } from 'next-intl/server'
 
 export async function generateStaticParams() {
     const events: { slug: { current: string } }[] = await getEvents()
     return events.map((event) => ({ slug: event.slug.current }))
 }
 
-export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
-    const { slug } = await params
-    const event: ClinicEvent = await getEventBySlug(slug)
+export async function generateMetadata({ params }: { params: Promise<{ slug: string; locale: string }> }) {
+    const { slug, locale } = await params
+    const event: ClinicEvent = localizeSanityData(await getEventBySlug(slug), locale)
 
     if (!event) {
         return { title: 'Événement non trouvé' }
@@ -57,8 +59,8 @@ const portableTextComponents = {
     },
 }
 
-function formatDateTime(value: string) {
-    return new Date(value).toLocaleString('fr-FR', {
+function formatDateTime(value: string, dateLocale: string) {
+    return new Date(value).toLocaleString(dateLocale, {
         weekday: 'long',
         day: 'numeric',
         month: 'long',
@@ -68,15 +70,20 @@ function formatDateTime(value: string) {
     })
 }
 
-export default async function EventPage({ params }: { params: Promise<{ slug: string }> }) {
-    const { slug } = await params
-    const event: ClinicEvent & { content?: any[] } = await getEventBySlug(slug)
+export default async function EventPage({ params }: { params: Promise<{ slug: string; locale: string }> }) {
+    const { slug, locale } = await params
+    const event: ClinicEvent & { content?: any[] } = localizeSanityData(
+        await getEventBySlug(slug),
+        locale,
+    )
 
     if (!event) {
         notFound()
     }
 
-    const siteSettings = await getSiteSettings()
+    const t = await getTranslations('events')
+    const dateLocale = locale === 'ar' ? 'ar-DZ' : 'fr-FR'
+    const siteSettings = localizeSanityData(await getSiteSettings(), locale)
 
     return (
         <>
@@ -88,14 +95,14 @@ export default async function EventPage({ params }: { params: Promise<{ slug: st
                             <Link href="/evenements">
                                 <Button variant="ghost" className="mb-8 -ml-4">
                                     <ArrowLeft className="mr-2 h-4 w-4" />
-                                    Retour aux événements
+                                    {t('backToEvents')}
                                 </Button>
                             </Link>
 
                             <header className="mb-8">
-                                {event.eventType && EVENT_TYPE_LABELS[event.eventType] && (
+                                {event.eventType && t.has(`type.${event.eventType}`) && (
                                     <Badge className="mb-4 bg-primary text-primary-foreground">
-                                        {EVENT_TYPE_LABELS[event.eventType]}
+                                        {t(`type.${event.eventType}`)}
                                     </Badge>
                                 )}
                                 <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4">
@@ -124,11 +131,11 @@ export default async function EventPage({ params }: { params: Promise<{ slug: st
                                 <div className="flex items-start gap-3">
                                     <CalendarDays className="h-5 w-5 text-primary mt-0.5 shrink-0" />
                                     <div>
-                                        <p className="font-semibold">Date et heure</p>
+                                        <p className="font-semibold">{t('dateTime')}</p>
                                         <p className="text-muted-foreground text-sm">
-                                            {formatDateTime(event.startDate)}
+                                            {formatDateTime(event.startDate, dateLocale)}
                                             {event.endDate && (
-                                                <> → {formatDateTime(event.endDate)}</>
+                                                <> → {formatDateTime(event.endDate, dateLocale)}</>
                                             )}
                                         </p>
                                     </div>
@@ -137,7 +144,7 @@ export default async function EventPage({ params }: { params: Promise<{ slug: st
                                     <div className="flex items-start gap-3">
                                         <MapPin className="h-5 w-5 text-primary mt-0.5 shrink-0" />
                                         <div>
-                                            <p className="font-semibold">Lieu</p>
+                                            <p className="font-semibold">{t('place')}</p>
                                             <p className="text-muted-foreground text-sm">{event.location}</p>
                                         </div>
                                     </div>
@@ -146,10 +153,10 @@ export default async function EventPage({ params }: { params: Promise<{ slug: st
                                     <div className="flex items-start gap-3">
                                         <Clock className="h-5 w-5 text-primary mt-0.5 shrink-0" />
                                         <div>
-                                            <p className="font-semibold">Date limite d'inscription</p>
+                                            <p className="font-semibold">{t('deadline')}</p>
                                             <p className="text-muted-foreground text-sm">
                                                 {new Date(event.registrationDeadline).toLocaleDateString(
-                                                    'fr-FR',
+                                                    dateLocale,
                                                     { day: 'numeric', month: 'long', year: 'numeric' },
                                                 )}
                                             </p>
@@ -160,7 +167,7 @@ export default async function EventPage({ params }: { params: Promise<{ slug: st
                                     <div className="flex items-start gap-3">
                                         <Phone className="h-5 w-5 text-primary mt-0.5 shrink-0" />
                                         <div>
-                                            <p className="font-semibold">Contact</p>
+                                            <p className="font-semibold">{t('contactLabel')}</p>
                                             <p className="text-muted-foreground text-sm">{event.contact}</p>
                                         </div>
                                     </div>
@@ -180,7 +187,7 @@ export default async function EventPage({ params }: { params: Promise<{ slug: st
                                 <Link href="/evenements">
                                     <Button variant="outline">
                                         <ArrowLeft className="mr-2 h-4 w-4" />
-                                        Autres événements
+                                        {t('otherEvents')}
                                     </Button>
                                 </Link>
                             </div>

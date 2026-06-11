@@ -3,6 +3,7 @@
 import type React from 'react'
 
 import { useState, useEffect } from 'react'
+import { useTranslations } from 'next-intl'
 import ScrollAnimation from '@/components/ui/scroll-animation'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
@@ -48,6 +49,9 @@ interface ContactProps {
 }
 
 export default function Contact({ siteSettings, sectionContent }: ContactProps) {
+  const t = useTranslations('contact')
+  const tf = useTranslations('contact.form')
+  const ti = useTranslations('contact.info')
   // Use Sanity data or fallback to static
   const contactData = {
     address: siteSettings?.address || siteConfigFallback.contact.address,
@@ -92,43 +96,43 @@ export default function Contact({ siteSettings, sectionContent }: ContactProps) 
     switch (name) {
       case 'firstName':
         if (!value.trim()) {
-          newErrors[name] = 'Le prénom est requis'
+          newErrors[name] = tf('vFirstNameRequired')
         } else if (value.trim().length < 2) {
-          newErrors[name] = 'Le prénom doit contenir au moins 2 caractères'
+          newErrors[name] = tf('vFirstNameMin')
         } else {
           delete newErrors[name]
         }
         break
       case 'lastName':
         if (!value.trim()) {
-          newErrors[name] = 'Le nom est requis'
+          newErrors[name] = tf('vLastNameRequired')
         } else if (value.trim().length < 2) {
-          newErrors[name] = 'Le nom doit contenir au moins 2 caractères'
+          newErrors[name] = tf('vLastNameMin')
         } else {
           delete newErrors[name]
         }
         break
       case 'email':
         if (!value.trim()) {
-          newErrors[name] = "L'email est requis"
+          newErrors[name] = tf('vEmailRequired')
         } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
-          newErrors[name] = 'Veuillez entrer un email valide'
+          newErrors[name] = tf('vEmailInvalid')
         } else {
           delete newErrors[name]
         }
         break
       case 'phone':
         if (value && !/^[\+]?[0-9\s\-\(\)]{8,}$/.test(value)) {
-          newErrors[name] = 'Veuillez entrer un numéro de téléphone valide'
+          newErrors[name] = tf('vPhoneInvalid')
         } else {
           delete newErrors[name]
         }
         break
       case 'message':
         if (!value.trim()) {
-          newErrors[name] = 'Le message est requis'
+          newErrors[name] = tf('vMessageRequired')
         } else if (value.trim().length < 10) {
-          newErrors[name] = 'Le message doit contenir au moins 10 caractères'
+          newErrors[name] = tf('vMessageMin')
         } else {
           delete newErrors[name]
         }
@@ -229,13 +233,13 @@ export default function Contact({ siteSettings, sectionContent }: ContactProps) 
       <div className='mx-auto max-w-7xl px-4 sm:px-6 lg:px-8'>
         <ScrollAnimation variant="fadeUp" className='mb-16 space-y-4 text-center'>
           <p className='text-primary text-sm font-semibold tracking-wide uppercase'>
-            {sectionContent?.badge || 'Nous contacter'}
+            {sectionContent?.badge || t('badge')}
           </p>
           <h2 className='text-foreground text-2xl sm:text-3xl md:text-4xl font-bold'>
-            {sectionContent?.title || 'Contact & Localisation'}
+            {sectionContent?.title || t('title')}
           </h2>
           <p className='text-muted-foreground mx-auto max-w-2xl text-base sm:text-lg'>
-            {sectionContent?.subtitle || 'Nous sommes à votre écoute pour toute question ou demande de rendez-vous'}
+            {sectionContent?.subtitle || t('subtitle')}
           </p>
         </ScrollAnimation>
 
@@ -281,7 +285,7 @@ export default function Contact({ siteSettings, sectionContent }: ContactProps) 
                   </div>
                 </div>
                 <div>
-                  <h3 className='text-foreground font-semibold'>Adresse</h3>
+                  <h3 className='text-foreground font-semibold'>{ti('address')}</h3>
                   <p className='text-muted-foreground mt-1'>
                     {contactData.address}
                   </p>
@@ -298,7 +302,7 @@ export default function Contact({ siteSettings, sectionContent }: ContactProps) 
                   </div>
                 </div>
                 <div>
-                  <h3 className='text-foreground font-semibold'>Téléphone</h3>
+                  <h3 className='text-foreground font-semibold'>{ti('phone')}</h3>
                   <div className='mt-1 flex flex-wrap gap-x-3 gap-y-1'>
                     {contactData.phone.split('/').map((num) => {
                       const display = num.trim()
@@ -315,7 +319,7 @@ export default function Contact({ siteSettings, sectionContent }: ContactProps) 
                     })}
                   </div>
                   <p className='text-muted-foreground text-sm'>
-                    Urgences : {contactData.hours?.emergency}
+                    {ti('emergency')} : {contactData.hours?.emergency}
                   </p>
                 </div>
               </div>
@@ -327,7 +331,7 @@ export default function Contact({ siteSettings, sectionContent }: ContactProps) 
                   </div>
                 </div>
                 <div>
-                  <h3 className='text-foreground font-semibold'>Email</h3>
+                  <h3 className='text-foreground font-semibold'>{ti('email')}</h3>
                   <a
                     href={`mailto:${contactData.email}`}
                     className='text-muted-foreground hover:text-primary mt-1 block break-all font-medium underline-offset-4 transition-colors hover:underline'
@@ -335,7 +339,7 @@ export default function Contact({ siteSettings, sectionContent }: ContactProps) 
                     {contactData.email}
                   </a>
                   <p className='text-muted-foreground text-sm'>
-                    Réponse rapide garantie
+                    {ti('fastReply')}
                   </p>
                 </div>
               </div>
@@ -347,12 +351,12 @@ export default function Contact({ siteSettings, sectionContent }: ContactProps) 
                   </div>
                 </div>
                 <div>
-                  <h3 className='text-foreground font-semibold'>Horaires</h3>
+                  <h3 className='text-foreground font-semibold'>{ti('hours')}</h3>
                   <p className='text-muted-foreground mt-1'>
-                    Samedi - Jeudi : {contactData.hours?.weekdays}
+                    {ti('weekdaysLabel')} : {contactData.hours?.weekdays}
                   </p>
                   <p className='text-muted-foreground text-sm'>
-                    Vendredi : {contactData.hours?.saturday}
+                    {ti('fridayLabel')} : {contactData.hours?.saturday}
                   </p>
                 </div>
               </div>
@@ -360,7 +364,7 @@ export default function Contact({ siteSettings, sectionContent }: ContactProps) 
 
             {/* Map */}
             <div className='border-border border-t pt-8'>
-              <h3 className='text-foreground mb-4 font-semibold'>Notre localisation</h3>
+              <h3 className='text-foreground mb-4 font-semibold'>{ti('ourLocation')}</h3>
               <Map
                 address={contactData.address}
                 coordinates={contactData.coordinates}
@@ -369,7 +373,7 @@ export default function Contact({ siteSettings, sectionContent }: ContactProps) 
 
             {/* Social Links */}
             <div className='border-border border-t pt-8'>
-              <p className='text-foreground mb-4 font-semibold'>Suivez-nous</p>
+              <p className='text-foreground mb-4 font-semibold'>{ti('followUs')}</p>
               <div className='flex gap-3'>
                 <a
                   href={contactData.social?.facebook || '#'}
@@ -398,7 +402,7 @@ export default function Contact({ siteSettings, sectionContent }: ContactProps) 
                 <div className='grid grid-cols-1 gap-4 sm:grid-cols-2'>
                   <div>
                     <label htmlFor='contact-firstName' className='text-foreground mb-2 block text-sm font-medium'>
-                      Prénom <span className='text-red-500'>*</span>
+                      {tf('firstName')} <span className='text-red-500'>*</span>
                     </label>
                     <div className='relative'>
                       <input
@@ -417,7 +421,7 @@ export default function Contact({ siteSettings, sectionContent }: ContactProps) 
                             ? 'border-green-500 focus:ring-green-500/50'
                             : 'border-border focus:ring-primary/50'
                           }`}
-                        placeholder='Votre prénom'
+                        placeholder={tf('firstNamePlaceholder')}
                         disabled={isSubmitting}
                       />
                       {touched.firstName &&
@@ -438,7 +442,7 @@ export default function Contact({ siteSettings, sectionContent }: ContactProps) 
                   </div>
                   <div>
                     <label htmlFor='contact-lastName' className='text-foreground mb-2 block text-sm font-medium'>
-                      Nom <span className='text-red-500'>*</span>
+                      {tf('lastName')} <span className='text-red-500'>*</span>
                     </label>
                     <div className='relative'>
                       <input
@@ -457,7 +461,7 @@ export default function Contact({ siteSettings, sectionContent }: ContactProps) 
                             ? 'border-green-500 focus:ring-green-500/50'
                             : 'border-border focus:ring-primary/50'
                           }`}
-                        placeholder='Votre nom'
+                        placeholder={tf('lastNamePlaceholder')}
                         disabled={isSubmitting}
                       />
                       {touched.lastName &&
@@ -480,7 +484,7 @@ export default function Contact({ siteSettings, sectionContent }: ContactProps) 
 
                 <div>
                   <label htmlFor='contact-email' className='text-foreground mb-2 block text-sm font-medium'>
-                    Email <span className='text-red-500'>*</span>
+                    {tf('email')} <span className='text-red-500'>*</span>
                   </label>
                   <div className='relative'>
                     <input
@@ -519,9 +523,9 @@ export default function Contact({ siteSettings, sectionContent }: ContactProps) 
 
                 <div>
                   <label htmlFor='contact-phone' className='text-foreground mb-2 block text-sm font-medium'>
-                    Téléphone{' '}
+                    {tf('phone')}{' '}
                     <span className='text-muted-foreground text-xs'>
-                      (optionnel)
+                      ({tf('optional')})
                     </span>
                   </label>
                   <div className='relative'>
@@ -561,7 +565,7 @@ export default function Contact({ siteSettings, sectionContent }: ContactProps) 
 
                 <div>
                   <label htmlFor='contact-message' className='text-foreground mb-2 block text-sm font-medium'>
-                    Message <span className='text-red-500'>*</span>
+                    {tf('message')} <span className='text-red-500'>*</span>
                   </label>
                   <div className='relative'>
                     <textarea
@@ -579,7 +583,7 @@ export default function Contact({ siteSettings, sectionContent }: ContactProps) 
                           ? 'border-green-500 focus:ring-green-500/50'
                           : 'border-border focus:ring-primary/50'
                         }`}
-                      placeholder='Décrivez votre demande de consultation ou vos questions...'
+                      placeholder={tf('messagePlaceholder')}
                       disabled={isSubmitting}
                     />
                     {touched.message && !errors.message && formData.message && (
@@ -596,7 +600,7 @@ export default function Contact({ siteSettings, sectionContent }: ContactProps) 
                     </p>
                   )}
                   <p className='text-muted-foreground mt-1 text-xs'>
-                    {formData.message.length}/10 caractères minimum
+                    {tf('charsMin', { count: formData.message.length })}
                   </p>
                 </div>
 
@@ -621,10 +625,10 @@ export default function Contact({ siteSettings, sectionContent }: ContactProps) 
                       <CheckCircle className='h-5 w-5 flex-shrink-0 text-green-600' />
                       <div>
                         <p className='font-medium text-green-800'>
-                          Message envoyé avec succès !
+                          {tf('success')}
                         </p>
                         <p className='text-sm text-green-700'>
-                          Nous vous répondrons dans les plus brefs délais.
+                          {tf('successDetail')}
                         </p>
                       </div>
                     </div>
@@ -637,10 +641,10 @@ export default function Contact({ siteSettings, sectionContent }: ContactProps) 
                       <AlertCircle className='h-5 w-5 flex-shrink-0 text-red-600' />
                       <div>
                         <p className='font-medium text-red-800'>
-                          Erreur lors de l'envoi
+                          {tf('error')}
                         </p>
                         <p className='text-sm text-red-700'>
-                          Veuillez réessayer ou nous contacter directement.
+                          {tf('errorMessage')}
                         </p>
                       </div>
                     </div>
@@ -657,12 +661,12 @@ export default function Contact({ siteSettings, sectionContent }: ContactProps) 
                   {isSubmitting ? (
                     <div className='flex items-center gap-2'>
                       <div className='h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white'></div>
-                      Envoi en cours...
+                      {tf('sending')}
                     </div>
                   ) : (
                     <div className='flex items-center gap-2'>
                       <Send className='h-4 w-4 transition-transform duration-300 group-hover:translate-x-1' />
-                      Envoyer le message
+                      {tf('send')}
                     </div>
                   )}
                 </Button>

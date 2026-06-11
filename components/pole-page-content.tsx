@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useCallback, useEffect } from 'react'
+import { useTranslations } from 'next-intl'
 import Image from 'next/image'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
@@ -10,6 +11,7 @@ import {
   Siren,
   FlaskConical,
   Eye,
+  Radiation,
   Phone,
   ArrowLeft,
   X,
@@ -29,6 +31,7 @@ const ICONS: Record<string, LucideIcon> = {
   Siren,
   FlaskConical,
   Eye,
+  Radiation,
 }
 
 export interface PolePhoto {
@@ -59,6 +62,8 @@ export default function PolePageContent({
   photos: PolePhoto[]
   phone: string
 }) {
+  const t = useTranslations('polePage')
+  const tc = useTranslations('common')
   const [index, setIndex] = useState<number | null>(null)
   const Icon = ICONS[pole.iconName] || Stethoscope
 
@@ -102,7 +107,7 @@ export default function PolePageContent({
             className="mb-8 inline-flex items-center gap-1.5 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
           >
             <ArrowLeft className="h-4 w-4" />
-            Retour à l’accueil
+            {t('backHome')}
           </Link>
 
           <motion.div
@@ -175,13 +180,13 @@ export default function PolePageContent({
                 style={{ backgroundColor: pole.accent }}
               >
                 <Phone className="h-4 w-4" />
-                Prendre rendez-vous
+                {t('bookAppointment')}
               </a>
               <Link
                 href="/#contact"
                 className="inline-flex items-center gap-2 rounded-xl border border-border px-5 py-3 text-sm font-semibold text-foreground/80 transition-colors hover:bg-foreground/5"
               >
-                Nous localiser
+                {t('locate')}
               </Link>
             </div>
           </motion.div>
@@ -193,7 +198,7 @@ export default function PolePageContent({
         <section className="border-t border-border/50 bg-muted/20 py-14 sm:py-16">
           <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
             <h2 className="mb-8 text-2xl font-bold sm:text-3xl">
-              En images
+              {t('inImages')}
             </h2>
 
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -246,7 +251,7 @@ export default function PolePageContent({
             <button
               type="button"
               onClick={() => setIndex(null)}
-              aria-label="Fermer"
+              aria-label={tc('close')}
               className="absolute right-5 top-5 z-10 flex h-11 w-11 items-center justify-center rounded-full bg-white/15 text-white backdrop-blur-md transition-colors hover:bg-white/30"
             >
               <X className="h-5 w-5" />
@@ -257,7 +262,7 @@ export default function PolePageContent({
                 e.stopPropagation()
                 go(-1)
               }}
-              aria-label="Précédent"
+              aria-label={tc('previous')}
               className="absolute left-3 top-1/2 z-10 flex h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full bg-white/15 text-white backdrop-blur-md transition-colors hover:bg-white/30 sm:left-6"
             >
               <ChevronLeft className="h-6 w-6" />
@@ -268,7 +273,7 @@ export default function PolePageContent({
                 e.stopPropagation()
                 go(1)
               }}
-              aria-label="Suivant"
+              aria-label={tc('next')}
               className="absolute right-3 top-1/2 z-10 flex h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full bg-white/15 text-white backdrop-blur-md transition-colors hover:bg-white/30 sm:right-6"
             >
               <ChevronRight className="h-6 w-6" />

@@ -1,17 +1,19 @@
 import type { ReactNode } from 'react'
-import { inter, lemonMilk, poppins } from './fonts'
+import { lemonMilk, poppins, montserratArabic } from './fonts'
+import { getLocale } from 'next-intl/server'
 import './globals.css'
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
+  const locale = await getLocale()
+  const dir = locale === 'ar' ? 'rtl' : 'ltr'
+
   return (
-    <html lang="fr" suppressHydrationWarning className={`${lemonMilk.variable} ${poppins.variable} ${inter.variable}`} data-scroll-behavior="smooth">
+    <html lang={locale} dir={dir} suppressHydrationWarning className={`${lemonMilk.variable} ${poppins.variable} ${montserratArabic.variable}`} data-scroll-behavior="smooth">
       <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
         <link rel="preconnect" href="https://cdn.sanity.io" />
         <link rel="dns-prefetch" href="https://cdn.sanity.io" />
         <link rel="dns-prefetch" href="https://www.googletagmanager.com" />

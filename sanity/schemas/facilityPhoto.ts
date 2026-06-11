@@ -14,13 +14,24 @@ export default defineType({
         }),
         defineField({
             name: 'title',
-            title: 'Titre',
+            title: 'Titre (FR)',
             type: 'string',
             validation: (Rule) => Rule.required(),
         }),
         defineField({
+            name: 'title_ar',
+            title: 'Titre (AR)',
+            type: 'string',
+        }),
+        defineField({
             name: 'description',
-            title: 'Description',
+            title: 'Description (FR)',
+            type: 'text',
+            rows: 2,
+        }),
+        defineField({
+            name: 'description_ar',
+            title: 'Description (AR)',
             type: 'text',
             rows: 2,
         }),
@@ -31,6 +42,7 @@ export default defineType({
             options: {
                 list: [
                     { title: 'Imagerie médicale', value: 'imagerie' },
+                    { title: 'Médecine nucléaire', value: 'nucleaire' },
                     { title: 'Bloc opératoire', value: 'bloc' },
                     { title: 'Laboratoire d’analyses', value: 'laboratoire' },
                     { title: 'Hospitalisation', value: 'hospitalisation' },

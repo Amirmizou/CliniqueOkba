@@ -1,7 +1,9 @@
 import { Suspense } from 'react'
 import SiteHeader from '@/components/site-header'
 import SiteFooter from '@/components/site-footer'
+import { getTranslations } from 'next-intl/server'
 import { getFaq, getSiteSettings } from '@/sanity/lib/fetch'
+import { localizeSanityData } from '@/sanity/lib/localize'
 import { HelpCircle, Phone, MapPin } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import ScrollAnimation from '@/components/ui/scroll-animation'
@@ -23,8 +25,9 @@ export const metadata = {
     description: 'Questions fréquemment posées sur la Clinique OKBA - Rendez-vous, examens, paiement et plus.',
 }
 
-async function FAQList() {
-    const sanityFaqs: FAQ[] = await getFaq()
+async function FAQList({ locale }: { locale: string }) {
+    const t = await getTranslations('faqPage')
+    const sanityFaqs: FAQ[] = localizeSanityData(await getFaq(), locale)
     // Sanity prioritaire, repli sur les questions locales
     const faqs: FAQ[] = sanityFaqs && sanityFaqs.length > 0 ? sanityFaqs : faqFallback
 
@@ -60,7 +63,7 @@ async function FAQList() {
                     <div className="mb-6">
                         <h2 className="text-2xl font-bold flex items-center gap-2">
                             <span>{categoryLabels[category]?.icon || '❓'}</span>
-                            {categoryLabels[category]?.label || category}
+                            {t.has(`cat.${category}`) ? t(`cat.${category}`) : (categoryLabels[category]?.label || category)}
                         </h2>
                     </div>
                     <div className="space-y-4">
@@ -89,8 +92,14 @@ async function FAQList() {
     )
 }
 
-export default async function FAQPage() {
-    const siteSettings = await getSiteSettings()
+export default async function FAQPage({
+    params,
+}: {
+    params: Promise<{ locale: string }>
+}) {
+    const { locale } = await params
+    const t = await getTranslations('faqPage')
+    const siteSettings = localizeSanityData(await getSiteSettings(), locale)
     const phoneDisplay = (siteSettings?.phone || siteConfig.contact.phone)
         .split('/')[0]
         .trim()
@@ -102,12 +111,12 @@ export default async function FAQPage() {
                 <section className="py-16 md:py-24">
                     <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
                         <ScrollAnimation variant="fadeUp" className="text-center mb-16">
-                            <Badge variant="outline" className="mb-4">Aide</Badge>
+                            <Badge variant="outline" className="mb-4">{t('badge')}</Badge>
                             <h1 className="text-4xl md:text-5xl font-bold mb-4">
-                                Questions Fréquentes
+                                {t('title')}
                             </h1>
                             <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-                                Trouvez rapidement les réponses à vos questions sur nos services.
+                                {t('subtitle')}
                             </p>
                         </ScrollAnimation>
 
@@ -118,17 +127,17 @@ export default async function FAQPage() {
                                 ))}
                             </div>
                         }>
-                            <FAQList />
+                            <FAQList locale={locale} />
                         </Suspense>
 
                         {/* Contact section */}
                         <ScrollAnimation variant="fadeUp" className="mt-16">
                             <div className="glass-card rounded-2xl p-8 text-center">
                                 <h3 className="text-2xl font-bold mb-4">
-                                    Vous n'avez pas trouvé votre réponse ?
+                                    {t('ctaTitle')}
                                 </h3>
                                 <p className="text-muted-foreground mb-6">
-                                    Notre équipe est disponible pour répondre à toutes vos questions.
+                                    {t('ctaSubtitle')}
                                 </p>
                                 <div className="flex flex-col sm:flex-row gap-4 justify-center">
                                     <a
@@ -136,14 +145,14 @@ export default async function FAQPage() {
                                         className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-primary text-white rounded-xl font-medium hover:bg-primary/90 transition-colors"
                                     >
                                         <Phone className="h-5 w-5" />
-                                        Nous appeler
+                                        {t('callUs')}
                                     </a>
                                     <a
                                         href="/#contact"
                                         className="inline-flex items-center justify-center gap-2 px-6 py-3 border border-primary text-primary rounded-xl font-medium hover:bg-primary/10 transition-colors"
                                     >
                                         <MapPin className="h-5 w-5" />
-                                        Nous rendre visite
+                                        {t('visitUs')}
                                     </a>
                                 </div>
                             </div>

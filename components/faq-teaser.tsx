@@ -1,3 +1,4 @@
+import { useTranslations } from 'next-intl'
 import { HelpCircle, ArrowRight } from 'lucide-react'
 import { Link } from '@/navigation'
 import ScrollAnimation from '@/components/ui/scroll-animation'
@@ -21,6 +22,7 @@ interface FaqTeaserProps {
  *   (rich snippets Google sur les questions/réponses).
  */
 export default function FaqTeaser({ data, sectionContent, limit = 5 }: FaqTeaserProps) {
+  const t = useTranslations('faqTeaser')
   const faqs = data && data.length > 0 ? data : faqFallback
   const visible = faqs.slice(0, limit)
 
@@ -57,16 +59,15 @@ export default function FaqTeaser({ data, sectionContent, limit = 5 }: FaqTeaser
         <ScrollAnimation variant="fadeUp" className="mb-12 text-center">
           <span className="mb-4 inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-4 py-1.5 text-sm font-semibold text-primary">
             <HelpCircle className="h-4 w-4" />
-            {sectionContent?.badge || 'Vos questions'}
+            {sectionContent?.badge || t('badge')}
           </span>
           <h2 className="mb-4 text-3xl font-bold sm:text-4xl md:text-5xl">
             <span className="text-foreground">
-              {sectionContent?.title || 'Questions fréquentes'}
+              {sectionContent?.title || t('title')}
             </span>
           </h2>
           <p className="mx-auto max-w-2xl text-base text-muted-foreground sm:text-lg">
-            {sectionContent?.subtitle ||
-              'Les réponses aux questions les plus posées par nos patients.'}
+            {sectionContent?.subtitle || t('subtitle')}
           </p>
         </ScrollAnimation>
 
@@ -96,7 +97,7 @@ export default function FaqTeaser({ data, sectionContent, limit = 5 }: FaqTeaser
             href="/faq"
             className="group inline-flex items-center justify-center gap-2 rounded-full border border-primary/30 bg-primary/5 px-6 py-3 text-sm font-semibold text-primary transition-all duration-300 hover:bg-primary/10 hover:shadow-md"
           >
-            Voir toutes les questions
+            {t('seeAll')}
             <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
           </Link>
         </div>

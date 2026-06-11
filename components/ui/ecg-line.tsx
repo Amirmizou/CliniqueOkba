@@ -42,6 +42,8 @@ export function ecgVariantForIcon(iconName?: string): ECGVariant {
   switch (iconName) {
     case 'ScanLine':
       return 'scan'
+    case 'Radiation':
+      return 'scan' // Médecine nucléaire
     case 'Smile':
       return 'dental'
     case 'Stethoscope':

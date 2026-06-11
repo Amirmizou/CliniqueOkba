@@ -2,6 +2,7 @@ import { notFound } from 'next/navigation'
 import SiteHeader from '@/components/site-header'
 import SiteFooter from '@/components/site-footer'
 import { getArticles, getArticleBySlug, getSiteSettings } from '@/sanity/lib/fetch'
+import { localizeSanityData } from '@/sanity/lib/localize'
 import { urlFor } from '@/sanity/lib/image'
 import Image from 'next/image'
 import { Link } from '@/navigation'
@@ -10,7 +11,7 @@ import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { PortableText } from '@portabletext/react'
 import ScrollAnimation from '@/components/ui/scroll-animation'
-import { CATEGORY_LABELS } from '@/lib/news'
+import { getTranslations } from 'next-intl/server'
 
 interface Article {
     _id: string
@@ -31,9 +32,9 @@ export async function generateStaticParams() {
     }))
 }
 
-export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
-    const { slug } = await params
-    const article: Article = await getArticleBySlug(slug)
+export async function generateMetadata({ params }: { params: Promise<{ slug: string; locale: string }> }) {
+    const { slug, locale } = await params
+    const article: Article = localizeSanityData(await getArticleBySlug(slug), locale)
 
     if (!article) {
         return { title: 'Article non trouvé' }
@@ -77,15 +78,17 @@ const portableTextComponents = {
     },
 }
 
-export default async function ArticlePage({ params }: { params: Promise<{ slug: string }> }) {
-    const { slug } = await params
-    const article: Article = await getArticleBySlug(slug)
+export default async function ArticlePage({ params }: { params: Promise<{ slug: string; locale: string }> }) {
+    const { slug, locale } = await params
+    const article: Article = localizeSanityData(await getArticleBySlug(slug), locale)
 
     if (!article) {
         notFound()
     }
 
-    const siteSettings = await getSiteSettings()
+    const t = await getTranslations('news')
+    const dateLocale = locale === 'ar' ? 'ar-DZ' : 'fr-FR'
+    const siteSettings = localizeSanityData(await getSiteSettings(), locale)
 
     return (
         <>
@@ -97,20 +100,20 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
                             <Link href="/actualites">
                                 <Button variant="ghost" className="mb-8 -ml-4">
                                     <ArrowLeft className="mr-2 h-4 w-4" />
-                                    Retour aux actualités
+                                    {t('backToNews')}
                                 </Button>
                             </Link>
 
                             <header className="mb-8">
-                                {article.category && CATEGORY_LABELS[article.category] && (
+                                {article.category && t.has(`cat.${article.category}`) && (
                                     <Badge className="mb-4 bg-primary text-primary-foreground">
-                                        {CATEGORY_LABELS[article.category]}
+                                        {t(`cat.${article.category}`)}
                                     </Badge>
                                 )}
                                 <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-muted-foreground mb-4">
                                     <span className="flex items-center gap-2">
                                         <Calendar className="h-4 w-4" />
-                                        {new Date(article.publishedAt).toLocaleDateString('fr-FR', {
+                                        {new Date(article.publishedAt).toLocaleDateString(dateLocale, {
                                             year: 'numeric',
                                             month: 'long',
                                             day: 'numeric',
@@ -160,7 +163,7 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
                                     <Link href="/actualites">
                                         <Button variant="outline">
                                             <ArrowLeft className="mr-2 h-4 w-4" />
-                                            Autres actualités
+                                            {t('otherNews')}
                                         </Button>
                                     </Link>
                                 </div>

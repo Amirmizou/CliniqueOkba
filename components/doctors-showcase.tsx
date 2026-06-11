@@ -1,6 +1,7 @@
 'use client'
 
 import { useRef, useState, type MouseEvent } from 'react'
+import { useTranslations, useLocale } from 'next-intl'
 import Image from 'next/image'
 import {
   motion,
@@ -42,23 +43,79 @@ const ICONS: Record<string, LucideIcon> = {
   FlaskConical,
 }
 
+/* Normalise un libellé pour la correspondance FR → AR (insensible à la casse,
+   aux civilités « Dr./Pr. », à la ponctuation et aux espaces multiples). */
+function normalizeKey(s?: string): string {
+  return (s || '')
+    .toLowerCase()
+    .replace(/\b(dr|pr|prof|docteur|professeur)\b\.?/g, '')
+    .replace(/[^\p{L}\p{N}]+/gu, ' ')
+    .trim()
+}
+
+/* Dictionnaires FR → AR construits à partir des données locales (data/doctors.ts).
+   Sert de filet de sécurité : même si le contenu Sanity n'a pas de champ _ar,
+   on retrouve la traduction arabe par correspondance sur le libellé français. */
+const AR_NAME = new Map<string, string>()
+const AR_SPECIALTY = new Map<string, string>()
+const AR_SUBTITLE = new Map<string, string>()
+const AR_EXPERIENCE = new Map<string, string>()
+const AR_DAYS = new Map<string, string>()
+const AR_HOURS = new Map<string, string>()
+const AR_SERVICE = new Map<string, string>()
+for (const d of doctors) {
+  if (d.name_ar) AR_NAME.set(normalizeKey(d.name), d.name_ar)
+  if (d.specialty_ar) AR_SPECIALTY.set(normalizeKey(d.specialty), d.specialty_ar)
+  if (d.subtitle_ar) AR_SUBTITLE.set(normalizeKey(d.subtitle), d.subtitle_ar)
+  if (d.experience_ar) AR_EXPERIENCE.set(normalizeKey(d.experience), d.experience_ar)
+  if (d.days_ar) AR_DAYS.set(normalizeKey(d.days), d.days_ar)
+  if (d.hours_ar) AR_HOURS.set(normalizeKey(d.hours), d.hours_ar)
+  if (d.services_ar) {
+    d.services.forEach((s, idx) => {
+      const ar = d.services_ar?.[idx]
+      if (ar) AR_SERVICE.set(normalizeKey(s), ar)
+    })
+  }
+}
+
+/* Traduit en arabe un médecin déjà résolu, via les dictionnaires FR → AR.
+   Si une valeur est déjà en arabe (Sanity localisé) ou inconnue, on la garde. */
+function toArabic(doc: Doctor): Doctor {
+  const tr = (map: Map<string, string>, v?: string) =>
+    (v && map.get(normalizeKey(v))) || v
+  return {
+    ...doc,
+    name: tr(AR_NAME, doc.name) || doc.name,
+    specialty: tr(AR_SPECIALTY, doc.specialty) || doc.specialty,
+    subtitle: tr(AR_SUBTITLE, doc.subtitle),
+    experience: tr(AR_EXPERIENCE, doc.experience),
+    days: tr(AR_DAYS, doc.days) || doc.days,
+    hours: tr(AR_HOURS, doc.hours) || doc.hours,
+    services: doc.services.map((s) => AR_SERVICE.get(normalizeKey(s)) || s),
+  }
+}
+
 /** Convertit les médecins Sanity en Doctor[] (repli sur les données locales) */
-function resolveDoctors(data?: any[]): Doctor[] {
-  if (!data || data.length === 0) return doctors
-  return data.map((d, i) => ({
-    id: d._id || String(i),
-    name: [d.title, d.name].filter(Boolean).join(' ').trim() || d.name,
-    specialty: d.specialty || '',
-    subtitle: d.subtitle || undefined,
-    services: Array.isArray(d.services) ? d.services : [],
-    experience: d.experience || undefined,
-    days: d.consultationDays || '',
-    hours: d.consultationHours || '',
-    poster: d.image ? urlFor(d.image).width(620).height(827).url() : '',
-    icon: ICONS[d.iconName] || Stethoscope,
-    accent: d.accentColor || '#006633',
-    gradient: '',
-  }))
+function resolveDoctors(data: any[] | undefined, locale: string): Doctor[] {
+  const base: Doctor[] =
+    !data || data.length === 0
+      ? doctors
+      : data.map((d, i) => ({
+          id: d._id || String(i),
+          name: [d.title, d.name].filter(Boolean).join(' ').trim() || d.name,
+          specialty: d.specialty || '',
+          subtitle: d.subtitle || undefined,
+          services: Array.isArray(d.services) ? d.services : [],
+          experience: d.experience || undefined,
+          days: d.consultationDays || '',
+          hours: d.consultationHours || '',
+          poster: d.image ? urlFor(d.image).width(620).height(827).url() : '',
+          icon: ICONS[d.iconName] || Stethoscope,
+          accent: d.accentColor || '#006633',
+          gradient: '',
+        }))
+
+  return locale === 'ar' ? base.map(toArabic) : base
 }
 
 /* -------------------------------------------------------------------------- */
@@ -74,6 +131,7 @@ function DoctorCard({
   index: number
   onOpen: (d: Doctor) => void
 }) {
+  const t = useTranslations('doctors')
   const ref = useRef<HTMLDivElement>(null)
   const [hovered, setHovered] = useState(false)
 
@@ -237,11 +295,11 @@ function DoctorCard({
               style={{ backgroundColor: doctor.accent }}
             >
               <MessageCircle className="h-4 w-4" />
-              Prendre RDV
+              {t('bookShort')}
             </a>
             <a
               href={`tel:${CLINIC_PHONE}`}
-              aria-label={`Appeler pour ${doctor.name}`}
+              aria-label={t('callFor', { name: doctor.name })}
               className="inline-flex items-center justify-center rounded-xl border px-3 py-2.5 text-foreground/80 transition-colors hover:bg-foreground/5"
               style={{ borderColor: `${doctor.accent}55` }}
             >
@@ -265,6 +323,7 @@ function PosterLightbox({
   doctor: Doctor
   onClose: () => void
 }) {
+  const tc = useTranslations('common')
   return (
     <motion.div
       initial={{ opacity: 0 }}
@@ -276,7 +335,7 @@ function PosterLightbox({
       <button
         type="button"
         onClick={onClose}
-        aria-label="Fermer"
+        aria-label={tc('close')}
         className="absolute right-5 top-5 flex h-11 w-11 items-center justify-center rounded-full bg-white/15 text-white backdrop-blur-md transition-colors hover:bg-white/30"
       >
         <X className="h-5 w-5" />
@@ -307,8 +366,10 @@ function PosterLightbox({
 /* -------------------------------------------------------------------------- */
 
 export default function DoctorsShowcase({ data }: { data?: any[] }) {
+  const t = useTranslations('doctors')
+  const locale = useLocale()
   const [active, setActive] = useState<Doctor | null>(null)
-  const list = resolveDoctors(data)
+  const list = resolveDoctors(data, locale)
 
   return (
     <section
@@ -325,16 +386,15 @@ export default function DoctorsShowcase({ data }: { data?: any[] }) {
           <div className="animate-item">
             <span className="mb-4 inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-4 py-1.5 text-sm font-semibold text-primary">
               <Sparkles className="h-4 w-4" />
-              Notre équipe médicale
+              {t('badge')}
             </span>
             <h2 className="mb-4 text-3xl font-bold sm:text-4xl md:text-5xl">
-              <span className="text-gradient">Des spécialistes</span>
+              <span className="text-gradient">{t('titleLine1')}</span>
               <br />
-              <span className="text-foreground">à votre écoute</span>
+              <span className="text-foreground">{t('titleLine2')}</span>
             </h2>
             <p className="mx-auto max-w-2xl text-base text-muted-foreground sm:text-lg">
-              Rencontrez les médecins de la Clinique OKBA. Survolez une carte pour
-              découvrir les prestations, ou cliquez sur l’affiche pour l’agrandir.
+              {t('subtitle')}
             </p>
           </div>
         </AnimatedSection>

@@ -12,6 +12,11 @@ export default defineType({
             validation: (Rule) => Rule.required(),
         }),
         defineField({
+            name: 'name_ar',
+            title: 'Nom du Service (AR)',
+            type: 'string',
+            }),
+        defineField({
             name: 'slug',
             title: 'Slug',
             type: 'slug',
@@ -24,8 +29,20 @@ export default defineType({
             rows: 2,
         }),
         defineField({
+            name: 'description_ar',
+            title: 'Description Courte (AR)',
+            type: 'text',
+            rows: 2,
+        }),
+        defineField({
             name: 'fullDescription',
             title: 'Description Complète',
+            type: 'array',
+            of: [{ type: 'block' }],
+        }),
+        defineField({
+            name: 'fullDescription_ar',
+            title: 'Description Complète (AR)',
             type: 'array',
             of: [{ type: 'block' }],
         }),

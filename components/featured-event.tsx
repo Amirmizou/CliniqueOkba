@@ -2,6 +2,7 @@
 
 import Image from 'next/image'
 import { motion } from 'framer-motion'
+import { useTranslations, useLocale } from 'next-intl'
 import { Link } from '@/navigation'
 import {
   CalendarDays,
@@ -12,10 +13,10 @@ import {
   Sparkles,
 } from 'lucide-react'
 import { urlFor } from '@/sanity/lib/image'
-import { EVENT_TYPE_LABELS, type ClinicEvent } from '@/lib/events'
+import { type ClinicEvent } from '@/lib/events'
 
-function formatDateTime(value: string) {
-  return new Date(value).toLocaleString('fr-FR', {
+function formatDateTime(value: string, dateLocale: string) {
+  return new Date(value).toLocaleString(dateLocale, {
     weekday: 'long',
     day: 'numeric',
     month: 'long',
@@ -25,17 +26,23 @@ function formatDateTime(value: string) {
   })
 }
 
-function countdownLabel(value: string): string {
-  const start = (d: Date) =>
-    new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime()
-  const diff = Math.round((start(new Date(value)) - start(new Date())) / 86400000)
-  if (diff <= 0) return "Aujourd'hui"
-  if (diff === 1) return 'Demain'
-  return `Dans ${diff} jours`
-}
-
 export default function FeaturedEvent({ event }: { event: ClinicEvent }) {
-  const typeLabel = event.eventType ? EVENT_TYPE_LABELS[event.eventType] : null
+  const t = useTranslations('events')
+  const locale = useLocale()
+  const dateLocale = locale === 'ar' ? 'ar-DZ' : 'fr-FR'
+  const typeLabel =
+    event.eventType && t.has(`type.${event.eventType}`)
+      ? t(`type.${event.eventType}`)
+      : null
+
+  const countdownLabel = (value: string): string => {
+    const start = (d: Date) =>
+      new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime()
+    const diff = Math.round((start(new Date(value)) - start(new Date())) / 86400000)
+    if (diff <= 0) return t('today')
+    if (diff === 1) return t('tomorrow')
+    return t('inDays', { count: diff })
+  }
 
   return (
     <section
@@ -51,10 +58,10 @@ export default function FeaturedEvent({ event }: { event: ClinicEvent }) {
         <div className="mb-10 text-center">
           <span className="mb-4 inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-4 py-1.5 text-sm font-semibold text-primary">
             <Sparkles className="h-4 w-4" />
-            À la une
+            {t('badge')}
           </span>
           <h2 className="text-3xl font-bold sm:text-4xl md:text-5xl">
-            <span className="text-gradient">Prochain événement</span>
+            <span className="text-gradient">{t('nextEvent')}</span>
           </h2>
         </div>
 
@@ -99,7 +106,7 @@ export default function FeaturedEvent({ event }: { event: ClinicEvent }) {
             <div className="flex flex-col justify-center gap-4 p-6 sm:p-8 md:p-10">
               <div className="inline-flex items-center gap-2 text-sm font-semibold text-primary">
                 <CalendarDays className="h-4 w-4 shrink-0" />
-                <span className="capitalize">{formatDateTime(event.startDate)}</span>
+                <span className="capitalize">{formatDateTime(event.startDate, dateLocale)}</span>
               </div>
 
               <h3 className="text-2xl font-bold leading-tight text-foreground sm:text-3xl">
@@ -120,8 +127,8 @@ export default function FeaturedEvent({ event }: { event: ClinicEvent }) {
                 {event.registrationDeadline && (
                   <li className="flex items-center gap-2">
                     <Clock className="h-4 w-4 shrink-0 text-primary" />
-                    Inscription avant le{' '}
-                    {new Date(event.registrationDeadline).toLocaleDateString('fr-FR')}
+                    {t('registerBefore')}{' '}
+                    {new Date(event.registrationDeadline).toLocaleDateString(dateLocale)}
                   </li>
                 )}
                 {event.contact && (
@@ -137,14 +144,14 @@ export default function FeaturedEvent({ event }: { event: ClinicEvent }) {
                   href={`/evenements/${event.slug.current}`}
                   className="inline-flex items-center gap-2 rounded-xl bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground shadow-md transition-transform duration-200 hover:scale-[1.03] active:scale-95"
                 >
-                  En savoir plus
+                  {t('learnMore')}
                   <ArrowRight className="h-4 w-4" />
                 </Link>
                 <Link
                   href="/evenements"
                   className="inline-flex items-center gap-1.5 text-sm font-semibold text-primary transition-colors hover:text-primary/80"
                 >
-                  Tous les événements
+                  {t('allEvents')}
                   <ArrowRight className="h-4 w-4" />
                 </Link>
               </div>

@@ -7,9 +7,14 @@ export default defineType({
     fields: [
         defineField({
             name: 'name',
-            title: 'Nom du Patient',
+            title: 'Nom du Patient (FR)',
             type: 'string',
             validation: (Rule) => Rule.required(),
+        }),
+        defineField({
+            name: 'name_ar',
+            title: 'Nom du Patient (AR)',
+            type: 'string',
         }),
         defineField({
             name: 'avatar',
@@ -26,16 +31,27 @@ export default defineType({
         }),
         defineField({
             name: 'comment',
-            title: 'Témoignage',
+            title: 'Témoignage (FR)',
             type: 'text',
             rows: 4,
             validation: (Rule) => Rule.required(),
         }),
         defineField({
+            name: 'comment_ar',
+            title: 'Témoignage (AR)',
+            type: 'text',
+            rows: 4,
+        }),
+        defineField({
             name: 'service',
-            title: 'Service Utilisé',
+            title: 'Service Utilisé (FR)',
             type: 'string',
             description: 'Ex: Radiologie, Chirurgie, Consultation...',
+        }),
+        defineField({
+            name: 'service_ar',
+            title: 'Service Utilisé (AR)',
+            type: 'string',
         }),
         defineField({
             name: 'date',

@@ -7,19 +7,35 @@ export default defineType({
     fields: [
         defineField({
             name: 'title',
-            title: 'Titre Principal',
+            title: 'Titre Principal (FR)',
             type: 'string',
             validation: (Rule) => Rule.required(),
             initialValue: 'Soins à Domicile',
         }),
         defineField({
+            name: 'title_ar',
+            title: 'Titre Principal (AR)',
+            type: 'string',
+        }),
+        defineField({
             name: 'subtitle',
-            title: 'Sous-titre',
+            title: 'Sous-titre (FR)',
+            type: 'string',
+        }),
+        defineField({
+            name: 'subtitle_ar',
+            title: 'Sous-titre (AR)',
             type: 'string',
         }),
         defineField({
             name: 'description',
-            title: 'Description',
+            title: 'Description (FR)',
+            type: 'text',
+            rows: 3,
+        }),
+        defineField({
+            name: 'description_ar',
+            title: 'Description (AR)',
             type: 'text',
             rows: 3,
         }),
@@ -31,7 +47,23 @@ export default defineType({
         }),
         defineField({
             name: 'services',
-            title: 'Services Proposés',
+            title: 'Services Proposés (FR)',
+            type: 'array',
+            of: [
+                {
+                    type: 'object',
+                    fields: [
+                        { name: 'name', title: 'Nom du Service', type: 'string' },
+                        { name: 'description', title: 'Description', type: 'text', rows: 2 },
+                        { name: 'icon', title: 'Icône (nom Lucide)', type: 'string' },
+                        { name: 'price', title: 'Prix', type: 'string' },
+                    ],
+                },
+            ],
+        }),
+        defineField({
+            name: 'services_ar',
+            title: 'Services Proposés (AR)',
             type: 'array',
             of: [
                 {
@@ -47,14 +79,29 @@ export default defineType({
         }),
         defineField({
             name: 'benefits',
-            title: 'Avantages',
+            title: 'Avantages (FR)',
             type: 'array',
             of: [{ type: 'string' }],
             description: 'Liste des avantages des soins à domicile',
         }),
         defineField({
+            name: 'benefits_ar',
+            title: 'Avantages (AR)',
+            type: 'array',
+            of: [{ type: 'string' }],
+        }),
+        defineField({
             name: 'callToAction',
-            title: 'Bouton d\'action',
+            title: 'Bouton d\'action (FR)',
+            type: 'object',
+            fields: [
+                { name: 'text', title: 'Texte', type: 'string' },
+                { name: 'phone', title: 'Numéro de téléphone', type: 'string' },
+            ],
+        }),
+        defineField({
+            name: 'callToAction_ar',
+            title: 'Bouton d\'action (AR)',
             type: 'object',
             fields: [
                 { name: 'text', title: 'Texte', type: 'string' },
@@ -63,9 +110,14 @@ export default defineType({
         }),
         defineField({
             name: 'availability',
-            title: 'Disponibilité',
+            title: 'Disponibilité (FR)',
             type: 'string',
             description: 'Ex: 24h/24 - 7j/7',
+        }),
+        defineField({
+            name: 'availability_ar',
+            title: 'Disponibilité (AR)',
+            type: 'string',
         }),
         defineField({
             name: 'active',

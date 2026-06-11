@@ -3,7 +3,7 @@ import Image from 'next/image'
 import { Link } from '@/navigation'
 import { motion } from 'framer-motion'
 import { Facebook, Instagram, Mail, MapPin, Phone, ArrowRight, HeartPulse } from 'lucide-react'
-import { useTranslations } from 'next-intl'
+import { useTranslations, useLocale } from 'next-intl'
 import { siteConfig as siteConfigFallback } from '@/data/site-config'
 import { poles } from '@/data/poles'
 import { cn } from '@/lib/utils'
@@ -29,6 +29,7 @@ interface FooterProps {
 export default function Footer({ siteSettings, footerContent }: FooterProps) {
   const t = useTranslations('footer')
   const tNav = useTranslations('nav')
+  const locale = useLocale()
 
   // Use Sanity data if available, otherwise fallback to static config
   const clinicData = {
@@ -113,7 +114,7 @@ export default function Footer({ siteSettings, footerContent }: FooterProps) {
               <div className="flex flex-col gap-1.5">
                 <span className='block text-2xl font-bold tracking-tight text-white drop-shadow-md'>Clinique <span className="text-primary">OKBA</span></span>
                 <span className='text-[10px] w-fit text-primary font-bold tracking-widest uppercase bg-primary/10 px-2.5 py-0.5 rounded-full border border-primary/20'>
-                  Excellence Médicale
+                  {tNav('tagline')}
                 </span>
               </div>
             </div>
@@ -165,15 +166,15 @@ export default function Footer({ siteSettings, footerContent }: FooterProps) {
               ))}
               {/* Additional pages */}
               {[
-                { name: 'Actualités', href: '/actualites' },
-                { name: 'Événements', href: '/evenements' },
-                { name: 'Équipe Médicale', href: '/equipe' },
-                { name: 'FAQ', href: '/faq' },
+                { key: 'news', href: '/actualites' },
+                { key: 'events', href: '/evenements' },
+                { key: 'team', href: '/equipe' },
+                { key: 'faq', href: '/faq' },
               ].map((item) => (
-                <li key={item.name}>
+                <li key={item.key}>
                   <a href={item.href} className='group flex items-center gap-3 text-sm text-slate-400 hover:text-white transition-all duration-300 hover:translate-x-1.5'>
                     <span className="w-1.5 h-1.5 rounded-full bg-slate-600 group-hover:bg-primary group-hover:w-3 transition-all duration-300" />
-                    {item.name}
+                    {tNav(item.key)}
                   </a>
                 </li>
               ))}
@@ -191,7 +192,7 @@ export default function Footer({ siteSettings, footerContent }: FooterProps) {
                 <li key={pole.slug}>
                   <Link href={`/poles/${pole.slug}`} className='group flex items-center gap-3 text-sm text-slate-400 hover:text-white transition-all duration-300 hover:translate-x-1.5'>
                     <HeartPulse className={cn("w-4 h-4 transition-colors", pole.urgent ? "text-red-500" : "text-slate-600 group-hover:text-secondary")} />
-                    <span className={pole.urgent ? "text-red-400 font-medium" : ""}>{pole.title}</span>
+                    <span className={pole.urgent ? "text-red-400 font-medium" : ""}>{locale === 'ar' && pole.title_ar ? pole.title_ar : pole.title}</span>
                   </Link>
                 </li>
               ))}

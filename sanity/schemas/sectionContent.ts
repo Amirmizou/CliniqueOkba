@@ -28,30 +28,57 @@ export default defineType({
         }),
         defineField({
             name: 'badge',
-            title: 'Badge / Label',
+            title: 'Badge / Label (FR)',
             type: 'string',
             description: 'Petit texte au-dessus du titre (ex: "Notre Excellence")',
         }),
         defineField({
+            name: 'badge_ar',
+            title: 'Badge / Label (AR)',
+            type: 'string',
+        }),
+        defineField({
             name: 'title',
-            title: 'Titre',
+            title: 'Titre (FR)',
+            type: 'string',
+        }),
+        defineField({
+            name: 'title_ar',
+            title: 'Titre (AR)',
             type: 'string',
         }),
         defineField({
             name: 'subtitle',
-            title: 'Sous-titre',
+            title: 'Sous-titre (FR)',
+            type: 'text',
+            rows: 2,
+        }),
+        defineField({
+            name: 'subtitle_ar',
+            title: 'Sous-titre (AR)',
             type: 'text',
             rows: 2,
         }),
         defineField({
             name: 'description',
-            title: 'Description',
+            title: 'Description (FR)',
+            type: 'text',
+            rows: 4,
+        }),
+        defineField({
+            name: 'description_ar',
+            title: 'Description (AR)',
             type: 'text',
             rows: 4,
         }),
         defineField({
             name: 'ctaText',
-            title: 'Texte du bouton CTA',
+            title: 'Texte du bouton CTA (FR)',
+            type: 'string',
+        }),
+        defineField({
+            name: 'ctaText_ar',
+            title: 'Texte du bouton CTA (AR)',
             type: 'string',
         }),
         defineField({

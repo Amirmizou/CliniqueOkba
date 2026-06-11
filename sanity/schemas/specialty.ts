@@ -12,8 +12,19 @@ export default defineType({
             validation: (Rule) => Rule.required(),
         }),
         defineField({
+            name: 'name_ar',
+            title: 'Nom (AR)',
+            type: 'string',
+            }),
+        defineField({
             name: 'description',
             title: 'Description',
+            type: 'text',
+            rows: 2,
+        }),
+        defineField({
+            name: 'description_ar',
+            title: 'Description (AR)',
             type: 'text',
             rows: 2,
         }),

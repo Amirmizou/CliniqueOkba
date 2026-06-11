@@ -12,6 +12,11 @@ export default defineType({
             validation: (Rule) => Rule.required(),
         }),
         defineField({
+            name: 'title_ar',
+            title: "Nom de l'événement (AR)",
+            type: 'string',
+        }),
+        defineField({
             name: 'slug',
             title: 'URL (slug)',
             type: 'slug',
@@ -44,8 +49,35 @@ export default defineType({
             description: 'Résumé affiché dans les listes',
         }),
         defineField({
+            name: 'description_ar',
+            title: 'Description (AR)',
+            type: 'text',
+            rows: 4,
+            description: 'Résumé affiché dans les listes',
+        }),
+        defineField({
             name: 'content',
             title: 'Contenu détaillé (facultatif)',
+            type: 'array',
+            of: [
+                {
+                    type: 'block',
+                    styles: [
+                        { title: 'Normal', value: 'normal' },
+                        { title: 'Titre 2', value: 'h2' },
+                        { title: 'Titre 3', value: 'h3' },
+                        { title: 'Citation', value: 'blockquote' },
+                    ],
+                },
+                {
+                    type: 'image',
+                    options: { hotspot: true },
+                },
+            ],
+        }),
+        defineField({
+            name: 'content_ar',
+            title: 'Contenu détaillé (facultatif) (AR)',
             type: 'array',
             of: [
                 {
@@ -77,6 +109,12 @@ export default defineType({
         defineField({
             name: 'location',
             title: 'Lieu',
+            type: 'string',
+            initialValue: 'Clinique OKBA, Ali Mendjeli, Constantine',
+        }),
+        defineField({
+            name: 'location_ar',
+            title: 'Lieu (AR)',
             type: 'string',
             initialValue: 'Clinique OKBA, Ali Mendjeli, Constantine',
         }),

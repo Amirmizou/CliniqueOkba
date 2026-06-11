@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { motion, useInView, animate, useReducedMotion } from 'framer-motion'
 import { ShieldCheck, Clock, Phone } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 import { siteConfig } from '@/data/site-config'
 
 interface TrustBandProps {
@@ -51,6 +52,7 @@ function StatValue({ raw }: { raw: string }) {
 }
 
 export default function TrustBand({ siteSettings }: TrustBandProps) {
+  const t = useTranslations('trustBand')
   const phoneDisplay = (siteSettings?.phone || siteConfig.contact.phone)
     .split('/')[0]
     .trim()
@@ -59,9 +61,9 @@ export default function TrustBand({ siteSettings }: TrustBandProps) {
   const weekdays = siteSettings?.hours?.weekdays || siteConfig.hours.consultation
 
   const statsFallback = [
-    { value: '6', label: 'Pôles d’excellence' },
-    { value: '24/7', label: 'Urgences' },
-    { value: '30+', label: 'Médecins' },
+    { value: '6', label: t('polesExcellence') },
+    { value: '24/7', label: t('emergencyStat') },
+    { value: '30+', label: t('doctorsStat') },
   ]
   const stats =
     siteSettings?.heroStats && siteSettings.heroStats.length > 0
@@ -99,15 +101,15 @@ export default function TrustBand({ siteSettings }: TrustBandProps) {
           <div className="grid border-t border-border/60 sm:grid-cols-3 lg:col-span-7 lg:border-t-0 lg:border-l">
             <TrustItem
               icon={<ShieldCheck className="h-5 w-5" />}
-              label="Urgences"
+              label={t('emergency')}
               value={emergency}
-              sub="Prise en charge immédiate"
+              sub={t('emergencySub')}
             />
             <TrustItem
               icon={<Clock className="h-5 w-5" />}
-              label="Consultations"
+              label={t('consultations')}
               value={weekdays}
-              sub="Du samedi au jeudi"
+              sub={t('consultationsSub')}
               className="border-t border-border/60 sm:border-l sm:border-t-0"
             />
             <a
@@ -119,12 +121,12 @@ export default function TrustBand({ siteSettings }: TrustBandProps) {
               </span>
               <span className="min-w-0">
                 <span className="block text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
-                  Téléphone
+                  {t('phone')}
                 </span>
                 <span className="block truncate font-semibold text-foreground" dir="ltr">
                   {phoneDisplay}
                 </span>
-                <span className="block text-xs text-muted-foreground">Appel direct</span>
+                <span className="block text-xs text-muted-foreground">{t('phoneSub')}</span>
               </span>
             </a>
           </div>

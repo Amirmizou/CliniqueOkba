@@ -1,6 +1,7 @@
 'use client'
 
-import { useRef, useState, type MouseEvent } from 'react'
+import { useRef, useState, type MouseEvent, type CSSProperties } from 'react'
+import { useTranslations, useLocale } from 'next-intl'
 import { motion, AnimatePresence, useMotionValue, useSpring, useTransform } from 'framer-motion'
 import {
   ScanLine,
@@ -32,6 +33,7 @@ import {
   UrgencesIcon,
   LaboratoireIcon,
   ChirurgieIcon,
+  NucleaireIcon,
 } from '@/components/icons/custom-pole-icons'
 
 const ICONS: Record<string, any> = {
@@ -41,6 +43,7 @@ const ICONS: Record<string, any> = {
   Siren: UrgencesIcon,
   FlaskConical: LaboratoireIcon,
   Eye: ChirurgieIcon,
+  Radiation: NucleaireIcon,
   ScanEye,
   Heart,
   Baby,
@@ -61,6 +64,7 @@ function resolvePoles(data?: any[]): Pole[] {
     accent: d.accentColor || '#006633',
     badge: d.badge || undefined,
     urgent: d.urgent ?? false,
+    featured: d.featured ?? false,
     galleryCategories: Array.isArray(d.galleryCategories) ? d.galleryCategories : [],
   }))
 }
@@ -70,8 +74,16 @@ function resolvePoles(data?: any[]): Pole[] {
 /* -------------------------------------------------------------------------- */
 
 function PoleCard({ pole, index }: { pole: Pole; index: number }) {
+  const t = useTranslations('poles')
+  const locale = useLocale()
   const ref = useRef<HTMLDivElement>(null)
   const [expanded, setExpanded] = useState(false)
+
+  const title = locale === 'ar' && pole.title_ar ? pole.title_ar : pole.title
+  const description = locale === 'ar' && pole.description_ar ? pole.description_ar : pole.description
+  const badge = locale === 'ar' && pole.badge_ar ? pole.badge_ar : pole.badge
+  const intro = locale === 'ar' && pole.intro_ar ? pole.intro_ar : pole.intro
+  const items = locale === 'ar' && pole.items_ar && pole.items_ar.length > 0 ? pole.items_ar : pole.items
 
   const mx = useMotionValue(0.5)
   const my = useMotionValue(0.5)
@@ -108,11 +120,13 @@ function PoleCard({ pole, index }: { pole: Pole; index: number }) {
       style={{ perspective: 1200 }}
       className="group relative h-full"
     >
-      {/* Halo coloré */}
+      {/* Halo coloré (toujours visible pour le pôle vedette) */}
       <div
-        className="absolute -inset-1.5 rounded-[1.75rem] opacity-0 blur-2xl transition-opacity duration-500 group-hover:opacity-60"
+        className={`absolute -inset-1.5 rounded-[1.75rem] blur-2xl transition-opacity duration-500 group-hover:opacity-70 ${
+          pole.featured ? 'opacity-50' : 'opacity-0'
+        }`}
         style={{
-          background: `radial-gradient(60% 60% at 50% 0%, ${pole.accent}55, transparent 70%)`,
+          background: `radial-gradient(60% 60% at 50% 0%, ${pole.accent}66, transparent 70%)`,
         }}
       />
 
@@ -120,11 +134,20 @@ function PoleCard({ pole, index }: { pole: Pole; index: number }) {
         ref={ref}
         onMouseMove={handleMove}
         onMouseLeave={handleLeave}
-        style={{ rotateX, rotateY, transformStyle: 'preserve-3d' }}
+        style={{
+          rotateX,
+          rotateY,
+          transformStyle: 'preserve-3d',
+          ...(pole.featured
+            ? ({ '--tw-ring-color': `${pole.accent}66` } as CSSProperties)
+            : {}),
+        }}
         className={`relative flex h-full flex-col overflow-hidden rounded-3xl border bg-white/70 p-6 shadow-lg backdrop-blur-md transition-colors dark:bg-white/5 sm:p-7 ${
           pole.urgent
             ? 'border-red-400/40 ring-1 ring-red-400/30'
-            : 'border-white/40 dark:border-white/10'
+            : pole.featured
+              ? 'border-transparent shadow-xl ring-2'
+              : 'border-white/40 dark:border-white/10'
         }`}
       >
         {/* Motif animé propre au domaine du pôle (fond) */}
@@ -132,6 +155,16 @@ function PoleCard({ pole, index }: { pole: Pole; index: number }) {
 
         {/* Bandeau accent haut */}
         <div className="absolute inset-x-0 top-0 h-1.5" style={{ background: pole.accent }} />
+
+        {/* Ruban « À la une » pour le pôle vedette */}
+        {pole.featured && !pole.urgent && (
+          <span
+            className="absolute right-0 top-0 z-10 rounded-bl-xl rounded-tr-3xl px-3 py-1 text-[0.65rem] font-bold uppercase tracking-wider text-white shadow-md"
+            style={{ background: pole.accent }}
+          >
+            {t('featured')}
+          </span>
+        )}
 
         {/* Icône (battement de cœur) + badge */}
         <div className="mb-5 flex items-start justify-between">
@@ -149,7 +182,7 @@ function PoleCard({ pole, index }: { pole: Pole; index: number }) {
           >
             <Icon className="h-7 w-7" />
           </motion.div>
-          {pole.badge && (
+          {badge && (
             <span
               className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-bold ${
                 pole.urgent ? 'text-white' : 'text-foreground/80'
@@ -162,19 +195,19 @@ function PoleCard({ pole, index }: { pole: Pole; index: number }) {
                   <span className="relative inline-flex h-2 w-2 rounded-full bg-white" />
                 </span>
               )}
-              {pole.badge}
+              {badge}
             </span>
           )}
         </div>
 
         {/* Titre + description */}
-        <h3 className="text-xl font-bold leading-tight text-foreground">{pole.title}</h3>
+        <h3 className="text-xl font-bold leading-tight text-foreground">{title}</h3>
         <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-          {pole.description}
+          {description}
         </p>
 
         {/* Accordéon : prestations / actes */}
-        {pole.items.length > 0 && (
+        {items.length > 0 && (
           <div className="mt-4">
             <button
               type="button"
@@ -184,7 +217,7 @@ function PoleCard({ pole, index }: { pole: Pole; index: number }) {
               style={{ backgroundColor: `${pole.accent}12`, color: pole.accent }}
             >
               <Activity className="h-3.5 w-3.5" />
-              {pole.items.length} prestation{pole.items.length > 1 ? 's' : ''}
+              {t('prestations', { count: items.length })}
               <ChevronDown
                 className={`h-3.5 w-3.5 transition-transform duration-300 ${
                   expanded ? 'rotate-180' : ''
@@ -202,7 +235,7 @@ function PoleCard({ pole, index }: { pole: Pole; index: number }) {
                   className="overflow-hidden"
                 >
                   <div className="mt-3 space-y-2">
-                    {pole.items.map((item, i) => (
+                    {items.map((item, i) => (
                       <motion.li
                         key={item}
                         initial={{ opacity: 0, x: -8 }}
@@ -231,7 +264,7 @@ function PoleCard({ pole, index }: { pole: Pole; index: number }) {
             className="inline-flex items-center gap-1.5 text-sm font-semibold transition-colors"
             style={{ color: pole.accent }}
           >
-            Découvrir le pôle
+            {t('discover')}
             <ArrowRight className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-1" />
           </Link>
           {pole.urgent && (
@@ -241,7 +274,7 @@ function PoleCard({ pole, index }: { pole: Pole; index: number }) {
               style={{ backgroundColor: pole.accent }}
             >
               <Phone className="h-4 w-4" />
-              Appeler
+              {t('call')}
             </a>
           )}
         </div>
@@ -260,6 +293,7 @@ function PoleCard({ pole, index }: { pole: Pole; index: number }) {
 /* -------------------------------------------------------------------------- */
 
 export default function Poles({ data }: { data?: any[] }) {
+  const t = useTranslations('poles')
   const [list] = useState(() => resolvePoles(data))
 
   return (
@@ -279,21 +313,19 @@ export default function Poles({ data }: { data?: any[] }) {
                 <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary opacity-75" />
                 <span className="relative inline-flex h-2 w-2 rounded-full bg-primary" />
               </span>
-              Une clinique pluridisciplinaire
+              {t('badge')}
             </span>
             <h2 className="mb-4 text-3xl font-bold sm:text-4xl md:text-5xl">
-              <span className="text-gradient">Nos Pôles</span>
+              <span className="text-gradient">{t('titleLine1')}</span>
               <br />
-              <span className="text-foreground">d’Excellence</span>
+              <span className="text-foreground">{t('titleLine2')}</span>
             </h2>
             {/* Ligne ECG sous le titre */}
             <div className="mx-auto mb-4 h-8 max-w-md">
               <ECGLine height={32} />
             </div>
             <p className="mx-auto max-w-2xl text-base text-muted-foreground sm:text-lg">
-              De l’imagerie de pointe aux urgences 24h/24, en passant par le pôle
-              dentaire complet et le laboratoire : déployez chaque pôle pour voir le
-              détail des prestations.
+              {t('subtitle')}
             </p>
           </div>
         </AnimatedSection>

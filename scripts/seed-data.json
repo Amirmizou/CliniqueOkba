@@ -63,7 +63,8 @@
     { "name": "Nadia S.", "rating": 5, "comment": "Suivi de grossesse impeccable, médecins attentionnés et plateau technique moderne. Je recommande vivement.", "service": "Gynécologie", "verified": true, "featured": true }
   ],
   "poles": [
-    { "slug": "imagerie", "title": "Imagerie médicale de pointe", "description": "Un plateau d’imagerie complet pour des diagnostics rapides et précis.", "items": ["Scanner (TDM)", "IRM", "Mammographie", "Radiologie numérique", "Échographie", "Scintigraphie"], "iconName": "ScanLine", "accentColor": "#3B82F6", "galleryCategories": ["imagerie"] },
+    { "slug": "imagerie", "title": "Imagerie médicale de pointe", "description": "Un plateau d’imagerie complet pour des diagnostics rapides et précis.", "items": ["Scanner (TDM)", "IRM", "Mammographie", "Radiologie numérique", "Échographie"], "iconName": "ScanLine", "accentColor": "#3B82F6", "galleryCategories": ["imagerie"] },
+    { "slug": "medecine-nucleaire", "title": "Médecine nucléaire", "description": "Un pôle d’excellence équipé du SPECT/CT Siemens Symbia Pro.specta pour une imagerie fonctionnelle de haute précision.", "items": ["Scintigraphie osseuse", "Scintigraphie cardiaque", "Scintigraphie thyroïdienne", "Scintigraphie rénale", "Imagerie hybride SPECT/CT"], "iconName": "Radiation", "accentColor": "#0D9488", "badge": "SPECT/CT · Nouveau", "featured": true, "galleryCategories": ["nucleaire"] },
     { "slug": "dentaire", "title": "Pôle dentaire", "description": "Toutes les spécialités dentaires réunies sous un même toit.", "items": ["Consultation dentaire", "Chirurgie dentaire", "Orthodontie (ODF)", "Prothèse dentaire"], "iconName": "Smile", "accentColor": "#06B6D4", "galleryCategories": [] },
     { "slug": "consultations", "title": "Consultations spécialisées", "description": "Des médecins spécialistes à votre écoute pour un suivi personnalisé.", "items": ["Gynécologie-obstétrique", "Endocrinologie", "Pédiatrie", "Médecine interne", "ORL"], "iconName": "Stethoscope", "accentColor": "#A855F7", "galleryCategories": ["consultation"] },
     { "slug": "urgences", "title": "Urgences 24h/24", "description": "Une équipe médicale de garde, disponible jour et nuit, 7j/7.", "items": ["Accueil permanent", "Équipe de garde", "Prise en charge immédiate"], "iconName": "Siren", "accentColor": "#EF4444", "badge": "24h/24 · 7j/7", "urgent": true, "galleryCategories": ["accueil"] },
@@ -194,7 +195,7 @@
   "facilityPhotos": [
     { "file": "eq-03", "title": "Scanner Siemens SOMATOM go.Top", "description": "Scanner haute définition pour des images en coupes ultra-précises, en quelques secondes.", "category": "imagerie", "featured": true },
     { "file": "eq-33", "title": "IRM Siemens", "description": "Imagerie par résonance magnétique dans un environnement apaisant (plafond panoramique).", "category": "imagerie", "featured": true },
-    { "file": "eq-02", "title": "Gamma caméra – Scintigraphie", "description": "Médecine nucléaire : exploration fonctionnelle des organes par imagerie isotopique.", "category": "imagerie", "featured": true },
+    { "file": "eq-02", "title": "SPECT/CT Siemens Symbia Pro.specta", "description": "Caméra hybride de médecine nucléaire couplant scintigraphie (SPECT) et scanner (CT) : imagerie fonctionnelle et anatomique en un seul examen, pour une localisation et un diagnostic d’une précision exceptionnelle.", "category": "nucleaire", "featured": true },
     { "file": "eq-35", "title": "Mammographe numérique", "description": "Dépistage et diagnostic du sein avec un faible niveau d’irradiation.", "category": "imagerie", "featured": false },
     { "file": "eq-40", "title": "Salle de radiologie", "description": "Radiographie numérique pour os, thorax et explorations courantes.", "category": "imagerie", "featured": false },
     { "file": "eq-43", "title": "Capteur de radiographie numérique", "description": "Tube et capteur plan dynamique pour des clichés nets et immédiats.", "category": "imagerie", "featured": false },
@@ -202,7 +203,7 @@
     { "file": "eq-37", "title": "IRM – poste de contrôle", "description": "Supervision de l’examen depuis la salle technique vitrée.", "category": "imagerie", "featured": false },
     { "file": "eq-04", "title": "Scanner – vue de la salle", "description": "Salle de scanner spacieuse et entièrement aux normes radioprotection.", "category": "imagerie", "featured": false },
     { "file": "eq-31", "title": "Scanner – salle d’examen", "description": "Environnement lumineux pensé pour le confort du patient.", "category": "imagerie", "featured": false },
-    { "file": "eq-08", "title": "Médecine nucléaire", "description": "Détecteurs double tête de la gamma caméra pour la scintigraphie.", "category": "imagerie", "featured": false },
+    { "file": "eq-08", "title": "Détecteurs SPECT double tête", "description": "Têtes de détection double du Symbia Pro.specta pour l’exploration isotopique des organes (os, cœur, thyroïde, reins…).", "category": "nucleaire", "featured": false },
 
     { "file": "eq-09", "title": "Bloc opératoire", "description": "Table chirurgicale, bras plafonniers et éclairage scialytique de haute précision.", "category": "bloc", "featured": true },
     { "file": "eq-11", "title": "Salle d’opération", "description": "Salle aux normes d’asepsie, équipée pour la chirurgie spécialisée.", "category": "bloc", "featured": false },

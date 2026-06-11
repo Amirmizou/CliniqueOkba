@@ -31,6 +31,12 @@ export default defineType({
             validation: (Rule) => Rule.max(70),
         }),
         defineField({
+            name: 'metaTitle_ar',
+            title: 'Meta Title (AR)',
+            type: 'string',
+            description: 'Titre pour les moteurs de recherche (50-60 caractères)',
+            }),
+        defineField({
             name: 'metaDescription',
             title: 'Meta Description',
             type: 'text',
@@ -38,6 +44,13 @@ export default defineType({
             description: 'Description pour les moteurs de recherche (150-160 caractères)',
             validation: (Rule) => Rule.max(170),
         }),
+        defineField({
+            name: 'metaDescription_ar',
+            title: 'Meta Description (AR)',
+            type: 'text',
+            rows: 3,
+            description: 'Description pour les moteurs de recherche (150-160 caractères)',
+            }),
         defineField({
             name: 'ogImage',
             title: 'Image OpenGraph',
@@ -51,8 +64,19 @@ export default defineType({
             of: [{ type: 'string' }],
         }),
         defineField({
+            name: 'keywords_ar',
+            title: 'Mots-clés (AR)',
+            type: 'array',
+            of: [{ type: 'string' }],
+        }),
+        defineField({
             name: 'canonicalUrl',
             title: 'URL Canonique',
+            type: 'url',
+        }),
+        defineField({
+            name: 'canonicalUrl_ar',
+            title: 'URL Canonique (AR)',
             type: 'url',
         }),
         defineField({

@@ -17,19 +17,6 @@ interface LazyComponentProps {
 }
 
 // Loading skeletons
-const MedicalTechSkeleton = () => (
-    <div className="py-20 px-4">
-        <div className="max-w-7xl mx-auto space-y-8">
-            <Skeleton className="h-12 w-64 mx-auto" />
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {[...Array(6)].map((_, i) => (
-                    <Skeleton key={i} className="h-64 w-full" />
-                ))}
-            </div>
-        </div>
-    </div>
-)
-
 const HomeCareSkeleton = () => (
     <div className="py-20 px-4">
         <Skeleton className="h-96 w-full max-w-7xl mx-auto" />
@@ -63,11 +50,6 @@ const TestimonialsSkeleton = () => (
 )
 
 // Dynamic imports with proper typing
-const MedicalTechnologyComponent = dynamic<LazyComponentProps>(
-    () => import('@/components/medical-technology').then(mod => mod.default as ComponentType<LazyComponentProps>),
-    { loading: MedicalTechSkeleton, ssr: false }
-)
-
 const HomeCareComponent = dynamic<LazyComponentProps>(
     () => import('@/components/home-care').then(mod => mod.default as ComponentType<LazyComponentProps>),
     { loading: HomeCareSkeleton, ssr: false }
@@ -84,10 +66,6 @@ const EquipementsGalleryComponent = dynamic<{ data?: any[] }>(
 )
 
 // Export wrapper components that forward props
-export function LazyMedicalTechnology({ data, sectionContent }: LazyComponentProps) {
-    return <MedicalTechnologyComponent data={data} sectionContent={sectionContent} />
-}
-
 export function LazyHomeCare({ data, sectionContent }: LazyComponentProps) {
     return <HomeCareComponent data={data} sectionContent={sectionContent} />
 }

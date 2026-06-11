@@ -12,6 +12,11 @@ export default defineType({
             validation: (Rule) => Rule.required(),
         }),
         defineField({
+            name: 'title_ar',
+            title: 'Titre (AR)',
+            type: 'string',
+        }),
+        defineField({
             name: 'slug',
             title: 'URL (slug)',
             type: 'slug',
@@ -29,8 +34,34 @@ export default defineType({
             description: 'Court résumé affiché dans les listes',
         }),
         defineField({
+            name: 'excerpt_ar',
+            title: 'Extrait (AR)',
+            type: 'text',
+            rows: 3,
+        }),
+        defineField({
             name: 'content',
             title: 'Contenu',
+            type: 'array',
+            of: [
+                {
+                    type: 'block',
+                    styles: [
+                        { title: 'Normal', value: 'normal' },
+                        { title: 'Titre 2', value: 'h2' },
+                        { title: 'Titre 3', value: 'h3' },
+                        { title: 'Citation', value: 'blockquote' },
+                    ],
+                },
+                {
+                    type: 'image',
+                    options: { hotspot: true },
+                },
+            ],
+        }),
+        defineField({
+            name: 'content_ar',
+            title: 'Contenu (AR)',
             type: 'array',
             of: [
                 {

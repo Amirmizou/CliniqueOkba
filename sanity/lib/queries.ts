@@ -9,7 +9,9 @@ export const heroSlidesQuery = groq`
   *[_type == "heroSlide" && active == true] | order(order asc) {
     _id,
     title,
+    title_ar,
     subtitle,
+    subtitle_ar,
     image,
     order
   }
@@ -22,16 +24,29 @@ export const heroSlidesQuery = groq`
 export const aboutSectionQuery = groq`
   *[_type == "aboutSection"][0] {
     title,
+    title_ar,
     subtitle,
+    subtitle_ar,
     description,
+    description_ar,
     mission,
+    mission_ar,
     vision,
+    vision_ar,
     values[] {
+      ...,
+    },
+    values_ar[] {
       title,
+    title_ar,
       description,
+    description_ar,
       icon
     },
     stats[] {
+      ...,
+    },
+    stats_ar[] {
       value,
       label,
       icon
@@ -49,8 +64,10 @@ export const servicesQuery = groq`
   *[_type == "service" && active == true] | order(order asc) {
     _id,
     name,
+    name_ar,
     slug,
     description,
+    description_ar,
     fullDescription,
     icon,
     image,
@@ -66,8 +83,10 @@ export const featuredServicesQuery = groq`
   *[_type == "service" && active == true && featured == true] | order(order asc) {
     _id,
     name,
+    name_ar,
     slug,
     description,
+    description_ar,
     icon,
     image
   }
@@ -77,8 +96,10 @@ export const serviceBySlugQuery = groq`
   *[_type == "service" && slug.current == $slug][0] {
     _id,
     name,
+    name_ar,
     slug,
     description,
+    description_ar,
     fullDescription,
     icon,
     image,
@@ -97,10 +118,12 @@ export const equipmentQuery = groq`
   *[_type == "equipment"] | order(order asc) {
     _id,
     name,
+    name_ar,
     brand,
     model,
     category,
     description,
+    description_ar,
     icon,
     image,
     features
@@ -115,14 +138,19 @@ export const polesQuery = groq`
   *[_type == "pole" && active == true] | order(order asc) {
     _id,
     title,
+    title_ar,
     "slug": slug.current,
     description,
+    description_ar,
     items,
+    items_ar,
     iconName,
     accentColor,
     galleryCategories,
     badge,
-    urgent
+    badge_ar,
+    urgent,
+    featured
   }
 `
 
@@ -134,7 +162,9 @@ export const specialtiesQuery = groq`
   *[_type == "specialty"] | order(order asc) {
     _id,
     name,
+    name_ar,
     description,
+    description_ar,
     icon,
     image
   }
@@ -148,10 +178,13 @@ export const testimonialsQuery = groq`
   *[_type == "testimonial" && active == true] | order(order asc) {
     _id,
     name,
+    name_ar,
     avatar,
     rating,
     comment,
+    comment_ar,
     service,
+    service_ar,
     date,
     verified,
     featured
@@ -162,10 +195,13 @@ export const featuredTestimonialsQuery = groq`
   *[_type == "testimonial" && active == true && featured == true] | order(rating desc)[0...5] {
     _id,
     name,
+    name_ar,
     avatar,
     rating,
     comment,
+    comment_ar,
     service,
+    service_ar,
     verified
   }
 `
@@ -177,16 +213,25 @@ export const featuredTestimonialsQuery = groq`
 export const homeCareQuery = groq`
   *[_type == "homeCare" && active == true][0] {
     title,
+    title_ar,
     subtitle,
+    subtitle_ar,
     description,
+    description_ar,
     image,
     services[] {
+      ...,
+    },
+    services_ar[] {
       name,
+    name_ar,
       description,
+    description_ar,
       icon,
       price
     },
     benefits,
+    benefits_ar,
     callToAction {
       text,
       phone
@@ -214,7 +259,9 @@ export const facilityPhotosQuery = groq`
     _id,
     image,
     title,
+    title_ar,
     description,
+    description_ar,
     category,
     featured
   }
@@ -228,6 +275,7 @@ export const articlesQuery = groq`
   *[_type == "article" && published == true] | order(publishedAt desc) {
     _id,
     title,
+    title_ar,
     slug,
     excerpt,
     image,
@@ -241,6 +289,7 @@ export const articleBySlugQuery = groq`
   *[_type == "article" && slug.current == $slug][0] {
     _id,
     title,
+    title_ar,
     slug,
     excerpt,
     content,
@@ -259,9 +308,11 @@ export const eventsQuery = groq`
   *[_type == "event" && published == true] | order(startDate asc) {
     _id,
     title,
+    title_ar,
     slug,
     eventType,
     description,
+    description_ar,
     startDate,
     endDate,
     location,
@@ -275,9 +326,11 @@ export const eventBySlugQuery = groq`
   *[_type == "event" && slug.current == $slug][0] {
     _id,
     title,
+    title_ar,
     slug,
     eventType,
     description,
+    description_ar,
     content,
     startDate,
     endDate,
@@ -296,18 +349,29 @@ export const doctorsQuery = groq`
   *[_type == "doctor" && active == true] | order(order asc) {
     _id,
     name,
+    name_ar,
     slug,
     specialty,
+    specialty_ar,
     title,
+    title_ar,
     subtitle,
+    subtitle_ar,
     image,
     bio,
+    bio_ar,
     experience,
+    experience_ar,
     services,
+    services_ar,
     qualifications,
+    qualifications_ar,
     languages,
+    languages_ar,
     consultationDays,
+    consultationDays_ar,
     consultationHours,
+    consultationHours_ar,
     accentColor,
     iconName
   }
@@ -317,13 +381,19 @@ export const doctorBySlugQuery = groq`
   *[_type == "doctor" && slug.current == $slug][0] {
     _id,
     name,
+    name_ar,
     slug,
     specialty,
+    specialty_ar,
     title,
+    title_ar,
     image,
     bio,
+    bio_ar,
     qualifications,
+    qualifications_ar,
     languages,
+    languages_ar,
     consultationDays
   }
 `
@@ -336,7 +406,9 @@ export const faqQuery = groq`
   *[_type == "faq" && active == true] | order(order asc) {
     _id,
     question,
+    question_ar,
     answer,
+    answer_ar,
     category
   }
 `
@@ -348,15 +420,22 @@ export const faqQuery = groq`
 export const insuranceSectionQuery = groq`
   *[_type == "insuranceSection" && active == true][0] {
     badge,
+    badge_ar,
     title,
+    title_ar,
     subtitle,
+    subtitle_ar,
     providers[] {
       name,
+    name_ar,
       description,
+    description_ar,
       logo
     },
     note,
-    ctaText
+    note_ar,
+    ctaText,
+    ctaText_ar
   }
 `
 
@@ -367,13 +446,17 @@ export const insuranceSectionQuery = groq`
 export const siteSettingsQuery = groq`
   *[_type == "siteSettings"][0] {
     clinicName,
+    clinicName_ar,
     description,
+    description_ar,
     logo,
     phone,
     whatsappNumber,
     appointmentMessage,
+    appointmentMessage_ar,
     email,
     address,
+    address_ar,
     coordinates {
       lat,
       lng
@@ -388,6 +471,9 @@ export const siteSettingsQuery = groq`
       instagram
     },
     heroStats[] {
+      ...,
+    },
+    heroStats_ar[] {
       value,
       label
     }
@@ -402,10 +488,15 @@ export const sectionContentQuery = groq`
   *[_type == "sectionContent" && sectionId == $sectionId][0] {
     sectionId,
     badge,
+    badge_ar,
     title,
+    title_ar,
     subtitle,
+    subtitle_ar,
     description,
+    description_ar,
     ctaText,
+    ctaText_ar,
     ctaLink,
     "videoUrl": videoFile.asset->url,
     videoPoster
@@ -416,10 +507,15 @@ export const allSectionContentsQuery = groq`
   *[_type == "sectionContent"] {
     sectionId,
     badge,
+    badge_ar,
     title,
+    title_ar,
     subtitle,
+    subtitle_ar,
     description,
+    description_ar,
     ctaText,
+    ctaText_ar,
     ctaLink,
     "videoUrl": videoFile.asset->url,
     videoPoster
@@ -433,21 +529,34 @@ export const allSectionContentsQuery = groq`
 export const footerContentQuery = groq`
   *[_type == "footerContent"][0] {
     description,
+    description_ar,
     quickLinks[] {
+      ...,
+    },
+    quickLinks_ar[] {
       label,
       href
     },
     servicesLinks[] {
+      ...,
+    },
+    servicesLinks_ar[] {
       label,
       href
     },
     legalLinks[] {
+      ...,
+    },
+    legalLinks_ar[] {
       label,
       href
     },
     copyright,
+    copyright_ar,
     newsletterTitle,
+    newsletterTitle_ar,
     newsletterDescription,
+    newsletterDescription_ar,
     showNewsletter
   }
 `

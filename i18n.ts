@@ -1,11 +1,10 @@
 import { getRequestConfig } from 'next-intl/server'
 
-export const locales = ['fr'] as const
+export const locales = ['fr', 'ar'] as const
 export type Locale = (typeof locales)[number]
 
 export default getRequestConfig(async ({ locale }) => {
-  // Since app is French-only, always use 'fr'
-  const validLocale = 'fr'
+  const validLocale: string = typeof locale === 'string' && locales.includes(locale as Locale) ? locale : 'fr'
 
   return {
     locale: validLocale,

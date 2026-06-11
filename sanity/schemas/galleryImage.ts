@@ -20,6 +20,11 @@ export default defineType({
             type: 'string',
         }),
         defineField({
+            name: 'caption_ar',
+            title: 'Légende (AR)',
+            type: 'string',
+        }),
+        defineField({
             name: 'category',
             title: 'Catégorie',
             type: 'string',

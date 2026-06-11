@@ -7,13 +7,24 @@ export default defineType({
     fields: [
         defineField({
             name: 'clinicName',
-            title: 'Nom de la Clinique',
+            title: 'Nom de la Clinique (FR)',
             type: 'string',
             validation: (Rule) => Rule.required(),
         }),
         defineField({
+            name: 'clinicName_ar',
+            title: 'Nom de la Clinique (AR)',
+            type: 'string',
+        }),
+        defineField({
             name: 'description',
-            title: 'Description',
+            title: 'Description (FR)',
+            type: 'text',
+            rows: 3,
+        }),
+        defineField({
+            name: 'description_ar',
+            title: 'Description (AR)',
             type: 'text',
             rows: 3,
         }),
@@ -36,9 +47,15 @@ export default defineType({
         }),
         defineField({
             name: 'appointmentMessage',
-            title: 'Message WhatsApp pré-rempli (Rendez-vous)',
+            title: 'Message WhatsApp pré-rempli (Rendez-vous) (FR)',
             description:
                 'Phrase d’introduction du message de demande de rendez-vous. Laisser vide pour utiliser le message par défaut.',
+            type: 'text',
+            rows: 2,
+        }),
+        defineField({
+            name: 'appointmentMessage_ar',
+            title: 'Message WhatsApp pré-rempli (Rendez-vous) (AR)',
             type: 'text',
             rows: 2,
         }),
@@ -49,7 +66,13 @@ export default defineType({
         }),
         defineField({
             name: 'address',
-            title: 'Adresse',
+            title: 'Adresse (FR)',
+            type: 'text',
+            rows: 2,
+        }),
+        defineField({
+            name: 'address_ar',
+            title: 'Adresse (AR)',
             type: 'text',
             rows: 2,
         }),
@@ -64,7 +87,17 @@ export default defineType({
         }),
         defineField({
             name: 'hours',
-            title: 'Horaires',
+            title: 'Horaires (FR)',
+            type: 'object',
+            fields: [
+                { name: 'emergency', title: 'Urgences', type: 'string' },
+                { name: 'weekdays', title: 'Jours ouvrables', type: 'string' },
+                { name: 'saturday', title: 'Vendredi/Samedi', type: 'string' },
+            ],
+        }),
+        defineField({
+            name: 'hours_ar',
+            title: 'Horaires (AR)',
             type: 'object',
             fields: [
                 { name: 'emergency', title: 'Urgences', type: 'string' },
@@ -83,8 +116,25 @@ export default defineType({
         }),
         defineField({
             name: 'heroStats',
-            title: 'Statistiques (bandeau Accueil)',
+            title: 'Statistiques (bandeau Accueil) (FR)',
             description: 'Chiffres-clés affichés sous le hero (ex : 8 Spécialités, 24/7 Urgences)',
+            type: 'array',
+            of: [
+                {
+                    type: 'object',
+                    fields: [
+                        { name: 'value', title: 'Valeur', type: 'string' },
+                        { name: 'label', title: 'Libellé', type: 'string' },
+                    ],
+                    preview: {
+                        select: { title: 'value', subtitle: 'label' },
+                    },
+                },
+            ],
+        }),
+        defineField({
+            name: 'heroStats_ar',
+            title: 'Statistiques (bandeau Accueil) (AR)',
             type: 'array',
             of: [
                 {

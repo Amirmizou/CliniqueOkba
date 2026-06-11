@@ -14,6 +14,7 @@ import {
     CalendarHeart,
 } from 'lucide-react'
 import Image from 'next/image'
+import { useTranslations } from 'next-intl'
 import { useReducedMotion } from '@/hooks/use-reduced-motion'
 import { urlFor } from '@/sanity/lib/image'
 import { siteConfig } from '@/data/site-config'
@@ -41,6 +42,7 @@ interface HeroCarouselProps {
 }
 
 export default function HeroCarousel({ slides: rawSlides = [], siteSettings, sectionContent }: HeroCarouselProps) {
+    const t = useTranslations('hero')
     const slides = rawSlides
         .map((slide, index) => ({
             id: slide._id || String(index),
@@ -113,9 +115,9 @@ export default function HeroCarousel({ slides: rawSlides = [], siteSettings, sec
         return (
             <section className="relative flex min-h-screen items-center justify-center bg-gradient-to-br from-primary/10 via-background to-primary/5">
                 <div className="px-4 text-center">
-                    <h1 className="mb-4 text-4xl font-bold md:text-6xl">Clinique OKBA</h1>
+                    <h1 className="mb-4 text-4xl font-bold md:text-6xl">{siteSettings?.clinicName || 'Clinique OKBA'}</h1>
                     <p className="text-lg text-muted-foreground md:text-xl">
-                        Votre santé, notre priorité
+                        {sectionContent?.subtitle || 'Votre santé, notre priorité'}
                     </p>
                 </div>
             </section>
@@ -259,7 +261,7 @@ export default function HeroCarousel({ slides: rawSlides = [], siteSettings, sec
                                     <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
                                     <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-400" />
                                 </span>
-                                {sectionContent?.badge || 'Excellence Médicale · Ali Mendjeli, Constantine'}
+                                {sectionContent?.badge || t('badge')}
                             </motion.div>
 
                             {/* Titre */}
@@ -308,7 +310,7 @@ export default function HeroCarousel({ slides: rawSlides = [], siteSettings, sec
                                     {/* Reflet qui balaie au survol */}
                                     <span className="pointer-events-none absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/25 to-transparent transition-transform duration-700 group-hover:translate-x-full" />
                                     <CalendarHeart className="h-5 w-5" />
-                                    Prendre Rendez-vous
+                                    {t('cta.appointment')}
                                     <ChevronRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
                                 </button>
 
@@ -317,7 +319,7 @@ export default function HeroCarousel({ slides: rawSlides = [], siteSettings, sec
                                     className="group inline-flex cursor-pointer items-center justify-center gap-2 rounded-full border border-white/25 bg-white/10 px-7 py-4 text-sm font-semibold text-white backdrop-blur-md transition duration-300 hover:border-white/50 hover:bg-white/20 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-white/30 active:scale-[0.97] sm:text-base"
                                 >
                                     <Phone className="h-5 w-5 text-emerald-300" />
-                                    Appeler
+                                    {t('cta.call')}
                                 </a>
                             </motion.div>
 

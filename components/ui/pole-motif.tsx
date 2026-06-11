@@ -21,6 +21,8 @@ export function motifVariantForIcon(iconName?: string): MotifVariant {
   switch (iconName) {
     case 'ScanLine':
       return 'scan' // Imagerie
+    case 'Radiation':
+      return 'molecule' // Médecine nucléaire (atome)
     case 'FlaskConical':
       return 'molecule' // Laboratoire
     case 'Stethoscope':

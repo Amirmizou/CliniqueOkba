@@ -12,6 +12,11 @@ export default defineType({
             validation: (Rule) => Rule.required(),
         }),
         defineField({
+            name: 'name_ar',
+            title: 'Nom (AR)',
+            type: 'string',
+        }),
+        defineField({
             name: 'brand',
             title: 'Marque',
             type: 'string',
@@ -38,6 +43,12 @@ export default defineType({
         defineField({
             name: 'description',
             title: 'Description',
+            type: 'text',
+            rows: 3,
+        }),
+        defineField({
+            name: 'description_ar',
+            title: 'Description (AR)',
             type: 'text',
             rows: 3,
         }),

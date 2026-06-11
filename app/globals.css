@@ -93,8 +93,8 @@
 @theme inline {
   /* Corps de texte : Poppins (lisible, compatible arabe à venir).
      Titres / affichage : Lemon Milk (tout en majuscules) via --font-heading. */
-  --font-sans: var(--font-poppins), 'Inter', sans-serif;
-  --font-heading: var(--font-lemon-milk), 'Poppins', sans-serif;
+  --font-sans: var(--font-base), 'Inter', sans-serif;
+  --font-heading: var(--font-title), 'Poppins', sans-serif;
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -121,6 +121,16 @@
 }
 
 @layer base {
+  :root {
+    --font-base: var(--font-poppins);
+    --font-title: var(--font-lemon-milk);
+  }
+
+  [dir="rtl"] {
+    --font-base: var(--font-montserrat-arabic);
+    --font-title: var(--font-montserrat-arabic);
+  }
+
   * {
     @apply border-border outline-ring/50;
   }
@@ -136,16 +146,14 @@
     letter-spacing: -0.01em;
   }
 
+  [dir="rtl"] h1, [dir="rtl"] h2, [dir="rtl"] h3, [dir="rtl"] h4, [dir="rtl"] h5, [dir="rtl"] h6 {
+    letter-spacing: normal;
+  }
+
   /* Utilitaire pour appliquer la police d'affichage hors balises de titre
      (ex. nom de la clinique, gros chiffres clés). */
   .font-display {
     font-family: var(--font-heading);
-  }
-  .maplibregl-popup-content {
-    @apply bg-transparent! shadow-none! p-0! rounded-none!;
-  }
-  .maplibregl-popup-tip {
-    @apply hidden!;
   }
 }
 

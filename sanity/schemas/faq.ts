@@ -12,12 +12,23 @@ export default defineType({
             validation: (Rule) => Rule.required(),
         }),
         defineField({
+            name: 'question_ar',
+            title: 'Question (AR)',
+            type: 'string',
+            }),
+        defineField({
             name: 'answer',
             title: 'Réponse',
             type: 'text',
             rows: 4,
             validation: (Rule) => Rule.required(),
         }),
+        defineField({
+            name: 'answer_ar',
+            title: 'Réponse (AR)',
+            type: 'text',
+            rows: 4,
+            }),
         defineField({
             name: 'category',
             title: 'Catégorie',

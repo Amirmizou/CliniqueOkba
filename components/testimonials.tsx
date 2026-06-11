@@ -1,6 +1,7 @@
 'use client'
 
 
+import { useTranslations } from 'next-intl'
 import ScrollAnimation from '@/components/ui/scroll-animation'
 import StaggerContainer from '@/components/ui/stagger-container'
 import { Star, Quote } from 'lucide-react'
@@ -43,12 +44,13 @@ interface TestimonialsProps {
 }
 
 export default function Testimonials({ data = [], sectionContent }: TestimonialsProps) {
-    const testimonials = data.filter((t: Testimonial) => t.visible !== false)
+    const t = useTranslations('testimonialsSection')
+    const testimonials = data.filter((tm: Testimonial) => tm.visible !== false)
 
     // Default content if not from Sanity
-    const title = sectionContent?.title || 'Ce que disent nos patients'
-    const subtitle = sectionContent?.subtitle || 'Votre satisfaction est notre priorité'
-    const badge = sectionContent?.badge || 'Témoignages'
+    const title = sectionContent?.title || t('title')
+    const subtitle = sectionContent?.subtitle || t('subtitle')
+    const badge = sectionContent?.badge || t('badge')
 
     // Helper to get image URL
     const getImageUrl = (testimonial: Testimonial): string | null => {
@@ -103,7 +105,7 @@ export default function Testimonials({ data = [], sectionContent }: Testimonials
                                     {/* Verified badge */}
                                     {testimonial.verified && (
                                         <div className="absolute top-4 left-4 bg-green-500/10 text-green-600 text-xs font-medium px-2 py-1 rounded-full">
-                                            ✓ Vérifié
+                                            ✓ {t('verified')}
                                         </div>
                                     )}
 

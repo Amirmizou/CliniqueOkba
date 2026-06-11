@@ -8,7 +8,22 @@
     "gallery": "Galerie",
     "testimonials": "Témoignages",
     "contact": "Contact",
-    "emergency": "Urgences"
+    "emergency": "Urgences",
+    "poles": "Pôles",
+    "more": "Plus",
+    "tagline": "Excellence Médicale",
+    "ourPoles": "Nos pôles",
+    "news": "Actualités",
+    "events": "Événements",
+    "team": "Équipe Médicale",
+    "faq": "FAQ",
+    "newsDesc": "Dernières nouvelles",
+    "eventsDesc": "Agenda & rendez-vous",
+    "teamDesc": "Nos spécialistes",
+    "faqDesc": "Questions fréquentes",
+    "settings": "Paramètres",
+    "appearance": "Apparence",
+    "language": "Langue / اللغة"
   },
   "hero": {
     "badge": "Leader en Innovation Médicale",
@@ -17,7 +32,9 @@
     "subtitle": "Une fusion parfaite entre expertise humaine et technologie de pointe pour votre santé.",
     "cta": {
       "services": "Nos Services",
-      "discover": "Découvrir"
+      "discover": "Découvrir",
+      "appointment": "Prendre Rendez-vous",
+      "call": "Appeler"
     },
     "stats": {
       "patients": "Patients Satisfaits",
@@ -113,7 +130,136 @@
       }
     }
   },
+  "poles": {
+    "badge": "Une clinique pluridisciplinaire",
+    "titleLine1": "Nos Pôles",
+    "titleLine2": "d'Excellence",
+    "subtitle": "De l'imagerie de pointe aux urgences 24h/24, en passant par le pôle dentaire complet et le laboratoire : déployez chaque pôle pour voir le détail des prestations.",
+    "prestations": "{count, plural, one {# prestation} other {# prestations}}",
+    "discover": "Découvrir le pôle",
+    "call": "Appeler",
+    "featured": "À la une"
+  },
+  "doctors": {
+    "badge": "Notre équipe médicale",
+    "titleLine1": "Des spécialistes",
+    "titleLine2": "à votre écoute",
+    "subtitle": "Rencontrez les médecins de la Clinique OKBA. Survolez une carte pour découvrir les prestations, ou cliquez sur l'affiche pour l'agrandir.",
+    "bookShort": "Prendre RDV",
+    "callFor": "Appeler pour {name}"
+  },
+  "gallery": {
+    "badge": "Plateau technique & espaces",
+    "titleLine1": "Un équipement de pointe,",
+    "titleLine2": "des espaces pensés pour vous",
+    "subtitle": "Découvrez en images notre plateau technique — imagerie, bloc opératoire, laboratoire — ainsi que nos chambres et espaces d'accueil.",
+    "allFilter": "Tout voir",
+    "showLess": "Voir moins",
+    "showAll": "Voir toute la galerie ({count} photos)",
+    "prevImage": "Image précédente",
+    "nextImage": "Image suivante",
+    "cat": {
+      "imagerie": "Imagerie médicale",
+      "nucleaire": "Médecine nucléaire",
+      "bloc": "Bloc opératoire",
+      "laboratoire": "Laboratoire d'analyses",
+      "hospitalisation": "Hospitalisation",
+      "consultation": "Consultation & exploration",
+      "accueil": "Espaces d'accueil"
+    }
+  },
+  "testimonialsSection": {
+    "badge": "Témoignages",
+    "title": "Ce que disent nos patients",
+    "subtitle": "Votre satisfaction est notre priorité",
+    "verified": "Vérifié"
+  },
+  "faqTeaser": {
+    "badge": "Vos questions",
+    "title": "Questions fréquentes",
+    "subtitle": "Les réponses aux questions les plus posées par nos patients.",
+    "seeAll": "Voir toutes les questions"
+  },
+  "events": {
+    "badge": "À la une",
+    "nextEvent": "Prochain événement",
+    "today": "Aujourd'hui",
+    "tomorrow": "Demain",
+    "inDays": "Dans {count} jours",
+    "registerBefore": "Inscription avant le",
+    "learnMore": "En savoir plus",
+    "allEvents": "Tous les événements",
+    "pageBadge": "Agenda",
+    "pageTitle": "Événements",
+    "pageSubtitle": "Journées de dépistage, campagnes de sensibilisation, conférences et portes ouvertes : retrouvez l'agenda de la Clinique OKBA.",
+    "upcoming": "À venir",
+    "past": "Événements passés",
+    "noUpcoming": "Aucun événement à venir pour l'instant. Revenez bientôt !",
+    "none": "Aucun événement programmé pour le moment.",
+    "noneHint": "Ajoutez des événements via le Studio Sanity.",
+    "finished": "Terminé",
+    "backToEvents": "Retour aux événements",
+    "otherEvents": "Autres événements",
+    "dateTime": "Date et heure",
+    "place": "Lieu",
+    "deadline": "Date limite d'inscription",
+    "contactLabel": "Contact",
+    "loadError": "Impossible de charger les événements. Vérifiez la connexion à Sanity.",
+    "errorTitle": "Erreur de chargement",
+    "type": {
+      "depistage": "Dépistage",
+      "sensibilisation": "Sensibilisation",
+      "conference": "Conférence",
+      "formation": "Formation",
+      "portes-ouvertes": "Portes ouvertes",
+      "prevention": "Prévention"
+    }
+  },
+  "news": {
+    "pageBadge": "Blog",
+    "pageTitle": "Actualités",
+    "pageSubtitle": "Restez informé des dernières nouvelles et événements de la Clinique OKBA.",
+    "readMore": "Lire la suite",
+    "none": "Aucun article disponible pour le moment.",
+    "noneHint": "Ajoutez des articles via le Studio Sanity.",
+    "loadError": "Impossible de charger les articles. Vérifiez la connexion à Sanity.",
+    "errorTitle": "Erreur de chargement",
+    "backToNews": "Retour aux actualités",
+    "otherNews": "Autres actualités",
+    "cat": {
+      "nouveau-medecin": "Nouveau médecin",
+      "nouvel-equipement": "Nouvel équipement",
+      "convention": "Convention",
+      "horaires": "Changement d'horaires",
+      "nouveau-service": "Nouveau service",
+      "certification": "Certification",
+      "communique": "Communiqué"
+    }
+  },
+  "equipe": {
+    "ctaTitle": "Besoin d'une consultation ?",
+    "ctaSubtitle": "Prenez rendez-vous directement par téléphone ou rendez-vous sur place à la clinique.",
+    "callNow": "Appeler maintenant",
+    "locate": "Nous localiser"
+  },
+  "faqPage": {
+    "badge": "Aide",
+    "title": "Questions Fréquentes",
+    "subtitle": "Trouvez rapidement les réponses à vos questions sur nos services.",
+    "ctaTitle": "Vous n'avez pas trouvé votre réponse ?",
+    "ctaSubtitle": "Notre équipe est disponible pour répondre à toutes vos questions.",
+    "callUs": "Nous appeler",
+    "visitUs": "Nous rendre visite",
+    "cat": {
+      "appointment": "Rendez-vous",
+      "exams": "Examens",
+      "payment": "Paiement",
+      "emergency": "Urgences",
+      "general": "Général"
+    }
+  },
   "contact": {
+    "badge": "Nous contacter",
     "title": "Contact & Localisation",
     "subtitle": "Nous sommes à votre écoute pour toute question ou demande de rendez-vous",
     "form": {
@@ -127,14 +273,35 @@
       "optional": "optionnel",
       "required": "requis",
       "success": "Message envoyé avec succès !",
+      "successDetail": "Nous vous répondrons dans les plus brefs délais.",
       "error": "Erreur lors de l'envoi",
-      "errorMessage": "Veuillez réessayer ou nous contacter directement."
+      "errorMessage": "Veuillez réessayer ou nous contacter directement.",
+      "firstNamePlaceholder": "Votre prénom",
+      "lastNamePlaceholder": "Votre nom",
+      "emailPlaceholder": "votre@email.com",
+      "messagePlaceholder": "Décrivez votre demande de consultation ou vos questions...",
+      "charsMin": "{count}/10 caractères minimum",
+      "vFirstNameRequired": "Le prénom est requis",
+      "vFirstNameMin": "Le prénom doit contenir au moins 2 caractères",
+      "vLastNameRequired": "Le nom est requis",
+      "vLastNameMin": "Le nom doit contenir au moins 2 caractères",
+      "vEmailRequired": "L'email est requis",
+      "vEmailInvalid": "Veuillez entrer un email valide",
+      "vPhoneInvalid": "Veuillez entrer un numéro de téléphone valide",
+      "vMessageRequired": "Le message est requis",
+      "vMessageMin": "Le message doit contenir au moins 10 caractères"
     },
     "info": {
       "address": "Adresse",
       "phone": "Téléphone",
       "email": "Email",
-      "hours": "Horaires"
+      "hours": "Horaires",
+      "emergency": "Urgences",
+      "fastReply": "Réponse rapide garantie",
+      "weekdaysLabel": "Samedi - Jeudi",
+      "fridayLabel": "Vendredi",
+      "ourLocation": "Notre localisation",
+      "followUs": "Suivez-nous"
     }
   },
   "footer": {
@@ -150,5 +317,87 @@
     "terms": "Mentions Légales",
     "cookies": "Cookies",
     "sitemap": "Plan du site"
+  },
+  "common": {
+    "close": "Fermer",
+    "previous": "Précédent",
+    "next": "Suivant",
+    "loading": "Chargement…",
+    "readMore": "Lire la suite",
+    "learnMore": "En savoir plus",
+    "viewAll": "Voir tout",
+    "all": "Tous",
+    "back": "Retour",
+    "call": "Appeler",
+    "errorTitle": "Erreur de chargement",
+    "backToTop": "Retour en haut"
+  },
+  "trustBand": {
+    "polesExcellence": "Pôles d’excellence",
+    "emergencyStat": "Urgences",
+    "doctorsStat": "Médecins",
+    "emergency": "Urgences",
+    "emergencySub": "Prise en charge immédiate",
+    "consultations": "Consultations",
+    "consultationsSub": "Du samedi au jeudi",
+    "phone": "Téléphone",
+    "phoneSub": "Appel direct"
+  },
+  "actionBar": {
+    "call": "Appeler",
+    "appointment": "RDV",
+    "directions": "Itinéraire"
+  },
+  "map": {
+    "directions": "Itinéraire",
+    "open": "Ouvrir",
+    "address": "Adresse",
+    "getDirections": "Obtenir l'itinéraire",
+    "getDirectionsSub": "Ouvrir dans Google Maps pour vous guider",
+    "loading": "Chargement de la carte...",
+    "fullscreen": "Plein écran",
+    "reduce": "Réduire"
+  },
+  "videoSection": {
+    "badge": "En vidéo",
+    "titlePrefix": "Découvrez la",
+    "subtitle": "Une présentation de notre établissement : nos spécialités, nos urgences 24h/24 et notre engagement à vos côtés."
+  },
+  "whatsappBooking": {
+    "title": "Rendez-vous express sur WhatsApp",
+    "subtitle": "Réponse rapide — confirmation directe par message.",
+    "nameLabel": "Nom complet",
+    "namePlaceholder": "Votre nom",
+    "phoneLabel": "Téléphone",
+    "phonePlaceholder": "07 .. .. .. ..",
+    "specialtyLabel": "Spécialité",
+    "choose": "— Choisir —",
+    "dateLabel": "Date souhaitée",
+    "noteLabel": "Motif (optionnel)",
+    "notePlaceholder": "Précisez votre demande…",
+    "submit": "Prendre rendez-vous sur WhatsApp",
+    "redirectNote": "Vous serez redirigé vers WhatsApp avec votre demande déjà rédigée.",
+    "nameError": "Merci d’indiquer votre nom.",
+    "noNumberError": "Le numéro WhatsApp n'est pas configuré. Contactez-nous par téléphone.",
+    "msgIntro": "Bonjour {clinic}, je souhaite prendre un rendez-vous.",
+    "msgName": "Nom",
+    "msgPhone": "Téléphone",
+    "msgSpecialty": "Spécialité",
+    "msgDate": "Date souhaitée",
+    "msgReason": "Motif",
+    "specialties": {
+      "endocrinology": "Endocrinologie",
+      "gynecology": "Gynécologie",
+      "internalMedicine": "Médecine interne",
+      "orl": "ORL",
+      "pediatrics": "Pédiatrie",
+      "other": "Autre"
+    }
+  },
+  "polePage": {
+    "backHome": "Retour à l'accueil",
+    "bookAppointment": "Prendre rendez-vous",
+    "locate": "Nous localiser",
+    "inImages": "En images"
   }
 }

@@ -26,8 +26,9 @@ import {
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { ThemeToggle } from '@/components/theme-toggle'
+import { LanguageSwitcher } from '@/components/language-switcher'
 import { Link, useRouter } from '@/navigation'
-import { useTranslations } from 'next-intl'
+import { useTranslations, useLocale } from 'next-intl'
 import Image from 'next/image'
 import { motion, AnimatePresence, useScroll, useMotionValueEvent } from 'framer-motion'
 import { cn } from '@/lib/utils'
@@ -56,11 +57,11 @@ interface NavPole {
 }
 
 /** Pôles du menu : Sanity prioritaire, repli sur les données locales */
-function resolveNavPoles(data?: any[]): NavPole[] {
+function resolveNavPoles(data: any[] | undefined, locale: string): NavPole[] {
   if (!data || data.length === 0) {
     return localPoles.map((p) => ({
       slug: p.slug,
-      title: p.title,
+      title: locale === 'ar' && p.title_ar ? p.title_ar : p.title,
       iconName: p.iconName,
       accent: p.accent,
       badge: p.badge,
@@ -88,7 +89,8 @@ interface HeaderProps {
 
 export default function Header({ siteSettings, poles }: HeaderProps) {
   const t = useTranslations('nav')
-  const navPoles = resolveNavPoles(poles)
+  const locale = useLocale()
+  const navPoles = resolveNavPoles(poles, locale)
   const [isOpen, setIsOpen] = useState(false)
   const [hidden, setHidden] = useState(false)
   const [activeTab, setActiveTab] = useState('home')
@@ -166,7 +168,7 @@ export default function Header({ siteSettings, poles }: HeaderProps) {
     setIsOpen(false)
 
     // Check if we're on the homepage
-    const isHomepage = window.location.pathname === '/'
+    const isHomepage = window.location.pathname === '/' || window.location.pathname === '/ar'
 
     if (isHomepage) {
       // On homepage, just scroll
@@ -219,7 +221,7 @@ export default function Header({ siteSettings, poles }: HeaderProps) {
             </motion.div>
             <div className="hidden sm:flex flex-col leading-none transition-all duration-300 opacity-100">
               <span className='font-display text-sm font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-foreground to-foreground/70 tracking-tight'>Clinique OKBA</span>
-              <span className='text-[9px] text-primary font-bold tracking-widest uppercase mt-0.5'>Excellence Médicale</span>
+              <span className='text-[9px] text-primary font-bold tracking-widest uppercase mt-0.5'>{t('tagline')}</span>
             </div>
           </a>
 
@@ -268,11 +270,11 @@ export default function Header({ siteSettings, poles }: HeaderProps) {
               <button
                 className="relative px-4 py-2 text-sm font-medium transition-colors duration-300 rounded-full text-muted-foreground hover:text-primary flex items-center gap-1 hover:bg-white/5"
               >
-                Pôles
+                {t('poles')}
                 <ChevronDown className="h-3 w-3 transition-transform duration-300 group-hover:-rotate-180" />
               </button>
 
-              <div className="absolute top-full left-1/2 -translate-x-1/2 mt-4 w-[22rem] opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform origin-top scale-95 group-hover:scale-100 pt-2">
+              <div className="absolute top-full start-1/2 -translate-x-1/2 mt-4 w-[22rem] opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform origin-top scale-95 group-hover:scale-100 pt-2">
                 <div className="glass-card p-2 rounded-2xl shadow-2xl border border-white/20 overflow-hidden bg-white/80 dark:bg-black/80 backdrop-blur-2xl">
                   <div className="grid grid-cols-1 gap-1">
                     {navPoles.map((pole) => {
@@ -312,12 +314,12 @@ export default function Header({ siteSettings, poles }: HeaderProps) {
               <button
                 className="relative px-4 py-2 text-sm font-medium transition-colors duration-300 rounded-full text-muted-foreground hover:text-primary flex items-center gap-1 hover:bg-white/5"
               >
-                Plus
+                {t('more')}
                 <ChevronDown className="h-3 w-3 transition-transform duration-300 group-hover:-rotate-180" />
               </button>
 
               {/* Dropdown Menu */}
-              <div className="absolute top-full right-0 mt-4 w-64 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform origin-top-right scale-95 group-hover:scale-100 pt-2">
+              <div className="absolute top-full end-0 mt-4 w-64 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform origin-top-[100%] scale-95 group-hover:scale-100 pt-2">
                 <div className="glass-card p-2 rounded-2xl shadow-2xl border border-white/20 overflow-hidden bg-white/80 dark:bg-black/80 backdrop-blur-2xl">
                   <div className="space-y-1">
                     <a href="/actualites" className="flex items-center gap-4 px-4 py-3 text-sm rounded-xl hover:bg-primary/5 text-muted-foreground hover:text-primary transition-all duration-200 group/item">
@@ -325,8 +327,8 @@ export default function Header({ siteSettings, poles }: HeaderProps) {
                         <Newspaper className="h-4 w-4" />
                       </div>
                       <div className="flex flex-col">
-                        <span className="font-semibold text-foreground group-hover/item:text-primary">Actualités</span>
-                        <span className="text-[10px] opacity-70">Dernières nouvelles</span>
+                        <span className="font-semibold text-foreground group-hover/item:text-primary">{t('news')}</span>
+                        <span className="text-[10px] opacity-70">{t('newsDesc')}</span>
                       </div>
                     </a>
                     <a href="/evenements" className="flex items-center gap-4 px-4 py-3 text-sm rounded-xl hover:bg-primary/5 text-muted-foreground hover:text-primary transition-all duration-200 group/item">
@@ -334,8 +336,8 @@ export default function Header({ siteSettings, poles }: HeaderProps) {
                         <CalendarDays className="h-4 w-4" />
                       </div>
                       <div className="flex flex-col">
-                        <span className="font-semibold text-foreground group-hover/item:text-primary">Événements</span>
-                        <span className="text-[10px] opacity-70">Agenda & rendez-vous</span>
+                        <span className="font-semibold text-foreground group-hover/item:text-primary">{t('events')}</span>
+                        <span className="text-[10px] opacity-70">{t('eventsDesc')}</span>
                       </div>
                     </a>
                     <a href="/equipe" className="flex items-center gap-4 px-4 py-3 text-sm rounded-xl hover:bg-primary/5 text-muted-foreground hover:text-primary transition-all duration-200 group/item">
@@ -343,8 +345,8 @@ export default function Header({ siteSettings, poles }: HeaderProps) {
                         <Users className="h-4 w-4" />
                       </div>
                       <div className="flex flex-col">
-                        <span className="font-semibold text-foreground group-hover/item:text-primary">Équipe Médicale</span>
-                        <span className="text-[10px] opacity-70">Nos spécialistes</span>
+                        <span className="font-semibold text-foreground group-hover/item:text-primary">{t('team')}</span>
+                        <span className="text-[10px] opacity-70">{t('teamDesc')}</span>
                       </div>
                     </a>
                     <a href="/faq" className="flex items-center gap-4 px-4 py-3 text-sm rounded-xl hover:bg-primary/5 text-muted-foreground hover:text-primary transition-all duration-200 group/item">
@@ -352,8 +354,8 @@ export default function Header({ siteSettings, poles }: HeaderProps) {
                         <HelpCircle className="h-4 w-4" />
                       </div>
                       <div className="flex flex-col">
-                        <span className="font-semibold text-foreground group-hover/item:text-primary">FAQ</span>
-                        <span className="text-[10px] opacity-70">Questions fréquentes</span>
+                        <span className="font-semibold text-foreground group-hover/item:text-primary">{t('faq')}</span>
+                        <span className="text-[10px] opacity-70">{t('faqDesc')}</span>
                       </div>
                     </a>
                   </div>
@@ -364,9 +366,12 @@ export default function Header({ siteSettings, poles }: HeaderProps) {
 
           {/* Actions */}
           <div className='flex items-center gap-2'>
-            {/* Theme toggle - larger on mobile */}
-            <div className="flex items-center gap-1 pr-2 border-r border-border/50 mr-2">
-              <div className="md:scale-100 scale-110">
+            {/* Theme & Language toggle */}
+            <div className="flex items-center gap-1 pe-2 border-e border-border/50 me-2">
+              <div className="hidden sm:block">
+                <LanguageSwitcher />
+              </div>
+              <div className="scale-90 sm:scale-100">
                 <ThemeToggle />
               </div>
             </div>
@@ -460,7 +465,7 @@ export default function Header({ siteSettings, poles }: HeaderProps) {
                 transition={{ delay: 0.35 }}
                 className="pt-4 border-t border-border/30"
               >
-                <p className="text-xs text-muted-foreground uppercase tracking-wider mb-2 px-2">Nos pôles</p>
+                <p className="text-xs text-muted-foreground uppercase tracking-wider mb-2 px-2">{t('ourPoles')}</p>
                 <div className="grid grid-cols-1 gap-2">
                   {navPoles.map((pole) => {
                     const Icon = POLE_ICONS[pole.iconName] || Stethoscope
@@ -491,24 +496,42 @@ export default function Header({ siteSettings, poles }: HeaderProps) {
                 transition={{ delay: 0.4 }}
                 className="pt-4 border-t border-border/30"
               >
-                <p className="text-xs text-muted-foreground uppercase tracking-wider mb-2 px-2">Plus</p>
+                <p className="text-xs text-muted-foreground uppercase tracking-wider mb-2 px-2">{t('more')}</p>
                 <div className="space-y-2">
                   <a href="/actualites" onClick={() => setIsOpen(false)} className="flex items-center gap-3 p-3 rounded-xl bg-card/50 border border-border/50 hover:bg-primary/5 hover:border-primary/20 transition-all">
                     <Newspaper className="h-5 w-5 text-primary" />
-                    <span className="font-medium">Actualités</span>
+                    <span className="font-medium">{t('news')}</span>
                   </a>
                   <a href="/evenements" onClick={() => setIsOpen(false)} className="flex items-center gap-3 p-3 rounded-xl bg-card/50 border border-border/50 hover:bg-primary/5 hover:border-primary/20 transition-all">
                     <CalendarDays className="h-5 w-5 text-primary" />
-                    <span className="font-medium">Événements</span>
+                    <span className="font-medium">{t('events')}</span>
                   </a>
                   <a href="/equipe" onClick={() => setIsOpen(false)} className="flex items-center gap-3 p-3 rounded-xl bg-card/50 border border-border/50 hover:bg-primary/5 hover:border-primary/20 transition-all">
                     <Users className="h-5 w-5 text-primary" />
-                    <span className="font-medium">Équipe Médicale</span>
+                    <span className="font-medium">{t('team')}</span>
                   </a>
                   <a href="/faq" onClick={() => setIsOpen(false)} className="flex items-center gap-3 p-3 rounded-xl bg-card/50 border border-border/50 hover:bg-primary/5 hover:border-primary/20 transition-all">
                     <HelpCircle className="h-5 w-5 text-primary" />
-                    <span className="font-medium">FAQ</span>
+                    <span className="font-medium">{t('faq')}</span>
                   </a>
+                </div>
+              </motion.div>
+
+              {/* Apparence et Langue (Mobile) */}
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.45 }}
+                className="pt-4 border-t border-border/30 pb-10"
+              >
+                <p className="text-xs text-muted-foreground uppercase tracking-wider mb-2 px-2">{t('settings')}</p>
+                <div className="flex items-center justify-between p-4 rounded-xl bg-card/50 border border-border/50">
+                  <span className="font-medium">{t('appearance')}</span>
+                  <ThemeToggle />
+                </div>
+                <div className="flex items-center justify-between p-4 rounded-xl bg-card/50 border border-border/50 mt-2">
+                  <span className="font-medium">{t('language')}</span>
+                  <LanguageSwitcher />
                 </div>
               </motion.div>
             </motion.nav>

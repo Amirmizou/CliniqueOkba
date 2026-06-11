@@ -4,6 +4,7 @@ import { Stethoscope, Home, PhoneCall, Clock, CheckCircle2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { motion } from 'framer-motion'
 import Image from 'next/image'
+import { useLocale } from 'next-intl'
 
 interface SectionContent {
   badge?: string
@@ -34,25 +35,46 @@ export default function HomeCare({ data, sectionContent }: HomeCareProps) {
     window.location.href = url.toString()
   }
 
+  const locale = useLocale()
+  const isAr = locale === 'ar'
+
   // Contenu : Sanity prioritaire, repli sur le texte par défaut
-  const badge = sectionContent?.badge || 'Service dédié'
-  const title = sectionContent?.title || data?.title || 'Soins à domicile'
+  // Fallbacks in Arabic
+  const arFallbacks = {
+    badge: 'خدمة مخصصة',
+    title: 'الرعاية المنزلية',
+    subtitle: 'فريق متنقل لرعاية طبية عالية الجودة في منزلك بكل أمان.',
+    prestations: [
+      'استشارات طبية عامة ومتابعة',
+      'تغيير الضمادات، الحقن، المحاليل',
+      'سحب الدم وفحوصات منزلية',
+      'مراقبة الأمراض المزمنة'
+    ],
+    availabilityText: 'تدخلات بمواعيد مسبقة وحالات طارئة حسب التوفر',
+    ctaText: 'طلب تدخل منزلي',
+    availabilityTitle: 'التوفر',
+    contactPrompt: 'اتصل بنا لتحديد موعد زيارة',
+    imageAlt: 'فريق الرعاية المنزلية'
+  }
+
+  const badge = sectionContent?.badge || (isAr ? arFallbacks.badge : 'Service dédié')
+  const title = sectionContent?.title || data?.title || (isAr ? arFallbacks.title : 'Soins à domicile')
   const subtitle =
     sectionContent?.subtitle ||
     data?.description ||
-    'Une équipe mobile pour des soins médicaux de qualité, chez vous, en toute sécurité.'
+    (isAr ? arFallbacks.subtitle : 'Une équipe mobile pour des soins médicaux de qualité, chez vous, en toute sécurité.')
   const prestations =
     data?.services && data.services.length > 0
       ? data.services.map((s) => s.name)
-      : [
+      : (isAr ? arFallbacks.prestations : [
           'Consultations générales et de suivi',
           'Pansements, injections, perfusions',
           'Prélèvements et examens à domicile',
           'Surveillance de patients chroniques',
-        ]
+        ])
   const availabilityText =
-    data?.availability || 'Interventions sur rendez-vous et urgences selon disponibilité'
-  const ctaText = data?.callToAction?.text || 'Demander une intervention à domicile'
+    data?.availability || (isAr ? arFallbacks.availabilityText : 'Interventions sur rendez-vous et urgences selon disponibilité')
+  const ctaText = data?.callToAction?.text || (isAr ? arFallbacks.ctaText : 'Demander une intervention à domicile')
 
   return (
     <section id='home-care' className='bg-background py-20'>
@@ -103,7 +125,7 @@ export default function HomeCare({ data, sectionContent }: HomeCareProps) {
               >
                 <div className='mb-4 flex items-center gap-3'>
                   <Stethoscope className='text-primary h-6 w-6' />
-                  <h3 className='text-foreground text-xl font-semibold'>Disponibilité</h3>
+                  <h3 className='text-foreground text-xl font-semibold'>{isAr ? arFallbacks.availabilityTitle : 'Disponibilité'}</h3>
                 </div>
                 <div className='space-y-4'>
                   <div className='flex items-center gap-3'>
@@ -112,7 +134,7 @@ export default function HomeCare({ data, sectionContent }: HomeCareProps) {
                   </div>
                   <div className='flex items-center gap-3'>
                     <PhoneCall className='text-primary h-5 w-5' />
-                    <p className='text-muted-foreground text-sm'>Contactez-nous pour planifier une visite</p>
+                    <p className='text-muted-foreground text-sm'>{isAr ? arFallbacks.contactPrompt : 'Contactez-nous pour planifier une visite'}</p>
                   </div>
                   <div className='pt-2'>
                     <Button onClick={scrollToContact} className='bg-primary hover:bg-primary/90 text-primary-foreground w-full'>
@@ -133,7 +155,7 @@ export default function HomeCare({ data, sectionContent }: HomeCareProps) {
           >
             <Image
               src="/images/spec/sad.jpeg"
-              alt="Équipe de soins à domicile"
+              alt={isAr ? arFallbacks.imageAlt : 'Équipe de soins à domicile'}
               fill
               className="object-cover"
               sizes="(max-width: 1024px) 100vw, 50vw"

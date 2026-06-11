@@ -6,20 +6,28 @@ import { ShieldCheck, BadgeCheck, ArrowRight } from 'lucide-react'
 import { urlFor } from '@/sanity/lib/image'
 import { insuranceFallback } from '@/data/insurance'
 import { AnimatedSection } from '@/components/ui/animated-section'
+import { useLocale } from 'next-intl'
 
 interface InsuranceProvider {
   name: string
+  name_ar?: string
   description?: string
+  description_ar?: string
   logo?: any
 }
 
 interface ResolvedContent {
   badge: string
+  badge_ar?: string
   title: string
+  title_ar?: string
   subtitle: string
+  subtitle_ar?: string
   providers: InsuranceProvider[]
   note: string
+  note_ar?: string
   ctaText: string
+  ctaText_ar?: string
 }
 
 interface InsuranceProps {
@@ -33,24 +41,30 @@ interface InsuranceProps {
   } | null
 }
 
-/** Fusionne les données Sanity avec le repli local (Sanity prioritaire) */
-function resolveContent(data?: InsuranceProps['data']): ResolvedContent {
+function resolveContent(data?: any): ResolvedContent {
   if (!data) return insuranceFallback
   return {
     badge: data.badge || insuranceFallback.badge,
+    badge_ar: data.badge_ar || insuranceFallback.badge_ar,
     title: data.title || insuranceFallback.title,
+    title_ar: data.title_ar || insuranceFallback.title_ar,
     subtitle: data.subtitle || insuranceFallback.subtitle,
+    subtitle_ar: data.subtitle_ar || insuranceFallback.subtitle_ar,
     providers:
       data.providers && data.providers.length > 0
         ? data.providers
         : insuranceFallback.providers,
     note: data.note || insuranceFallback.note,
+    note_ar: data.note_ar || insuranceFallback.note_ar,
     ctaText: data.ctaText || insuranceFallback.ctaText,
+    ctaText_ar: data.ctaText_ar || insuranceFallback.ctaText_ar,
   }
 }
 
 export default function Insurance({ data }: InsuranceProps) {
   const content = resolveContent(data)
+  const locale = useLocale()
+  const isAr = locale === 'ar'
 
   return (
     <section
@@ -66,13 +80,13 @@ export default function Insurance({ data }: InsuranceProps) {
           <div className="animate-item">
             <span className="mb-4 inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-4 py-1.5 text-sm font-semibold text-primary">
               <ShieldCheck className="h-4 w-4" />
-              {content.badge}
+              {isAr ? (content.badge_ar || content.badge) : content.badge}
             </span>
             <h2 className="mb-4 text-3xl font-bold sm:text-4xl md:text-5xl">
-              <span className="text-foreground">{content.title}</span>
+              <span className="text-foreground">{isAr ? (content.title_ar || content.title) : content.title}</span>
             </h2>
             <p className="mx-auto max-w-2xl text-base text-muted-foreground sm:text-lg">
-              {content.subtitle}
+              {isAr ? (content.subtitle_ar || content.subtitle) : content.subtitle}
             </p>
           </div>
         </AnimatedSection>
@@ -80,9 +94,11 @@ export default function Insurance({ data }: InsuranceProps) {
         {/* Grille des organismes */}
         <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
           {content.providers.map((provider, i) => {
-            const logoUrl = provider.logo
-              ? urlFor(provider.logo).width(160).height(160).fit('max').url()
-              : ''
+            const logoUrl = typeof provider.logo === 'string'
+              ? provider.logo
+              : provider.logo
+                ? urlFor(provider.logo).width(160).height(160).fit('max').url()
+                : ''
             return (
               <motion.div
                 key={provider.name}
@@ -106,11 +122,11 @@ export default function Insurance({ data }: InsuranceProps) {
                   )}
                 </div>
                 <h3 className="text-base font-bold text-foreground">
-                  {provider.name}
+                  {isAr ? (provider.name_ar || provider.name) : provider.name}
                 </h3>
-                {provider.description && (
+                {(provider.description || provider.description_ar) && (
                   <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-                    {provider.description}
+                    {isAr ? (provider.description_ar || provider.description) : provider.description}
                   </p>
                 )}
               </motion.div>
@@ -126,17 +142,17 @@ export default function Insurance({ data }: InsuranceProps) {
           transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
           className="mt-10 flex flex-col items-center gap-5 rounded-2xl border border-primary/15 bg-primary/[0.04] p-6 text-center sm:flex-row sm:justify-between sm:text-left"
         >
-          {content.note && (
+          {(content.note || content.note_ar) && (
             <p className="max-w-3xl text-sm leading-relaxed text-muted-foreground">
-              {content.note}
+              {isAr ? (content.note_ar || content.note) : content.note}
             </p>
           )}
           <a
             href="#contact"
             className="group inline-flex shrink-0 items-center justify-center gap-2 rounded-full bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground shadow-md transition-all duration-300 hover:scale-[1.03] hover:shadow-lg active:scale-95"
           >
-            {content.ctaText}
-            <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+            {isAr ? (content.ctaText_ar || content.ctaText) : content.ctaText}
+            <ArrowRight className={isAr ? "h-4 w-4 transition-transform group-hover:-translate-x-1 rotate-180" : "h-4 w-4 transition-transform group-hover:translate-x-1"} />
           </a>
         </motion.div>
       </div>

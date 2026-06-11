@@ -13,10 +13,20 @@ export default defineType({
             initialValue: 'Prise en charge',
         }),
         defineField({
+            name: 'badge_ar',
+            title: 'Badge / Label (AR)',
+            type: 'string',
+        }),
+        defineField({
             name: 'title',
             title: 'Titre',
             type: 'string',
             initialValue: 'Conventions & Remboursement',
+        }),
+        defineField({
+            name: 'title_ar',
+            title: 'Titre (AR)',
+            type: 'string',
         }),
         defineField({
             name: 'subtitle',
@@ -25,6 +35,12 @@ export default defineType({
             rows: 2,
             initialValue:
                 'La Clinique OKBA vous accompagne dans vos démarches de prise en charge et de remboursement.',
+        }),
+        defineField({
+            name: 'subtitle_ar',
+            title: 'Sous-titre (AR)',
+            type: 'text',
+            rows: 2,
         }),
         defineField({
             name: 'providers',
@@ -42,8 +58,19 @@ export default defineType({
                             validation: (Rule) => Rule.required(),
                         }),
                         defineField({
+                            name: 'name_ar',
+                            title: 'Nom (AR)',
+                            type: 'string',
+                        }),
+                        defineField({
                             name: 'description',
                             title: 'Description',
+                            type: 'text',
+                            rows: 2,
+                        }),
+                        defineField({
+                            name: 'description_ar',
+                            title: 'Description (AR)',
                             type: 'text',
                             rows: 2,
                         }),
@@ -69,10 +96,21 @@ export default defineType({
                 'Ex : « Présentez votre carte CHIFA à l’accueil. Pour toute question sur votre prise en charge, contactez-nous. »',
         }),
         defineField({
+            name: 'note_ar',
+            title: 'Note de bas de section (AR)',
+            type: 'text',
+            rows: 2,
+        }),
+        defineField({
             name: 'ctaText',
             title: 'Texte du bouton',
             type: 'string',
             initialValue: 'Vérifier ma prise en charge',
+        }),
+        defineField({
+            name: 'ctaText_ar',
+            title: 'Texte du bouton (AR)',
+            type: 'string',
         }),
         defineField({
             name: 'active',

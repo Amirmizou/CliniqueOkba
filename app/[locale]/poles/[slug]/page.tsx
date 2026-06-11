@@ -6,6 +6,7 @@ import PolePageContent, {
     type PolePageData,
 } from '@/components/pole-page-content'
 import { getSiteSettings, getPoles, getFacilityPhotos } from '@/sanity/lib/fetch'
+import { localizeSanityData } from '@/sanity/lib/localize'
 import { urlFor } from '@/sanity/lib/image'
 import { poles as localPoles, getPoleBySlug, CLINIC_PHONE } from '@/data/poles'
 import { equipements } from '@/data/equipements'
@@ -40,23 +41,28 @@ function buildPhotos(categories: string[], facility?: any[]): PolePhoto[] {
 }
 
 // Résout les métadonnées du pôle (Sanity prioritaire, repli local)
-function resolvePole(slug: string, sanityPoles?: any[]) {
+function resolvePole(slug: string, locale: string, sanityPoles?: any[]) {
     const local = getPoleBySlug(slug)
     const sanity = (sanityPoles || []).find((p) => p.slug === slug)
     if (!local && !sanity) return null
 
+    const title = sanity?.title || (locale === 'ar' && local?.title_ar ? local.title_ar : local?.title) || ''
+    const description = sanity?.description || (locale === 'ar' && local?.description_ar ? local.description_ar : local?.description) || ''
+    const intro = sanity?.intro || (locale === 'ar' && local?.intro_ar ? local.intro_ar : local?.intro) || undefined
+    const badge = sanity?.badge || (locale === 'ar' && local?.badge_ar ? local.badge_ar : local?.badge)
+    const items = sanity?.items && sanity.items.length > 0
+        ? sanity.items
+        : (locale === 'ar' && local?.items_ar && local.items_ar.length > 0 ? local.items_ar : local?.items) || []
+
     const pole: PolePageData = {
         slug,
-        title: sanity?.title || local?.title || '',
-        description: sanity?.description || local?.description || '',
-        intro: local?.intro || sanity?.description || undefined,
-        items:
-            sanity?.items && sanity.items.length > 0
-                ? sanity.items
-                : local?.items || [],
+        title,
+        description,
+        intro,
+        items,
         iconName: sanity?.iconName || local?.iconName || 'Stethoscope',
         accent: sanity?.accentColor || local?.accent || '#006633',
-        badge: sanity?.badge || local?.badge,
+        badge,
         urgent: sanity?.urgent ?? local?.urgent ?? false,
     }
     const categories: string[] =
@@ -70,31 +76,40 @@ function resolvePole(slug: string, sanityPoles?: any[]) {
 export async function generateMetadata({
     params,
 }: {
-    params: Promise<{ slug: string }>
+    params: Promise<{ slug: string; locale: string }>
 }) {
-    const { slug } = await params
+    const { slug, locale } = await params
     const local = getPoleBySlug(slug)
     if (!local) return { title: 'Pôle | Clinique OKBA' }
+
+    const title = locale === 'ar' && local.title_ar ? local.title_ar : local.title
+    const desc = locale === 'ar' && local.description_ar ? local.description_ar : local.description
+
     return {
-        title: `${local.title} | Clinique OKBA`,
-        description: local.description,
+        title: `${title} | Clinique OKBA`,
+        description: desc,
     }
 }
 
 export default async function PolePage({
     params,
 }: {
-    params: Promise<{ slug: string }>
+    params: Promise<{ slug: string; locale: string }>
 }) {
-    const { slug } = await params
+    const { slug, locale } = await params
 
-    const [siteSettings, sanityPoles, facilityPhotos] = await Promise.all([
+    const [siteSettingsRaw, sanityPolesRaw, facilityPhotosRaw] = await Promise.all([
         getSiteSettings(),
         getPoles(),
         getFacilityPhotos(),
     ])
 
-    const resolved = resolvePole(slug, sanityPoles)
+    // Localisation FR/AR du contenu Sanity (repli sur le français)
+    const siteSettings = localizeSanityData(siteSettingsRaw, locale)
+    const sanityPoles = localizeSanityData(sanityPolesRaw, locale)
+    const facilityPhotos = localizeSanityData(facilityPhotosRaw, locale)
+
+    const resolved = resolvePole(slug, locale, sanityPoles)
     if (!resolved) notFound()
 
     const photos = buildPhotos(resolved.categories, facilityPhotos)

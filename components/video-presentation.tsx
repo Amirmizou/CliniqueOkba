@@ -10,6 +10,7 @@ import {
   AnimatePresence,
 } from 'framer-motion'
 import { Play, Pause, Volume2, VolumeX } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 import { useReducedMotion } from '@/hooks/use-reduced-motion'
 import { urlFor } from '@/sanity/lib/image'
 
@@ -28,6 +29,7 @@ export default function VideoPresentation({
 }: {
   sectionContent?: SectionContent
 }) {
+  const t = useTranslations('videoSection')
   const sectionRef = useRef<HTMLElement>(null)
   const videoRef = useRef<HTMLVideoElement>(null)
   const prefersReducedMotion = useReducedMotion()
@@ -212,12 +214,12 @@ export default function VideoPresentation({
           </motion.div>
 
           <p className="text-sm font-semibold uppercase tracking-[0.2em] text-primary">
-            {sectionContent?.badge || 'En vidéo'}
+            {sectionContent?.badge || t('badge')}
           </p>
           <h2 className="mt-3 text-3xl font-bold tracking-tight text-foreground sm:text-4xl md:text-5xl lg:text-6xl">
             {sectionContent?.title || (
               <>
-                Découvrez la{' '}
+                {t('titlePrefix')}{' '}
                 <span
                   style={{
                     background:
@@ -233,8 +235,7 @@ export default function VideoPresentation({
             )}
           </h2>
           <p className="mx-auto mt-4 max-w-2xl text-base text-muted-foreground sm:text-lg">
-            {sectionContent?.subtitle ||
-              'Une présentation de notre établissement : nos spécialités, nos urgences 24h/24 et notre engagement à vos côtés.'}
+            {sectionContent?.subtitle || t('subtitle')}
           </p>
         </motion.div>
 

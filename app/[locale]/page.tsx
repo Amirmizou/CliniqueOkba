@@ -38,12 +38,13 @@ import {
   getInsuranceSection,
   getFaq,
 } from '@/sanity/lib/fetch'
+import { localizeSanityData } from '@/sanity/lib/localize'
 import type { ClinicEvent } from '@/lib/events'
 
 // ISR: Revalidate every hour for better performance
 export const revalidate = 3600
 
-export default async function Home() {
+export default async function Home(props: { params: Promise<{ locale: string }> }) {
   // Fetch all data from Sanity in parallel
   const [
     siteSettings,
@@ -73,8 +74,27 @@ export default async function Home() {
     getFaq(),
   ])
 
+  // Get current locale
+  const { locale } = await props.params
+
+  // Localize all fetched data
+  const localizedData = {
+    siteSettings: localizeSanityData(siteSettings, locale),
+    aboutSection: localizeSanityData(aboutSection, locale),
+    testimonials: localizeSanityData(testimonials, locale),
+    homeCare: localizeSanityData(homeCare, locale),
+    sectionContents: localizeSanityData(sectionContents, locale),
+    heroSlides: localizeSanityData(heroSlides, locale),
+    doctors: localizeSanityData(doctors, locale),
+    facilityPhotos: localizeSanityData(facilityPhotos, locale),
+    poles: localizeSanityData(poles, locale),
+    events: localizeSanityData(events, locale),
+    insurance: localizeSanityData(insurance, locale),
+    faqs: localizeSanityData(faqs, locale),
+  }
+
   // Create a map of section contents for easy access
-  const sectionContentMap = (sectionContents || []).reduce((acc: Record<string, any>, item: any) => {
+  const sectionContentMap = (localizedData.sectionContents || []).reduce((acc: Record<string, any>, item: any) => {
     if (item?.sectionId) {
       acc[item.sectionId] = item
     }
@@ -84,7 +104,7 @@ export default async function Home() {
   // Prochain événement publié (à venir) pour la section « À la une »
   const now = Date.now()
   const featuredEvent: ClinicEvent | null =
-    (events as ClinicEvent[] | undefined)?.find(
+    (localizedData.events as ClinicEvent[] | undefined)?.find(
       (e) => new Date(e.endDate || e.startDate).getTime() >= now,
     ) || null
 
@@ -93,19 +113,19 @@ export default async function Home() {
       <LogoIntro />
       <SkipLink />
       <ScrollProgress />
-      <SiteHeader siteSettings={siteSettings} />
+      <SiteHeader siteSettings={localizedData.siteSettings} />
       <main id='main-content' className='min-h-screen'>
-        <HeroCarousel slides={heroSlides} siteSettings={siteSettings} sectionContent={sectionContentMap['hero']} />
-        <TrustBand siteSettings={siteSettings} />
+        <HeroCarousel slides={localizedData.heroSlides} siteSettings={localizedData.siteSettings} sectionContent={sectionContentMap['hero']} />
+        <TrustBand siteSettings={localizedData.siteSettings} />
         <About
-          data={aboutSection}
+          data={localizedData.aboutSection}
           sectionContent={sectionContentMap['about']}
         />
         <VideoPresentation sectionContent={sectionContentMap['video']} />
         <SectionDivider variant="ecg" />
-        <Poles data={poles} />
+        <Poles data={localizedData.poles} />
         <SectionDivider variant="ecg" />
-        <DoctorsShowcase data={doctors} />
+        <DoctorsShowcase data={localizedData.doctors} />
         <SectionDivider variant="ecg" />
         {featuredEvent && (
           <>
@@ -113,26 +133,26 @@ export default async function Home() {
             <SectionDivider variant="ecg" />
           </>
         )}
-        <LazyEquipementsGallery data={facilityPhotos} />
+        <LazyEquipementsGallery data={localizedData.facilityPhotos} />
         <LazyHomeCare
-          data={homeCare}
+          data={localizedData.homeCare}
           sectionContent={sectionContentMap['homecare']}
         />
         <SectionDivider variant="gradient" />
         <LazyTestimonials
-          data={testimonials}
+          data={localizedData.testimonials}
           sectionContent={sectionContentMap['testimonials']}
         />
         <SectionDivider variant="ecg" />
-        <Insurance data={insurance} />
+        <Insurance data={localizedData.insurance} />
         <SectionDivider variant="ecg" />
-        <FaqTeaser data={faqs} sectionContent={sectionContentMap['faq']} />
+        <FaqTeaser data={localizedData.faqs} sectionContent={sectionContentMap['faq']} />
         <SectionDivider />
-        <Contact siteSettings={siteSettings} sectionContent={sectionContentMap['contact']} />
+        <Contact siteSettings={localizedData.siteSettings} sectionContent={sectionContentMap['contact']} />
       </main>
-      <SiteFooter siteSettings={siteSettings} />
+      <SiteFooter siteSettings={localizedData.siteSettings} />
       <BackToTop />
-      <MobileActionBar siteSettings={siteSettings} />
+      <MobileActionBar siteSettings={localizedData.siteSettings} />
     </>
   )
 }

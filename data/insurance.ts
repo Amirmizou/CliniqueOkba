@@ -4,45 +4,66 @@
 
 export interface InsuranceProvider {
   name: string
+  name_ar?: string
   description: string
+  description_ar?: string
+  logo?: string | any
 }
 
 export interface InsuranceContent {
   badge: string
+  badge_ar?: string
   title: string
+  title_ar?: string
   subtitle: string
+  subtitle_ar?: string
   providers: InsuranceProvider[]
   note: string
+  note_ar?: string
   ctaText: string
+  ctaText_ar?: string
 }
 
 export const insuranceFallback: InsuranceContent = {
   badge: 'Prise en charge',
-  title: 'Conventions & Remboursement',
+  badge_ar: 'التكفل الطبي',
+  title: 'Conventions & Partenaires',
+  title_ar: 'الاتفاقيات والشركاء',
   subtitle:
-    'La Clinique OKBA vous accompagne dans vos démarches de prise en charge et de remboursement.',
+    'La Clinique OKBA est fière de collaborer avec ses partenaires pour vous faciliter l\'accès aux soins.',
+  subtitle_ar: 'تفتخر المصحة الطبية عقبة بالتعاون مع شركائها لتسهيل حصولكم على الرعاية الطبية.',
   providers: [
     {
-      name: 'CNAS',
-      description:
-        'Assurés salariés : prise en charge selon les barèmes de la Caisse Nationale des Assurances Sociales.',
+      name: 'SEACO',
+      name_ar: 'سياكو',
+      description: 'Société de l\'Eau et de l\'Assainissement de Constantine.',
+      description_ar: 'شركة المياه والتطهير بقسنطينة.',
+      logo: '/images/conventions/seaco.png'
     },
     {
-      name: 'CASNOS',
-      description:
-        'Travailleurs non-salariés : dossiers de remboursement pris en charge sur présentation des justificatifs.',
+      name: 'ENSB',
+      name_ar: 'المدرسة الوطنية العليا للبيوتكنولوجيا',
+      description: 'École Nationale Supérieure de Biotechnologie.',
+      description_ar: 'المدرسة الوطنية العليا للبيوتكنولوجيا.',
+      logo: '/images/conventions/ensb.png'
     },
     {
-      name: 'Carte CHIFA',
-      description:
-        'Présentez votre carte CHIFA à l’accueil pour faciliter vos démarches administratives.',
+      name: 'Promotion Dambri Saddek',
+      name_ar: 'ترقية دمبري صادق',
+      description: 'Acquéreurs de la promotion Dambri Saddek.',
+      description_ar: 'المستفيدون من ترقية دمبري صادق.',
+      logo: '/images/conventions/dambri.png'
     },
     {
-      name: 'Mutuelles & Assurances',
-      description:
-        'Conventions avec plusieurs mutuelles d’entreprise. Contactez-nous pour vérifier votre couverture.',
+      name: 'Association Oncologica',
+      name_ar: 'جمعية أونكولوجيكا',
+      description: 'Association Oncologica Constantine pour l\'aide des cancéreux.',
+      description_ar: 'جمعية أونكولوجيكا قسنطينة لمساعدة مرضى السرطان.',
+      logo: '/images/conventions/oncologica.png'
     },
   ],
-  note: 'Les modalités de remboursement dépendent de votre organisme. Notre équipe administrative reste à votre disposition pour toute question sur votre prise en charge.',
-  ctaText: 'Vérifier ma prise en charge',
+  note: 'Pour toute information supplémentaire concernant nos conventions, n\'hésitez pas à nous contacter.',
+  note_ar: 'لمزيد من المعلومات حول اتفاقياتنا، لا تترددوا في الاتصال بنا.',
+  ctaText: 'Nous contacter',
+  ctaText_ar: 'اتصل بنا',
 }

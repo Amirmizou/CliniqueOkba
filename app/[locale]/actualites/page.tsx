@@ -2,6 +2,7 @@ import { Suspense } from 'react'
 import SiteHeader from '@/components/site-header'
 import SiteFooter from '@/components/site-footer'
 import { getArticles, getSiteSettings } from '@/sanity/lib/fetch'
+import { localizeSanityData } from '@/sanity/lib/localize'
 import { urlFor } from '@/sanity/lib/image'
 import Image from 'next/image'
 import { Link } from '@/navigation'
@@ -9,7 +10,7 @@ import { Calendar, ArrowRight, Newspaper, User } from 'lucide-react'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import ScrollAnimation from '@/components/ui/scroll-animation'
-import { CATEGORY_LABELS } from '@/lib/news'
+import { getTranslations } from 'next-intl/server'
 
 interface Article {
     _id: string
@@ -27,9 +28,11 @@ export const metadata = {
     description: 'Découvrez les dernières actualités et informations de la Clinique OKBA à Constantine.',
 }
 
-async function ArticlesList() {
+async function ArticlesList({ locale }: { locale: string }) {
+    const t = await getTranslations('news')
+    const dateLocale = locale === 'ar' ? 'ar-DZ' : 'fr-FR'
     try {
-        const articles: Article[] = await getArticles()
+        const articles: Article[] = localizeSanityData(await getArticles(), locale)
 
         if (!articles || articles.length === 0) {
             return (
@@ -37,10 +40,10 @@ async function ArticlesList() {
                     <div className="bg-muted/30 rounded-2xl p-12 max-w-lg mx-auto">
                         <Newspaper className="h-16 w-16 mx-auto text-muted-foreground mb-4" />
                         <p className="text-muted-foreground text-lg">
-                            Aucun article disponible pour le moment.
+                            {t('none')}
                         </p>
                         <p className="text-sm text-muted-foreground mt-2">
-                            Ajoutez des articles via le Studio Sanity.
+                            {t('noneHint')}
                         </p>
                     </div>
                 </div>
@@ -63,9 +66,9 @@ async function ArticlesList() {
                                             className="object-cover transition-transform duration-500 group-hover:scale-110"
                                         />
                                         <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
-                                        {article.category && CATEGORY_LABELS[article.category] && (
+                                        {article.category && t.has(`cat.${article.category}`) && (
                                             <Badge className="absolute top-3 left-3 bg-primary text-primary-foreground shadow-md">
-                                                {CATEGORY_LABELS[article.category]}
+                                                {t(`cat.${article.category}`)}
                                             </Badge>
                                         )}
                                     </div>
@@ -74,7 +77,7 @@ async function ArticlesList() {
                                     <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-muted-foreground mb-2">
                                         <span className="flex items-center gap-2">
                                             <Calendar className="h-4 w-4" />
-                                            {new Date(article.publishedAt).toLocaleDateString('fr-FR', {
+                                            {new Date(article.publishedAt).toLocaleDateString(dateLocale, {
                                                 year: 'numeric',
                                                 month: 'long',
                                                 day: 'numeric',
@@ -96,7 +99,7 @@ async function ArticlesList() {
                                         {article.excerpt}
                                     </p>
                                     <div className="flex items-center text-primary font-medium">
-                                        Lire la suite
+                                        {t('readMore')}
                                         <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-2" />
                                     </div>
                                 </CardContent>
@@ -112,10 +115,10 @@ async function ArticlesList() {
             <div className="text-center py-16">
                 <div className="bg-destructive/10 rounded-2xl p-12 max-w-lg mx-auto">
                     <p className="text-destructive text-lg font-semibold mb-2">
-                        Erreur de chargement
+                        {t('errorTitle')}
                     </p>
                     <p className="text-muted-foreground text-sm">
-                        Impossible de charger les articles. Vérifiez la connexion à Sanity.
+                        {t('loadError')}
                     </p>
                 </div>
             </div>
@@ -123,8 +126,14 @@ async function ArticlesList() {
     }
 }
 
-export default async function ActualitesPage() {
-    const siteSettings = await getSiteSettings()
+export default async function ActualitesPage({
+    params,
+}: {
+    params: Promise<{ locale: string }>
+}) {
+    const { locale } = await params
+    const t = await getTranslations('news')
+    const siteSettings = localizeSanityData(await getSiteSettings(), locale)
     return (
         <>
             <SiteHeader siteSettings={siteSettings} />
@@ -132,10 +141,10 @@ export default async function ActualitesPage() {
                 <section className="py-16 md:py-24">
                     <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                         <ScrollAnimation variant="fadeUp" className="text-center mb-16">
-                            <Badge variant="outline" className="mb-4">Blog</Badge>
-                            <h1 className="text-4xl md:text-5xl font-bold mb-4">Actualités</h1>
+                            <Badge variant="outline" className="mb-4">{t('pageBadge')}</Badge>
+                            <h1 className="text-4xl md:text-5xl font-bold mb-4">{t('pageTitle')}</h1>
                             <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-                                Restez informé des dernières nouvelles et événements de la Clinique OKBA.
+                                {t('pageSubtitle')}
                             </p>
                         </ScrollAnimation>
 
@@ -146,7 +155,7 @@ export default async function ActualitesPage() {
                                 ))}
                             </div>
                         }>
-                            <ArticlesList />
+                            <ArticlesList locale={locale} />
                         </Suspense>
                     </div>
                 </section>

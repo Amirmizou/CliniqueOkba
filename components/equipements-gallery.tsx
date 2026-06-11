@@ -1,6 +1,7 @@
 'use client'
 
 import { useMemo, useState, useCallback, useEffect } from 'react'
+import { useTranslations } from 'next-intl'
 import Image from 'next/image'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
@@ -58,6 +59,7 @@ function GalleryTile({
   item: EquipementItem
   onOpen: (item: EquipementItem) => void
 }) {
+  const t = useTranslations('gallery')
   const cat = categoryById[item.category]
 
   return (
@@ -104,7 +106,7 @@ function GalleryTile({
           style={{ backgroundColor: `${cat.accent}E6` }}
         >
           <cat.icon className="h-3 w-3" />
-          {cat.label}
+          {t(`cat.${item.category}`)}
         </span>
 
         {/* Texte */}
@@ -144,6 +146,8 @@ function Lightbox({
   onClose: () => void
   onNavigate: (next: number) => void
 }) {
+  const t = useTranslations('gallery')
+  const tc = useTranslations('common')
   const item = items[index]
   const cat = categoryById[item.category]
 
@@ -177,7 +181,7 @@ function Lightbox({
       <button
         type="button"
         onClick={onClose}
-        aria-label="Fermer"
+        aria-label={tc('close')}
         className="absolute right-5 top-5 z-10 flex h-11 w-11 items-center justify-center rounded-full bg-white/15 text-white backdrop-blur-md transition-colors hover:bg-white/30"
       >
         <X className="h-5 w-5" />
@@ -190,7 +194,7 @@ function Lightbox({
           e.stopPropagation()
           go(-1)
         }}
-        aria-label="Image précédente"
+        aria-label={t('prevImage')}
         className="absolute left-3 top-1/2 z-10 flex h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full bg-white/15 text-white backdrop-blur-md transition-colors hover:bg-white/30 sm:left-6"
       >
         <ChevronLeft className="h-6 w-6" />
@@ -201,7 +205,7 @@ function Lightbox({
           e.stopPropagation()
           go(1)
         }}
-        aria-label="Image suivante"
+        aria-label={t('nextImage')}
         className="absolute right-3 top-1/2 z-10 flex h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full bg-white/15 text-white backdrop-blur-md transition-colors hover:bg-white/30 sm:right-6"
       >
         <ChevronRight className="h-6 w-6" />
@@ -234,7 +238,7 @@ function Lightbox({
               style={{ backgroundColor: `${cat.accent}E6` }}
             >
               <cat.icon className="h-3.5 w-3.5" />
-              {cat.label}
+              {t(`cat.${item.category}`)}
             </span>
             <h3 className="text-lg font-bold text-white sm:text-xl">{item.title}</h3>
             <p className="mx-auto mt-1 max-w-xl text-sm text-white/75">
@@ -258,6 +262,7 @@ function Lightbox({
 const PREVIEW_COUNT = 8
 
 export default function EquipementsGallery({ data }: { data?: any[] }) {
+  const t = useTranslations('gallery')
   const [filter, setFilter] = useState<Filter>('all')
   const [showAll, setShowAll] = useState(false)
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null)
@@ -287,12 +292,12 @@ export default function EquipementsGallery({ data }: { data?: any[] }) {
 
   const present = new Set(items.map((i) => i.category))
   const filters: { id: Filter; label: string; accent: string }[] = [
-    { id: 'all', label: 'Tout voir', accent: '#006633' },
+    { id: 'all', label: t('allFilter'), accent: '#006633' },
     ...equipementCategories
       .filter((c) => present.has(c.id))
       .map((c) => ({
         id: c.id as Filter,
-        label: c.label,
+        label: t(`cat.${c.id}`),
         accent: c.accent,
       })),
   ]
@@ -312,16 +317,15 @@ export default function EquipementsGallery({ data }: { data?: any[] }) {
           <div className="animate-item">
             <span className="mb-4 inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-4 py-1.5 text-sm font-semibold text-primary">
               <Sparkles className="h-4 w-4" />
-              Plateau technique & espaces
+              {t('badge')}
             </span>
             <h2 className="mb-4 text-3xl font-bold sm:text-4xl md:text-5xl">
-              <span className="text-gradient">Un équipement de pointe,</span>
+              <span className="text-gradient">{t('titleLine1')}</span>
               <br />
-              <span className="text-foreground">des espaces pensés pour vous</span>
+              <span className="text-foreground">{t('titleLine2')}</span>
             </h2>
             <p className="mx-auto max-w-2xl text-base text-muted-foreground sm:text-lg">
-              Découvrez en images notre plateau technique — imagerie, bloc opératoire,
-              laboratoire — ainsi que nos chambres et espaces d’accueil.
+              {t('subtitle')}
             </p>
           </div>
         </AnimatedSection>
@@ -373,8 +377,8 @@ export default function EquipementsGallery({ data }: { data?: any[] }) {
               className="group inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/5 px-6 py-3 text-sm font-semibold text-primary transition-all duration-300 hover:bg-primary hover:text-white hover:shadow-lg hover:shadow-primary/20"
             >
               {showAll
-                ? 'Voir moins'
-                : `Voir toute la galerie (${visible.length} photos)`}
+                ? t('showLess')
+                : t('showAll', { count: visible.length })}
               <ChevronDown
                 className={`h-4 w-4 transition-transform duration-300 ${
                   showAll ? 'rotate-180' : ''

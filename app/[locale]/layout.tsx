@@ -20,14 +20,19 @@ export const metadata: Metadata = {
 
 // Le wrapper <html>/<body> est fourni par le layout racine (app/layout.tsx).
 // Ici on n'ajoute que les providers (i18n, thème, etc.) pour éviter un <html> imbriqué.
+
+export function generateStaticParams() {
+  return [{ locale: 'fr' }, { locale: 'ar' }]
+}
+
 export default async function LocaleLayout({
   children,
+  params
 }: {
   children: React.ReactNode
   params: Promise<{ locale: string }>
 }) {
-  // Always use French locale since app is French-only
-  const locale = 'fr'
+  const { locale } = await params;
   const messages = await getMessages({ locale })
 
   return (

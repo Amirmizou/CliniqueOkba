@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useTranslations } from 'next-intl'
 import { buildWhatsAppUrl } from '@/lib/whatsapp'
 import { siteConfig as siteConfigFallback } from '@/data/site-config'
 
@@ -13,15 +14,6 @@ function WhatsAppIcon({ className }: { className?: string }) {
   )
 }
 
-const DEFAULT_SPECIALTIES = [
-  'Endocrinologie',
-  'Gynécologie',
-  'Médecine interne',
-  'ORL',
-  'Pédiatrie',
-  'Autre',
-]
-
 interface WhatsAppBookingProps {
   whatsappNumber?: string
   clinicName?: string
@@ -33,9 +25,21 @@ export default function WhatsAppBooking({
   whatsappNumber,
   clinicName = 'Clinique OKBA',
   introMessage,
-  specialties = DEFAULT_SPECIALTIES,
+  specialties,
 }: WhatsAppBookingProps) {
+  const t = useTranslations('whatsappBooking')
   const number = whatsappNumber || siteConfigFallback.contact.phone
+  const specialtyList =
+    specialties && specialties.length > 0
+      ? specialties
+      : [
+          t('specialties.endocrinology'),
+          t('specialties.gynecology'),
+          t('specialties.internalMedicine'),
+          t('specialties.orl'),
+          t('specialties.pediatrics'),
+          t('specialties.other'),
+        ]
   const [name, setName] = useState('')
   const [phone, setPhone] = useState('')
   const [specialty, setSpecialty] = useState('')
@@ -45,27 +49,26 @@ export default function WhatsAppBooking({
 
   const buildMessage = () => {
     const intro =
-      introMessage?.trim() ||
-      `Bonjour ${clinicName}, je souhaite prendre un rendez-vous.`
+      introMessage?.trim() || t('msgIntro', { clinic: clinicName })
     const lines = [intro, '']
-    if (name.trim()) lines.push(`Nom : ${name.trim()}`)
-    if (phone.trim()) lines.push(`Téléphone : ${phone.trim()}`)
-    if (specialty) lines.push(`Spécialité : ${specialty}`)
-    if (date) lines.push(`Date souhaitée : ${date}`)
-    if (note.trim()) lines.push(`Motif : ${note.trim()}`)
+    if (name.trim()) lines.push(`${t('msgName')} : ${name.trim()}`)
+    if (phone.trim()) lines.push(`${t('msgPhone')} : ${phone.trim()}`)
+    if (specialty) lines.push(`${t('msgSpecialty')} : ${specialty}`)
+    if (date) lines.push(`${t('msgDate')} : ${date}`)
+    if (note.trim()) lines.push(`${t('msgReason')} : ${note.trim()}`)
     return lines.join('\n')
   }
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     if (!name.trim()) {
-      setError('Merci d’indiquer votre nom.')
+      setError(t('nameError'))
       return
     }
     setError('')
     const url = buildWhatsAppUrl(number, buildMessage())
     if (!url) {
-      setError("Le numéro WhatsApp n'est pas configuré. Contactez-nous par téléphone.")
+      setError(t('noNumberError'))
       return
     }
     window.open(url, '_blank', 'noopener,noreferrer')
@@ -86,10 +89,10 @@ export default function WhatsAppBooking({
           </span>
           <div>
             <h3 className="text-foreground text-lg font-bold sm:text-xl">
-              Rendez-vous express sur WhatsApp
+              {t('title')}
             </h3>
             <p className="text-muted-foreground text-sm">
-              Réponse rapide — confirmation directe par message.
+              {t('subtitle')}
             </p>
           </div>
         </div>
@@ -98,34 +101,34 @@ export default function WhatsAppBooking({
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div>
               <label htmlFor="wa-name" className="mb-1.5 block text-sm font-medium text-foreground">
-                Nom complet <span className="text-[#25D366]">*</span>
+                {t('nameLabel')} <span className="text-[#25D366]">*</span>
               </label>
               <input
                 id="wa-name"
                 type="text"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                placeholder="Votre nom"
+                placeholder={t('namePlaceholder')}
                 className={inputClass}
                 required
               />
             </div>
             <div>
               <label htmlFor="wa-phone" className="mb-1.5 block text-sm font-medium text-foreground">
-                Téléphone
+                {t('phoneLabel')}
               </label>
               <input
                 id="wa-phone"
                 type="tel"
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
-                placeholder="07 .. .. .. .."
+                placeholder={t('phonePlaceholder')}
                 className={inputClass}
               />
             </div>
             <div>
               <label htmlFor="wa-specialty" className="mb-1.5 block text-sm font-medium text-foreground">
-                Spécialité
+                {t('specialtyLabel')}
               </label>
               <select
                 id="wa-specialty"
@@ -133,8 +136,8 @@ export default function WhatsAppBooking({
                 onChange={(e) => setSpecialty(e.target.value)}
                 className={inputClass}
               >
-                <option value="">— Choisir —</option>
-                {specialties.map((s) => (
+                <option value="">{t('choose')}</option>
+                {specialtyList.map((s) => (
                   <option key={s} value={s}>
                     {s}
                   </option>
@@ -143,7 +146,7 @@ export default function WhatsAppBooking({
             </div>
             <div>
               <label htmlFor="wa-date" className="mb-1.5 block text-sm font-medium text-foreground">
-                Date souhaitée
+                {t('dateLabel')}
               </label>
               <input
                 id="wa-date"
@@ -157,14 +160,14 @@ export default function WhatsAppBooking({
 
           <div>
             <label htmlFor="wa-note" className="mb-1.5 block text-sm font-medium text-foreground">
-              Motif (optionnel)
+              {t('noteLabel')}
             </label>
             <textarea
               id="wa-note"
               value={note}
               onChange={(e) => setNote(e.target.value)}
               rows={2}
-              placeholder="Précisez votre demande…"
+              placeholder={t('notePlaceholder')}
               className={inputClass}
             />
           </div>
@@ -178,11 +181,11 @@ export default function WhatsAppBooking({
             className="group inline-flex w-full cursor-pointer items-center justify-center gap-2.5 rounded-full bg-[#25D366] px-6 py-4 text-base font-semibold text-white shadow-lg shadow-[#25D366]/30 transition-all duration-300 hover:bg-[#1ebe5b] hover:shadow-xl hover:shadow-[#25D366]/40 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#25D366]/40 active:scale-[0.99]"
           >
             <WhatsAppIcon className="h-6 w-6" />
-            Prendre rendez-vous sur WhatsApp
+            {t('submit')}
           </button>
 
           <p className="text-center text-xs text-muted-foreground">
-            Vous serez redirigé vers WhatsApp avec votre demande déjà rédigée.
+            {t('redirectNote')}
           </p>
         </form>
       </div>

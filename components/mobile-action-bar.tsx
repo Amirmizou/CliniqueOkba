@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { motion, AnimatePresence, useScroll, useMotionValueEvent } from 'framer-motion'
 import { Phone, MessageCircle, MapPin } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 import { siteConfig } from '@/data/site-config'
 import { buildWhatsAppUrl } from '@/lib/whatsapp'
 
@@ -22,6 +23,7 @@ interface MobileActionBarProps {
  * Apparaît après le hero pour ne pas doublonner les CTA du haut de page.
  */
 export default function MobileActionBar({ siteSettings }: MobileActionBarProps) {
+  const t = useTranslations('actionBar')
   const [visible, setVisible] = useState(false)
   const { scrollY } = useScroll()
 
@@ -64,7 +66,7 @@ export default function MobileActionBar({ siteSettings }: MobileActionBarProps) 
               className="flex flex-col items-center justify-center gap-1 rounded-xl bg-gradient-to-b from-[#006633] to-[#00532a] py-2.5 text-white shadow-md active:scale-95 transition-transform"
             >
               <Phone className="h-5 w-5" />
-              <span className="text-[11px] font-semibold leading-none">Appeler</span>
+              <span className="text-[11px] font-semibold leading-none">{t('call')}</span>
             </a>
 
             {waUrl ? (
@@ -75,7 +77,7 @@ export default function MobileActionBar({ siteSettings }: MobileActionBarProps) 
                 className="flex flex-col items-center justify-center gap-1 rounded-xl bg-gradient-to-b from-[#25D366] to-[#1da851] py-2.5 text-white shadow-md active:scale-95 transition-transform"
               >
                 <MessageCircle className="h-5 w-5" />
-                <span className="text-[11px] font-semibold leading-none">RDV</span>
+                <span className="text-[11px] font-semibold leading-none">{t('appointment')}</span>
               </a>
             ) : (
               <a
@@ -83,7 +85,7 @@ export default function MobileActionBar({ siteSettings }: MobileActionBarProps) 
                 className="flex flex-col items-center justify-center gap-1 rounded-xl bg-gradient-to-b from-[#25D366] to-[#1da851] py-2.5 text-white shadow-md active:scale-95 transition-transform"
               >
                 <MessageCircle className="h-5 w-5" />
-                <span className="text-[11px] font-semibold leading-none">RDV</span>
+                <span className="text-[11px] font-semibold leading-none">{t('appointment')}</span>
               </a>
             )}
 
@@ -94,7 +96,7 @@ export default function MobileActionBar({ siteSettings }: MobileActionBarProps) 
               className="flex flex-col items-center justify-center gap-1 rounded-xl border border-border/60 bg-card py-2.5 text-foreground active:scale-95 transition-transform"
             >
               <MapPin className="h-5 w-5 text-primary" />
-              <span className="text-[11px] font-semibold leading-none">Itinéraire</span>
+              <span className="text-[11px] font-semibold leading-none">{t('directions')}</span>
             </a>
           </div>
         </motion.nav>
