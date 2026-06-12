@@ -44,12 +44,7 @@ export const defaultMetadata: Metadata = {
     telephone: false,
   },
   metadataBase: new URL(baseUrl),
-  alternates: {
-    canonical: '/',
-    languages: {
-      'fr-DZ': '/',
-    },
-  },
+
   openGraph: {
     type: 'website',
     locale: 'fr_DZ',
