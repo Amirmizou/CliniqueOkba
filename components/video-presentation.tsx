@@ -67,8 +67,8 @@ export default function VideoPresentation({
   // Vidéo : Sanity prioritaire, repli local
   const videoSrc = sectionContent?.videoUrl || '/videos/clinique-okba-promo.mp4'
   const posterSrc = sectionContent?.videoPoster
-    ? urlFor(sectionContent.videoPoster).width(1600).height(900).url()
-    : '/videos/promo-poster.png'
+    ? urlFor(sectionContent.videoPoster).url() // LCP Fix : on utilise directement le CDN Sanity optimisé
+    : '/_next/image?url=%2Fvideos%2Fpromo-poster.png&w=1080&q=75' // LCP Fix : on force Next.js à compresser cette image lourde en WebP
 
   // Lecture automatique UNE SEULE FOIS quand la vidéo entre dans la vue
   // (muette = autorisée par le navigateur). En quittant la vue : pause, mais
@@ -134,7 +134,7 @@ export default function VideoPresentation({
           className="pointer-events-none absolute left-1/2 top-1/2 z-0 h-[60vw] max-h-[760px] w-[60vw] max-w-[760px] -translate-x-1/2 -translate-y-1/2"
           aria-hidden
         >
-          <Image src="/logo.png" alt="" fill className="object-contain" />
+          <Image src="/logo.png" alt="" fill sizes="(max-width: 768px) 80vw, 50vw" className="object-contain" />
         </motion.div>
       )}
 
