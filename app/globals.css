@@ -126,10 +126,12 @@
     --font-title: var(--font-lemon-milk);
   }
 
-  [dir="rtl"], [dir="rtl"] * {
-    --font-base: var(--font-montserrat-arabic) !important;
-    --font-title: var(--font-montserrat-arabic) !important;
-    font-family: var(--font-montserrat-arabic) !important;
+  /* Override des variables de police pour l'arabe (titres + corps).
+     L'application réelle se fait par la règle HORS @layer plus bas
+     (html[dir="rtl"] body *), qui bat les utilitaires Tailwind v4. */
+  [dir="rtl"] {
+    --font-base: var(--font-montserrat-arabic);
+    --font-title: var(--font-montserrat-arabic);
   }
 
   * {
@@ -188,6 +190,28 @@
   .font-display {
     font-family: var(--font-heading);
   }
+}
+
+/* ==========================================================================
+   POLICE ARABE (RTL) — application déterministe
+   --------------------------------------------------------------------------
+   @font-face autonome (servi depuis /public) : ne dépend pas de next/font ni
+   de la résolution des variables de thème. La règle ci-dessous est HORS de
+   tout @layer : en CSS, les déclarations non-layered l'emportent sur toutes
+   les couches Tailwind v4 (theme/base/components/utilities), donc elle bat
+   les utilitaires .font-sans / .font-display sans recourir à !important.
+   ========================================================================== */
+@font-face {
+  font-family: 'MontserratArabic';
+  src: url('/fonts/montserrat-arabic/alfont_com_Montserrat-Arabic-Regular.ttf') format('truetype');
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+html[dir='rtl'] body,
+html[dir='rtl'] body * {
+  font-family: 'MontserratArabic', system-ui, 'Segoe UI', Tahoma, sans-serif;
 }
 
 /* Smooth scroll behavior */
