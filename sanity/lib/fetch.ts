@@ -36,14 +36,13 @@ import {
 // En production : ISR pour la performance.
 const isDev = process.env.NODE_ENV === 'development'
 
-// Cache options for better performance
-const cacheOptions = {
-    next: { revalidate: isDev ? 1 : 3600 }, // 1 s en dev, 1 h en prod
-}
+const cacheOptions = isDev 
+    ? { cache: 'no-store' as const }
+    : { next: { revalidate: 3600 } }
 
-const shortCacheOptions = {
-    next: { revalidate: isDev ? 1 : 60 }, // 1 s en dev, 1 min en prod
-}
+const shortCacheOptions = isDev
+    ? { cache: 'no-store' as const }
+    : { next: { revalidate: 60 } }
 
 // ==========================================
 // HERO & HOME

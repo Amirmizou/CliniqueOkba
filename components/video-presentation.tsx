@@ -124,6 +124,7 @@ export default function VideoPresentation({
       ref={sectionRef}
       id="video"
       className="relative w-full overflow-hidden bg-background py-20 sm:py-24 md:py-28"
+      style={{ position: 'relative' }}
     >
       {/* ---------- Décor d'ambiance ---------- */}
       {/* Filigrane logo géant en parallax */}

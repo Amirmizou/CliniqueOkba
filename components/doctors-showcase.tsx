@@ -148,14 +148,16 @@ function DoctorCard({
     damping: 18,
   })
 
-  function handleMove(e: MouseEvent<HTMLDivElement>) {
+  function handleMove(e: React.PointerEvent<HTMLDivElement>) {
+    if (e.pointerType !== 'mouse') return // Ignore touch inputs for 3D tilt to prevent scroll blocking
     const rect = ref.current?.getBoundingClientRect()
     if (!rect) return
     mx.set((e.clientX - rect.left) / rect.width)
     my.set((e.clientY - rect.top) / rect.height)
   }
 
-  function handleLeave() {
+  function handleLeave(e: React.PointerEvent<HTMLDivElement>) {
+    if (e.pointerType !== 'mouse') return
     mx.set(0.5)
     my.set(0.5)
     setHovered(false)
@@ -185,9 +187,9 @@ function DoctorCard({
 
       <motion.div
         ref={ref}
-        onMouseMove={handleMove}
-        onMouseEnter={() => setHovered(true)}
-        onMouseLeave={handleLeave}
+        onPointerMove={handleMove}
+        onPointerEnter={(e) => e.pointerType === 'mouse' && setHovered(true)}
+        onPointerLeave={handleLeave}
         style={{ rotateX, rotateY, transformStyle: 'preserve-3d' }}
         className="relative flex h-full flex-col overflow-hidden rounded-[1.75rem] border border-white/40 bg-white/70 shadow-xl ring-1 ring-[#006633]/15 backdrop-blur-md dark:border-white/10 dark:bg-white/5"
       >
@@ -196,14 +198,15 @@ function DoctorCard({
           type="button"
           onClick={() => onOpen(doctor)}
           aria-label={`Agrandir la photo de ${doctor.name}`}
-          className="relative block aspect-[3/4] w-full overflow-hidden bg-gradient-to-br from-[#006633] via-[#0a7a3f] to-[#FDE68A]"
+          className="relative block aspect-[3/4] w-full overflow-hidden bg-gradient-to-br from-[#006633] via-[#0a7a3f] to-[#FDE68A] cursor-zoom-in touch-manipulation"
         >
           <Image
             src={doctor.poster}
             alt={`Photo ${doctor.name} – ${doctor.specialty}`}
             fill
+            draggable={false}
             sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
-            className="object-cover transition-transform duration-700 group-hover:scale-[1.06]"
+            className="object-cover transition-transform duration-700 group-hover:scale-[1.06] select-none"
           />
 
           {/* Voile de marque haut : le fond clair des portraits prend l'identité visuelle */}
@@ -401,7 +404,7 @@ export default function DoctorsShowcase({ data }: { data?: any[] }) {
         </AnimatedSection>
 
         {/* Grille (flex centré : s'équilibre quel que soit le nombre de médecins) */}
-        <div className="flex flex-nowrap overflow-x-auto pb-8 snap-x snap-mandatory gap-4 touch-pan-y overscroll-x-contain sm:gap-6 sm:flex-wrap sm:justify-center sm:overflow-visible sm:pb-0 sm:snap-none [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+        <div className="flex flex-nowrap overflow-x-auto pb-8 snap-x snap-mandatory gap-4 overscroll-x-contain sm:gap-6 sm:flex-wrap sm:justify-center sm:overflow-visible sm:pb-0 sm:snap-none [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
           {list.map((doctor, i) => (
             <div
               key={doctor.id}

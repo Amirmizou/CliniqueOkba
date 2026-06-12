@@ -24,19 +24,21 @@ interface FooterContent {
 interface FooterProps {
   siteSettings?: SiteSettings
   footerContent?: FooterContent
+  sanityPoles?: any[]
 }
 
-export default function Footer({ siteSettings, footerContent }: FooterProps) {
+export default function Footer({ siteSettings, footerContent, sanityPoles }: FooterProps) {
   const t = useTranslations('footer')
   const tNav = useTranslations('nav')
   const locale = useLocale()
 
   const isAr = locale === 'ar'
 
-  // Use Sanity data if available
+  // siteSettings are already localized by the parent (localizeSanityData)
+  // so address, clinicName etc. already contain the correct language
   const siteConfig = {
     contact: {
-      address: isAr ? (siteSettings?.address_ar || siteSettings?.address || '') : (siteSettings?.address || ''),
+      address: siteSettings?.address || '',
       phone: siteSettings?.phone || '',
       email: siteSettings?.email || '',
     },
@@ -194,14 +196,22 @@ export default function Footer({ siteSettings, footerContent }: FooterProps) {
               {t('poles')}
             </h4>
             <ul className='space-y-3'>
-              {poles.map((pole) => (
-                <li key={pole.slug}>
-                  <Link href={`/poles/${pole.slug}`} className='group flex items-center gap-3 text-base md:text-sm text-slate-400 hover:text-white transition-all duration-300 hover:translate-x-1.5 py-2 touch-target'>
+              {(sanityPoles && sanityPoles.length > 0 ? sanityPoles : poles).map((pole: any) => {
+                const poleSlug = pole.slug?.current || pole.slug
+                // sanityPoles are already localized (title contains Arabic when locale=ar)
+                // static poles from data/poles.ts still need manual title_ar fallback
+                const displayTitle = sanityPoles && sanityPoles.length > 0
+                  ? pole.title
+                  : (isAr ? (pole.title_ar || pole.title) : pole.title)
+                return (
+                <li key={poleSlug}>
+                  <Link href={`/poles/${poleSlug}`} className='group flex items-center gap-3 text-base md:text-sm text-slate-400 hover:text-white transition-all duration-300 hover:translate-x-1.5 py-2 touch-target'>
                     <HeartPulse className={cn("w-4 h-4 transition-colors", pole.urgent ? "text-red-500" : "text-slate-600 group-hover:text-secondary")} />
-                    <span className={pole.urgent ? "text-red-400 font-medium" : ""}>{locale === 'ar' && pole.title_ar ? pole.title_ar : pole.title}</span>
+                    <span className={pole.urgent ? "text-red-400 font-medium" : ""}>{displayTitle}</span>
                   </Link>
                 </li>
-              ))}
+                )
+              })}
             </ul>
           </motion.div>
 

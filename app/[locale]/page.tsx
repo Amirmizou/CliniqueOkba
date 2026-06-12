@@ -39,12 +39,13 @@ import {
   getInsuranceSection,
   getFaq,
   getVideos,
+  getFooterContent,
 } from '@/sanity/lib/fetch'
 import { localizeSanityData } from '@/sanity/lib/localize'
 import type { ClinicEvent } from '@/lib/events'
 
-// ISR: Revalidate every hour for better performance
-export const revalidate = 3600
+// ISR: Utilisation du cache au niveau des fetch (sanity/lib/fetch.ts) plutôt qu'au niveau de la page globale
+export const revalidate = 0
 
 export default async function Home(props: { params: Promise<{ locale: string }> }) {
   // Fetch all data from Sanity in parallel
@@ -62,6 +63,7 @@ export default async function Home(props: { params: Promise<{ locale: string }> 
     insurance,
     faqs,
     videos,
+    footerContent,
   ] = await Promise.all([
     getSiteSettings(),
     getAboutSection(),
@@ -76,6 +78,7 @@ export default async function Home(props: { params: Promise<{ locale: string }> 
     getInsuranceSection(),
     getFaq(),
     getVideos(),
+    getFooterContent(),
   ])
 
   // Get current locale
@@ -96,6 +99,7 @@ export default async function Home(props: { params: Promise<{ locale: string }> 
     insurance: localizeSanityData(insurance, locale),
     faqs: localizeSanityData(faqs, locale),
     videos: localizeSanityData(videos, locale),
+    footerContent: localizeSanityData(footerContent, locale),
   }
 
   // Create a map of section contents for easy access
@@ -156,7 +160,7 @@ export default async function Home(props: { params: Promise<{ locale: string }> 
         <SectionDivider />
         <Contact siteSettings={localizedData.siteSettings} sectionContent={sectionContentMap['contact']} />
       </main>
-      <SiteFooter siteSettings={localizedData.siteSettings} />
+      <SiteFooter siteSettings={localizedData.siteSettings} footerContent={localizedData.footerContent} poles={localizedData.poles} />
       <BackToTop />
       <MobileActionBar siteSettings={localizedData.siteSettings} />
     </>

@@ -297,6 +297,7 @@
       "email": "Email",
       "hours": "Horaires",
       "emergency": "Urgences",
+      "emergencyCallHint": "Appuyez pour appeler — prise en charge immédiate",
       "fastReply": "Réponse rapide garantie",
       "weekdaysLabel": "Samedi - Jeudi",
       "fridayLabel": "Vendredi",
@@ -414,6 +415,16 @@
       "pediatrics": "Pédiatrie",
       "other": "Autre"
     }
+  },
+  "homeCare": {
+    "badge": "Soins à domicile",
+    "title": "Soins infirmiers à domicile",
+    "subtitle": "Notre équipe médicale se déplace chez vous pour assurer la continuité de vos soins.",
+    "prestations": "Prestations",
+    "availabilityTitle": "Disponibilité",
+    "availabilityText": "Intervention rapide 7j/7",
+    "contactPrompt": "Contactez-nous pour planifier",
+    "ctaText": "Demander une intervention"
   },
   "polePage": {
     "backHome": "Retour à l'accueil",

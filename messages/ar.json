@@ -297,6 +297,7 @@
       "email": "البريد الإلكتروني",
       "hours": "ساعات العمل",
       "emergency": "الطوارئ",
+      "emergencyCallHint": "اضغط للاتصال — تكفّل فوري",
       "fastReply": "ردّ سريع مضمون",
       "weekdaysLabel": "السبت - الخميس",
       "fridayLabel": "الجمعة",
@@ -414,6 +415,16 @@
       "pediatrics": "طب الأطفال",
       "other": "أخرى"
     }
+  },
+  "homeCare": {
+    "badge": "الرعاية المنزلية",
+    "title": "الرعاية التمريضية المنزلية",
+    "subtitle": "فريقنا الطبي يتنقل إلى منزلك لضمان استمرارية رعايتك الصحية.",
+    "prestations": "الخدمات",
+    "availabilityTitle": "التوفر",
+    "availabilityText": "تدخّل سريع 7 أيام في الأسبوع",
+    "contactPrompt": "اتصل بنا للتخطيط",
+    "ctaText": "طلب تدخّل منزلي"
   },
   "polePage": {
     "backHome": "العودة للرئيسية",

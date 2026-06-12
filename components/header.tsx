@@ -195,10 +195,10 @@ export default function Header({ siteSettings, poles }: HeaderProps) {
         className="fixed top-0 left-0 right-0 z-[100] flex justify-center pt-4 px-4 pointer-events-none"
       >
         <div className={cn(
-          "pointer-events-auto flex items-center justify-between gap-2 sm:gap-4 px-3 py-2 rounded-full transition-all duration-500 ease-out border shadow-2xl backdrop-blur-2xl w-full max-w-6xl",
+          "pointer-events-auto flex items-center justify-between gap-2 sm:gap-4 px-3 py-2 rounded-full transition-all duration-500 ease-out border w-full max-w-6xl",
           isScrolled
-            ? "bg-background/70 border-border/40 shadow-primary/5"
-            : "bg-background/40 border-white/20 dark:border-white/10 shadow-black/5"
+            ? "bg-white/70 dark:bg-black/70 backdrop-blur-[24px] border-border/40 shadow-[0_8px_30px_rgb(0,0,0,0.12)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.3)]"
+            : "bg-white/40 dark:bg-black/40 backdrop-blur-lg border-white/40 dark:border-white/10 shadow-[0_8px_30px_rgb(0,0,0,0.05)]"
         )}>
           {/* Logo Section */}
           <a
@@ -239,8 +239,8 @@ export default function Header({ siteSettings, poles }: HeaderProps) {
                     // setActiveTab(item.id) 
                   }}
                   className={cn(
-                    'relative px-4 py-2 text-sm font-medium transition-colors duration-300 rounded-full flex items-center gap-2 group z-10',
-                    isActive ? "text-primary" : "text-muted-foreground hover:text-primary"
+                    'relative px-4 py-2 text-sm font-semibold transition-colors duration-300 rounded-full flex items-center gap-2 group z-10',
+                    isActive ? "text-primary drop-shadow-sm" : "text-foreground/90 hover:text-primary"
                   )}
                 >
                   {/* Active Indicator (The "Liquid Pill") - Premium */}
@@ -266,16 +266,25 @@ export default function Header({ siteSettings, poles }: HeaderProps) {
             <div className="hidden md:block w-px h-6 bg-border/50 mx-1" /> {/* Divider */}
 
             {/* Dropdown : Pôles */}
-            <div className="relative group z-30">
+            <motion.div initial="initial" whileHover="hover" className="relative z-30">
               <button
-                className="relative px-4 py-2 text-sm font-medium transition-colors duration-300 rounded-full text-muted-foreground hover:text-primary flex items-center gap-1 hover:bg-white/5"
+                className="relative px-4 py-2 text-sm font-semibold transition-colors duration-300 rounded-full text-foreground/90 hover:text-primary flex items-center gap-1 hover:bg-white/5"
               >
                 {t('poles')}
-                <ChevronDown className="h-3 w-3 transition-transform duration-300 group-hover:-rotate-180" />
+                <motion.div variants={{ initial: { rotate: 0 }, hover: { rotate: -180 } }} transition={{ duration: 0.3 }}>
+                  <ChevronDown className="h-3 w-3" />
+                </motion.div>
               </button>
 
-              <div className="absolute top-full start-1/2 -translate-x-1/2 mt-4 w-[22rem] opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform origin-top scale-95 group-hover:scale-100 pt-2">
-                <div className="glass-card p-2 rounded-2xl shadow-2xl border border-white/20 overflow-hidden bg-white/80 dark:bg-black/80 backdrop-blur-2xl">
+              <motion.div 
+                className="absolute top-full start-1/2 -translate-x-1/2 mt-4 w-[22rem] pt-2"
+                variants={{
+                  initial: { opacity: 0, y: 15, scale: 0.95, pointerEvents: "none" },
+                  hover: { opacity: 1, y: 0, scale: 1, pointerEvents: "auto" }
+                }}
+                transition={{ type: "spring", stiffness: 400, damping: 25 }}
+              >
+                <div className="glass-card p-2 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.12)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.3)] border border-white/40 dark:border-white/10 overflow-hidden bg-white/90 dark:bg-black/90 backdrop-blur-[24px]">
                   <div className="grid grid-cols-1 gap-1">
                     {navPoles.map((pole) => {
                       const Icon = POLE_ICONS[pole.iconName] || Stethoscope
@@ -306,21 +315,30 @@ export default function Header({ siteSettings, poles }: HeaderProps) {
                     })}
                   </div>
                 </div>
-              </div>
-            </div>
+              </motion.div>
+            </motion.div>
 
             {/* Dropdown for additional pages */}
-            <div className="relative group z-20">
+            <motion.div initial="initial" whileHover="hover" className="relative z-20">
               <button
-                className="relative px-4 py-2 text-sm font-medium transition-colors duration-300 rounded-full text-muted-foreground hover:text-primary flex items-center gap-1 hover:bg-white/5"
+                className="relative px-4 py-2 text-sm font-semibold transition-colors duration-300 rounded-full text-foreground/90 hover:text-primary flex items-center gap-1 hover:bg-white/5"
               >
                 {t('more')}
-                <ChevronDown className="h-3 w-3 transition-transform duration-300 group-hover:-rotate-180" />
+                <motion.div variants={{ initial: { rotate: 0 }, hover: { rotate: -180 } }} transition={{ duration: 0.3 }}>
+                  <ChevronDown className="h-3 w-3" />
+                </motion.div>
               </button>
 
               {/* Dropdown Menu */}
-              <div className="absolute top-full end-0 mt-4 w-64 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform origin-top-[100%] scale-95 group-hover:scale-100 pt-2">
-                <div className="glass-card p-2 rounded-2xl shadow-2xl border border-white/20 overflow-hidden bg-white/80 dark:bg-black/80 backdrop-blur-2xl">
+              <motion.div 
+                className="absolute top-full end-0 mt-4 w-64 pt-2"
+                variants={{
+                  initial: { opacity: 0, y: 15, scale: 0.95, pointerEvents: "none" },
+                  hover: { opacity: 1, y: 0, scale: 1, pointerEvents: "auto" }
+                }}
+                transition={{ type: "spring", stiffness: 400, damping: 25 }}
+              >
+                <div className="glass-card p-2 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.12)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.3)] border border-white/40 dark:border-white/10 overflow-hidden bg-white/90 dark:bg-black/90 backdrop-blur-[24px]">
                   <div className="space-y-1">
                     <a href="/actualites" className="flex items-center gap-4 px-4 py-3 text-sm rounded-xl hover:bg-primary/5 text-muted-foreground hover:text-primary transition-all duration-200 group/item">
                       <div className="p-2 rounded-lg bg-primary/10 text-primary group-hover/item:bg-primary group-hover/item:text-white transition-colors shadow-sm">
@@ -360,8 +378,8 @@ export default function Header({ siteSettings, poles }: HeaderProps) {
                     </a>
                   </div>
                 </div>
-              </div>
-            </div>
+              </motion.div>
+            </motion.div>
           </nav>
 
           {/* Actions */}

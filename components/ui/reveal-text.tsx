@@ -38,7 +38,38 @@ export function WordReveal({
   const reduce = useReducedMotion()
   const words = text.split(' ').filter(Boolean)
 
-  if (reduce) return <span className={className}>{text}</span>
+  // Detect if text contains Arabic/RTL characters
+  const isRtl = /[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF\uFB50-\uFDFF\uFE70-\uFEFF]/.test(text)
+
+  if (reduce) return <span className={className} dir={isRtl ? 'rtl' : undefined}>{text}</span>
+
+  // RTL text: animate the whole block at once to avoid bidi reordering issues
+  // Uses a smooth upward slide + fade (no word splitting = no reordering)
+  if (isRtl) {
+    const rtlAnimProps =
+      mode === 'mount'
+        ? {
+            initial: { y: 32, opacity: 0 },
+            animate: { y: 0, opacity: 1 },
+          }
+        : {
+            initial: { y: 32, opacity: 0 },
+            whileInView: { y: 0, opacity: 1 },
+            viewport: { once: true, margin: '-60px' },
+          }
+
+    return (
+      <motion.span
+        className={className}
+        dir="rtl"
+        style={{ display: 'block' }}
+        {...rtlAnimProps}
+        transition={{ duration: 0.8, ease: EASE, delay }}
+      >
+        {text}
+      </motion.span>
+    )
+  }
 
   const animProps =
     mode === 'mount'
@@ -73,7 +104,7 @@ export function WordReveal({
           >
             {word}
           </motion.span>
-          {i < words.length - 1 && ' '}
+          {i < words.length - 1 && ' '}
         </span>
       ))}
     </motion.span>

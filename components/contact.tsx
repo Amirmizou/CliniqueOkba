@@ -264,13 +264,13 @@ export default function Contact({ siteSettings, sectionContent }: ContactProps) 
               </div>
               <div className='min-w-0'>
                 <h3 className='font-bold text-red-700 dark:text-red-400'>
-                  Urgences {contactData.hours?.emergency}
+                  {ti('emergency')} {contactData.hours?.emergency}
                 </h3>
                 <p className='truncate font-semibold text-foreground' dir='ltr'>
                   {contactData.phone.split('/')[0].trim()}
                 </p>
                 <p className='text-sm text-red-700/70 dark:text-red-400/70'>
-                  Appuyez pour appeler — prise en charge immédiate
+                  {ti('emergencyCallHint')}
                 </p>
               </div>
             </a>

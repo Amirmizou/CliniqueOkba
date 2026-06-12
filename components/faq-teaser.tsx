@@ -1,4 +1,4 @@
-import { useTranslations } from 'next-intl'
+import { useTranslations, useLocale } from 'next-intl'
 import { HelpCircle, ArrowRight } from 'lucide-react'
 import { Link } from '@/navigation'
 import ScrollAnimation from '@/components/ui/scroll-animation'
@@ -23,6 +23,8 @@ interface FaqTeaserProps {
  */
 export default function FaqTeaser({ data, sectionContent, limit = 5 }: FaqTeaserProps) {
   const t = useTranslations('faqTeaser')
+  const locale = useLocale()
+  const isAr = locale === 'ar'
   const faqs = data || []
   const visible = faqs.slice(0, limit)
 
@@ -42,6 +44,13 @@ export default function FaqTeaser({ data, sectionContent, limit = 5 }: FaqTeaser
     })),
   }
 
+  const hasArabicLetters = (text?: string) => /[\u0600-\u06FF]/.test(text || '');
+
+  // Workaround pour Sanity: si le titre retourné ne contient pas d'arabe alors qu'on est en arabe, on utilise la traduction locale
+  const badge = sectionContent?.badge && (!isAr || hasArabicLetters(sectionContent.badge)) ? sectionContent.badge : t('badge')
+  const title = sectionContent?.title && (!isAr || hasArabicLetters(sectionContent.title)) ? sectionContent.title : t('title')
+  const subtitle = sectionContent?.subtitle && (!isAr || hasArabicLetters(sectionContent.subtitle)) ? sectionContent.subtitle : t('subtitle')
+
   return (
     <section
       id="faq"
@@ -59,15 +68,15 @@ export default function FaqTeaser({ data, sectionContent, limit = 5 }: FaqTeaser
         <ScrollAnimation variant="fadeUp" className="mb-12 text-center">
           <span className="mb-4 inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-4 py-1.5 text-sm font-semibold text-primary">
             <HelpCircle className="h-4 w-4" />
-            {sectionContent?.badge || t('badge')}
+            {badge}
           </span>
           <h2 className="mb-4 text-3xl font-bold sm:text-4xl md:text-5xl">
             <span className="text-foreground">
-              {sectionContent?.title || t('title')}
+              {title}
             </span>
           </h2>
           <p className="mx-auto max-w-2xl text-base text-muted-foreground sm:text-lg">
-            {sectionContent?.subtitle || t('subtitle')}
+            {subtitle}
           </p>
         </ScrollAnimation>
 

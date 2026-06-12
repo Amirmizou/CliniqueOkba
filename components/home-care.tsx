@@ -4,7 +4,7 @@ import { Stethoscope, Home, PhoneCall, Clock, CheckCircle2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { motion } from 'framer-motion'
 import Image from 'next/image'
-import { useLocale } from 'next-intl'
+import { useLocale, useTranslations } from 'next-intl'
 
 interface SectionContent {
   badge?: string
@@ -46,16 +46,20 @@ export default function HomeCare({ data, sectionContent }: HomeCareProps) {
   }
 
   const locale = useLocale()
+  const t = useTranslations('homeCare')
   const isAr = locale === 'ar'
 
-  const badge = data?.badge || sectionContent?.badge
-  const title = data?.title || sectionContent?.title
-  const subtitle = data?.subtitle || sectionContent?.subtitle || data?.description
-  const prestations = data?.services?.map(s => s.name) || []
-  const availabilityText = data?.availability
-  const availabilityTitle = data?.availabilityTitle
-  const contactPrompt = data?.contactPrompt
-  const ctaText = data?.callToAction?.text
+  const hasArabicLetters = (text?: string) => /[\u0600-\u06FF]/.test(text || '');
+
+  // Workaround pour Sanity: si la donnée n'est pas en arabe alors qu'on est sur la version arabe, on force la traduction locale
+  const badge = sectionContent?.badge && (!isAr || hasArabicLetters(sectionContent.badge)) ? sectionContent.badge : data?.badge && (!isAr || hasArabicLetters(data.badge)) ? data.badge : t('badge')
+  const title = sectionContent?.title && (!isAr || hasArabicLetters(sectionContent.title)) ? sectionContent.title : data?.title && (!isAr || hasArabicLetters(data.title)) ? data.title : t('title')
+  const subtitle = sectionContent?.subtitle && (!isAr || hasArabicLetters(sectionContent.subtitle)) ? sectionContent.subtitle : data?.subtitle && (!isAr || hasArabicLetters(data.subtitle)) ? data.subtitle : data?.description || t('subtitle')
+  const prestations = data?.services?.length && (!isAr || data.services.some(s => hasArabicLetters(s.name))) ? data.services.map(s => s.name) : []
+  const availabilityText = data?.availability && (!isAr || hasArabicLetters(data.availability)) ? data.availability : t('availabilityText')
+  const availabilityTitle = data?.availabilityTitle && (!isAr || hasArabicLetters(data.availabilityTitle)) ? data.availabilityTitle : t('availabilityTitle')
+  const contactPrompt = data?.contactPrompt && (!isAr || hasArabicLetters(data.contactPrompt)) ? data.contactPrompt : t('contactPrompt')
+  const ctaText = data?.callToAction?.text && (!isAr || hasArabicLetters(data.callToAction.text)) ? data.callToAction.text : t('ctaText')
 
   return (
     <section id='home-care' className='bg-background py-20'>
@@ -85,15 +89,32 @@ export default function HomeCare({ data, sectionContent }: HomeCareProps) {
               >
                 <div className='mb-4 flex items-center gap-3'>
                   <Home className='text-primary h-6 w-6' />
-                  <h3 className='text-foreground text-xl font-semibold'>Prestations</h3>
+                  <h3 className='text-foreground text-xl font-semibold'>{t('prestations')}</h3>
                 </div>
                 <ul className='space-y-3'>
-                  {prestations.map((item) => (
-                    <li key={item} className='flex items-start gap-3'>
-                      <CheckCircle2 className='text-primary mt-0.5 h-5 w-5 flex-shrink-0' />
-                      <span className='text-foreground text-sm'>{item}</span>
-                    </li>
-                  ))}
+                  {prestations.length > 0 ? (
+                    prestations.map((item) => (
+                      <li key={item} className='flex items-start gap-3'>
+                        <CheckCircle2 className='text-primary mt-0.5 h-5 w-5 flex-shrink-0' />
+                        <span className='text-foreground text-sm'>{item}</span>
+                      </li>
+                    ))
+                  ) : (
+                    <>
+                      <li className='flex items-start gap-3'>
+                        <CheckCircle2 className='text-primary mt-0.5 h-5 w-5 flex-shrink-0' />
+                        <span className='text-foreground text-sm'>{isAr ? 'حقن وإعطاء الأدوية' : 'Injections et administration de médicaments'}</span>
+                      </li>
+                      <li className='flex items-start gap-3'>
+                        <CheckCircle2 className='text-primary mt-0.5 h-5 w-5 flex-shrink-0' />
+                        <span className='text-foreground text-sm'>{isAr ? 'تغيير الضمادات' : 'Changement de pansements'}</span>
+                      </li>
+                      <li className='flex items-start gap-3'>
+                        <CheckCircle2 className='text-primary mt-0.5 h-5 w-5 flex-shrink-0' />
+                        <span className='text-foreground text-sm'>{isAr ? 'مراقبة العلامات الحيوية' : 'Surveillance des constantes vitales'}</span>
+                      </li>
+                    </>
+                  )}
                 </ul>
               </motion.div>
 
