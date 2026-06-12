@@ -1,14 +1,28 @@
 import { Poppins, Amiri } from 'next/font/google'
 import localFont from 'next/font/local'
 
-// Police de test (Amiri - très différente, style Serif traditionnel) 
-// pour prouver à l'utilisateur que le changement s'applique bien.
-// On garde le même nom de variable pour ne rien casser ailleurs.
-export const montserratArabic = Amiri({
-    subsets: ['arabic'],
-    weight: ['400', '700'],
+// Montserrat Arabic — police arabe (corps + titres en RTL).
+// Remplacée par la version alfont.com à la demande de l'utilisateur.
+// preload: false — les fichiers ne sont téléchargés que
+// lorsque la page est en arabe (dir="rtl"), pas sur les pages françaises.
+export const montserratArabic = localFont({
+    src: [
+        {
+            path: '../public/fonts/montserrat-arabic/alfont_com_Montserrat-Arabic-Regular.ttf',
+            weight: '400',
+            style: 'normal',
+        },
+        {
+            path: '../public/fonts/montserrat-arabic/alfont_com_Montserrat-Arabic-Regular.ttf',
+            weight: '700',
+            style: 'normal',
+        }
+    ],
     display: 'swap',
+    preload: false,
     variable: '--font-montserrat-arabic',
+    fallback: ['system-ui', 'arial'],
+    adjustFontFallback: 'Arial',
 })
 
 // Poppins : utilisé en fallback (corps de texte, caractères non-latins/arabe)

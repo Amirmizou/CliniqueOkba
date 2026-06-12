@@ -126,7 +126,7 @@
     --font-title: var(--font-lemon-milk);
   }
 
-  [dir="rtl"] {
+  [dir="rtl"], [dir="rtl"] * {
     --font-base: var(--font-montserrat-arabic) !important;
     --font-title: var(--font-montserrat-arabic) !important;
     font-family: var(--font-montserrat-arabic) !important;
