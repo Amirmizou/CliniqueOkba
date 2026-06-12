@@ -149,17 +149,6 @@ export default defineType({
             ],
         }),
         defineField({
-            name: 'availability',
-            title: 'Disponibilité (FR)',
-            type: 'string',
-            description: 'Ex: 24h/24 - 7j/7',
-        }),
-        defineField({
-            name: 'availability_ar',
-            title: 'Disponibilité (AR)',
-            type: 'string',
-        }),
-        defineField({
             name: 'active',
             title: 'Activer cette section',
             type: 'boolean',
