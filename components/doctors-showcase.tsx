@@ -401,7 +401,7 @@ export default function DoctorsShowcase({ data }: { data?: any[] }) {
         </AnimatedSection>
 
         {/* Grille (flex centré : s'équilibre quel que soit le nombre de médecins) */}
-        <div className="flex flex-nowrap overflow-x-auto pb-8 snap-x snap-mandatory gap-4 sm:gap-6 sm:flex-wrap sm:justify-center sm:overflow-visible sm:pb-0 sm:snap-none [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+        <div className="flex flex-nowrap overflow-x-auto pb-8 snap-x snap-mandatory gap-4 touch-pan-y overscroll-x-contain sm:gap-6 sm:flex-wrap sm:justify-center sm:overflow-visible sm:pb-0 sm:snap-none [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
           {list.map((doctor, i) => (
             <div
               key={doctor.id}

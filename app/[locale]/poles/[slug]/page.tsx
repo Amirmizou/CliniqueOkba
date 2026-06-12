@@ -64,6 +64,9 @@ function resolvePole(slug: string, locale: string, sanityPoles?: any[]) {
         accent: sanity?.accentColor || local?.accent || '#006633',
         badge,
         urgent: sanity?.urgent ?? local?.urgent ?? false,
+        videos: Array.isArray(sanity?.videos)
+            ? sanity.videos.filter((v: any) => v?.videoUrl)
+            : undefined,
     }
     const categories: string[] =
         sanity?.galleryCategories && sanity.galleryCategories.length > 0

@@ -2,7 +2,6 @@
 
 import { useEffect, useRef } from 'react'
 import Image from 'next/image'
-import clinicDataFallback from '@/data/clinic.json'
 import { useTranslations, useLocale } from 'next-intl'
 import * as LucideIcons from 'lucide-react'
 import { urlFor } from '@/sanity/lib/image'
@@ -50,19 +49,8 @@ export default function About({ data, sectionContent }: AboutProps) {
   const locale = useLocale()
   const isAr = locale === 'ar'
 
-  const statsFallback = [
-    { value: '24/7', label: isAr ? 'طوارئ متاحة' : 'Urgences disponibles', icon: 'Clock' },
-    { value: '30+', label: isAr ? 'أطباء أخصائيون' : 'Médecins spécialistes', icon: 'Users' },
-    { value: '11', label: isAr ? 'تخصصات طبية' : 'Spécialités médicales', icon: 'Award' },
-  ]
-  const stats = data?.stats?.length ? data.stats : statsFallback
-
-  const valuesFallback = [
-    { title: t('features.equipment.title'), description: t('features.equipment.desc'), icon: 'Check' },
-    { title: t('features.team.title'), description: t('features.team.desc'), icon: 'Check' },
-    { title: t('features.care.title'), description: t('features.care.desc'), icon: 'Check' }
-  ]
-  const values = data?.values?.length ? data.values : valuesFallback
+  const stats = data?.stats || []
+  const values = data?.values || []
 
   const getIcon = (name?: string) => {
     if (!name) return LucideIcons.Check;
@@ -228,12 +216,12 @@ export default function About({ data, sectionContent }: AboutProps) {
                 {sectionContent?.badge || data?.subtitle || t('title')}
               </p>
               <h2 className='text-foreground text-2xl sm:text-3xl md:text-4xl font-bold'>
-                {sectionContent?.title || data?.title || clinicDataFallback.name}
+                {sectionContent?.title || data?.title || 'Clinique OKBA'}
               </h2>
             </div>
 
             <p className='text-muted-foreground text-base sm:text-lg leading-relaxed'>
-              {data?.description || clinicDataFallback.description || t('description')}
+              {data?.description || t('description')}
             </p>
 
             <div ref={featuresRef} className='space-y-4'>

@@ -4,7 +4,6 @@ import { useEffect, useRef, useState } from 'react'
 import { motion, useInView, animate, useReducedMotion } from 'framer-motion'
 import { ShieldCheck, Clock, Phone } from 'lucide-react'
 import { useTranslations } from 'next-intl'
-import { siteConfig } from '@/data/site-config'
 
 interface TrustBandProps {
   siteSettings?: {
@@ -53,22 +52,14 @@ function StatValue({ raw }: { raw: string }) {
 
 export default function TrustBand({ siteSettings }: TrustBandProps) {
   const t = useTranslations('trustBand')
-  const phoneDisplay = (siteSettings?.phone || siteConfig.contact.phone)
+  const phoneDisplay = (siteSettings?.phone || '')
     .split('/')[0]
     .trim()
   const phoneHref = `tel:${phoneDisplay.replace(/[^+\d]/g, '')}`
-  const emergency = siteSettings?.hours?.emergency || siteConfig.hours.emergency
-  const weekdays = siteSettings?.hours?.weekdays || siteConfig.hours.consultation
+  const emergency = siteSettings?.hours?.emergency || ''
+  const weekdays = siteSettings?.hours?.weekdays || ''
 
-  const statsFallback = [
-    { value: '6', label: t('polesExcellence') },
-    { value: '24/7', label: t('emergencyStat') },
-    { value: '30+', label: t('doctorsStat') },
-  ]
-  const stats =
-    siteSettings?.heroStats && siteSettings.heroStats.length > 0
-      ? siteSettings.heroStats
-      : statsFallback
+  const stats = siteSettings?.heroStats || []
 
   return (
     <section className="relative z-10 bg-background pb-6">

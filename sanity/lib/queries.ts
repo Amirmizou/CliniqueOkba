@@ -148,6 +148,12 @@ export const polesQuery = groq`
     iconName,
     accentColor,
     galleryCategories,
+    "videos": videos[]{
+      title,
+      title_ar,
+      "videoUrl": videoFile.asset->url,
+      poster
+    },
     badge,
     badge_ar,
     urgent,
@@ -215,6 +221,8 @@ export const homeCareQuery = groq`
   *[_type == "homeCare" && active == true][0] {
     title,
     title_ar,
+    badge,
+    badge_ar,
     subtitle,
     subtitle_ar,
     description,
@@ -237,7 +245,16 @@ export const homeCareQuery = groq`
       text,
       phone
     },
-    availability
+    callToAction_ar {
+      text,
+      phone
+    },
+    availability,
+    availability_ar,
+    availabilityTitle,
+    availabilityTitle_ar,
+    contactPrompt,
+    contactPrompt_ar
   }
 `
 

@@ -2,7 +2,7 @@ import { useTranslations } from 'next-intl'
 import { HelpCircle, ArrowRight } from 'lucide-react'
 import { Link } from '@/navigation'
 import ScrollAnimation from '@/components/ui/scroll-animation'
-import { faqFallback, type FaqItem } from '@/data/faq'
+import { type FaqItem } from '@/data/faq'
 
 interface FaqTeaserProps {
   data?: FaqItem[]
@@ -23,7 +23,7 @@ interface FaqTeaserProps {
  */
 export default function FaqTeaser({ data, sectionContent, limit = 5 }: FaqTeaserProps) {
   const t = useTranslations('faqTeaser')
-  const faqs = data && data.length > 0 ? data : faqFallback
+  const faqs = data || []
   const visible = faqs.slice(0, limit)
 
   if (visible.length === 0) return null

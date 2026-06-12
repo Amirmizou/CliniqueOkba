@@ -1,7 +1,6 @@
 import heroSlide from './heroSlide'
 import equipment from './equipment'
 import specialty from './specialty'
-import galleryImage from './galleryImage'
 import facilityPhoto from './facilityPhoto'
 import article from './article'
 import event from './event'
@@ -43,7 +42,6 @@ export const schemaTypes = [
     testimonial,
 
     // Média & Contenu
-    galleryImage,
     facilityPhoto,
     video,
     article,

@@ -6,6 +6,16 @@ export default defineType({
     type: 'document',
     fields: [
         defineField({
+            name: 'badge',
+            title: 'Badge (FR)',
+            type: 'string',
+        }),
+        defineField({
+            name: 'badge_ar',
+            title: 'Badge (AR)',
+            type: 'string',
+        }),
+        defineField({
             name: 'title',
             title: 'Titre Principal (FR)',
             type: 'string',
@@ -89,6 +99,36 @@ export default defineType({
             title: 'Avantages (AR)',
             type: 'array',
             of: [{ type: 'string' }],
+        }),
+        defineField({
+            name: 'availability',
+            title: 'Texte Disponibilité (FR)',
+            type: 'string',
+        }),
+        defineField({
+            name: 'availability_ar',
+            title: 'Texte Disponibilité (AR)',
+            type: 'string',
+        }),
+        defineField({
+            name: 'availabilityTitle',
+            title: 'Titre Disponibilité (FR)',
+            type: 'string',
+        }),
+        defineField({
+            name: 'availabilityTitle_ar',
+            title: 'Titre Disponibilité (AR)',
+            type: 'string',
+        }),
+        defineField({
+            name: 'contactPrompt',
+            title: 'Texte d\'incitation au contact (FR)',
+            type: 'string',
+        }),
+        defineField({
+            name: 'contactPrompt_ar',
+            title: 'Texte d\'incitation au contact (AR)',
+            type: 'string',
         }),
         defineField({
             name: 'callToAction',

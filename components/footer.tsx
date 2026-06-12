@@ -4,9 +4,8 @@ import { Link } from '@/navigation'
 import { motion } from 'framer-motion'
 import { Facebook, Instagram, Mail, MapPin, Phone, ArrowRight, HeartPulse } from 'lucide-react'
 import { useTranslations, useLocale } from 'next-intl'
-import { siteConfig as siteConfigFallback } from '@/data/site-config'
-import { poles } from '@/data/poles'
 import { cn } from '@/lib/utils'
+import { poles } from '@/data/poles'
 
 interface SiteSettings {
   clinicName?: string
@@ -34,14 +33,14 @@ export default function Footer({ siteSettings, footerContent }: FooterProps) {
 
   const isAr = locale === 'ar'
 
-  // Use Sanity data if available, otherwise fallback to static config
-  const clinicData = {
+  // Use Sanity data if available
+  const siteConfig = {
     contact: {
-      address: isAr ? (siteSettings?.address_ar || siteSettings?.address || siteConfigFallback.contact.address) : (siteSettings?.address || siteConfigFallback.contact.address),
-      phone: siteSettings?.phone || siteConfigFallback.contact.phone,
-      email: siteSettings?.email || siteConfigFallback.contact.email,
+      address: isAr ? (siteSettings?.address_ar || siteSettings?.address || '') : (siteSettings?.address || ''),
+      phone: siteSettings?.phone || '',
+      email: siteSettings?.email || '',
     },
-    social: siteSettings?.social || siteConfigFallback.social,
+    social: siteSettings?.social || { facebook: '', instagram: '' },
   }
 
   const containerVariants = {
@@ -130,7 +129,7 @@ export default function Footer({ siteSettings, footerContent }: FooterProps) {
             </p>
             <div className='flex gap-3'>
               <motion.a
-                href={clinicData?.social?.facebook || '#'}
+                href={siteConfig?.social?.facebook || '#'}
                 target="_blank"
                 rel="noopener noreferrer"
                 whileHover={{ y: -3, backgroundColor: 'rgba(59, 130, 246, 0.2)' }}
@@ -139,7 +138,7 @@ export default function Footer({ siteSettings, footerContent }: FooterProps) {
                 <Facebook size={18} />
               </motion.a>
               <motion.a
-                href={clinicData?.social?.instagram || '#'}
+                href={siteConfig?.social?.instagram || '#'}
                 target="_blank"
                 rel="noopener noreferrer"
                 whileHover={{ y: -3, backgroundColor: 'rgba(59, 130, 246, 0.2)' }}
@@ -219,7 +218,7 @@ export default function Footer({ siteSettings, footerContent }: FooterProps) {
                 </div>
                 <div>
                   <p className="text-[11px] text-slate-500 font-bold uppercase mb-1 tracking-widest">{t('address')}</p>
-                  <p className="text-sm text-slate-300 leading-relaxed font-medium">{clinicData?.contact.address || (isAr ? 'المدينة الجديدة علي منجلي، قسنطينة' : 'Nouvelle ville Ali Mendjeli, Constantine')}</p>
+                  <p className="text-sm text-slate-300 leading-relaxed font-medium">{siteConfig?.contact.address || (isAr ? 'المدينة الجديدة علي منجلي، قسنطينة' : 'Nouvelle ville Ali Mendjeli, Constantine')}</p>
                 </div>
               </li>
               <li className='flex gap-4 group p-3 -ml-3 rounded-xl hover:bg-white/5 transition-colors duration-300'>
@@ -228,7 +227,7 @@ export default function Footer({ siteSettings, footerContent }: FooterProps) {
                 </div>
                 <div>
                   <p className="text-[11px] text-slate-500 font-bold uppercase mb-1 tracking-widest">{t('phone')}</p>
-                  <p className="text-sm text-slate-300 ltr:text-left rtl:text-right font-medium" dir="ltr">{clinicData?.contact.phone || '+213 555 123 456'}</p>
+                  <p className="text-sm text-slate-300 ltr:text-left rtl:text-right font-medium" dir="ltr">{siteConfig?.contact.phone || '+213 555 123 456'}</p>
                 </div>
               </li>
               <li className='flex gap-4 group p-3 -ml-3 rounded-xl hover:bg-white/5 transition-colors duration-300'>
@@ -237,7 +236,7 @@ export default function Footer({ siteSettings, footerContent }: FooterProps) {
                 </div>
                 <div>
                   <p className="text-[11px] text-slate-500 font-bold uppercase mb-1 tracking-widest">{t('email')}</p>
-                  <p className="text-sm text-slate-300 font-medium">{clinicData?.contact.email || 'contact@cliniqueokba.com'}</p>
+                  <p className="text-sm text-slate-300 font-medium">{siteConfig?.contact.email || 'contact@cliniqueokba.com'}</p>
                 </div>
               </li>
             </ul>

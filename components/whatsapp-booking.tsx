@@ -2,8 +2,8 @@
 
 import { useState } from 'react'
 import { useTranslations } from 'next-intl'
+import { MessageCircle } from 'lucide-react'
 import { buildWhatsAppUrl } from '@/lib/whatsapp'
-import { siteConfig as siteConfigFallback } from '@/data/site-config'
 
 // Icône officielle WhatsApp (simple-icons, MIT)
 function WhatsAppIcon({ className }: { className?: string }) {
@@ -28,7 +28,7 @@ export default function WhatsAppBooking({
   specialties,
 }: WhatsAppBookingProps) {
   const t = useTranslations('whatsappBooking')
-  const number = whatsappNumber || siteConfigFallback.contact.phone
+  const number = whatsappNumber || process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || ''
   const specialtyList =
     specialties && specialties.length > 0
       ? specialties

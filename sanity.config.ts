@@ -141,13 +141,7 @@ export default defineConfig({
 
                         S.divider(),
 
-                        // 📸 MÉDIAS
-                        S.listItem()
-                            .title('📸 Galerie Photos')
-                            .icon(() => '📸')
-                            .child(S.documentTypeList('galleryImage').title('Galerie')),
 
-                        S.divider(),
 
                         // 📰 PUBLICATIONS
                         S.listItem()

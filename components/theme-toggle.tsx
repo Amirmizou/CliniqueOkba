@@ -21,7 +21,7 @@ export function ThemeToggle() {
       <Button
         variant='outline'
         size='icon'
-        className='relative h-9 w-9 rounded-full border-border/50 hover:border-primary/50 transition-all duration-300'
+        className='relative flex items-center justify-center h-9 w-9 rounded-full border-border/50 hover:border-primary/50 transition-all duration-300'
       >
         <Sun className='h-4 w-4' />
         <span className='sr-only'>Toggle theme</span>
@@ -36,7 +36,7 @@ export function ThemeToggle() {
       variant='outline'
       size='icon'
       onClick={() => setTheme(isDark ? 'light' : 'dark')}
-      className='relative h-9 w-9 rounded-full border-border/50 hover:border-primary/50 transition-all duration-300 overflow-hidden group hover:scale-105 active:scale-95'
+      className='relative flex items-center justify-center h-9 w-9 rounded-full border-border/50 hover:border-primary/50 transition-all duration-300 overflow-hidden group hover:scale-105 active:scale-95'
       aria-label={isDark ? 'Passer au mode clair' : 'Passer au mode sombre'}
     >
       {/* Background glow effect */}

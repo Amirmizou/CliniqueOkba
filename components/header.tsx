@@ -365,13 +365,13 @@ export default function Header({ siteSettings, poles }: HeaderProps) {
           </nav>
 
           {/* Actions */}
-          <div className='flex items-center gap-2'>
+          <div className='flex items-center gap-1 sm:gap-2'>
             {/* Theme & Language toggle */}
-            <div className="flex items-center gap-1 pe-2 border-e border-border/50 me-2">
-              <div className="hidden sm:block">
+            <div className="flex items-center gap-1 pe-1 sm:pe-2 border-e border-border/50 me-1 sm:me-2">
+              <div className="flex items-center justify-center">
                 <LanguageSwitcher />
               </div>
-              <div className="scale-90 sm:scale-100">
+              <div className="flex items-center justify-center">
                 <ThemeToggle />
               </div>
             </div>
@@ -529,10 +529,6 @@ export default function Header({ siteSettings, poles }: HeaderProps) {
                 <div className="flex items-center justify-between p-4 rounded-xl bg-card/50 border border-border/50">
                   <span className="font-medium">{t('appearance')}</span>
                   <ThemeToggle />
-                </div>
-                <div className="flex items-center justify-between p-4 rounded-xl bg-card/50 border border-border/50 mt-2">
-                  <span className="font-medium">{t('language')}</span>
-                  <LanguageSwitcher />
                 </div>
               </motion.div>
             </motion.nav>

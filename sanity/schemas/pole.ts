@@ -96,6 +96,52 @@ export default defineType({
             description: 'Quelles photos de la galerie afficher sur la page de ce pôle',
         }),
         defineField({
+            name: 'videos',
+            title: 'Vidéos de présentation (optionnel)',
+            type: 'array',
+            description: 'Une ou plusieurs vidéos affichées sur la page de ce pôle.',
+            of: [
+                {
+                    type: 'object',
+                    name: 'poleVideo',
+                    title: 'Vidéo',
+                    fields: [
+                        {
+                            name: 'title',
+                            title: 'Titre (FR)',
+                            type: 'string',
+                        },
+                        {
+                            name: 'title_ar',
+                            title: 'Titre (AR)',
+                            type: 'string',
+                        },
+                        {
+                            name: 'videoFile',
+                            title: 'Fichier vidéo',
+                            type: 'file',
+                            options: { accept: 'video/mp4,video/webm' },
+                            validation: (Rule) => Rule.required(),
+                            description: 'MP4 recommandé, compressé (max ~100 Mo).',
+                        },
+                        {
+                            name: 'poster',
+                            title: 'Affiche (image de couverture)',
+                            type: 'image',
+                            options: { hotspot: true },
+                            description: 'Image affichée avant la lecture.',
+                        },
+                    ],
+                    preview: {
+                        select: { title: 'title', media: 'poster' },
+                        prepare({ title, media }) {
+                            return { title: title || 'Vidéo', media }
+                        },
+                    },
+                },
+            ],
+        }),
+        defineField({
             name: 'badge',
             title: 'Badge (FR) (optionnel)',
             type: 'string',

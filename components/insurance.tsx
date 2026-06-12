@@ -4,7 +4,6 @@ import Image from 'next/image'
 import { motion } from 'framer-motion'
 import { ShieldCheck, BadgeCheck, ArrowRight } from 'lucide-react'
 import { urlFor } from '@/sanity/lib/image'
-import { insuranceFallback } from '@/data/insurance'
 import { AnimatedSection } from '@/components/ui/animated-section'
 import { useLocale } from 'next-intl'
 
@@ -16,53 +15,25 @@ interface InsuranceProvider {
   logo?: any
 }
 
-interface ResolvedContent {
-  badge: string
-  badge_ar?: string
-  title: string
-  title_ar?: string
-  subtitle: string
-  subtitle_ar?: string
-  providers: InsuranceProvider[]
-  note: string
-  note_ar?: string
-  ctaText: string
-  ctaText_ar?: string
-}
-
 interface InsuranceProps {
   data?: {
     badge?: string
+    badge_ar?: string
     title?: string
+    title_ar?: string
     subtitle?: string
+    subtitle_ar?: string
     providers?: InsuranceProvider[]
     note?: string
+    note_ar?: string
     ctaText?: string
+    ctaText_ar?: string
   } | null
 }
 
-function resolveContent(data?: any): ResolvedContent {
-  if (!data) return insuranceFallback
-  return {
-    badge: data.badge || insuranceFallback.badge,
-    badge_ar: data.badge_ar || insuranceFallback.badge_ar,
-    title: data.title || insuranceFallback.title,
-    title_ar: data.title_ar || insuranceFallback.title_ar,
-    subtitle: data.subtitle || insuranceFallback.subtitle,
-    subtitle_ar: data.subtitle_ar || insuranceFallback.subtitle_ar,
-    providers:
-      data.providers && data.providers.length > 0
-        ? data.providers
-        : insuranceFallback.providers,
-    note: data.note || insuranceFallback.note,
-    note_ar: data.note_ar || insuranceFallback.note_ar,
-    ctaText: data.ctaText || insuranceFallback.ctaText,
-    ctaText_ar: data.ctaText_ar || insuranceFallback.ctaText_ar,
-  }
-}
-
 export default function Insurance({ data }: InsuranceProps) {
-  const content = resolveContent(data)
+  if (!data?.providers || data.providers.length === 0) return null
+
   const locale = useLocale()
   const isAr = locale === 'ar'
 
@@ -80,20 +51,20 @@ export default function Insurance({ data }: InsuranceProps) {
           <div className="animate-item">
             <span className="mb-4 inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-4 py-1.5 text-sm font-semibold text-primary">
               <ShieldCheck className="h-4 w-4" />
-              {isAr ? (content.badge_ar || content.badge) : content.badge}
+              {isAr ? (data.badge_ar || data.badge) : data.badge}
             </span>
             <h2 className="mb-4 text-3xl font-bold sm:text-4xl md:text-5xl">
-              <span className="text-foreground">{isAr ? (content.title_ar || content.title) : content.title}</span>
+              <span className="text-foreground">{isAr ? (data.title_ar || data.title) : data.title}</span>
             </h2>
             <p className="mx-auto max-w-2xl text-base text-muted-foreground sm:text-lg">
-              {isAr ? (content.subtitle_ar || content.subtitle) : content.subtitle}
+              {isAr ? (data.subtitle_ar || data.subtitle) : data.subtitle}
             </p>
           </div>
         </AnimatedSection>
 
         {/* Grille des organismes */}
         <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
-          {content.providers.map((provider, i) => {
+          {data.providers.map((provider, i) => {
             const logoUrl = typeof provider.logo === 'string'
               ? provider.logo
               : provider.logo
@@ -142,16 +113,16 @@ export default function Insurance({ data }: InsuranceProps) {
           transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
           className="mt-10 flex flex-col items-center gap-5 rounded-2xl border border-primary/15 bg-primary/[0.04] p-6 text-center sm:flex-row sm:justify-between sm:text-left"
         >
-          {(content.note || content.note_ar) && (
+          {(data.note || data.note_ar) && (
             <p className="max-w-3xl text-sm leading-relaxed text-muted-foreground">
-              {isAr ? (content.note_ar || content.note) : content.note}
+              {isAr ? (data.note_ar || data.note) : data.note}
             </p>
           )}
           <a
             href="#contact"
             className="group inline-flex shrink-0 items-center justify-center gap-2 rounded-full bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground shadow-md transition-all duration-300 hover:scale-[1.03] hover:shadow-lg active:scale-95"
           >
-            {isAr ? (content.ctaText_ar || content.ctaText) : content.ctaText}
+            {isAr ? (data.ctaText_ar || data.ctaText) : data.ctaText}
             <ArrowRight className={isAr ? "h-4 w-4 transition-transform group-hover:-translate-x-1 rotate-180" : "h-4 w-4 transition-transform group-hover:translate-x-1"} />
           </a>
         </motion.div>

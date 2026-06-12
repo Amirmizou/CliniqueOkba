@@ -20,9 +20,7 @@ import {
 } from 'lucide-react'
 import Map from '@/components/map'
 import WhatsAppBooking from '@/components/whatsapp-booking'
-// Fallback to static data if Sanity data not available
-import clinicDataFallback from '@/data/clinic.json'
-import { siteConfig as siteConfigFallback } from '@/data/site-config'
+
 
 interface SiteSettings {
   clinicName?: string
@@ -54,13 +52,13 @@ export default function Contact({ siteSettings, sectionContent }: ContactProps) 
   const ti = useTranslations('contact.info')
   // Use Sanity data or fallback to static
   const contactData = {
-    address: siteSettings?.address || siteConfigFallback.contact.address,
-    phone: siteSettings?.phone || siteConfigFallback.contact.phone,
-    email: siteSettings?.email || siteConfigFallback.contact.email,
-    coordinates: siteSettings?.coordinates || siteConfigFallback.contact.coordinates,
-    hours: siteSettings?.hours || clinicDataFallback.hours,
-    social: siteSettings?.social || siteConfigFallback.social,
-    description: siteSettings?.description || clinicDataFallback.description,
+    address: siteSettings?.address || '',
+    phone: siteSettings?.phone || '',
+    email: siteSettings?.email || '',
+    coordinates: siteSettings?.coordinates || { lat: 35.700010, lng: -0.569500 },
+    hours: siteSettings?.hours || { emergency: '24h/24 et 7j/7', weekdays: '08:00 - 20:00', saturday: '08:00 - 18:00' },
+    social: siteSettings?.social || { facebook: '', instagram: '' },
+    description: siteSettings?.description || 'La Clinique OKBA est votre partenaire de confiance pour votre santé.',
   }
   const [formData, setFormData] = useState({
     firstName: '',
