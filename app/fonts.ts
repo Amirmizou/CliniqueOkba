@@ -1,4 +1,4 @@
-import { Poppins, Amiri } from 'next/font/google'
+import { Poppins } from 'next/font/google'
 import localFont from 'next/font/local'
 
 // Montserrat Arabic — police arabe (corps + titres en RTL).
