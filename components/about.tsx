@@ -159,9 +159,16 @@ export default function About({ data, sectionContent }: AboutProps) {
 
         const statNumbers = statsRef.current.querySelectorAll('.stat-number')
         statNumbers.forEach((num) => {
-          const target = num.textContent || '0'
-          const numValue = parseInt(target.replace(/\D/g, '')) || 0
-          
+          // Valeur exacte issue de Sanity (ex : « 24/7 », « 8 », « 30+ », « 24/24 »).
+          const original = (num.textContent || '').trim()
+          // Décompose en : préfixe non-numérique / premier nombre / reste (suffixe).
+          // « 24/7 » → ['', '24', '/7'] ; « 30+ » → ['', '30', '+'].
+          const match = original.match(/^(\D*)(\d+)(.*)$/)
+          if (!match) return // aucune valeur numérique → on laisse le texte tel quel
+
+          const prefix = match[1]
+          const numValue = parseInt(match[2], 10)
+          const suffix = match[3]
           const counter = { val: 0 }
 
           gsap.to(counter, {
@@ -173,17 +180,10 @@ export default function About({ data, sectionContent }: AboutProps) {
               start: 'top 80%',
               toggleActions: 'play none none none',
             },
-            onUpdate: function () {
-              const current = Math.round(counter.val)
-              if (target.includes('+')) {
-                num.textContent = current + '+'
-              } else if (target.includes('/')) {
-                // Pour "24/7", on anime de 0/7 à 24/7
-                num.textContent = current + '/7'
-              } else {
-                num.textContent = current.toString()
-              }
-            }
+            onUpdate() {
+              // Reconstruit en préservant le format exact de Sanity.
+              num.textContent = prefix + Math.round(counter.val) + suffix
+            },
           })
         })
       }
