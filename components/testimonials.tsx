@@ -149,9 +149,9 @@ export default function Testimonials({ data = [], sectionContent }: Testimonials
                                                 )}
                                             </div>
                                             <div className='text-left'>
-                                                <h4 className='text-foreground font-bold'>
+                                                <h3 className='text-foreground font-bold'>
                                                     {testimonial.name}
-                                                </h4>
+                                                </h3>
                                                 <p className='text-primary text-sm font-medium'>
                                                     {testimonialRole}
                                                 </p>
