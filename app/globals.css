@@ -127,8 +127,9 @@
   }
 
   [dir="rtl"] {
-    --font-base: var(--font-montserrat-arabic);
-    --font-title: var(--font-montserrat-arabic);
+    --font-base: var(--font-montserrat-arabic) !important;
+    --font-title: var(--font-montserrat-arabic) !important;
+    font-family: var(--font-montserrat-arabic) !important;
   }
 
   * {
