@@ -32,7 +32,7 @@ export default function LogoIntro() {
 
     // Verrouille le scroll pendant l'intro
     document.body.style.overflow = 'hidden'
-    const duration = prefersReducedMotion ? 800 : 2400
+    const duration = prefersReducedMotion ? 400 : 1200
     const timer = setTimeout(() => setVisible(false), duration)
     return () => {
       clearTimeout(timer)

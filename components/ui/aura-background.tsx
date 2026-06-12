@@ -1,7 +1,5 @@
 "use client"
 
-import { useEffect, useRef } from "react"
-import { motion, useScroll, useTransform } from "framer-motion"
 import { cn } from "@/lib/utils"
 
 interface AuraBackgroundProps extends React.HTMLAttributes<HTMLDivElement> {
@@ -9,34 +7,26 @@ interface AuraBackgroundProps extends React.HTMLAttributes<HTMLDivElement> {
 }
 
 export function AuraBackground({ className, children, ...props }: AuraBackgroundProps) {
-    const { scrollY } = useScroll()
-
-    // Parallax effect for the blobs
-    const y1 = useTransform(scrollY, [0, 1000], [0, 200])
-    const y2 = useTransform(scrollY, [0, 1000], [0, -150])
-
     return (
         <div className={cn("relative w-full min-h-screen overflow-hidden bg-background", className)} {...props}>
-            {/* Organic Blobs */}
+            {/* Organic Blobs — CSS-only, pas de JS scroll tracking */}
             <div className="fixed inset-0 z-0 pointer-events-none overflow-hidden">
-                {/* Top Left Blob (Blue/Teal) */}
-                <motion.div
-                    style={{ y: y1 }}
-                    className="absolute -top-[10%] -left-[10%] w-[50vw] h-[50vw] bg-primary/20 rounded-full blur-[120px] mix-blend-multiply filter opacity-30 animate-blob"
-                />
-
-                {/* Bottom Right Blob (Accent) */}
-                <motion.div
-                    style={{ y: y2 }}
-                    className="absolute bottom-[20%] -right-[10%] w-[40vw] h-[40vw] bg-accent/30 rounded-full blur-[100px] mix-blend-multiply filter opacity-30 animate-blob animation-delay-2000"
-                />
-
-                {/* Center Blob — statique (profondeur sans mouvement perpétuel) */}
+                {/* Top Left Blob */}
                 <div
-                    className="absolute top-[40%] left-[30%] w-[30vw] h-[30vw] bg-secondary/40 rounded-full blur-[80px] mix-blend-multiply filter opacity-20"
+                    className="absolute -top-[10%] -left-[10%] w-[50vw] h-[50vw] bg-primary/15 rounded-full blur-[120px] opacity-25 will-change-transform"
                 />
 
-                {/* Grain SVG inline (aucune requête réseau) — brise la platitude numérique */}
+                {/* Bottom Right Blob */}
+                <div
+                    className="absolute bottom-[20%] -right-[10%] w-[40vw] h-[40vw] bg-accent/20 rounded-full blur-[100px] opacity-25 will-change-transform"
+                />
+
+                {/* Center Blob */}
+                <div
+                    className="absolute top-[40%] left-[30%] w-[30vw] h-[30vw] bg-secondary/30 rounded-full blur-[80px] opacity-15"
+                />
+
+                {/* Grain SVG inline */}
                 <div
                     className="absolute inset-0 opacity-[0.04] mix-blend-overlay"
                     style={{

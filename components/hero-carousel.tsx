@@ -168,7 +168,7 @@ export default function HeroCarousel({ slides: rawSlides = [], siteSettings, sec
                 style={prefersReducedMotion ? undefined : { y: yImage }}
                 className="absolute inset-0 z-0"
             >
-                <AnimatePresence mode="wait">
+                <AnimatePresence mode="wait" initial={false}>
                     <motion.div
                         key={currentIndex}
                         initial={{ opacity: 0 }}

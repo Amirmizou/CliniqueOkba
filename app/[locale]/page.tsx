@@ -44,8 +44,9 @@ import {
 import { localizeSanityData } from '@/sanity/lib/localize'
 import type { ClinicEvent } from '@/lib/events'
 
-// ISR: Utilisation du cache au niveau des fetch (sanity/lib/fetch.ts) plutôt qu'au niveau de la page globale
-export const revalidate = 0
+// ISR: revalidation toutes les heures — la page est servie depuis le cache edge de Vercel
+// L'administrateur peut forcer un refresh via le webhook Sanity → on-demand revalidation
+export const revalidate = 3600
 
 export default async function Home(props: { params: Promise<{ locale: string }> }) {
   // Fetch all data from Sanity in parallel
