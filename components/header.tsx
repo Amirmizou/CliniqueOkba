@@ -220,7 +220,11 @@ export default function Header({ siteSettings, poles }: HeaderProps) {
               />
             </motion.div>
             <div className="hidden sm:flex flex-col leading-none transition-all duration-300 opacity-100">
-              <span className='font-display text-sm font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-foreground to-foreground/70 tracking-tight'>Clinique OKBA</span>
+              <span className='font-display text-sm font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-foreground to-foreground/70 tracking-tight'>
+                {siteSettings?.clinicName && (!locale || locale !== 'ar' || /[\u0600-\u06FF]/.test(siteSettings.clinicName)) 
+                  ? siteSettings.clinicName 
+                  : (locale === 'ar' ? 'المصحة الطبية عقبة' : 'Clinique OKBA')}
+              </span>
               <span className='text-[9px] text-primary font-bold tracking-widest uppercase mt-0.5'>{t('tagline')}</span>
             </div>
           </a>

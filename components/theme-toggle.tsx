@@ -52,47 +52,49 @@ export function ThemeToggle() {
   }
 
   return (
+
     <button
       onClick={toggleTheme}
       type="button"
       className="relative flex items-center justify-center w-10 h-10 rounded-full group outline-none touch-target"
       aria-label="Toggle theme surgical light"
     >
-      {/* Outer casing of the surgical light */}
-      <div className="absolute inset-0 rounded-full border-[2px] border-[#1e293b] bg-[#050914] shadow-[inset_0_4px_10px_rgba(0,0,0,0.9),0_2px_4px_rgba(0,0,0,0.1)] transition-colors group-hover:border-[#334155]" />
+      {/* Base/Boîtier du scialytique */}
+      <div className="absolute inset-0 rounded-full border-[1px] border-[#1e293b]/60 bg-[#0a0f1c] shadow-[inset_0_2px_8px_rgba(0,0,0,0.8),0_2px_4px_rgba(0,0,0,0.1)] transition-colors group-hover:border-[#334155]/80" />
 
-      {/* The 6 LED Pods array (pétales du scialytique) */}
-      {[0, 60, 120, 180, 240, 300].map((angle, i) => (
+      {/* The 3 large LED Pods array (pétales du scialytique style "Maquet/Steris clover") */}
+      {[0, 120, 240].map((angle, i) => (
         <div 
           key={angle}
           className="absolute inset-0 flex items-center justify-center pointer-events-none"
           style={{ transform: `rotate(${angle}deg)` }}
         >
+          {/* Petal body */}
           <motion.div 
-            className="w-[9px] h-[8px] rounded-[3px] border border-black/60 -translate-y-[11px]"
+            className="w-[18px] h-[18px] rounded-full border border-[#020408]/80 -translate-y-[7px] z-0"
             initial={false}
             animate={{
-              backgroundColor: isDark ? '#0f172a' : '#ffffff',
+              backgroundColor: isDark ? '#111827' : '#ffffff',
               boxShadow: isDark 
-                ? 'inset 0 1px 2px rgba(0,0,0,0.8)' 
-                : '0 0 8px #fff, 0 0 12px rgba(250,204,21,0.5), inset 0 0 4px #fff'
+                ? 'inset 0 3px 6px rgba(0,0,0,0.9)' 
+                : '0 0 15px rgba(255,255,255,0.9), 0 0 25px rgba(250,204,21,0.5), inset 0 0 8px #fff'
             }}
             transition={{ 
               duration: 0.15, 
-              // Séquence d'allumage rapide des LEDs en cascade (0.02s de décalage), extinction instantanée
-              delay: isDark ? 0 : i * 0.02 
+              // Séquence d'allumage rotative (très rapide)
+              delay: isDark ? 0 : i * 0.04 
             }}
           />
         </div>
       ))}
 
       {/* Center Sterile Handle (Poignée centrale stérile) */}
-      <div className="absolute w-[12px] h-[12px] rounded-full border-[1.5px] border-[#334155] bg-[#1e293b] shadow-[0_4px_8px_rgba(0,0,0,0.8)] flex items-center justify-center z-10">
+      <div className="absolute w-[12px] h-[12px] rounded-full border-[2px] border-[#020408] bg-[#334155] shadow-[0_4px_8px_rgba(0,0,0,0.8)] flex items-center justify-center z-10 transition-transform group-hover:scale-110">
         {/* Standby indicator LED (Small green dot when OFF) */}
         <motion.div 
           className="w-[3px] h-[3px] rounded-full"
           animate={{
-            backgroundColor: isDark ? '#10b981' : '#334155',
+            backgroundColor: isDark ? '#10b981' : '#1e293b',
             boxShadow: isDark ? '0 0 4px #10b981, 0 0 8px rgba(16,185,129,0.5)' : 'none'
           }}
           transition={{ duration: 0.2 }}
@@ -101,19 +103,20 @@ export function ThemeToggle() {
 
       {/* Main Blinding Flare (Glows OUTSIDE the button bounds when ON) */}
       <motion.div
-        className="absolute inset-[-12px] z-20 pointer-events-none"
+        className="absolute inset-[-14px] z-20 pointer-events-none"
         initial={false}
         animate={{ 
           background: isDark 
             ? 'radial-gradient(circle at center, rgba(255,255,255,0) 0%, transparent 100%)'
-            : 'radial-gradient(circle at center, rgba(255,255,255,0.95) 15%, rgba(255,248,180,0.4) 40%, transparent 70%)',
-          opacity: isDark ? 0 : 1
+            : 'radial-gradient(circle at center, rgba(255,255,255,0.95) 15%, rgba(255,248,180,0.45) 45%, transparent 70%)',
+          opacity: isDark ? 0 : 1,
+          scale: isDark ? 0.8 : 1
         }}
-        transition={{ duration: 0.3 }}
+        transition={{ duration: 0.3, ease: 'easeOut' }}
       />
       
       {/* Front glass lens reflection */}
-      <div className="absolute inset-0 rounded-full shadow-[inset_0_1px_3px_rgba(255,255,255,0.05)] pointer-events-none" />
+      <div className="absolute inset-0 rounded-full shadow-[inset_0_1px_4px_rgba(255,255,255,0.1)] pointer-events-none z-30" />
     </button>
   )
 }
