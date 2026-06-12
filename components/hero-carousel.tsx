@@ -16,7 +16,7 @@ import {
 import Image from 'next/image'
 import { useTranslations, useLocale } from 'next-intl'
 import { useReducedMotion } from '@/hooks/use-reduced-motion'
-import { urlFor } from '@/sanity/lib/image'
+import { urlFor, sanityImageLoader } from '@/sanity/lib/image'
 import { siteConfig } from '@/data/site-config'
 import { buildWhatsAppUrl } from '@/lib/whatsapp'
 import { AnimatedLogo } from '@/components/ui/animated-logo'
@@ -58,7 +58,8 @@ export default function HeroCarousel({ slides: rawSlides = [], siteSettings, sec
             id: slide._id || String(index),
             title: isAr ? (slide.title_ar || slide.title) : slide.title,
             subtitle: isAr ? (slide.subtitle_ar || slide.subtitle) : (slide.subtitle || ''),
-            image: slide.image ? urlFor(slide.image).width(1920).height(1080).url() : '',
+            // Suppression du hardcoding .width(1920).height(1080) pour laisser le loader gérer la taille (Mobile LCP Fix)
+            image: slide.image ? urlFor(slide.image).url() : '',
         }))
         .filter((slide) => slide.image !== '')
 
@@ -184,6 +185,7 @@ export default function HeroCarousel({ slides: rawSlides = [], siteSettings, sec
                             className="relative h-full w-full"
                         >
                             <Image
+                                loader={sanityImageLoader}
                                 src={currentSlide.image}
                                 alt={currentSlide.title || 'Clinique OKBA'}
                                 fill
@@ -191,6 +193,7 @@ export default function HeroCarousel({ slides: rawSlides = [], siteSettings, sec
                                 priority
                                 quality={80}
                                 sizes="100vw"
+                                unoptimized={false}
                             />
                         </motion.div>
                     </motion.div>

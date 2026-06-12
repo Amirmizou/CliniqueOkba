@@ -267,7 +267,7 @@ export default function VideoPresentation({
                   ref={videoRef}
                   key={videoSrc}
                   className="aspect-video max-h-[88vh] w-full cursor-pointer object-cover"
-                  preload="metadata"
+                  preload="none"
                   playsInline
                   muted={isMuted}
                   poster={posterSrc}
