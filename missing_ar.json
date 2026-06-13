@@ -1,0 +1,1073 @@
+[
+  {
+    "docId": "aboutSection",
+    "docType": "aboutSection",
+    "field": "description",
+    "value": "La Clinique OKBA est un établissement privé pluridisciplinaire situé à Ali Mendjeli, Constantine. Nous réunissons un plateau technique de pointe — imagerie, laboratoire, bloc opératoire — et une équipe de spécialistes dévoués, pour vous offrir des soins complets et de qualité, dans un cadre moderne et accueillant.",
+    "path": ".description"
+  },
+  {
+    "docId": "aboutSection",
+    "docType": "aboutSection",
+    "field": "label",
+    "value": "Urgences disponibles",
+    "path": ".stats[0].label"
+  },
+  {
+    "docId": "aboutSection",
+    "docType": "aboutSection",
+    "field": "value",
+    "value": "24/7",
+    "path": ".stats[0].value"
+  },
+  {
+    "docId": "aboutSection",
+    "docType": "aboutSection",
+    "field": "label",
+    "value": "Médecins spécialistes",
+    "path": ".stats[1].label"
+  },
+  {
+    "docId": "aboutSection",
+    "docType": "aboutSection",
+    "field": "value",
+    "value": "30+",
+    "path": ".stats[1].value"
+  },
+  {
+    "docId": "aboutSection",
+    "docType": "aboutSection",
+    "field": "label",
+    "value": "Spécialités médicales",
+    "path": ".stats[2].label"
+  },
+  {
+    "docId": "aboutSection",
+    "docType": "aboutSection",
+    "field": "value",
+    "value": "11",
+    "path": ".stats[2].value"
+  },
+  {
+    "docId": "aboutSection",
+    "docType": "aboutSection",
+    "field": "subtitle",
+    "value": "À propos de nous",
+    "path": ".subtitle"
+  },
+  {
+    "docId": "aboutSection",
+    "docType": "aboutSection",
+    "field": "title",
+    "value": "Clinique OKBA",
+    "path": ".title"
+  },
+  {
+    "docId": "aboutSection",
+    "docType": "aboutSection",
+    "field": "description",
+    "value": "Dernières technologies médicales",
+    "path": ".values[0].description"
+  },
+  {
+    "docId": "aboutSection",
+    "docType": "aboutSection",
+    "field": "title",
+    "value": "Équipements modernes",
+    "path": ".values[0].title"
+  },
+  {
+    "docId": "aboutSection",
+    "docType": "aboutSection",
+    "field": "description",
+    "value": "Spécialistes qualifiés et dévoués",
+    "path": ".values[1].description"
+  },
+  {
+    "docId": "aboutSection",
+    "docType": "aboutSection",
+    "field": "title",
+    "value": "Équipe expérimentée",
+    "path": ".values[1].title"
+  },
+  {
+    "docId": "aboutSection",
+    "docType": "aboutSection",
+    "field": "description",
+    "value": "Approche centrée sur le patient",
+    "path": ".values[2].description"
+  },
+  {
+    "docId": "aboutSection",
+    "docType": "aboutSection",
+    "field": "title",
+    "value": "Soins de qualité",
+    "path": ".values[2].title"
+  },
+  {
+    "docId": "3d91117d-4d94-4615-bbf9-c6a90b93f8b9",
+    "docType": "article",
+    "field": "text",
+    "value": "je suis entrain de tester",
+    "path": ".content[0].children[0].text"
+  },
+  {
+    "docId": "3d91117d-4d94-4615-bbf9-c6a90b93f8b9",
+    "docType": "article",
+    "field": "excerpt",
+    "value": "test blog",
+    "path": ".excerpt"
+  },
+  {
+    "docId": "3d91117d-4d94-4615-bbf9-c6a90b93f8b9",
+    "docType": "article",
+    "field": "publishedAt",
+    "value": "2025-12-20T11:09:00.000+01:00",
+    "path": ".publishedAt"
+  },
+  {
+    "docId": "3d91117d-4d94-4615-bbf9-c6a90b93f8b9",
+    "docType": "article",
+    "field": "current",
+    "value": "ho",
+    "path": ".slug.current"
+  },
+  {
+    "docId": "3d91117d-4d94-4615-bbf9-c6a90b93f8b9",
+    "docType": "article",
+    "field": "title",
+    "value": "Lancement du BLOG",
+    "path": ".title"
+  },
+  {
+    "docId": "doctor-aissaoui-laboratoire",
+    "docType": "doctor",
+    "field": "accentColor",
+    "value": "#0EA5E9",
+    "path": ".accentColor"
+  },
+  {
+    "docId": "doctor-aissaoui-laboratoire",
+    "docType": "doctor",
+    "field": "consultationDays",
+    "value": "Du samedi au jeudi",
+    "path": ".consultationDays"
+  },
+  {
+    "docId": "doctor-aissaoui-laboratoire",
+    "docType": "doctor",
+    "field": "consultationHours",
+    "value": "08h00 – 16h00",
+    "path": ".consultationHours"
+  },
+  {
+    "docId": "doctor-aissaoui-laboratoire",
+    "docType": "doctor",
+    "field": "iconName",
+    "value": "FlaskConical",
+    "path": ".iconName"
+  },
+  {
+    "docId": "doctor-aissaoui-laboratoire",
+    "docType": "doctor",
+    "field": "name",
+    "value": "Aissaoui",
+    "path": ".name"
+  },
+  {
+    "docId": "doctor-aissaoui-laboratoire",
+    "docType": "doctor",
+    "field": "current",
+    "value": "aissaoui-laboratoire",
+    "path": ".slug.current"
+  },
+  {
+    "docId": "doctor-aissaoui-laboratoire",
+    "docType": "doctor",
+    "field": "specialty",
+    "value": "Responsable laboratoire",
+    "path": ".specialty"
+  },
+  {
+    "docId": "doctor-aissaoui-laboratoire",
+    "docType": "doctor",
+    "field": "subtitle",
+    "value": "Biologie médicale",
+    "path": ".subtitle"
+  },
+  {
+    "docId": "doctor-aissaoui-laboratoire",
+    "docType": "doctor",
+    "field": "title",
+    "value": "Pr.",
+    "path": ".title"
+  },
+  {
+    "docId": "doctor-ameziane-leila",
+    "docType": "doctor",
+    "field": "accentColor",
+    "value": "#10B981",
+    "path": ".accentColor"
+  },
+  {
+    "docId": "doctor-ameziane-leila",
+    "docType": "doctor",
+    "field": "consultationDays",
+    "value": "Du samedi au jeudi",
+    "path": ".consultationDays"
+  },
+  {
+    "docId": "doctor-ameziane-leila",
+    "docType": "doctor",
+    "field": "consultationHours",
+    "value": "08h00 – 16h00",
+    "path": ".consultationHours"
+  },
+  {
+    "docId": "doctor-ameziane-leila",
+    "docType": "doctor",
+    "field": "experience",
+    "value": "Plus de 25 ans d’expérience",
+    "path": ".experience"
+  },
+  {
+    "docId": "doctor-ameziane-leila",
+    "docType": "doctor",
+    "field": "iconName",
+    "value": "Activity",
+    "path": ".iconName"
+  },
+  {
+    "docId": "doctor-ameziane-leila",
+    "docType": "doctor",
+    "field": "name",
+    "value": "Ameziane Leila",
+    "path": ".name"
+  },
+  {
+    "docId": "doctor-ameziane-leila",
+    "docType": "doctor",
+    "field": "current",
+    "value": "ameziane-leila",
+    "path": ".slug.current"
+  },
+  {
+    "docId": "doctor-ameziane-leila",
+    "docType": "doctor",
+    "field": "specialty",
+    "value": "Endocrinologue",
+    "path": ".specialty"
+  },
+  {
+    "docId": "doctor-ameziane-leila",
+    "docType": "doctor",
+    "field": "subtitle",
+    "value": "Diabétologue",
+    "path": ".subtitle"
+  },
+  {
+    "docId": "doctor-ameziane-leila",
+    "docType": "doctor",
+    "field": "title",
+    "value": "Dr.",
+    "path": ".title"
+  },
+  {
+    "docId": "doctor-boughanout-seyfeddine",
+    "docType": "doctor",
+    "field": "accentColor",
+    "value": "#F97316",
+    "path": ".accentColor"
+  },
+  {
+    "docId": "doctor-boughanout-seyfeddine",
+    "docType": "doctor",
+    "field": "consultationDays",
+    "value": "Du samedi au mercredi",
+    "path": ".consultationDays"
+  },
+  {
+    "docId": "doctor-boughanout-seyfeddine",
+    "docType": "doctor",
+    "field": "consultationHours",
+    "value": "08h00 – 16h00",
+    "path": ".consultationHours"
+  },
+  {
+    "docId": "doctor-boughanout-seyfeddine",
+    "docType": "doctor",
+    "field": "iconName",
+    "value": "Ear",
+    "path": ".iconName"
+  },
+  {
+    "docId": "doctor-boughanout-seyfeddine",
+    "docType": "doctor",
+    "field": "name",
+    "value": "Boughanout Seyfeddine",
+    "path": ".name"
+  },
+  {
+    "docId": "doctor-boughanout-seyfeddine",
+    "docType": "doctor",
+    "field": "current",
+    "value": "boughanout-seyfeddine",
+    "path": ".slug.current"
+  },
+  {
+    "docId": "doctor-boughanout-seyfeddine",
+    "docType": "doctor",
+    "field": "specialty",
+    "value": "ORL",
+    "path": ".specialty"
+  },
+  {
+    "docId": "doctor-boughanout-seyfeddine",
+    "docType": "doctor",
+    "field": "subtitle",
+    "value": "Chirurgie de l’oreille, du nez, de la gorge, de la face & du cou",
+    "path": ".subtitle"
+  },
+  {
+    "docId": "doctor-boughanout-seyfeddine",
+    "docType": "doctor",
+    "field": "title",
+    "value": "Dr.",
+    "path": ".title"
+  },
+  {
+    "docId": "doctor-boukredera-amira",
+    "docType": "doctor",
+    "field": "accentColor",
+    "value": "#F59E0B",
+    "path": ".accentColor"
+  },
+  {
+    "docId": "doctor-boukredera-amira",
+    "docType": "doctor",
+    "field": "consultationDays",
+    "value": "Du samedi au jeudi",
+    "path": ".consultationDays"
+  },
+  {
+    "docId": "doctor-boukredera-amira",
+    "docType": "doctor",
+    "field": "consultationHours",
+    "value": "08h00 – 16h00",
+    "path": ".consultationHours"
+  },
+  {
+    "docId": "doctor-boukredera-amira",
+    "docType": "doctor",
+    "field": "iconName",
+    "value": "Baby",
+    "path": ".iconName"
+  },
+  {
+    "docId": "doctor-boukredera-amira",
+    "docType": "doctor",
+    "field": "name",
+    "value": "Boukredera Amira",
+    "path": ".name"
+  },
+  {
+    "docId": "doctor-boukredera-amira",
+    "docType": "doctor",
+    "field": "current",
+    "value": "boukredera-amira",
+    "path": ".slug.current"
+  },
+  {
+    "docId": "doctor-boukredera-amira",
+    "docType": "doctor",
+    "field": "specialty",
+    "value": "Pédiatre",
+    "path": ".specialty"
+  },
+  {
+    "docId": "doctor-boukredera-amira",
+    "docType": "doctor",
+    "field": "title",
+    "value": "Dr.",
+    "path": ".title"
+  },
+  {
+    "docId": "doctor-meskaldji-rima",
+    "docType": "doctor",
+    "field": "accentColor",
+    "value": "#A855F7",
+    "path": ".accentColor"
+  },
+  {
+    "docId": "doctor-meskaldji-rima",
+    "docType": "doctor",
+    "field": "consultationDays",
+    "value": "Du samedi au jeudi",
+    "path": ".consultationDays"
+  },
+  {
+    "docId": "doctor-meskaldji-rima",
+    "docType": "doctor",
+    "field": "consultationHours",
+    "value": "08h00 – 16h00",
+    "path": ".consultationHours"
+  },
+  {
+    "docId": "doctor-meskaldji-rima",
+    "docType": "doctor",
+    "field": "iconName",
+    "value": "Baby",
+    "path": ".iconName"
+  },
+  {
+    "docId": "doctor-meskaldji-rima",
+    "docType": "doctor",
+    "field": "name",
+    "value": "Meskaldji Rima ep. Benabdi",
+    "path": ".name"
+  },
+  {
+    "docId": "doctor-meskaldji-rima",
+    "docType": "doctor",
+    "field": "current",
+    "value": "meskaldji-rima",
+    "path": ".slug.current"
+  },
+  {
+    "docId": "doctor-meskaldji-rima",
+    "docType": "doctor",
+    "field": "specialty",
+    "value": "Gynécologie Obstétrique",
+    "path": ".specialty"
+  },
+  {
+    "docId": "doctor-meskaldji-rima",
+    "docType": "doctor",
+    "field": "subtitle",
+    "value": "Ancienne Maître Assistante",
+    "path": ".subtitle"
+  },
+  {
+    "docId": "doctor-meskaldji-rima",
+    "docType": "doctor",
+    "field": "title",
+    "value": "Dr.",
+    "path": ".title"
+  },
+  {
+    "docId": "doctor-zerizer-loubna",
+    "docType": "doctor",
+    "field": "accentColor",
+    "value": "#3B82F6",
+    "path": ".accentColor"
+  },
+  {
+    "docId": "doctor-zerizer-loubna",
+    "docType": "doctor",
+    "field": "consultationDays",
+    "value": "Du samedi au jeudi",
+    "path": ".consultationDays"
+  },
+  {
+    "docId": "doctor-zerizer-loubna",
+    "docType": "doctor",
+    "field": "consultationHours",
+    "value": "08h00 – 16h00",
+    "path": ".consultationHours"
+  },
+  {
+    "docId": "doctor-zerizer-loubna",
+    "docType": "doctor",
+    "field": "iconName",
+    "value": "Stethoscope",
+    "path": ".iconName"
+  },
+  {
+    "docId": "doctor-zerizer-loubna",
+    "docType": "doctor",
+    "field": "name",
+    "value": "Zerizer Loubna",
+    "path": ".name"
+  },
+  {
+    "docId": "doctor-zerizer-loubna",
+    "docType": "doctor",
+    "field": "current",
+    "value": "zerizer-loubna",
+    "path": ".slug.current"
+  },
+  {
+    "docId": "doctor-zerizer-loubna",
+    "docType": "doctor",
+    "field": "specialty",
+    "value": "Médecine interne",
+    "path": ".specialty"
+  },
+  {
+    "docId": "doctor-zerizer-loubna",
+    "docType": "doctor",
+    "field": "title",
+    "value": "Dr.",
+    "path": ".title"
+  },
+  {
+    "docId": "11dd345a-2d13-4d7c-bb49-035b415dec76",
+    "docType": "event",
+    "field": "description",
+    "value": "",
+    "path": ".description"
+  },
+  {
+    "docId": "11dd345a-2d13-4d7c-bb49-035b415dec76",
+    "docType": "event",
+    "field": "eventType",
+    "value": "",
+    "path": ".eventType"
+  },
+  {
+    "docId": "11dd345a-2d13-4d7c-bb49-035b415dec76",
+    "docType": "event",
+    "field": "location",
+    "value": "Clinique OKBA, Ali Mendjeli, Constantine",
+    "path": ".location"
+  },
+  {
+    "docId": "11dd345a-2d13-4d7c-bb49-035b415dec76",
+    "docType": "event",
+    "field": "current",
+    "value": "ouverture-officiel",
+    "path": ".slug.current"
+  },
+  {
+    "docId": "11dd345a-2d13-4d7c-bb49-035b415dec76",
+    "docType": "event",
+    "field": "startDate",
+    "value": "2023-05-07T13:23:00.000Z",
+    "path": ".startDate"
+  },
+  {
+    "docId": "11dd345a-2d13-4d7c-bb49-035b415dec76",
+    "docType": "event",
+    "field": "title",
+    "value": "Ouverture Officiel",
+    "path": ".title"
+  },
+  {
+    "docId": "footerContent",
+    "docType": "footerContent",
+    "field": "copyright",
+    "value": "",
+    "path": ".copyright"
+  },
+  {
+    "docId": "footerContent",
+    "docType": "footerContent",
+    "field": "newsletterDescription",
+    "value": "",
+    "path": ".newsletterDescription"
+  },
+  {
+    "docId": "footerContent",
+    "docType": "footerContent",
+    "field": "newsletterTitle",
+    "value": "",
+    "path": ".newsletterTitle"
+  },
+  {
+    "docId": "actExlJ9USbzmoGsOqWa21",
+    "docType": "heroSlide",
+    "field": "subtitle",
+    "value": "",
+    "path": ".subtitle"
+  },
+  {
+    "docId": "mYBnIMFQ449l0WiRGKaAzM",
+    "docType": "heroSlide",
+    "field": "subtitle",
+    "value": "",
+    "path": ".subtitle"
+  },
+  {
+    "docId": "homeCare",
+    "docType": "homeCare",
+    "field": "availability",
+    "value": "Interventions sur rendez-vous et urgences selon disponibilité",
+    "path": ".availability"
+  },
+  {
+    "docId": "homeCare",
+    "docType": "homeCare",
+    "field": "text",
+    "value": "Demander une intervention à domicile",
+    "path": ".callToAction.text"
+  },
+  {
+    "docId": "homeCare",
+    "docType": "homeCare",
+    "field": "description",
+    "value": "Une équipe mobile pour des soins médicaux de qualité, chez vous, en toute sécurité.",
+    "path": ".description"
+  },
+  {
+    "docId": "homeCare",
+    "docType": "homeCare",
+    "field": "name",
+    "value": "Consultations générales et de suivi",
+    "path": ".services[0].name"
+  },
+  {
+    "docId": "homeCare",
+    "docType": "homeCare",
+    "field": "name",
+    "value": "Pansements, injections, perfusions",
+    "path": ".services[1].name"
+  },
+  {
+    "docId": "homeCare",
+    "docType": "homeCare",
+    "field": "name",
+    "value": "Prélèvements et examens à domicile",
+    "path": ".services[2].name"
+  },
+  {
+    "docId": "homeCare",
+    "docType": "homeCare",
+    "field": "name",
+    "value": "Surveillance de patients chroniques",
+    "path": ".services[3].name"
+  },
+  {
+    "docId": "homeCare",
+    "docType": "homeCare",
+    "field": "subtitle",
+    "value": "Service dédié",
+    "path": ".subtitle"
+  },
+  {
+    "docId": "homeCare",
+    "docType": "homeCare",
+    "field": "title",
+    "value": "Soins à domicile",
+    "path": ".title"
+  },
+  {
+    "docId": "0wmj31LodWz2rwvx7VmAWi",
+    "docType": "pole",
+    "field": "accentColor",
+    "value": "#0D9488",
+    "path": ".accentColor"
+  },
+  {
+    "docId": "0wmj31LodWz2rwvx7VmAWi",
+    "docType": "pole",
+    "field": "iconName",
+    "value": "Radiation",
+    "path": ".iconName"
+  },
+  {
+    "docId": "0wmj31LodWz2rwvx7VmAWi",
+    "docType": "pole",
+    "field": "current",
+    "value": "medecine-nucleaire.",
+    "path": ".slug.current"
+  },
+  {
+    "docId": "pole-chirurgie",
+    "docType": "pole",
+    "field": "iconName",
+    "value": "Eye",
+    "path": ".iconName"
+  },
+  {
+    "docId": "pole-chirurgie",
+    "docType": "pole",
+    "field": "current",
+    "value": "chirurgie",
+    "path": ".slug.current"
+  },
+  {
+    "docId": "pole-consultations",
+    "docType": "pole",
+    "field": "iconName",
+    "value": "Stethoscope",
+    "path": ".iconName"
+  },
+  {
+    "docId": "pole-consultations",
+    "docType": "pole",
+    "field": "current",
+    "value": "consultations",
+    "path": ".slug.current"
+  },
+  {
+    "docId": "pole-dentaire",
+    "docType": "pole",
+    "field": "iconName",
+    "value": "Smile",
+    "path": ".iconName"
+  },
+  {
+    "docId": "pole-dentaire",
+    "docType": "pole",
+    "field": "current",
+    "value": "dentaire",
+    "path": ".slug.current"
+  },
+  {
+    "docId": "pole-imagerie",
+    "docType": "pole",
+    "field": "iconName",
+    "value": "ScanLine",
+    "path": ".iconName"
+  },
+  {
+    "docId": "pole-imagerie",
+    "docType": "pole",
+    "field": "current",
+    "value": "imagerie",
+    "path": ".slug.current"
+  },
+  {
+    "docId": "pole-laboratoire",
+    "docType": "pole",
+    "field": "iconName",
+    "value": "FlaskConical",
+    "path": ".iconName"
+  },
+  {
+    "docId": "pole-laboratoire",
+    "docType": "pole",
+    "field": "current",
+    "value": "laboratoire",
+    "path": ".slug.current"
+  },
+  {
+    "docId": "pole-medecine-nucleaire",
+    "docType": "pole",
+    "field": "iconName",
+    "value": "Radiation",
+    "path": ".iconName"
+  },
+  {
+    "docId": "pole-medecine-nucleaire",
+    "docType": "pole",
+    "field": "current",
+    "value": "medecine-nucleaire",
+    "path": ".slug.current"
+  },
+  {
+    "docId": "pole-urgences",
+    "docType": "pole",
+    "field": "iconName",
+    "value": "Siren",
+    "path": ".iconName"
+  },
+  {
+    "docId": "pole-urgences",
+    "docType": "pole",
+    "field": "current",
+    "value": "urgences",
+    "path": ".slug.current"
+  },
+  {
+    "docId": "sectionContent-contact",
+    "docType": "sectionContent",
+    "field": "badge",
+    "value": "Nous contacter",
+    "path": ".badge"
+  },
+  {
+    "docId": "sectionContent-contact",
+    "docType": "sectionContent",
+    "field": "sectionId",
+    "value": "contact",
+    "path": ".sectionId"
+  },
+  {
+    "docId": "sectionContent-contact",
+    "docType": "sectionContent",
+    "field": "subtitle",
+    "value": "Nous sommes à votre écoute pour toute question ou demande de rendez-vous",
+    "path": ".subtitle"
+  },
+  {
+    "docId": "sectionContent-contact",
+    "docType": "sectionContent",
+    "field": "title",
+    "value": "Contact & Localisation",
+    "path": ".title"
+  },
+  {
+    "docId": "sectionContent-hero",
+    "docType": "sectionContent",
+    "field": "badge",
+    "value": "Excellence Médicale · Ali Mendjeli, Constantine",
+    "path": ".badge"
+  },
+  {
+    "docId": "sectionContent-hero",
+    "docType": "sectionContent",
+    "field": "sectionId",
+    "value": "hero",
+    "path": ".sectionId"
+  },
+  {
+    "docId": "sectionContent-homecare",
+    "docType": "sectionContent",
+    "field": "badge",
+    "value": "Service dédié",
+    "path": ".badge"
+  },
+  {
+    "docId": "sectionContent-homecare",
+    "docType": "sectionContent",
+    "field": "sectionId",
+    "value": "homecare",
+    "path": ".sectionId"
+  },
+  {
+    "docId": "sectionContent-homecare",
+    "docType": "sectionContent",
+    "field": "subtitle",
+    "value": "Une équipe mobile pour des soins médicaux de qualité, chez vous, en toute sécurité.",
+    "path": ".subtitle"
+  },
+  {
+    "docId": "sectionContent-homecare",
+    "docType": "sectionContent",
+    "field": "title",
+    "value": "Soins à domicile",
+    "path": ".title"
+  },
+  {
+    "docId": "sectionContent-testimonials",
+    "docType": "sectionContent",
+    "field": "badge",
+    "value": "Témoignages",
+    "path": ".badge"
+  },
+  {
+    "docId": "sectionContent-testimonials",
+    "docType": "sectionContent",
+    "field": "sectionId",
+    "value": "testimonials",
+    "path": ".sectionId"
+  },
+  {
+    "docId": "sectionContent-testimonials",
+    "docType": "sectionContent",
+    "field": "subtitle",
+    "value": "Votre satisfaction est notre priorité",
+    "path": ".subtitle"
+  },
+  {
+    "docId": "sectionContent-testimonials",
+    "docType": "sectionContent",
+    "field": "title",
+    "value": "Ce que disent nos patients",
+    "path": ".title"
+  },
+  {
+    "docId": "sectionContent-video",
+    "docType": "sectionContent",
+    "field": "badge",
+    "value": "En vidéo",
+    "path": ".badge"
+  },
+  {
+    "docId": "sectionContent-video",
+    "docType": "sectionContent",
+    "field": "sectionId",
+    "value": "video",
+    "path": ".sectionId"
+  },
+  {
+    "docId": "sectionContent-video",
+    "docType": "sectionContent",
+    "field": "subtitle",
+    "value": "Une présentation de notre établissement : nos spécialités, nos urgences 24h/24 et notre engagement à vos côtés.",
+    "path": ".subtitle"
+  },
+  {
+    "docId": "sectionContent-video",
+    "docType": "sectionContent",
+    "field": "title",
+    "value": "Découvrez la Clinique OKBA",
+    "path": ".title"
+  },
+  {
+    "docId": "siteSettings",
+    "docType": "siteSettings",
+    "field": "address",
+    "value": "Nouvelle ville Ali Mendjeli, extension ouest, à proximité du grand rond-point en allant vers Aïn Smara, Constantine, Algérie",
+    "path": ".address"
+  },
+  {
+    "docId": "siteSettings",
+    "docType": "siteSettings",
+    "field": "appointmentMessage",
+    "value": "Bonjour la Clinique OKBA, je souhaite prendre un rendez-vous.",
+    "path": ".appointmentMessage"
+  },
+  {
+    "docId": "siteSettings",
+    "docType": "siteSettings",
+    "field": "clinicName",
+    "value": "Clinique OKBA",
+    "path": ".clinicName"
+  },
+  {
+    "docId": "siteSettings",
+    "docType": "siteSettings",
+    "field": "description",
+    "value": "Clinique privée pluridisciplinaire moderne à Ali Mendjeli, Constantine.",
+    "path": ".description"
+  },
+  {
+    "docId": "siteSettings",
+    "docType": "siteSettings",
+    "field": "label",
+    "value": "Pôles d’excellence",
+    "path": ".heroStats[0].label"
+  },
+  {
+    "docId": "siteSettings",
+    "docType": "siteSettings",
+    "field": "value",
+    "value": "6",
+    "path": ".heroStats[0].value"
+  },
+  {
+    "docId": "siteSettings",
+    "docType": "siteSettings",
+    "field": "label",
+    "value": "Urgences",
+    "path": ".heroStats[1].label"
+  },
+  {
+    "docId": "siteSettings",
+    "docType": "siteSettings",
+    "field": "value",
+    "value": "24/7",
+    "path": ".heroStats[1].value"
+  },
+  {
+    "docId": "siteSettings",
+    "docType": "siteSettings",
+    "field": "label",
+    "value": "Médecins",
+    "path": ".heroStats[2].label"
+  },
+  {
+    "docId": "siteSettings",
+    "docType": "siteSettings",
+    "field": "value",
+    "value": "30+",
+    "path": ".heroStats[2].value"
+  },
+  {
+    "docId": "siteSettings",
+    "docType": "siteSettings",
+    "field": "emergency",
+    "value": "24h/24 - 7j/7",
+    "path": ".hours.emergency"
+  },
+  {
+    "docId": "siteSettings",
+    "docType": "siteSettings",
+    "field": "saturday",
+    "value": "08:00 - 14:00",
+    "path": ".hours.saturday"
+  },
+  {
+    "docId": "siteSettings",
+    "docType": "siteSettings",
+    "field": "weekdays",
+    "value": "08:00 - 18:00",
+    "path": ".hours.weekdays"
+  },
+  {
+    "docId": "siteSettings",
+    "docType": "siteSettings",
+    "field": "facebook",
+    "value": "https://www.facebook.com/p/Clinique-OKBA-61576965629601/",
+    "path": ".social.facebook"
+  },
+  {
+    "docId": "siteSettings",
+    "docType": "siteSettings",
+    "field": "instagram",
+    "value": "https://www.instagram.com/clinique_okba/",
+    "path": ".social.instagram"
+  },
+  {
+    "docId": "siteSettings",
+    "docType": "siteSettings",
+    "field": "whatsappNumber",
+    "value": "213770884242",
+    "path": ".whatsappNumber"
+  },
+  {
+    "docId": "testimonial-0",
+    "docType": "testimonial",
+    "field": "comment",
+    "value": "Accueil chaleureux et personnel très professionnel. Le scanner a été réalisé rapidement et les résultats étaient clairs.",
+    "path": ".comment"
+  },
+  {
+    "docId": "testimonial-0",
+    "docType": "testimonial",
+    "field": "name",
+    "value": "Amel B.",
+    "path": ".name"
+  },
+  {
+    "docId": "testimonial-0",
+    "docType": "testimonial",
+    "field": "service",
+    "value": "Imagerie",
+    "path": ".service"
+  },
+  {
+    "docId": "testimonial-1",
+    "docType": "testimonial",
+    "field": "comment",
+    "value": "Excellente prise en charge au service des urgences, de jour comme de nuit. Une équipe à l'écoute et réactive.",
+    "path": ".comment"
+  },
+  {
+    "docId": "testimonial-1",
+    "docType": "testimonial",
+    "field": "name",
+    "value": "Karim M.",
+    "path": ".name"
+  },
+  {
+    "docId": "testimonial-1",
+    "docType": "testimonial",
+    "field": "service",
+    "value": "Urgences",
+    "path": ".service"
+  },
+  {
+    "docId": "testimonial-2",
+    "docType": "testimonial",
+    "field": "comment",
+    "value": "Suivi de grossesse impeccable, médecins attentionnés et plateau technique moderne. Je recommande vivement.",
+    "path": ".comment"
+  },
+  {
+    "docId": "testimonial-2",
+    "docType": "testimonial",
+    "field": "name",
+    "value": "Nadia S.",
+    "path": ".name"
+  },
+  {
+    "docId": "testimonial-2",
+    "docType": "testimonial",
+    "field": "service",
+    "value": "Gynécologie",
+    "path": ".service"
+  }
+]

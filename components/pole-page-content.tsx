@@ -24,7 +24,7 @@ import {
 import { Link } from '@/navigation'
 import { ECGLine, ecgVariantForIcon } from '@/components/ui/ecg-line'
 import { PoleMotif, motifVariantForIcon } from '@/components/ui/pole-motif'
-import { urlFor } from '@/sanity/lib/image'
+import { urlFor, hiResImage, sanityImageLoader } from '@/sanity/lib/image'
 import { useReducedMotion } from '@/hooks/use-reduced-motion'
 
 const ICONS: Record<string, LucideIcon> = {
@@ -119,12 +119,6 @@ export default function PolePageContent({
     <>
       {/* ----------------------------- HERO ----------------------------- */}
       <section className="relative overflow-hidden">
-        {/* Décor */}
-        <div
-          className="pointer-events-none absolute -top-24 right-0 h-96 w-96 rounded-full blur-[130px]"
-          style={{ background: `${pole.accent}33` }}
-        />
-        <div className="pointer-events-none absolute -bottom-24 left-0 h-96 w-96 rounded-full bg-[#FDE68A]/20 blur-[130px]" />
 
         {/* Motif animé propre au domaine du pôle */}
         <PoleMotif variant={motifVariantForIcon(pole.iconName)} color={pole.accent} />
@@ -138,12 +132,14 @@ export default function PolePageContent({
             {t('backHome')}
           </Link>
 
-          <motion.div
-            initial={{ opacity: 0, y: 24 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-            className="flex flex-col items-start gap-6"
-          >
+          <div className="grid grid-cols-1 gap-12 lg:grid-cols-2 lg:gap-8 lg:items-center">
+            {/* Left: Text */}
+            <motion.div
+              initial={{ opacity: 0, x: -24 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+              className="flex flex-col items-start gap-6"
+            >
             <div className="flex items-center gap-4">
               <div
                 className="flex h-16 w-16 items-center justify-center rounded-2xl text-white shadow-lg"
@@ -218,8 +214,49 @@ export default function PolePageContent({
               </Link>
             </div>
           </motion.div>
+
+          {/* Right: Visual Anchor */}
+          {(photos.length > 0 || videos.length > 0) && (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.6, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
+              className="relative mx-auto w-full max-w-lg lg:max-w-none"
+            >
+              <div className="relative aspect-[4/3] w-full overflow-hidden rounded-3xl shadow-2xl ring-1 ring-border/50">
+                <div className="absolute inset-0 z-10 bg-gradient-to-tr from-black/20 via-transparent to-transparent" />
+                {photos.length > 0 ? (
+                  <Image
+                    loader={sanityImageLoader}
+                    src={photos[0].src}
+                    alt={pole.title}
+                    fill
+                    sizes="(max-width: 1024px) 100vw, 50vw"
+                    className="object-cover"
+                    priority
+                  />
+                ) : (
+                  <Image
+                    loader={sanityImageLoader}
+                    src={posterUrlOf(videos[0]) || ''}
+                    alt={pole.title}
+                    fill
+                    sizes="(max-width: 1024px) 100vw, 50vw"
+                    className="object-cover"
+                    priority
+                  />
+                )}
+              </div>
+              {/* Decorative accent element behind the image */}
+              <div 
+                className="absolute -right-4 -bottom-4 -z-10 h-full w-full rounded-3xl border-2 opacity-50"
+                style={{ borderColor: pole.accent }}
+              />
+            </motion.div>
+          )}
         </div>
-      </section>
+      </div>
+    </section>
 
       {/* --------------------------- VIDÉOS ---------------------------- */}
       {videos.length > 0 && current && (
@@ -227,21 +264,9 @@ export default function PolePageContent({
           <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
             <h2 className="mb-8 text-2xl font-bold sm:text-3xl">{t('inVideo')}</h2>
 
-            {/* Cadre à bordure conique animée (signature visuelle du site) */}
-            <div className="group relative overflow-hidden rounded-[2rem] p-[2px]">
-              {!prefersReducedMotion && (
-                <motion.div
-                  aria-hidden
-                  className="absolute inset-[-40%] z-0"
-                  style={{
-                    background: `conic-gradient(from 0deg, transparent 0deg, ${pole.accent} 90deg, #FDE68A 180deg, transparent 280deg)`,
-                  }}
-                  animate={{ rotate: 360 }}
-                  transition={{ duration: 11, repeat: Infinity, ease: 'linear' }}
-                />
-              )}
-
-              <div className="relative z-10 overflow-hidden rounded-[1.9rem] bg-black shadow-2xl">
+            {/* Cadre vidéo Premium */}
+            <div className="group relative overflow-hidden rounded-[2rem] ring-1 ring-border/50 shadow-[0_20px_50px_rgba(0,0,0,0.1)]">
+              <div className="relative z-10 overflow-hidden rounded-[2rem] bg-black">
                 <AnimatePresence mode="wait">
                   <motion.div
                     key={activeVideo}
@@ -272,6 +297,7 @@ export default function PolePageContent({
                       >
                         {posterUrlOf(current) ? (
                           <Image
+                            loader={sanityImageLoader}
                             src={posterUrlOf(current)!}
                             alt={current.title || pole.title}
                             fill
@@ -333,6 +359,7 @@ export default function PolePageContent({
                       <span className="relative block aspect-video w-full bg-muted">
                         {posterUrlOf(v, 416, 234) ? (
                           <Image
+                            loader={sanityImageLoader}
                             src={posterUrlOf(v, 416, 234)!}
                             alt={v.title || ''}
                             fill
@@ -387,6 +414,7 @@ export default function PolePageContent({
                 >
                   <div className="relative aspect-[4/3] w-full">
                     <Image
+                      loader={sanityImageLoader}
                       src={p.src}
                       alt={p.title}
                       fill
@@ -436,6 +464,7 @@ export default function PolePageContent({
                     {eq.image || eq.imageUrl ? (
                       <div className="relative aspect-[4/3] w-full overflow-hidden rounded-3xl bg-muted shadow-2xl ring-1 ring-border/50">
                         <Image
+                          loader={sanityImageLoader}
                           src={eq.image ? urlFor(eq.image).width(800).height(600).url() : eq.imageUrl}
                           alt={eq.name}
                           fill
@@ -555,10 +584,12 @@ export default function PolePageContent({
               >
                 <div className="relative w-full overflow-hidden rounded-2xl shadow-2xl">
                   <Image
-                    src={photos[index].src}
+                    src={hiResImage(photos[index].src)}
                     alt={photos[index].title}
-                    width={1280}
-                    height={960}
+                    width={2400}
+                    height={1800}
+                    quality={100}
+                    unoptimized
                     className="h-auto max-h-[72vh] w-full object-contain"
                   />
                 </div>

@@ -5,9 +5,13 @@ import { localizeSanityData } from '@/sanity/lib/localize'
 
 /**
  * Wrapper serveur du Header : récupère les pôles (pour le menu déroulant)
- * et les transmet au Header client. `siteSettings` peut être fourni par la
- * page (pour éviter un double fetch) ou récupéré ici.
- * Le contenu Sanity est localisé (FR/AR) selon la locale courante.
+ * et les transmet au Header client.
+ *
+ * IMPORTANT : on transmet les pôles BRUTS (avec `title`/`title_ar`), sans les
+ * localiser ici. La localisation est faite dans le composant client Header
+ * via `useLocale()`, qui renvoie toujours la bonne langue — contrairement à
+ * `getLocale()` côté serveur qui, en rendu statique, peut retomber sur la
+ * locale par défaut (fr) et faire apparaître les pôles en français en arabe.
  */
 export default async function SiteHeader({
     siteSettings,
@@ -20,9 +24,8 @@ export default async function SiteHeader({
         siteSettings ? Promise.resolve(siteSettings) : getSiteSettings(),
     ])
 
-    const poles = localizeSanityData(polesRaw, locale)
     // `siteSettings` reçu en prop est déjà localisé par la page ; sinon on localise ici.
     const settings = siteSettings ? settingsRaw : localizeSanityData(settingsRaw, locale)
 
-    return <Header siteSettings={settings} poles={poles} />
+    return <Header siteSettings={settings} poles={polesRaw} />
 }

@@ -1,44 +1,56 @@
-import { Poppins } from 'next/font/google'
+import { Montserrat } from 'next/font/google'
 import localFont from 'next/font/local'
 
-// Montserrat Arabic — police arabe (corps + titres en RTL).
-// Remplacée par la version alfont.com à la demande de l'utilisateur.
-// preload: false — les fichiers ne sont téléchargés que
-// lorsque la page est en arabe (dir="rtl"), pas sur les pages françaises.
+// Montserrat Arabic : géré via next/font/local (comme Lemon Milk) pour garantir
+// le chargement et éviter les problèmes de cache ou de fallback système.
 export const montserratArabic = localFont({
     src: [
         {
+            path: '../public/fonts/montserrat-arabic/Montserrat-Arabic-Light.ttf',
+            weight: '300',
+            style: 'normal',
+        },
+        {
+            // On utilise la version alfont.com pour le Regular comme demandé précédemment
             path: '../public/fonts/montserrat-arabic/alfont_com_Montserrat-Arabic-Regular.ttf',
             weight: '400',
             style: 'normal',
         },
         {
-            path: '../public/fonts/montserrat-arabic/alfont_com_Montserrat-Arabic-Regular.ttf',
+            path: '../public/fonts/montserrat-arabic/Montserrat-Arabic-Medium.ttf',
+            weight: '500',
+            style: 'normal',
+        },
+        {
+            path: '../public/fonts/montserrat-arabic/Montserrat-Arabic-SemiBold.ttf',
+            weight: '600',
+            style: 'normal',
+        },
+        {
+            path: '../public/fonts/montserrat-arabic/Montserrat-Arabic-Bold.ttf',
             weight: '700',
             style: 'normal',
-        }
+        },
     ],
     display: 'swap',
-    preload: false,
+    preload: false, // On ne preload pas pour ne pas alourdir la version FR
     variable: '--font-montserrat-arabic',
     fallback: ['system-ui', 'arial'],
-    adjustFontFallback: 'Arial',
 })
 
-// Poppins : utilisé en fallback (corps de texte, caractères non-latins/arabe)
-// car Lemon Milk est une police 100% majuscules sans glyphes arabes.
-export const poppins = Poppins({
+// Montserrat : utilisé comme police globale (corps de texte)
+export const montserrat = Montserrat({
     subsets: ['latin'],
-    weight: ['400', '500', '600', '700'],
+    weight: ['300', '400', '500', '600', '700'],
     display: 'swap',
     preload: true,
-    variable: '--font-poppins',
+    variable: '--font-montserrat',
     fallback: ['system-ui', 'arial'],
     adjustFontFallback: true,
 })
 
 // Lemon Milk — police d'AFFICHAGE uniquement (tout en majuscules).
-// Réservée aux titres + identité de marque. Le corps de texte reste en Poppins.
+// Réservée aux titres + identité de marque. Le corps de texte reste en Montserrat.
 export const lemonMilk = localFont({
     src: [
         {
@@ -66,6 +78,6 @@ export const lemonMilk = localFont({
     preload: true,
     variable: '--font-lemon-milk',
     // Fallback lisible pendant le chargement et pour les caractères absents
-    fallback: ['Poppins', 'system-ui', 'arial'],
+    fallback: ['Montserrat', 'system-ui', 'arial'],
     adjustFontFallback: 'Arial',
 })

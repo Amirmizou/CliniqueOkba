@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react'
-import { lemonMilk, poppins, montserratArabic } from './fonts'
+import { lemonMilk, montserrat, montserratArabic } from './fonts'
 import { getLocale } from 'next-intl/server'
 import './globals.css'
 
@@ -12,7 +12,7 @@ export default async function RootLayout({
   const dir = locale === 'ar' ? 'rtl' : 'ltr'
 
   return (
-    <html lang={locale} dir={dir} suppressHydrationWarning className={`${lemonMilk.variable} ${poppins.variable} ${montserratArabic.variable}`} data-scroll-behavior="smooth">
+    <html lang={locale} dir={dir} suppressHydrationWarning className={`${lemonMilk.variable} ${montserrat.variable} ${montserratArabic.variable}`} data-scroll-behavior="smooth">
       <head>
         <link rel="preconnect" href="https://cdn.sanity.io" />
         <link rel="dns-prefetch" href="https://cdn.sanity.io" />

@@ -11,7 +11,7 @@ import { useRef, useState } from 'react'
 import Image from 'next/image'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Play, Film } from 'lucide-react'
-import { useTranslations } from 'next-intl'
+import { useTranslations, useLocale } from 'next-intl'
 import { urlFor } from '@/sanity/lib/image'
 import { useReducedMotion } from '@/hooks/use-reduced-motion'
 import { AnimatedSection } from '@/components/ui/animated-section'
@@ -30,6 +30,8 @@ interface VideoItem {
 
 export default function VideosGallery({ data }: { data?: VideoItem[] }) {
   const t = useTranslations('videosGallery')
+  const locale = useLocale()
+  const isAr = locale === 'ar'
   const prefersReducedMotion = useReducedMotion()
   const videoRef = useRef<HTMLVideoElement>(null)
 
@@ -80,14 +82,22 @@ export default function VideosGallery({ data }: { data?: VideoItem[] }) {
         {/* En-tête */}
         <AnimatedSection animation="fade" className="mb-12 text-center">
           <div className="animate-item">
-            <span className="mb-4 inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-4 py-1.5 text-sm font-semibold text-primary">
+            <span className="mb-4 inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-4 py-2 text-sm font-semibold leading-normal text-primary">
               <Film className="h-4 w-4" />
               {t('badge')}
             </span>
             <h2 className="mb-4 text-3xl font-bold sm:text-4xl md:text-5xl">
-              <LineReveal className="text-gradient">{t('titleLine1')}</LineReveal>
-              <br />
-              <LineReveal className="text-foreground" delay={0.12}>{t('titleLine2')}</LineReveal>
+              {isAr ? (
+                <LineReveal className="text-gradient">
+                  {t('titleLine1')} <span className="text-foreground">{t('titleLine2')}</span>
+                </LineReveal>
+              ) : (
+                <>
+                  <LineReveal className="text-gradient">{t('titleLine1')}</LineReveal>
+                  <br />
+                  <LineReveal className="text-foreground" delay={0.12}>{t('titleLine2')}</LineReveal>
+                </>
+              )}
             </h2>
             <p className="mx-auto max-w-2xl text-base text-muted-foreground sm:text-lg">
               {t('subtitle')}

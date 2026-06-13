@@ -6,9 +6,6 @@ import Image from 'next/image'
 import {
   motion,
   AnimatePresence,
-  useMotionValue,
-  useSpring,
-  useTransform,
 } from 'framer-motion'
 import {
   Calendar,
@@ -29,7 +26,7 @@ import {
   type LucideIcon,
 } from 'lucide-react'
 import { doctors, CLINIC_WHATSAPP, CLINIC_PHONE, type Doctor } from '@/data/doctors'
-import { urlFor } from '@/sanity/lib/image'
+import { urlFor, sanityImageLoader, hiResImage } from '@/sanity/lib/image'
 import { AnimatedSection } from '@/components/ui/animated-section'
 import { LineReveal } from '@/components/ui/reveal-text'
 
@@ -133,35 +130,7 @@ function DoctorCard({
   onOpen: (d: Doctor) => void
 }) {
   const t = useTranslations('doctors')
-  const ref = useRef<HTMLDivElement>(null)
   const [hovered, setHovered] = useState(false)
-
-  // Suivi de la souris pour l'inclinaison 3D
-  const mx = useMotionValue(0.5)
-  const my = useMotionValue(0.5)
-  const rotateX = useSpring(useTransform(my, [0, 1], [8, -8]), {
-    stiffness: 150,
-    damping: 18,
-  })
-  const rotateY = useSpring(useTransform(mx, [0, 1], [-8, 8]), {
-    stiffness: 150,
-    damping: 18,
-  })
-
-  function handleMove(e: React.PointerEvent<HTMLDivElement>) {
-    if (e.pointerType !== 'mouse') return // Ignore touch inputs for 3D tilt to prevent scroll blocking
-    const rect = ref.current?.getBoundingClientRect()
-    if (!rect) return
-    mx.set((e.clientX - rect.left) / rect.width)
-    my.set((e.clientY - rect.top) / rect.height)
-  }
-
-  function handleLeave(e: React.PointerEvent<HTMLDivElement>) {
-    if (e.pointerType !== 'mouse') return
-    mx.set(0.5)
-    my.set(0.5)
-    setHovered(false)
-  }
 
   const Icon = doctor.icon
   const waMessage = encodeURIComponent(
@@ -175,32 +144,21 @@ function DoctorCard({
       viewport={{ once: true, margin: '-80px' }}
       transition={{ duration: 0.6, delay: index * 0.12, ease: [0.22, 1, 0.36, 1] }}
       className="group relative h-full"
-      style={{ perspective: 1200 }}
     >
-      {/* Halo coloré derrière la carte */}
       <div
-        className="absolute -inset-2 rounded-[2rem] opacity-0 blur-2xl transition-opacity duration-500 group-hover:opacity-60"
-        style={{
-          background: `radial-gradient(60% 60% at 50% 0%, ${doctor.accent}66, transparent 70%)`,
-        }}
-      />
-
-      <motion.div
-        ref={ref}
-        onPointerMove={handleMove}
         onPointerEnter={(e) => e.pointerType === 'mouse' && setHovered(true)}
-        onPointerLeave={handleLeave}
-        style={{ rotateX, rotateY, transformStyle: 'preserve-3d' }}
-        className="relative flex h-full flex-col overflow-hidden rounded-[1.75rem] border border-white/40 bg-white/70 shadow-xl ring-1 ring-[#006633]/15 backdrop-blur-md dark:border-white/10 dark:bg-white/5"
+        onPointerLeave={(e) => e.pointerType === 'mouse' && setHovered(false)}
+        className="relative flex h-full flex-col overflow-hidden rounded-[1.75rem] border border-border/40 bg-white shadow-xl ring-1 ring-[#006633]/5 transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl dark:border-white/10 dark:bg-slate-900"
       >
         {/* ----- Affiche ----- */}
         <button
           type="button"
           onClick={() => onOpen(doctor)}
           aria-label={`Agrandir la photo de ${doctor.name}`}
-          className="relative block aspect-[3/4] w-full overflow-hidden bg-gradient-to-br from-[#006633] via-[#0a7a3f] to-[#FDE68A] cursor-zoom-in touch-manipulation"
+          className="relative block aspect-[3/4] w-full overflow-hidden bg-slate-100 dark:bg-slate-800 cursor-zoom-in touch-manipulation"
         >
           <Image
+            loader={sanityImageLoader}
             src={doctor.poster}
             alt={`Photo ${doctor.name} – ${doctor.specialty}`}
             fill
@@ -209,14 +167,11 @@ function DoctorCard({
             className="object-cover transition-transform duration-700 group-hover:scale-[1.06] select-none"
           />
 
-          {/* Voile de marque haut : le fond clair des portraits prend l'identité visuelle */}
-          <div className="absolute inset-x-0 top-0 h-1/3 bg-gradient-to-b from-[#006633]/35 via-[#006633]/10 to-transparent" />
-
           {/* Liseré doré supérieur (identité visuelle) */}
           <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-[#006633] via-[#FDE68A] to-[#006633]" />
 
-          {/* Voile vert dégradé bas (lisibilité du nom + identité) */}
-          <div className="absolute inset-x-0 bottom-0 h-2/3 bg-gradient-to-t from-[#00401f] via-[#006633]/45 to-transparent" />
+          {/* Voile sombre bas (lisibilité du nom) */}
+          <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
 
           {/* Indice "agrandir" */}
           <div className="absolute right-4 top-4 flex h-9 w-9 items-center justify-center rounded-full bg-white/20 text-white opacity-0 backdrop-blur-md transition-opacity duration-300 group-hover:opacity-100">
@@ -226,7 +181,6 @@ function DoctorCard({
           {/* Spécialité, Nom + expérience (toujours visibles, posés sur le voile) */}
           <div
             className="absolute inset-x-0 bottom-0 p-5 text-left flex flex-col items-start"
-            style={{ transform: 'translateZ(30px)' }}
           >
             {/* Badge spécialité déplacé en bas pour ne pas cacher le visage */}
             <div
@@ -311,7 +265,7 @@ function DoctorCard({
             </a>
           </div>
         </div>
-      </motion.div>
+      </div>
     </motion.div>
   )
 }
@@ -354,10 +308,12 @@ function PosterLightbox({
         className="relative max-h-[88vh] w-auto overflow-hidden rounded-2xl shadow-2xl ring-2 ring-[#FDE68A]/40"
       >
         <Image
-          src={doctor.poster}
+          src={hiResImage(doctor.poster, 1600)}
           alt={`Affiche ${doctor.name}`}
-          width={620}
-          height={827}
+          width={1200}
+          height={1600}
+          quality={100}
+          unoptimized
           className="h-auto max-h-[88vh] w-auto object-contain"
         />
       </motion.div>
@@ -388,14 +344,22 @@ export default function DoctorsShowcase({ data }: { data?: any[] }) {
         {/* En-tête */}
         <AnimatedSection animation="fade" className="mb-14 text-center">
           <div className="animate-item">
-            <span className="mb-4 inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-4 py-1.5 text-sm font-semibold text-primary">
+            <span className="mb-4 inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-4 py-2 text-sm font-semibold leading-normal text-primary">
               <Sparkles className="h-4 w-4" />
               {t('badge')}
             </span>
             <h2 className="mb-4 text-3xl font-bold sm:text-4xl md:text-5xl">
-              <LineReveal className="text-gradient">{t('titleLine1')}</LineReveal>
-              <br />
-              <LineReveal className="text-foreground" delay={0.12}>{t('titleLine2')}</LineReveal>
+              {locale === 'ar' ? (
+                <LineReveal className="text-gradient">
+                  {t('titleLine1')} <span className="text-foreground">{t('titleLine2')}</span>
+                </LineReveal>
+              ) : (
+                <>
+                  <LineReveal className="text-gradient">{t('titleLine1')}</LineReveal>
+                  <br />
+                  <LineReveal className="text-foreground" delay={0.12}>{t('titleLine2')}</LineReveal>
+                </>
+              )}
             </h2>
             <p className="mx-auto max-w-2xl text-base text-muted-foreground sm:text-lg">
               {t('subtitle')}

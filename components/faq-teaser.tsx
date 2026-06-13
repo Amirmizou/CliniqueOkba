@@ -66,7 +66,7 @@ export default function FaqTeaser({ data, sectionContent, limit = 5 }: FaqTeaser
 
       <div className="relative z-10 mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
         <ScrollAnimation variant="fadeUp" className="mb-12 text-center">
-          <span className="mb-4 inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-4 py-1.5 text-sm font-semibold text-primary">
+          <span className="mb-4 inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-4 py-2 text-sm font-semibold leading-normal text-primary">
             <HelpCircle className="h-4 w-4" />
             {badge}
           </span>

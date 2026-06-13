@@ -6,7 +6,7 @@ import { ThemeProvider } from '@/components/theme-provider'
 import { GoogleAnalytics } from '@/lib/analytics'
 import { defaultMetadata, generateStructuredData } from '@/lib/seo'
 import { NextIntlClientProvider } from 'next-intl'
-import { getMessages } from 'next-intl/server'
+import { getMessages, setRequestLocale } from 'next-intl/server'
 import PageTransition from '@/components/page-transition'
 import { ServiceWorkerRegistration as SWRegistrationComponent } from '@/components/service-worker-registration'
 import { AuraBackground } from '@/components/ui/aura-background'
@@ -33,10 +33,11 @@ export default async function LocaleLayout({
   params: Promise<{ locale: string }>
 }) {
   const { locale } = await params;
+  setRequestLocale(locale);
   const messages = await getMessages({ locale })
 
   return (
-    <NextIntlClientProvider messages={messages}>
+    <NextIntlClientProvider locale={locale} messages={messages}>
       {/* Données structurées MedicalOrganization (SEO local + fiche Google) */}
       <script
         type="application/ld+json"
@@ -47,6 +48,7 @@ export default async function LocaleLayout({
       <ThemeProvider
         attribute='class'
         defaultTheme='light'
+        enableSystem={false}
         disableTransitionOnChange
       >
         <AuraBackground>

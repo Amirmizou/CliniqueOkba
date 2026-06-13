@@ -58,7 +58,10 @@ const client = createClient({
   useCdn: false,
 })
 
-const data = JSON.parse(readFileSync(join(__dirname, 'seed-data.json'), 'utf8'))
+import { createRequire } from 'module'
+const require = createRequire(import.meta.url)
+// We will read the updated data that we generate first.
+const data = JSON.parse(readFileSync(join(__dirname, 'seed-data-updated.json'), 'utf8'))
 
 // Cache d'upload pour ne pas ré-uploader une image déjà envoyée
 async function uploadImage(relPath) {
@@ -183,12 +186,16 @@ async function run() {
       title: p.title,
       slug: { _type: 'slug', current: p.slug },
       description: p.description,
-      items: p.items,
+      title_ar: p.title_ar,
+      description_ar: p.description_ar,
+      items_ar: p.items_ar,
+      badge_ar: p.badge_ar,
       iconName: p.iconName,
       accentColor: p.accentColor,
       galleryCategories: p.galleryCategories || [],
       badge: p.badge,
       urgent: p.urgent ?? false,
+      featured: p.featured ?? false,
       order: poleOrder++,
       active: true,
     })

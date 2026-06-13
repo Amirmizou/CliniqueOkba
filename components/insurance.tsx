@@ -49,7 +49,7 @@ export default function Insurance({ data }: InsuranceProps) {
       <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <AnimatedSection animation="fade" className="mb-12 text-center">
           <div className="animate-item">
-            <span className="mb-4 inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-4 py-1.5 text-sm font-semibold text-primary">
+            <span className="mb-4 inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-4 py-2 text-sm font-semibold leading-normal text-primary">
               <ShieldCheck className="h-4 w-4" />
               {isAr ? (data.badge_ar || data.badge) : data.badge}
             </span>

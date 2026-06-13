@@ -117,6 +117,10 @@ export default defineConfig({
                                     .title('Contenu Médical')
                                     .items([
                                         S.listItem()
+                                            .title('Pôles d\'Excellence')
+                                            .icon(() => '⭐')
+                                            .child(S.documentTypeList('pole').title('Pôles d\'Excellence')),
+                                        S.listItem()
                                             .title('Spécialités Médicales')
                                             .icon(() => '🩺')
                                             .child(S.documentTypeList('specialty').title('Spécialités')),
@@ -138,6 +142,26 @@ export default defineConfig({
                             .title('⭐ Témoignages Patients')
                             .icon(() => '⭐')
                             .child(S.documentTypeList('testimonial').title('Témoignages')),
+
+                        S.divider(),
+
+                        // 📸 GALERIE & MÉDIAS
+                        S.listItem()
+                            .title('📸 Galerie & Médias')
+                            .child(
+                                S.list()
+                                    .title('Médias')
+                                    .items([
+                                        S.listItem()
+                                            .title('Photos des Installations')
+                                            .icon(() => '🏥')
+                                            .child(S.documentTypeList('facilityPhoto').title('Photos')),
+                                        S.listItem()
+                                            .title('Vidéos')
+                                            .icon(() => '🎥')
+                                            .child(S.documentTypeList('video').title('Vidéos')),
+                                    ])
+                            ),
 
                         S.divider(),
 

@@ -37,6 +37,20 @@ export default defineType({
             rows: 2,
         }),
         defineField({
+            name: 'intro',
+            title: 'Introduction (FR)',
+            type: 'text',
+            description: 'Paragraphe d\'introduction plus long affiché sur la page du pôle.',
+            rows: 4,
+        }),
+        defineField({
+            name: 'intro_ar',
+            title: 'Introduction (AR)',
+            type: 'text',
+            description: 'Paragraphe d\'introduction en arabe.',
+            rows: 4,
+        }),
+        defineField({
             name: 'items',
             title: 'Sous-spécialités / prestations (FR)',
             type: 'array',

@@ -4,7 +4,7 @@ import { useEffect, useRef } from 'react'
 import Image from 'next/image'
 import { useTranslations, useLocale } from 'next-intl'
 import * as LucideIcons from 'lucide-react'
-import { urlFor } from '@/sanity/lib/image'
+import { urlFor, sanityImageLoader } from '@/sanity/lib/image'
 import { gsap } from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { useReducedMotion } from '@/hooks/use-reduced-motion'
@@ -197,10 +197,11 @@ export default function About({ data, sectionContent }: AboutProps) {
       <div className='mx-auto max-w-7xl px-4 sm:px-6 lg:px-8'>
         <div className='grid items-center gap-12 md:grid-cols-2'>
           {/* Image with surgical curtain reveal */}
-          <div ref={imageRef} className='relative order-2 h-64 sm:h-80 md:h-96 md:order-1 rounded-2xl overflow-hidden'>
+          <div ref={imageRef} className='relative order-2 h-64 sm:h-80 md:h-96 md:order-1 rounded-2xl overflow-hidden shadow-2xl border border-border/50 ring-1 ring-white/10'>
             <div className='from-secondary/30 to-primary/20 absolute inset-0 bg-gradient-to-br z-10'></div>
             <Image
-              src={data?.image ? urlFor(data.image).url() : '/uploads/hero/1763825620251-Gemini_Generated_Image_gzjk7ygzjk7ygzjk.png'}
+              loader={sanityImageLoader}
+              src={data?.image ? urlFor(data.image).url() : '/uploads/hero/1763826628906-Gemini_Generated_Image_ubdtr0ubdtr0ubdt.png'}
               alt={data?.title || 'Façade architecturale moderne de la Clinique OKBA située à Constantine, Ali Mendjeli'}
               className='h-full w-full object-cover'
               fill

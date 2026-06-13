@@ -6,6 +6,7 @@ import PolePageContent, {
     type PolePageData,
 } from '@/components/pole-page-content'
 import { getSiteSettings, getPoles, getFacilityPhotos, getEquipment } from '@/sanity/lib/fetch'
+import { setRequestLocale } from 'next-intl/server'
 import { localizeSanityData } from '@/sanity/lib/localize'
 import { urlFor } from '@/sanity/lib/image'
 import { poles as localPoles, getPoleBySlug, CLINIC_PHONE } from '@/data/poles'
@@ -46,13 +47,45 @@ function resolvePole(slug: string, locale: string, sanityPoles?: any[]) {
     const sanity = (sanityPoles || []).find((p) => p.slug === slug)
     if (!local && !sanity) return null
 
-    const title = sanity?.title || (locale === 'ar' && local?.title_ar ? local.title_ar : local?.title) || ''
-    const description = sanity?.description || (locale === 'ar' && local?.description_ar ? local.description_ar : local?.description) || ''
-    const intro = sanity?.intro || (locale === 'ar' && local?.intro_ar ? local.intro_ar : local?.intro) || undefined
-    const badge = sanity?.badge || (locale === 'ar' && local?.badge_ar ? local.badge_ar : local?.badge)
-    const items = sanity?.items && sanity.items.length > 0
-        ? sanity.items
-        : (locale === 'ar' && local?.items_ar && local.items_ar.length > 0 ? local.items_ar : local?.items) || []
+    let title = sanity?.title || ''
+    const hasArabicTitle = /[\u0600-\u06FF]/.test(title)
+    if (locale === 'ar' && local?.title_ar && !hasArabicTitle) {
+        title = local.title_ar
+    } else if (!title && local) {
+        title = locale === 'ar' && local.title_ar ? local.title_ar : local.title
+    }
+
+    let description = sanity?.description || ''
+    const hasArabicDesc = /[\u0600-\u06FF]/.test(description)
+    if (locale === 'ar' && local?.description_ar && !hasArabicDesc) {
+        description = local.description_ar
+    } else if (!description && local) {
+        description = locale === 'ar' && local.description_ar ? local.description_ar : local.description
+    }
+
+    let intro = sanity?.intro || undefined
+    const hasArabicIntro = intro ? /[\u0600-\u06FF]/.test(intro) : false
+    if (locale === 'ar' && local?.intro_ar && intro && !hasArabicIntro) {
+        intro = local.intro_ar
+    } else if (!intro && local) {
+        intro = locale === 'ar' && local.intro_ar ? local.intro_ar : local.intro
+    }
+
+    let badge = sanity?.badge || undefined
+    const hasArabicBadge = badge ? /[\u0600-\u06FF]/.test(badge) : false
+    if (locale === 'ar' && local?.badge_ar && badge && !hasArabicBadge) {
+        badge = local.badge_ar
+    } else if (!badge && local) {
+        badge = locale === 'ar' && local.badge_ar ? local.badge_ar : local.badge
+    }
+
+    let items = sanity?.items || []
+    const itemsHaveArabic = items.some((item: string) => /[\u0600-\u06FF]/.test(item))
+    if (locale === 'ar' && local?.items_ar && items.length > 0 && !itemsHaveArabic) {
+        items = local.items_ar
+    } else if (items.length === 0 && local) {
+        items = locale === 'ar' && local.items_ar && local.items_ar.length > 0 ? local.items_ar : local.items
+    }
 
     const pole: PolePageData = {
         slug,
@@ -100,6 +133,7 @@ export default async function PolePage({
     params: Promise<{ slug: string; locale: string }>
 }) {
     const { slug, locale } = await params
+    setRequestLocale(locale)
 
     const [siteSettingsRaw, sanityPolesRaw, facilityPhotosRaw, equipmentsRaw] = await Promise.all([
         getSiteSettings(),

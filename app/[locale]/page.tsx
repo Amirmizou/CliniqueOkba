@@ -17,6 +17,7 @@ import BackToTop from '@/components/back-to-top'
 import MobileActionBar from '@/components/mobile-action-bar'
 import ScrollProgress from '@/components/ui/scroll-progress'
 import SectionDivider from '@/components/ui/section-divider'
+import { setRequestLocale } from 'next-intl/server'
 // Lazy load des composants lourds (below the fold)
 import {
   LazyEquipementsGallery,
@@ -49,6 +50,10 @@ import type { ClinicEvent } from '@/lib/events'
 export const revalidate = 3600
 
 export default async function Home(props: { params: Promise<{ locale: string }> }) {
+  // Get current locale
+  const { locale } = await props.params
+  setRequestLocale(locale)
+
   // Fetch all data from Sanity in parallel
   const [
     siteSettings,
@@ -81,9 +86,6 @@ export default async function Home(props: { params: Promise<{ locale: string }> 
     getVideos(),
     getFooterContent(),
   ])
-
-  // Get current locale
-  const { locale } = await props.params
 
   // Localize all fetched data
   const localizedData = {

@@ -199,42 +199,13 @@ export default function HeroCarousel({ slides: rawSlides = [], siteSettings, sec
                     </motion.div>
                 </AnimatePresence>
 
-                {/* Scrim de lisibilité (vert de marque) : fort à gauche + bas, léger en haut */}
-                <div className="absolute inset-0 bg-gradient-to-r from-[#00271a]/95 via-[#00351b]/60 to-transparent" />
-                <div className="absolute inset-0 bg-gradient-to-t from-[#001b10]/85 via-transparent to-[#001b10]/25" />
+                {/* Scrim de lisibilité (clair et médical) : assure la lisibilité du texte blanc sans assombrir la photo */}
+                <div className="absolute inset-0 bg-gradient-to-r from-teal-900/40 via-teal-900/10 to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-t from-slate-900/40 via-transparent to-slate-900/10" />
                 {/* Fondu bas vers le fond (transition vers la vague) */}
                 <div className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-background to-transparent" />
 
-                {/* Aurora de marque animée : vert profond + vert clair + ambre */}
-                <motion.div
-                    aria-hidden
-                    className="absolute -left-24 top-1/4 h-[28rem] w-[28rem] rounded-full bg-[#006633]/45 blur-[140px]"
-                    animate={prefersReducedMotion ? undefined : { scale: [1, 1.15, 1], opacity: [0.45, 0.7, 0.45] }}
-                    transition={{ duration: 9, repeat: Infinity, ease: 'easeInOut' }}
-                />
-                <motion.div
-                    aria-hidden
-                    className="absolute right-[14%] top-1/3 h-80 w-80 rounded-full bg-[#FDE68A]/15 blur-[120px]"
-                    animate={prefersReducedMotion ? undefined : { scale: [1, 1.2, 1], x: [0, 30, 0] }}
-                    transition={{ duration: 12, repeat: Infinity, ease: 'easeInOut', delay: 1.5 }}
-                />
-                <motion.div
-                    aria-hidden
-                    className="absolute -bottom-12 left-1/3 h-72 w-72 rounded-full bg-[#4caf6e]/25 blur-[130px]"
-                    animate={prefersReducedMotion ? undefined : { scale: [1, 1.1, 1], opacity: [0.25, 0.45, 0.25] }}
-                    transition={{ duration: 10, repeat: Infinity, ease: 'easeInOut', delay: 3 }}
-                />
 
-                {/* Balayage lumineux périodique (effet « scan » médical) */}
-                {!prefersReducedMotion && (
-                    <motion.div
-                        aria-hidden
-                        className="pointer-events-none absolute inset-y-0 left-0 w-1/4 -skew-x-12 bg-gradient-to-r from-transparent via-white/10 to-transparent"
-                        initial={{ x: '-130%' }}
-                        animate={{ x: ['-130%', '530%'] }}
-                        transition={{ duration: 6, repeat: Infinity, ease: 'easeInOut', repeatDelay: 5 }}
-                    />
-                )}
 
                 {/* Texture grille de points (subtile, masquée vers la zone de texte) */}
                 <div
@@ -277,12 +248,8 @@ export default function HeroCarousel({ slides: rawSlides = [], siteSettings, sec
                                 initial={{ opacity: 0, y: 12 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{ delay: 0.15 }}
-                                className="mb-5 inline-flex items-center gap-2 rounded-full border border-emerald-400/30 bg-[#00271a]/50 px-4 py-2 text-xs font-medium text-emerald-50 shadow-lg shadow-black/20 backdrop-blur-md sm:text-sm"
+                                className="mb-5 inline-flex items-center gap-2 rounded-full border border-white/30 bg-white/10 px-4 py-2 text-xs font-medium text-white backdrop-blur-md sm:text-sm"
                             >
-                                <span className="relative flex h-2 w-2">
-                                    <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
-                                    <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-400" />
-                                </span>
                                 {isAr ? (sectionContent?.badge_ar || sectionContent?.badge || t('badge')) : (sectionContent?.badge || t('badge'))}
                             </motion.div>
 
@@ -299,12 +266,12 @@ export default function HeroCarousel({ slides: rawSlides = [], siteSettings, sec
                                 />
                             </h1>
 
-                            {/* Filet dégradé signature (avec halo ambré) */}
+                            {/* Filet dégradé signature (épuré) */}
                             <motion.div
                                 initial={{ scaleX: 0 }}
                                 animate={{ scaleX: 1 }}
                                 transition={{ delay: 0.5, duration: 0.7, ease: EASE_OUT }}
-                                className="mt-5 h-1 w-32 origin-left rounded-full bg-gradient-to-r from-[#006633] via-[#4caf6e] to-[#FDE68A] shadow-[0_0_18px_rgba(253,230,138,0.45)]"
+                                className="mt-5 h-1 w-32 origin-left rounded-full bg-gradient-to-r from-[#006633] to-[#FDE68A]"
                             />
 
                             {/* Sous-titre */}
@@ -330,10 +297,8 @@ export default function HeroCarousel({ slides: rawSlides = [], siteSettings, sec
                                 <Magnetic className="w-full sm:w-fit">
                                     <button
                                         onClick={handleBooking}
-                                        className="group relative inline-flex w-full cursor-pointer items-center justify-center gap-2 overflow-hidden rounded-full bg-gradient-to-r from-[#006633] to-[#0a8a45] px-7 py-4 text-sm font-semibold text-white shadow-lg shadow-[#006633]/40 ring-1 ring-[#FDE68A]/20 transition duration-300 hover:shadow-xl hover:shadow-[#006633]/60 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#FDE68A]/60 active:scale-[0.98] sm:w-auto sm:text-base touch-target"
+                                        className="group relative inline-flex w-full cursor-pointer items-center justify-center gap-2 overflow-hidden rounded-full bg-white px-7 py-4 text-sm font-semibold text-[#006633] shadow-lg transition duration-300 hover:bg-gray-50 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-white/60 active:scale-[0.98] sm:w-auto sm:text-base touch-target"
                                     >
-                                        {/* Reflet qui balaie au survol */}
-                                        <span className="pointer-events-none absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/25 to-transparent transition-transform duration-700 group-hover:translate-x-full" />
                                         <CalendarHeart className="h-5 w-5" />
                                         {t('cta.appointment')}
                                         <ChevronRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />

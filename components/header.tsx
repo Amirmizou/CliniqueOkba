@@ -56,24 +56,37 @@ interface NavPole {
   badge?: string
 }
 
-/** Pôles du menu : Sanity prioritaire, repli sur les données locales */
+/** Pôles du menu : Sanity prioritaire (brut, avec title_ar), repli sur les
+ *  données locales. La langue est choisie ici via la locale client (fiable). */
 function resolveNavPoles(data: any[] | undefined, locale: string): NavPole[] {
-  if (!data || data.length === 0) {
-    return localPoles.map((p) => ({
-      slug: p.slug,
-      title: locale === 'ar' && p.title_ar ? p.title_ar : p.title,
-      iconName: p.iconName,
-      accent: p.accent,
-      badge: p.badge,
-    }))
-  }
-  return data.map((p, i) => ({
-    slug: p.slug?.current || p.slug || String(i),
-    title: p.title || '',
-    iconName: p.iconName || 'Stethoscope',
-    accent: p.accentColor || '#006633',
-    badge: p.badge || undefined,
-  }))
+  const source = data && data.length > 0 ? data : localPoles
+  return source.map((p: any, i: number) => {
+    const slug = p.slug?.current || p.slug || String(i)
+    const local = localPoles.find((lp) => lp.slug === slug)
+
+    let title = (locale === 'ar' && p.title_ar) ? p.title_ar : (p.title || '')
+    const hasArabicChars = /[\u0600-\u06FF]/.test(title)
+    
+    // Si on est en arabe mais que le texte n'a pas de caractères arabes, 
+    // on va chercher dans les données locales.
+    if (locale === 'ar' && !hasArabicChars && local?.title_ar) {
+      title = local.title_ar
+    }
+
+    let badge = (locale === 'ar' && p.badge_ar) ? p.badge_ar : (p.badge || undefined)
+    const badgeHasArabic = badge ? /[\u0600-\u06FF]/.test(badge) : false
+    if (locale === 'ar' && badge && !badgeHasArabic && local?.badge_ar) {
+      badge = local.badge_ar
+    }
+
+    return {
+      slug,
+      title,
+      iconName: p.iconName || local?.iconName || 'Stethoscope',
+      accent: p.accentColor || p.accent || local?.accent || '#006633',
+      badge,
+    }
+  })
 }
 
 interface SiteSettings {
@@ -230,7 +243,7 @@ export default function Header({ siteSettings, poles }: HeaderProps) {
           </a>
 
           {/* Desktop Navigation - The "Island" */}
-          <nav className='hidden md:flex items-center gap-1 bg-secondary/30 p-1 rounded-full border border-white/10'>
+          <nav className='hidden md:flex items-center gap-2 bg-white/50 dark:bg-black/20 p-1.5 rounded-full border border-white/40 dark:border-white/10 shadow-sm'>
             {navItems.map((item) => {
               const isActive = activeTab === item.id || activeTab === item.id.replace('#', '')
 
@@ -243,7 +256,7 @@ export default function Header({ siteSettings, poles }: HeaderProps) {
                     // setActiveTab(item.id) 
                   }}
                   className={cn(
-                    'relative px-4 py-2 text-sm font-semibold transition-colors duration-300 rounded-full flex items-center gap-2 group z-10',
+                    'relative px-5 py-2.5 text-sm font-semibold transition-colors duration-300 rounded-full flex items-center gap-2 group z-10',
                     isActive ? "text-primary drop-shadow-sm" : "text-foreground/90 hover:text-primary"
                   )}
                 >
@@ -272,7 +285,7 @@ export default function Header({ siteSettings, poles }: HeaderProps) {
             {/* Dropdown : Pôles */}
             <motion.div initial="initial" whileHover="hover" className="relative z-30">
               <button
-                className="relative px-4 py-2 text-sm font-semibold transition-colors duration-300 rounded-full text-foreground/90 hover:text-primary flex items-center gap-1 hover:bg-white/5"
+                className="relative px-5 py-2.5 text-sm font-semibold transition-colors duration-300 rounded-full text-foreground/90 hover:text-primary flex items-center gap-1 hover:bg-white/5"
               >
                 {t('poles')}
                 <motion.div variants={{ initial: { rotate: 0 }, hover: { rotate: -180 } }} transition={{ duration: 0.3 }}>
@@ -281,14 +294,14 @@ export default function Header({ siteSettings, poles }: HeaderProps) {
               </button>
 
               <motion.div 
-                className="absolute top-full start-1/2 -translate-x-1/2 mt-4 w-[22rem] pt-2"
+                className="absolute top-full start-1/2 -translate-x-1/2 pt-6 w-[22rem]"
                 variants={{
                   initial: { opacity: 0, y: 15, scale: 0.95, pointerEvents: "none" },
                   hover: { opacity: 1, y: 0, scale: 1, pointerEvents: "auto" }
                 }}
                 transition={{ type: "spring", stiffness: 400, damping: 25 }}
               >
-                <div className="glass-card p-2 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.12)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.3)] border border-white/40 dark:border-white/10 overflow-hidden bg-white/90 dark:bg-black/90 backdrop-blur-[24px]">
+                <div className="glass-card p-2 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.12)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.3)] border border-white/40 dark:border-white/10 overflow-hidden bg-white/95 dark:bg-black/95 backdrop-blur-[24px]">
                   <div className="grid grid-cols-1 gap-1">
                     {navPoles.map((pole) => {
                       const Icon = POLE_ICONS[pole.iconName] || Stethoscope
@@ -325,7 +338,7 @@ export default function Header({ siteSettings, poles }: HeaderProps) {
             {/* Dropdown for additional pages */}
             <motion.div initial="initial" whileHover="hover" className="relative z-20">
               <button
-                className="relative px-4 py-2 text-sm font-semibold transition-colors duration-300 rounded-full text-foreground/90 hover:text-primary flex items-center gap-1 hover:bg-white/5"
+                className="relative px-5 py-2.5 text-sm font-semibold transition-colors duration-300 rounded-full text-foreground/90 hover:text-primary flex items-center gap-1 hover:bg-white/5"
               >
                 {t('more')}
                 <motion.div variants={{ initial: { rotate: 0 }, hover: { rotate: -180 } }} transition={{ duration: 0.3 }}>
@@ -335,14 +348,14 @@ export default function Header({ siteSettings, poles }: HeaderProps) {
 
               {/* Dropdown Menu */}
               <motion.div 
-                className="absolute top-full end-0 mt-4 w-64 pt-2"
+                className="absolute top-full end-0 pt-6 w-64"
                 variants={{
                   initial: { opacity: 0, y: 15, scale: 0.95, pointerEvents: "none" },
                   hover: { opacity: 1, y: 0, scale: 1, pointerEvents: "auto" }
                 }}
                 transition={{ type: "spring", stiffness: 400, damping: 25 }}
               >
-                <div className="glass-card p-2 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.12)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.3)] border border-white/40 dark:border-white/10 overflow-hidden bg-white/90 dark:bg-black/90 backdrop-blur-[24px]">
+                <div className="glass-card p-2 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.12)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.3)] border border-white/40 dark:border-white/10 overflow-hidden bg-white/95 dark:bg-black/95 backdrop-blur-[24px]">
                   <div className="space-y-1">
                     <a href="/actualites" className="flex items-center gap-4 px-4 py-3 text-sm rounded-xl hover:bg-primary/5 text-muted-foreground hover:text-primary transition-all duration-200 group/item">
                       <div className="p-2 rounded-lg bg-primary/10 text-primary group-hover/item:bg-primary group-hover/item:text-white transition-colors shadow-sm">
@@ -388,35 +401,25 @@ export default function Header({ siteSettings, poles }: HeaderProps) {
 
           {/* Actions */}
           <div className='flex items-center gap-1 sm:gap-2'>
-            {/* Theme & Language toggle */}
+            {/* Language toggle */}
             <div className="flex items-center gap-1 pe-1 sm:pe-2 border-e border-border/50 me-1 sm:me-2">
               <div className="flex items-center justify-center">
                 <LanguageSwitcher />
               </div>
-              <div className="flex items-center justify-center">
-                <ThemeToggle />
-              </div>
             </div>
 
-            {/* Modern Emergency Button with Animated Pulse Rings */}
+            {/* Elegant Call to Action Button */}
             <motion.div
               className="relative overflow-hidden rounded-full"
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
             >
-              {/* Premium Pulsating Glow */}
-              <div className="absolute inset-0 rounded-full pointer-events-none">
-                <div className="absolute inset-0 rounded-full bg-red-500/20 blur-md animate-pulse"></div>
-                <span className="absolute inset-0 rounded-full border border-red-500/50 animate-ping" style={{ animationDuration: '2.5s' }}></span>
-              </div>
-
               <Button
                 size='sm'
                 className={cn(
-                  "relative rounded-full font-semibold shadow-2xl transition-all duration-300 overflow-hidden group border-0 z-10",
-                  "bg-gradient-to-r from-red-600 via-red-500 to-orange-500",
-                  "hover:from-red-500 hover:via-red-400 hover:to-orange-400",
-                  "hover:shadow-red-500/50 hover:shadow-2xl h-11 px-4 sm:px-5 touch-target"
+                  "relative rounded-full font-semibold shadow-lg transition-all duration-300 overflow-hidden group border-0 z-10",
+                  "bg-[#006633] text-white hover:bg-[#004d26]",
+                  "hover:shadow-[#006633]/30 hover:shadow-xl h-11 px-5 sm:px-6 touch-target"
                 )}
                 onClick={() => scrollToSection('#contact')}
               >

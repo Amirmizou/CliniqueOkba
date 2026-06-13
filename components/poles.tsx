@@ -2,7 +2,7 @@
 
 import { useRef, useState, type MouseEvent, type CSSProperties } from 'react'
 import { useTranslations, useLocale } from 'next-intl'
-import { motion, AnimatePresence, useMotionValue, useSpring, useTransform } from 'framer-motion'
+import { motion, AnimatePresence } from 'framer-motion'
 import {
   ScanLine,
   Smile,
@@ -77,7 +77,6 @@ function resolvePoles(data?: any[]): Pole[] {
 function PoleCard({ pole, index }: { pole: Pole; index: number }) {
   const t = useTranslations('poles')
   const locale = useLocale()
-  const ref = useRef<HTMLDivElement>(null)
   const [expanded, setExpanded] = useState(false)
 
   const title = locale === 'ar' && pole.title_ar ? pole.title_ar : pole.title
@@ -85,28 +84,6 @@ function PoleCard({ pole, index }: { pole: Pole; index: number }) {
   const badge = locale === 'ar' && pole.badge_ar ? pole.badge_ar : pole.badge
   const intro = locale === 'ar' && pole.intro_ar ? pole.intro_ar : pole.intro
   const items = locale === 'ar' && pole.items_ar && pole.items_ar.length > 0 ? pole.items_ar : pole.items
-
-  const mx = useMotionValue(0.5)
-  const my = useMotionValue(0.5)
-  const rotateX = useSpring(useTransform(my, [0, 1], [5, -5]), {
-    stiffness: 150,
-    damping: 18,
-  })
-  const rotateY = useSpring(useTransform(mx, [0, 1], [-5, 5]), {
-    stiffness: 150,
-    damping: 18,
-  })
-
-  function handleMove(e: MouseEvent<HTMLDivElement>) {
-    const rect = ref.current?.getBoundingClientRect()
-    if (!rect) return
-    mx.set((e.clientX - rect.left) / rect.width)
-    my.set((e.clientY - rect.top) / rect.height)
-  }
-  function handleLeave() {
-    mx.set(0.5)
-    my.set(0.5)
-  }
 
   const Icon = ICONS[pole.iconName] || Stethoscope
   const variant = ecgVariantForIcon(pole.iconName)
@@ -131,24 +108,13 @@ function PoleCard({ pole, index }: { pole: Pole; index: number }) {
         }}
       />
 
-      <motion.div
-        ref={ref}
-        onMouseMove={handleMove}
-        onMouseLeave={handleLeave}
-        style={{
-          rotateX,
-          rotateY,
-          transformStyle: 'preserve-3d',
-          ...(pole.featured
-            ? ({ '--tw-ring-color': `${pole.accent}66` } as CSSProperties)
-            : {}),
-        }}
-        className={`relative flex h-full flex-col overflow-hidden rounded-3xl border bg-white/70 p-6 shadow-lg backdrop-blur-md transition-colors dark:bg-white/5 sm:p-7 ${
+      <div
+        className={`relative flex h-full flex-col overflow-hidden rounded-3xl border bg-white p-6 shadow-lg transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl dark:bg-slate-900 sm:p-7 ${
           pole.urgent
             ? 'border-red-400/40 ring-1 ring-red-400/30'
             : pole.featured
               ? 'border-transparent shadow-xl ring-2'
-              : 'border-white/40 dark:border-white/10'
+              : 'border-border/40 dark:border-white/10'
         }`}
       >
         {/* Motif animé propre au domaine du pôle (fond) */}
@@ -284,7 +250,7 @@ function PoleCard({ pole, index }: { pole: Pole; index: number }) {
         <div className="-mx-6 -mb-6 mt-5 h-7 opacity-70 sm:-mx-7 sm:-mb-7">
           <ECGLine color={pole.accent} height={28} variant={variant} />
         </div>
-      </motion.div>
+      </div>
     </motion.div>
   )
 }
@@ -295,6 +261,8 @@ function PoleCard({ pole, index }: { pole: Pole; index: number }) {
 
 export default function Poles({ data }: { data?: any[] }) {
   const t = useTranslations('poles')
+  const locale = useLocale()
+  const isAr = locale === 'ar'
   const [list] = useState(() => resolvePoles(data))
 
   return (
@@ -309,7 +277,7 @@ export default function Poles({ data }: { data?: any[] }) {
       <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <AnimatedSection animation="fade" className="mb-12 text-center">
           <div className="animate-item">
-            <span className="mb-4 inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-4 py-1.5 text-sm font-semibold text-primary">
+            <span className="mb-4 inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-4 py-2 text-sm font-semibold leading-normal text-primary">
               <span className="relative flex h-2 w-2">
                 <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary opacity-75" />
                 <span className="relative inline-flex h-2 w-2 rounded-full bg-primary" />
@@ -317,9 +285,17 @@ export default function Poles({ data }: { data?: any[] }) {
               {t('badge')}
             </span>
             <h2 className="mb-4 text-3xl font-bold sm:text-4xl md:text-5xl">
-              <LineReveal className="text-gradient">{t('titleLine1')}</LineReveal>
-              <br />
-              <LineReveal className="text-foreground" delay={0.12}>{t('titleLine2')}</LineReveal>
+              {isAr ? (
+                <LineReveal className="text-gradient">
+                  {t('titleLine1')} <span className="text-foreground">{t('titleLine2')}</span>
+                </LineReveal>
+              ) : (
+                <>
+                  <LineReveal className="text-gradient">{t('titleLine1')}</LineReveal>
+                  <br />
+                  <LineReveal className="text-foreground" delay={0.12}>{t('titleLine2')}</LineReveal>
+                </>
+              )}
             </h2>
             {/* Ligne ECG sous le titre */}
             <div className="mx-auto mb-4 h-8 max-w-md">

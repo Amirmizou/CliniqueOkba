@@ -2,7 +2,7 @@
 export const heroSlides = [
     {
         id: '1',
-        image: '/uploads/hero/1763825620251-Gemini_Generated_Image_gzjk7ygzjk7ygzjk.png',
+        image: '/uploads/hero/1763826628906-Gemini_Generated_Image_ubdtr0ubdtr0ubdt.png',
         title: 'Technologie de Pointe',
         title_ar: 'تكنولوجيا متقدمة',
         subtitle: 'Des équipements modernes pour des diagnostics précis',

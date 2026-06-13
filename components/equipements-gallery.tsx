@@ -1,7 +1,7 @@
 'use client'
 
 import { useMemo, useState, useCallback, useEffect } from 'react'
-import { useTranslations } from 'next-intl'
+import { useTranslations, useLocale } from 'next-intl'
 import Image from 'next/image'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
@@ -19,7 +19,7 @@ import {
   type EquipementItem,
   type EquipementCategoryId,
 } from '@/data/equipements'
-import { urlFor } from '@/sanity/lib/image'
+import { urlFor, hiResImage } from '@/sanity/lib/image'
 import { AnimatedSection } from '@/components/ui/animated-section'
 
 type Filter = 'all' | EquipementCategoryId
@@ -223,10 +223,12 @@ function Lightbox({
         >
           <div className="relative w-full overflow-hidden rounded-2xl shadow-2xl">
             <Image
-              src={item.src}
+              src={hiResImage(item.src)}
               alt={item.title}
-              width={1280}
-              height={960}
+              width={2400}
+              height={1800}
+              quality={100}
+              unoptimized
               className="h-auto max-h-[72vh] w-full object-contain"
             />
           </div>
@@ -263,6 +265,7 @@ const PREVIEW_COUNT = 8
 
 export default function EquipementsGallery({ data }: { data?: any[] }) {
   const t = useTranslations('gallery')
+  const isAr = useLocale() === 'ar'
   const [filter, setFilter] = useState<Filter>('all')
   const [showAll, setShowAll] = useState(false)
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null)
@@ -315,14 +318,23 @@ export default function EquipementsGallery({ data }: { data?: any[] }) {
         {/* En-tête */}
         <AnimatedSection animation="fade" className="mb-10 text-center">
           <div className="animate-item">
-            <span className="mb-4 inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-4 py-1.5 text-sm font-semibold text-primary">
+            <span className="mb-4 inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-4 py-2 text-sm font-semibold leading-normal text-primary">
               <Sparkles className="h-4 w-4" />
               {t('badge')}
             </span>
             <h2 className="mb-4 text-3xl font-bold sm:text-4xl md:text-5xl">
-              <span className="text-gradient">{t('titleLine1')}</span>
-              <br />
-              <span className="text-foreground">{t('titleLine2')}</span>
+              {isAr ? (
+                <span>
+                  <span className="text-gradient">{t('titleLine1')}</span>{' '}
+                  <span className="text-foreground">{t('titleLine2')}</span>
+                </span>
+              ) : (
+                <>
+                  <span className="text-gradient">{t('titleLine1')}</span>
+                  <br />
+                  <span className="text-foreground">{t('titleLine2')}</span>
+                </>
+              )}
             </h2>
             <p className="mx-auto max-w-2xl text-base text-muted-foreground sm:text-lg">
               {t('subtitle')}

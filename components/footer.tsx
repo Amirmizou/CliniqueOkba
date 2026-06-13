@@ -235,9 +235,29 @@ export default function Footer({ siteSettings, footerContent, sanityPoles }: Foo
                 <div className="bg-white/5 p-3 h-fit rounded-xl group-hover:bg-primary/20 transition-colors shadow-inner shadow-white/5">
                   <Phone className='w-5 h-5 text-primary' />
                 </div>
-                <div>
+                <div className="space-y-3">
                   <p className="text-[11px] text-slate-500 font-bold uppercase mb-1 tracking-widest">{t('phone')}</p>
-                  <p className="text-sm text-slate-300 ltr:text-left rtl:text-right font-medium" dir="ltr">{siteConfig?.contact.phone || '+213 555 123 456'}</p>
+                  
+                  <div>
+                    <p className="text-xs text-slate-400">{isAr ? 'الاستعجالات' : 'Urgences / Standard'}</p>
+                    <p className="text-sm text-slate-300 font-medium ltr:text-left rtl:text-right" dir="ltr">+213 770 88 42 42</p>
+                    <p className="text-sm text-slate-300 font-medium ltr:text-left rtl:text-right" dir="ltr">+213 770 88 43 43</p>
+                  </div>
+                  
+                  <div>
+                    <p className="text-xs text-slate-400">{isAr ? 'الاستقبال' : 'Réception'}</p>
+                    <p className="text-sm text-slate-300 font-medium ltr:text-left rtl:text-right" dir="ltr">0550 25 00 54</p>
+                  </div>
+
+                  <div>
+                    <p className="text-xs text-slate-400">{isAr ? 'مخبر التحاليل' : 'Laboratoire d\'analyses'}</p>
+                    <p className="text-sm text-slate-300 font-medium ltr:text-left rtl:text-right" dir="ltr">0550 25 00 58</p>
+                  </div>
+
+                  <div>
+                    <p className="text-xs text-slate-400">{isAr ? 'الهاتف الثابت' : 'Fix'}</p>
+                    <p className="text-sm text-slate-300 font-medium ltr:text-left rtl:text-right" dir="ltr">039 33 88 71 / 039 33 81 27</p>
+                  </div>
                 </div>
               </li>
               <li className='flex gap-4 group p-3 -ml-3 rounded-xl hover:bg-white/5 transition-colors duration-300'>

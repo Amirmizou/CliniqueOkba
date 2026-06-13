@@ -1,0 +1,471 @@
+[
+  {
+    "docId": "aboutSection",
+    "docType": "aboutSection",
+    "field": "description",
+    "value": "La Clinique OKBA est un établissement privé pluridisciplinaire situé à Ali Mendjeli, Constantine. Nous réunissons un plateau technique de pointe — imagerie, laboratoire, bloc opératoire — et une équipe de spécialistes dévoués, pour vous offrir des soins complets et de qualité, dans un cadre moderne et accueillant.",
+    "path": ".description"
+  },
+  {
+    "docId": "aboutSection",
+    "docType": "aboutSection",
+    "field": "subtitle",
+    "value": "À propos de nous",
+    "path": ".subtitle"
+  },
+  {
+    "docId": "aboutSection",
+    "docType": "aboutSection",
+    "field": "title",
+    "value": "Clinique OKBA",
+    "path": ".title"
+  },
+  {
+    "docId": "aboutSection",
+    "docType": "aboutSection",
+    "field": "description",
+    "value": "Dernières technologies médicales",
+    "path": ".values[0].description"
+  },
+  {
+    "docId": "aboutSection",
+    "docType": "aboutSection",
+    "field": "title",
+    "value": "Équipements modernes",
+    "path": ".values[0].title"
+  },
+  {
+    "docId": "aboutSection",
+    "docType": "aboutSection",
+    "field": "description",
+    "value": "Spécialistes qualifiés et dévoués",
+    "path": ".values[1].description"
+  },
+  {
+    "docId": "aboutSection",
+    "docType": "aboutSection",
+    "field": "title",
+    "value": "Équipe expérimentée",
+    "path": ".values[1].title"
+  },
+  {
+    "docId": "aboutSection",
+    "docType": "aboutSection",
+    "field": "description",
+    "value": "Approche centrée sur le patient",
+    "path": ".values[2].description"
+  },
+  {
+    "docId": "aboutSection",
+    "docType": "aboutSection",
+    "field": "title",
+    "value": "Soins de qualité",
+    "path": ".values[2].title"
+  },
+  {
+    "docId": "3d91117d-4d94-4615-bbf9-c6a90b93f8b9",
+    "docType": "article",
+    "field": "text",
+    "value": "je suis entrain de tester",
+    "path": ".content[0].children[0].text"
+  },
+  {
+    "docId": "3d91117d-4d94-4615-bbf9-c6a90b93f8b9",
+    "docType": "article",
+    "field": "excerpt",
+    "value": "test blog",
+    "path": ".excerpt"
+  },
+  {
+    "docId": "3d91117d-4d94-4615-bbf9-c6a90b93f8b9",
+    "docType": "article",
+    "field": "title",
+    "value": "Lancement du BLOG",
+    "path": ".title"
+  },
+  {
+    "docId": "doctor-aissaoui-laboratoire",
+    "docType": "doctor",
+    "field": "name",
+    "value": "Aissaoui",
+    "path": ".name"
+  },
+  {
+    "docId": "doctor-aissaoui-laboratoire",
+    "docType": "doctor",
+    "field": "subtitle",
+    "value": "Biologie médicale",
+    "path": ".subtitle"
+  },
+  {
+    "docId": "doctor-aissaoui-laboratoire",
+    "docType": "doctor",
+    "field": "title",
+    "value": "Pr.",
+    "path": ".title"
+  },
+  {
+    "docId": "doctor-ameziane-leila",
+    "docType": "doctor",
+    "field": "name",
+    "value": "Ameziane Leila",
+    "path": ".name"
+  },
+  {
+    "docId": "doctor-ameziane-leila",
+    "docType": "doctor",
+    "field": "subtitle",
+    "value": "Diabétologue",
+    "path": ".subtitle"
+  },
+  {
+    "docId": "doctor-ameziane-leila",
+    "docType": "doctor",
+    "field": "title",
+    "value": "Dr.",
+    "path": ".title"
+  },
+  {
+    "docId": "doctor-boughanout-seyfeddine",
+    "docType": "doctor",
+    "field": "name",
+    "value": "Boughanout Seyfeddine",
+    "path": ".name"
+  },
+  {
+    "docId": "doctor-boughanout-seyfeddine",
+    "docType": "doctor",
+    "field": "subtitle",
+    "value": "Chirurgie de l’oreille, du nez, de la gorge, de la face & du cou",
+    "path": ".subtitle"
+  },
+  {
+    "docId": "doctor-boughanout-seyfeddine",
+    "docType": "doctor",
+    "field": "title",
+    "value": "Dr.",
+    "path": ".title"
+  },
+  {
+    "docId": "doctor-boukredera-amira",
+    "docType": "doctor",
+    "field": "name",
+    "value": "Boukredera Amira",
+    "path": ".name"
+  },
+  {
+    "docId": "doctor-boukredera-amira",
+    "docType": "doctor",
+    "field": "title",
+    "value": "Dr.",
+    "path": ".title"
+  },
+  {
+    "docId": "doctor-meskaldji-rima",
+    "docType": "doctor",
+    "field": "name",
+    "value": "Meskaldji Rima ep. Benabdi",
+    "path": ".name"
+  },
+  {
+    "docId": "doctor-meskaldji-rima",
+    "docType": "doctor",
+    "field": "subtitle",
+    "value": "Ancienne Maître Assistante",
+    "path": ".subtitle"
+  },
+  {
+    "docId": "doctor-meskaldji-rima",
+    "docType": "doctor",
+    "field": "title",
+    "value": "Dr.",
+    "path": ".title"
+  },
+  {
+    "docId": "doctor-zerizer-loubna",
+    "docType": "doctor",
+    "field": "name",
+    "value": "Zerizer Loubna",
+    "path": ".name"
+  },
+  {
+    "docId": "doctor-zerizer-loubna",
+    "docType": "doctor",
+    "field": "title",
+    "value": "Dr.",
+    "path": ".title"
+  },
+  {
+    "docId": "11dd345a-2d13-4d7c-bb49-035b415dec76",
+    "docType": "event",
+    "field": "description",
+    "value": "",
+    "path": ".description"
+  },
+  {
+    "docId": "11dd345a-2d13-4d7c-bb49-035b415dec76",
+    "docType": "event",
+    "field": "title",
+    "value": "Ouverture Officiel",
+    "path": ".title"
+  },
+  {
+    "docId": "actExlJ9USbzmoGsOqWa21",
+    "docType": "heroSlide",
+    "field": "subtitle",
+    "value": "",
+    "path": ".subtitle"
+  },
+  {
+    "docId": "mYBnIMFQ449l0WiRGKaAzM",
+    "docType": "heroSlide",
+    "field": "subtitle",
+    "value": "",
+    "path": ".subtitle"
+  },
+  {
+    "docId": "homeCare",
+    "docType": "homeCare",
+    "field": "availability",
+    "value": "Interventions sur rendez-vous et urgences selon disponibilité",
+    "path": ".availability"
+  },
+  {
+    "docId": "homeCare",
+    "docType": "homeCare",
+    "field": "text",
+    "value": "Demander une intervention à domicile",
+    "path": ".callToAction.text"
+  },
+  {
+    "docId": "homeCare",
+    "docType": "homeCare",
+    "field": "description",
+    "value": "Une équipe mobile pour des soins médicaux de qualité, chez vous, en toute sécurité.",
+    "path": ".description"
+  },
+  {
+    "docId": "homeCare",
+    "docType": "homeCare",
+    "field": "name",
+    "value": "Consultations générales et de suivi",
+    "path": ".services[0].name"
+  },
+  {
+    "docId": "homeCare",
+    "docType": "homeCare",
+    "field": "name",
+    "value": "Pansements, injections, perfusions",
+    "path": ".services[1].name"
+  },
+  {
+    "docId": "homeCare",
+    "docType": "homeCare",
+    "field": "name",
+    "value": "Prélèvements et examens à domicile",
+    "path": ".services[2].name"
+  },
+  {
+    "docId": "homeCare",
+    "docType": "homeCare",
+    "field": "name",
+    "value": "Surveillance de patients chroniques",
+    "path": ".services[3].name"
+  },
+  {
+    "docId": "homeCare",
+    "docType": "homeCare",
+    "field": "subtitle",
+    "value": "Service dédié",
+    "path": ".subtitle"
+  },
+  {
+    "docId": "homeCare",
+    "docType": "homeCare",
+    "field": "title",
+    "value": "Soins à domicile",
+    "path": ".title"
+  },
+  {
+    "docId": "sectionContent-contact",
+    "docType": "sectionContent",
+    "field": "badge",
+    "value": "Nous contacter",
+    "path": ".badge"
+  },
+  {
+    "docId": "sectionContent-contact",
+    "docType": "sectionContent",
+    "field": "subtitle",
+    "value": "Nous sommes à votre écoute pour toute question ou demande de rendez-vous",
+    "path": ".subtitle"
+  },
+  {
+    "docId": "sectionContent-contact",
+    "docType": "sectionContent",
+    "field": "title",
+    "value": "Contact & Localisation",
+    "path": ".title"
+  },
+  {
+    "docId": "sectionContent-hero",
+    "docType": "sectionContent",
+    "field": "badge",
+    "value": "Excellence Médicale · Ali Mendjeli, Constantine",
+    "path": ".badge"
+  },
+  {
+    "docId": "sectionContent-homecare",
+    "docType": "sectionContent",
+    "field": "badge",
+    "value": "Service dédié",
+    "path": ".badge"
+  },
+  {
+    "docId": "sectionContent-homecare",
+    "docType": "sectionContent",
+    "field": "subtitle",
+    "value": "Une équipe mobile pour des soins médicaux de qualité, chez vous, en toute sécurité.",
+    "path": ".subtitle"
+  },
+  {
+    "docId": "sectionContent-homecare",
+    "docType": "sectionContent",
+    "field": "title",
+    "value": "Soins à domicile",
+    "path": ".title"
+  },
+  {
+    "docId": "sectionContent-testimonials",
+    "docType": "sectionContent",
+    "field": "badge",
+    "value": "Témoignages",
+    "path": ".badge"
+  },
+  {
+    "docId": "sectionContent-testimonials",
+    "docType": "sectionContent",
+    "field": "subtitle",
+    "value": "Votre satisfaction est notre priorité",
+    "path": ".subtitle"
+  },
+  {
+    "docId": "sectionContent-testimonials",
+    "docType": "sectionContent",
+    "field": "title",
+    "value": "Ce que disent nos patients",
+    "path": ".title"
+  },
+  {
+    "docId": "sectionContent-video",
+    "docType": "sectionContent",
+    "field": "badge",
+    "value": "En vidéo",
+    "path": ".badge"
+  },
+  {
+    "docId": "sectionContent-video",
+    "docType": "sectionContent",
+    "field": "subtitle",
+    "value": "Une présentation de notre établissement : nos spécialités, nos urgences 24h/24 et notre engagement à vos côtés.",
+    "path": ".subtitle"
+  },
+  {
+    "docId": "sectionContent-video",
+    "docType": "sectionContent",
+    "field": "title",
+    "value": "Découvrez la Clinique OKBA",
+    "path": ".title"
+  },
+  {
+    "docId": "siteSettings",
+    "docType": "siteSettings",
+    "field": "address",
+    "value": "Nouvelle ville Ali Mendjeli, extension ouest, à proximité du grand rond-point en allant vers Aïn Smara, Constantine, Algérie",
+    "path": ".address"
+  },
+  {
+    "docId": "siteSettings",
+    "docType": "siteSettings",
+    "field": "appointmentMessage",
+    "value": "Bonjour la Clinique OKBA, je souhaite prendre un rendez-vous.",
+    "path": ".appointmentMessage"
+  },
+  {
+    "docId": "siteSettings",
+    "docType": "siteSettings",
+    "field": "clinicName",
+    "value": "Clinique OKBA",
+    "path": ".clinicName"
+  },
+  {
+    "docId": "siteSettings",
+    "docType": "siteSettings",
+    "field": "description",
+    "value": "Clinique privée pluridisciplinaire moderne à Ali Mendjeli, Constantine.",
+    "path": ".description"
+  },
+  {
+    "docId": "testimonial-0",
+    "docType": "testimonial",
+    "field": "comment",
+    "value": "Accueil chaleureux et personnel très professionnel. Le scanner a été réalisé rapidement et les résultats étaient clairs.",
+    "path": ".comment"
+  },
+  {
+    "docId": "testimonial-0",
+    "docType": "testimonial",
+    "field": "name",
+    "value": "Amel B.",
+    "path": ".name"
+  },
+  {
+    "docId": "testimonial-0",
+    "docType": "testimonial",
+    "field": "service",
+    "value": "Imagerie",
+    "path": ".service"
+  },
+  {
+    "docId": "testimonial-1",
+    "docType": "testimonial",
+    "field": "comment",
+    "value": "Excellente prise en charge au service des urgences, de jour comme de nuit. Une équipe à l'écoute et réactive.",
+    "path": ".comment"
+  },
+  {
+    "docId": "testimonial-1",
+    "docType": "testimonial",
+    "field": "name",
+    "value": "Karim M.",
+    "path": ".name"
+  },
+  {
+    "docId": "testimonial-1",
+    "docType": "testimonial",
+    "field": "service",
+    "value": "Urgences",
+    "path": ".service"
+  },
+  {
+    "docId": "testimonial-2",
+    "docType": "testimonial",
+    "field": "comment",
+    "value": "Suivi de grossesse impeccable, médecins attentionnés et plateau technique moderne. Je recommande vivement.",
+    "path": ".comment"
+  },
+  {
+    "docId": "testimonial-2",
+    "docType": "testimonial",
+    "field": "name",
+    "value": "Nadia S.",
+    "path": ".name"
+  },
+  {
+    "docId": "testimonial-2",
+    "docType": "testimonial",
+    "field": "service",
+    "value": "Gynécologie",
+    "path": ".service"
+  }
+]

@@ -1,7 +1,7 @@
 import { withAuth } from "next-auth/middleware"
 import createMiddleware from 'next-intl/middleware'
 import { locales } from './i18n'
-import { NextRequest } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 
 const intlMiddleware = createMiddleware({
   locales,
@@ -13,6 +13,9 @@ const intlMiddleware = createMiddleware({
 const authMiddleware = withAuth(
   // Note: If you need to augment the request for the intlMiddleware, do it here.
   function onSuccess(req) {
+    if (req.nextUrl.pathname.startsWith('/admin') || req.nextUrl.pathname.startsWith('/studio')) {
+      return NextResponse.next()
+    }
     return intlMiddleware(req)
   },
   {
@@ -31,6 +34,15 @@ export default function middleware(req: NextRequest) {
   const isStudioRoute = req.nextUrl.pathname.startsWith('/studio')
   const isAdminDashboard = req.nextUrl.pathname.startsWith('/admin/dashboard') ||
     req.nextUrl.pathname.startsWith('/admin/api')
+
+  // Strip locale from admin routes and redirect to unlocalized /admin
+  const localePrefixMatch = req.nextUrl.pathname.match(/^\/(fr|ar)\/(admin|studio)(.*)$/);
+  if (localePrefixMatch) {
+    const newPath = `/${localePrefixMatch[2]}${localePrefixMatch[3]}`;
+    const url = req.nextUrl.clone();
+    url.pathname = newPath;
+    return NextResponse.redirect(url);
+  }
 
   // Auth, admin, and studio routes should not be processed by intl middleware
   if (isAuthRoute || isAdminRoute || isStudioRoute) {

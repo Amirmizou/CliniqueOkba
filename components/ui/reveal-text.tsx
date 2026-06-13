@@ -12,6 +12,7 @@
  * Les deux respectent prefers-reduced-motion (affichage direct, sans animation).
  */
 
+import React from 'react'
 import { motion } from 'framer-motion'
 import { useReducedMotion } from '@/hooks/use-reduced-motion'
 
@@ -87,25 +88,24 @@ export function WordReveal({
       transition={{ staggerChildren: stagger, delayChildren: delay }}
     >
       {words.map((word, i) => (
-        <span
-          key={`${word}-${i}`}
-          className="inline-block overflow-hidden align-bottom pb-[0.08em] -mb-[0.08em]"
-        >
-          <motion.span
-            className="inline-block will-change-transform"
-            variants={{
-              hidden: { y: '110%', opacity: 0 },
-              visible: {
-                y: '0%',
-                opacity: 1,
-                transition: { duration: 0.65, ease: EASE },
-              },
-            }}
-          >
-            {word}
-          </motion.span>
-          {i < words.length - 1 && ' '}
-        </span>
+        <React.Fragment key={`${word}-${i}`}>
+          <span className="inline-block overflow-hidden align-bottom pb-[0.15em] pt-[0.15em]">
+            <motion.span
+              className="inline-block will-change-transform"
+              variants={{
+                hidden: { y: '110%', opacity: 0 },
+                visible: {
+                  y: '0%',
+                  opacity: 1,
+                  transition: { duration: 0.65, ease: EASE },
+                },
+              }}
+            >
+              {word}
+            </motion.span>
+          </span>
+          {i < words.length - 1 ? ' ' : null}
+        </React.Fragment>
       ))}
     </motion.span>
   )
@@ -124,7 +124,7 @@ export function LineReveal({ children, className, delay = 0 }: LineRevealProps) 
   if (reduce) return <span className={className}>{children}</span>
 
   return (
-    <span className="inline-block overflow-hidden align-bottom">
+    <span className="inline-block overflow-hidden align-bottom pb-[0.15em] pt-[0.15em]">
       <motion.span
         className={`inline-block ${className ?? ''}`}
         initial={{ clipPath: 'inset(0 0 100% 0)', y: 14, opacity: 0 }}
