@@ -232,7 +232,7 @@ export default function PolePageContent({
                     alt={pole.title}
                     fill
                     sizes="(max-width: 1024px) 100vw, 50vw"
-                    className="object-cover"
+                    className="object-contain bg-muted/30"
                     priority
                   />
                 ) : (
@@ -242,7 +242,7 @@ export default function PolePageContent({
                     alt={pole.title}
                     fill
                     sizes="(max-width: 1024px) 100vw, 50vw"
-                    className="object-cover"
+                    className="object-contain bg-muted/30"
                     priority
                   />
                 )}
