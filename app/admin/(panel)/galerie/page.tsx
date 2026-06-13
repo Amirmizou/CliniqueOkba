@@ -13,6 +13,7 @@ const PHOTO_CATS = [
   { value: 'imagerie', label: 'Imagerie médicale' },
   { value: 'nucleaire', label: 'Médecine nucléaire' },
   { value: 'bloc', label: 'Bloc opératoire' },
+  { value: 'dentaire', label: 'Dentaire' },
   { value: 'laboratoire', label: 'Laboratoire d\'analyses' },
   { value: 'hospitalisation', label: 'Hospitalisation' },
   { value: 'consultation', label: 'Consultation & exploration' },

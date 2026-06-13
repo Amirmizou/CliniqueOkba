@@ -118,7 +118,7 @@ export const poles: Pole[] = [
     ],
     iconName: 'Smile',
     accent: '#06B6D4',
-    galleryCategories: [],
+    galleryCategories: ['dentaire'],
     intro:
       'Un pôle dentaire complet : consultation, chirurgie, orthodontie dento-faciale (ODF) et prothèse dentaire, pour prendre en charge tous vos besoins bucco-dentaires.',
     intro_ar: 'مركز شامل لطب الأسنان: استشارات، جراحة، تقويم الأسنان والوجه والفكين، وتركيبات الأسنان، لتلبية جميع احتياجاتك لصحة الفم.',

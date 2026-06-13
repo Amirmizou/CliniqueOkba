@@ -101,6 +101,7 @@ export default defineType({
                     { title: 'Imagerie médicale', value: 'imagerie' },
                     { title: 'Médecine nucléaire', value: 'nucleaire' },
                     { title: 'Bloc opératoire', value: 'bloc' },
+                    { title: 'Dentaire', value: 'dentaire' },
                     { title: 'Laboratoire d’analyses', value: 'laboratoire' },
                     { title: 'Hospitalisation', value: 'hospitalisation' },
                     { title: 'Consultation & exploration', value: 'consultation' },
