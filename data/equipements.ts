@@ -21,6 +21,7 @@ export type EquipementCategoryId =
   | 'hospitalisation'
   | 'consultation'
   | 'accueil'
+  | 'dentaire'
 
 export interface EquipementCategory {
   id: EquipementCategoryId
@@ -109,6 +110,15 @@ export const equipementCategories: EquipementCategory[] = [
     tagline_ar: 'استقبال، انتظار وممرات مضيئة',
     icon: Building2,
     accent: '#14B8A6',
+  },
+  {
+    id: 'dentaire',
+    label: 'Pôle Dentaire',
+    label_ar: 'طب الأسنان',
+    tagline: 'Consultation, chirurgie, orthodontie & prothèse',
+    tagline_ar: 'استشارات، جراحة، تقويم وتركيبات الأسنان',
+    icon: Building2, // Reusing Building2 since Smile isn't imported here
+    accent: '#06B6D4',
   },
 ]
 
