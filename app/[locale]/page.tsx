@@ -3,7 +3,7 @@ import HeroCarousel from '@/components/hero-carousel'
 import About from '@/components/about'
 import VideoPresentation from '@/components/video-presentation'
 import VideosGallery from '@/components/videos-gallery'
-import LogoIntro from '@/components/logo-intro'
+import LogoLoader from '@/components/logo-loader'
 import TrustBand from '@/components/trust-band'
 import Poles from '@/components/poles'
 import DoctorsShowcase from '@/components/doctors-showcase'
@@ -122,7 +122,7 @@ export default async function Home(props: { params: Promise<{ locale: string }> 
 
   return (
     <>
-      <LogoIntro />
+      <LogoLoader />
       <SkipLink />
       <ScrollProgress />
       <SiteHeader siteSettings={localizedData.siteSettings} />

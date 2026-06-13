@@ -23,5 +23,5 @@
     }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
-  "exclude": ["node_modules", "video", "video/**/*"]
+  "exclude": ["node_modules", "video", "video/**/*", "remotion-okba", "remotion-okba/**/*"]
 }

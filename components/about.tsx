@@ -128,6 +128,7 @@ export default function About({ data, sectionContent }: AboutProps) {
             },
           }
         )
+      }
     }, sectionRef)
 
     return () => ctx.revert()
