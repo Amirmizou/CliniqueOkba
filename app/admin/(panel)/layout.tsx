@@ -3,8 +3,8 @@
 import { useEffect } from 'react'
 import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
-import { Loader2 } from 'lucide-react'
 import AdminShell from '@/components/admin/admin-shell'
+import { LogoBadge } from '@/components/ui/logo-badge'
 
 /**
  * Layout du dashboard sur-mesure (groupe (panel)).
@@ -26,7 +26,7 @@ export default function PanelLayout({ children }: { children: React.ReactNode })
   if (status !== 'authenticated') {
     return (
       <div className="flex min-h-screen items-center justify-center bg-slate-50 dark:bg-slate-950">
-        <Loader2 className="h-6 w-6 animate-spin text-emerald-600" />
+        <LogoBadge size={96} />
       </div>
     )
   }

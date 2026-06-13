@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { ArrowLeft, Loader2, Plus, Save, Trash2, Eye, EyeOff } from 'lucide-react'
 import { Text, Lines, ImagePicker, useToast } from '@/components/admin/ui'
+import { LogoBadgeSpinner } from '@/components/ui/logo-badge'
 
 interface Doctor {
   _id?: string
@@ -99,7 +100,7 @@ export default function MedecinsEditor() {
       </div>
 
       {loading ? (
-        <div className="flex justify-center py-20 text-slate-400"><Loader2 className="h-6 w-6 animate-spin" /></div>
+        <LogoBadgeSpinner label="Chargement des médecins…" />
       ) : (
         <div className="space-y-5">
           {list.map((d, i) => (

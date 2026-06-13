@@ -14,6 +14,7 @@ import {
   ArrowLeft,
 } from 'lucide-react'
 import Link from 'next/link'
+import { LogoBadgeSpinner } from '@/components/ui/logo-badge'
 
 interface Slide {
   _id?: string
@@ -137,9 +138,7 @@ export default function HeroEditor() {
       </div>
 
       {loading ? (
-        <div className="flex items-center justify-center py-20 text-slate-400">
-          <Loader2 className="h-6 w-6 animate-spin" />
-        </div>
+        <LogoBadgeSpinner label="Chargement des slides…" />
       ) : slides.length === 0 ? (
         <div className="rounded-2xl border border-dashed border-slate-300 py-16 text-center text-slate-400 dark:border-slate-700">
           Aucun slide. Cliquez sur « Ajouter ».
