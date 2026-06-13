@@ -43,13 +43,11 @@ export default function About({ data, sectionContent }: AboutProps) {
   // Refs for GSAP animations
   const sectionRef = useRef<HTMLElement>(null)
   const imageRef = useRef<HTMLDivElement>(null)
-  const statsRef = useRef<HTMLDivElement>(null)
   const featuresRef = useRef<HTMLDivElement>(null)
 
   const locale = useLocale()
   const isAr = locale === 'ar'
 
-  const stats = data?.stats || []
   const values = data?.values || []
 
   const getIcon = (name?: string) => {
@@ -130,63 +128,6 @@ export default function About({ data, sectionContent }: AboutProps) {
             },
           }
         )
-      }
-
-      // Stats horizontal scroll reveal with radial progress
-      if (statsRef.current) {
-        const statCards = statsRef.current.querySelectorAll('.stat-card')
-        gsap.fromTo(
-          statCards,
-          {
-            opacity: 0,
-            x: 100,
-            scale: 0.8,
-          },
-          {
-            opacity: 1,
-            x: 0,
-            scale: 1,
-            duration: 0.8,
-            stagger: 0.2,
-            ease: 'power3.out',
-            scrollTrigger: {
-              trigger: statsRef.current,
-              start: 'top 85%',
-              toggleActions: 'play none none reverse',
-            },
-          }
-        )
-
-        const statNumbers = statsRef.current.querySelectorAll('.stat-number')
-        statNumbers.forEach((num) => {
-          // Valeur exacte issue de Sanity (ex : « 24/7 », « 8 », « 30+ », « 24/24 »).
-          const original = (num.textContent || '').trim()
-          // Décompose en : préfixe non-numérique / premier nombre / reste (suffixe).
-          // « 24/7 » → ['', '24', '/7'] ; « 30+ » → ['', '30', '+'].
-          const match = original.match(/^(\D*)(\d+)(.*)$/)
-          if (!match) return // aucune valeur numérique → on laisse le texte tel quel
-
-          const prefix = match[1]
-          const numValue = parseInt(match[2], 10)
-          const suffix = match[3]
-          const counter = { val: 0 }
-
-          gsap.to(counter, {
-            val: numValue,
-            duration: 2,
-            ease: 'power1.out',
-            scrollTrigger: {
-              trigger: statsRef.current,
-              start: 'top 80%',
-              toggleActions: 'play none none none',
-            },
-            onUpdate() {
-              // Reconstruit en préservant le format exact de Sanity.
-              num.textContent = prefix + Math.round(counter.val) + suffix
-            },
-          })
-        })
-      }
     }, sectionRef)
 
     return () => ctx.revert()
@@ -247,30 +188,6 @@ export default function About({ data, sectionContent }: AboutProps) {
                 )
               })}
             </div>
-          </div>
-        </div>
-
-        {/* Stats Section with horizontal scroll reveal */}
-        <div ref={statsRef} className="mt-16">
-          <div className="grid grid-cols-3 gap-4 sm:gap-6 p-6 sm:p-8 bg-gradient-to-br from-primary/5 via-background to-secondary/5 rounded-2xl border border-border/50">
-            {stats.map((stat, index) => {
-              const Icon = getIcon(stat.icon)
-              return (
-                <div key={index} className="stat-card text-center group">
-                  <div className="flex justify-center mb-3">
-                    <div className="p-2 sm:p-3 rounded-xl bg-primary/10 group-hover:bg-primary/20 transition-colors">
-                      <Icon className="w-5 h-5 sm:w-6 sm:h-6 text-primary animate-medical-pulse" />
-                    </div>
-                  </div>
-                  <p className="stat-number text-2xl sm:text-3xl md:text-4xl font-bold text-primary mb-1">
-                    {stat.value}
-                  </p>
-                  <p className="text-xs sm:text-sm text-muted-foreground">
-                    {stat.label}
-                  </p>
-                </div>
-              )
-            })}
           </div>
         </div>
       </div>
