@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
-import { Loader2, Save } from 'lucide-react'
+import { Loader2, Save, Plus, Trash2 } from 'lucide-react'
 import { Text, Lines, ImagePicker, inputCls, Field, useToast } from '@/components/admin/ui'
 
 export default function SettingsPage() {
@@ -126,6 +126,44 @@ export default function SettingsPage() {
               <Field label="Instagram"><Text val={data.socialLinks?.instagram} onChange={(v) => setData({ ...data, socialLinks: { ...data.socialLinks, instagram: v }})} /></Field>
               <Field label="LinkedIn"><Text val={data.socialLinks?.linkedin} onChange={(v) => setData({ ...data, socialLinks: { ...data.socialLinks, linkedin: v }})} /></Field>
               <Field label="Twitter / X"><Text val={data.socialLinks?.twitter} onChange={(v) => setData({ ...data, socialLinks: { ...data.socialLinks, twitter: v }})} /></Field>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="md:col-span-2">
+          <CardContent className="p-6 space-y-4">
+            <h2 className="text-lg font-semibold border-b pb-2">Chiffres-clés du Hero (FR)</h2>
+            <div className="flex justify-between items-center">
+              <p className="text-sm text-muted-foreground">Les statistiques affichées directement sous le carrousel.</p>
+              <Button variant="outline" size="sm" onClick={() => setData({...data, heroStats: [...(data.heroStats || []), { _key: Date.now().toString(), value: '', label: '' }]})}>
+                <Plus className="h-4 w-4 mr-2"/> Ajouter un chiffre
+              </Button>
+            </div>
+            <div className="space-y-4">
+              {(data.heroStats || []).map((stat: any, i: number) => (
+                <div key={stat._key || i} className="flex gap-4 items-end bg-slate-50 dark:bg-slate-800/50 p-4 rounded-lg">
+                  <div className="flex-1"><Field label="Valeur (ex: 50+)"><Text val={stat.value} onChange={(v) => { const n = [...data.heroStats]; n[i].value = v; setData({...data, heroStats: n}) }} /></Field></div>
+                  <div className="flex-1"><Field label="Label (ex: Spécialistes)"><Text val={stat.label} onChange={(v) => { const n = [...data.heroStats]; n[i].label = v; setData({...data, heroStats: n}) }} /></Field></div>
+                  <Button variant="destructive" size="icon" onClick={() => { const n = [...data.heroStats]; n.splice(i, 1); setData({...data, heroStats: n}) }}><Trash2 className="h-4 w-4" /></Button>
+                </div>
+              ))}
+            </div>
+
+            <h2 className="text-lg font-semibold border-b pb-2 mt-8">Chiffres-clés du Hero (AR)</h2>
+            <div className="flex justify-between items-center">
+              <p className="text-sm text-muted-foreground">Les statistiques en arabe.</p>
+              <Button variant="outline" size="sm" onClick={() => setData({...data, heroStats_ar: [...(data.heroStats_ar || []), { _key: Date.now().toString(), value: '', label: '' }]})}>
+                <Plus className="h-4 w-4 mr-2"/> Ajouter un chiffre (AR)
+              </Button>
+            </div>
+            <div className="space-y-4">
+              {(data.heroStats_ar || []).map((stat: any, i: number) => (
+                <div key={stat._key || i} className="flex gap-4 items-end bg-slate-50 dark:bg-slate-800/50 p-4 rounded-lg">
+                  <div className="flex-1"><Field label="Valeur (ex: +50)"><Text val={stat.value} onChange={(v) => { const n = [...data.heroStats_ar]; n[i].value = v; setData({...data, heroStats_ar: n}) }} dir="rtl" /></Field></div>
+                  <div className="flex-1"><Field label="Label"><Text val={stat.label} onChange={(v) => { const n = [...data.heroStats_ar]; n[i].label = v; setData({...data, heroStats_ar: n}) }} dir="rtl" /></Field></div>
+                  <Button variant="destructive" size="icon" onClick={() => { const n = [...data.heroStats_ar]; n.splice(i, 1); setData({...data, heroStats_ar: n}) }}><Trash2 className="h-4 w-4" /></Button>
+                </div>
+              ))}
             </div>
           </CardContent>
         </Card>
