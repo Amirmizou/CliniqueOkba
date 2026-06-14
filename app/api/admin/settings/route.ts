@@ -40,6 +40,10 @@ export async function POST(request: Request) {
     if (b.hours) doc.hours = b.hours
     if (b.hours_ar) doc.hours_ar = b.hours_ar
 
+    // Statistiques du hero
+    if (b.heroStats) doc.heroStats = b.heroStats
+    if (b.heroStats_ar) doc.heroStats_ar = b.heroStats_ar
+
     // Objet socialLinks
     if (b.socialLinks) doc.socialLinks = b.socialLinks
 
