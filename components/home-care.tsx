@@ -134,9 +134,16 @@ export default function HomeCare({ data, sectionContent }: HomeCareProps) {
                     <Clock className='text-primary h-5 w-5' />
                     <p className='text-muted-foreground text-sm'>{availabilityText}</p>
                   </div>
-                  <div className='flex items-center gap-3'>
-                    <PhoneCall className='text-primary h-5 w-5' />
-                    <p className='text-muted-foreground text-sm'>{contactPrompt}</p>
+                  <div className='flex items-start gap-3'>
+                    <PhoneCall className='text-primary mt-1 h-5 w-5' />
+                    <div className='flex flex-col'>
+                      <p className='text-muted-foreground text-sm'>{contactPrompt}</p>
+                      <div className="mt-2 flex flex-col sm:flex-row sm:gap-2 font-bold text-lg text-foreground" dir="ltr">
+                        <a href="tel:0563015916" className="hover:text-primary transition-colors">0563 01 59 16</a>
+                        <span className="hidden sm:inline text-muted-foreground">/</span>
+                        <a href="tel:0563015917" className="hover:text-primary transition-colors">0563 01 59 17</a>
+                      </div>
+                    </div>
                   </div>
                   <div className='pt-2'>
                     <Button onClick={scrollToContact} className='bg-primary hover:bg-primary/90 text-primary-foreground w-full'>
