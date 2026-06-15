@@ -148,7 +148,7 @@ function DoctorCard({
       <div
         onPointerEnter={(e) => e.pointerType === 'mouse' && setHovered(true)}
         onPointerLeave={(e) => e.pointerType === 'mouse' && setHovered(false)}
-        className="relative flex h-full flex-col overflow-hidden rounded-[1.75rem] border border-border/40 bg-white shadow-xl ring-1 ring-[#006633]/5 transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl dark:border-white/10 dark:bg-slate-900"
+        className="relative flex h-full flex-col overflow-hidden rounded-[1.75rem] border border-border/40 bg-white shadow-soft ring-1 ring-[#006633]/5 transition-all duration-300 hover:-translate-y-1 hover:shadow-elevated dark:border-white/10 dark:bg-slate-900"
       >
         {/* ----- Affiche ----- */}
         <button
@@ -337,8 +337,8 @@ export default function DoctorsShowcase({ data }: { data?: any[] }) {
       className="relative overflow-hidden bg-background py-16 sm:py-20 md:py-24"
     >
       {/* Décor d'ambiance */}
-      <div className="pointer-events-none absolute -top-32 right-0 h-96 w-96 rounded-full bg-[#006633]/15 blur-[130px]" />
-      <div className="pointer-events-none absolute -bottom-32 left-0 h-96 w-96 rounded-full bg-[#FDE68A]/20 blur-[130px]" />
+      <div className="pointer-events-none absolute -top-32 right-0 h-96 w-96 rounded-full bg-brand-green/15 blur-[130px]" />
+      <div className="pointer-events-none absolute -bottom-32 left-0 h-96 w-96 rounded-full bg-brand-gold/20 blur-[130px]" />
 
       <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* En-tête */}

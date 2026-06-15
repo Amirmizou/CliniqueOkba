@@ -75,8 +75,8 @@ export default function VideosGallery({ data }: { data?: VideoItem[] }) {
   return (
     <section id="videos" className="relative overflow-hidden bg-background py-16 sm:py-20 md:py-24">
       {/* Décor d'ambiance (langage visuel des autres sections) */}
-      <div className="pointer-events-none absolute -top-32 left-0 h-96 w-96 rounded-full bg-[#006633]/12 blur-[130px]" />
-      <div className="pointer-events-none absolute -bottom-32 right-0 h-96 w-96 rounded-full bg-[#FDE68A]/15 blur-[130px]" />
+      <div className="pointer-events-none absolute -top-32 left-0 h-96 w-96 rounded-full bg-brand-green/12 blur-[130px]" />
+      <div className="pointer-events-none absolute -bottom-32 right-0 h-96 w-96 rounded-full bg-brand-gold/15 blur-[130px]" />
 
       <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* En-tête */}

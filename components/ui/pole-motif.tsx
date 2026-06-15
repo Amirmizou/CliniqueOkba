@@ -60,7 +60,7 @@ export function PoleMotif({
   return (
     <div
       aria-hidden
-      className="pointer-events-none absolute inset-0 -z-[1] overflow-hidden opacity-[0.16]"
+      className="pointer-events-none absolute inset-0 -z-[1] overflow-hidden opacity-[0.07] transition-opacity duration-500 group-hover:opacity-[0.18]"
     >
       <svg
         className="h-full w-full"

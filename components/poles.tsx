@@ -109,7 +109,7 @@ function PoleCard({ pole, index }: { pole: Pole; index: number }) {
       />
 
       <div
-        className={`relative flex h-full flex-col overflow-hidden rounded-3xl border bg-white p-6 shadow-lg transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl dark:bg-slate-900 sm:p-7 ${
+        className={`relative flex h-full flex-col overflow-hidden rounded-3xl border bg-white p-6 shadow-soft transition-all duration-300 hover:-translate-y-1 hover:shadow-elevated dark:bg-slate-900 sm:p-7 ${
           pole.urgent
             ? 'border-red-400/40 ring-1 ring-red-400/30'
             : pole.featured
@@ -143,7 +143,7 @@ function PoleCard({ pole, index }: { pole: Pole; index: number }) {
               duration: 1.8,
               times: [0, 0.12, 0.24, 0.36, 0.6],
               repeat: Infinity,
-              repeatDelay: 0.6,
+              repeatDelay: 2.6,
               ease: 'easeOut',
             }}
           >
@@ -271,8 +271,8 @@ export default function Poles({ data }: { data?: any[] }) {
       className="relative overflow-hidden bg-background py-16 sm:py-20 md:py-24"
     >
       {/* Décor */}
-      <div className="pointer-events-none absolute -top-32 left-0 h-96 w-96 rounded-full bg-[#006633]/12 blur-[130px]" />
-      <div className="pointer-events-none absolute -bottom-32 right-0 h-96 w-96 rounded-full bg-[#FDE68A]/20 blur-[130px]" />
+      <div className="pointer-events-none absolute -top-32 left-0 h-96 w-96 rounded-full bg-brand-green/12 blur-[130px]" />
+      <div className="pointer-events-none absolute -bottom-32 right-0 h-96 w-96 rounded-full bg-brand-gold/20 blur-[130px]" />
 
       <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <AnimatedSection animation="fade" className="mb-12 text-center">

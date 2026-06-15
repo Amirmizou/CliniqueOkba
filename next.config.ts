@@ -8,7 +8,7 @@ const withNextIntl = createNextIntlPlugin(path.join(process.cwd(), 'i18n.ts'))
 const nextConfig: NextConfig = {
   images: {
     formats: ['image/avif', 'image/webp'], // AVIF en premier pour meilleure compression
-    deviceSizes: [640, 750, 828, 1080, 1200, 1920],
+    deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2560, 3840],
     qualities: [25, 50, 75, 80, 90, 100],
     imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
     minimumCacheTTL: 31536000, // 1 an pour images statiques

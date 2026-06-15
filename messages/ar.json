@@ -165,7 +165,8 @@
       "laboratoire": "مخبر التحاليل",
       "hospitalisation": "الاستشفاء",
       "consultation": "الاستشارة والفحص",
-      "accueil": "مساحات الاستقبال"
+      "accueil": "مساحات الاستقبال",
+      "dentaire": "طب الأسنان"
     }
   },
   "testimonialsSection": {

@@ -191,7 +191,7 @@ export default function HeroCarousel({ slides: rawSlides = [], siteSettings, sec
                                 fill
                                 className="object-cover object-center"
                                 priority
-                                quality={80}
+                                quality={90}
                                 sizes="100vw"
                                 unoptimized={false}
                             />

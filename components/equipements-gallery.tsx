@@ -71,7 +71,7 @@ function GalleryTile({
       animate={{ opacity: 1, scale: 1 }}
       exit={{ opacity: 0, scale: 0.96 }}
       transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-      className={`group relative block w-full overflow-hidden rounded-2xl text-left shadow-lg ring-1 ring-black/5 ${
+      className={`group relative block w-full overflow-hidden rounded-2xl text-left shadow-soft ring-1 ring-black/5 transition-shadow duration-300 hover:shadow-elevated ${
         item.featured ? 'sm:col-span-2 sm:row-span-2' : ''
       }`}
     >
@@ -311,8 +311,8 @@ export default function EquipementsGallery({ data }: { data?: any[] }) {
       className="relative overflow-hidden bg-gradient-to-b from-background via-background to-primary/5 py-16 sm:py-20 md:py-24"
     >
       {/* Décor */}
-      <div className="pointer-events-none absolute -top-24 left-1/4 h-96 w-96 rounded-full bg-[#3B82F6]/10 blur-[130px]" />
-      <div className="pointer-events-none absolute -bottom-24 right-1/4 h-96 w-96 rounded-full bg-[#006633]/15 blur-[130px]" />
+      <div className="pointer-events-none absolute -top-24 left-1/4 h-96 w-96 rounded-full bg-brand-gold/10 blur-[130px]" />
+      <div className="pointer-events-none absolute -bottom-24 right-1/4 h-96 w-96 rounded-full bg-brand-green/15 blur-[130px]" />
 
       <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* En-tête */}

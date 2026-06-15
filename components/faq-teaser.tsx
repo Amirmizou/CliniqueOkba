@@ -62,7 +62,7 @@ export default function FaqTeaser({ data, sectionContent, limit = 5 }: FaqTeaser
       />
 
       {/* Décor d'ambiance */}
-      <div className="pointer-events-none absolute -top-24 left-0 h-80 w-80 rounded-full bg-[#006633]/10 blur-[120px]" />
+      <div className="pointer-events-none absolute -top-24 left-0 h-80 w-80 rounded-full bg-brand-green/10 blur-[120px]" />
 
       <div className="relative z-10 mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
         <ScrollAnimation variant="fadeUp" className="mb-12 text-center">
