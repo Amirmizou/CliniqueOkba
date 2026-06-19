@@ -232,16 +232,16 @@ function PoleCard({ pole, index }: { pole: Pole; index: number }) {
         )}
 
         {/* CTA */}
-        <div className="mt-auto flex flex-wrap items-center gap-x-4 gap-y-2 pt-5">
+        <div className="mt-auto flex items-center gap-2 pt-5">
           <Link
             href={`/poles/${pole.slug}`}
-            className="inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-sm font-semibold transition-all duration-200 hover:gap-2.5"
+            className="inline-flex flex-1 items-center justify-center gap-1.5 rounded-full px-3 py-2 text-sm font-semibold transition-all duration-200 hover:gap-2.5"
             style={{ color: pole.accent, backgroundColor: `${pole.accent}12` }}
           >
             {t('discover')}
             <ArrowRight className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-1" />
           </Link>
-          {pole.urgent && (
+          {pole.urgent ? (
             <a
               href={`tel:${CLINIC_PHONE}`}
               className="inline-flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-semibold text-white shadow-md transition-transform duration-200 hover:scale-[1.03] active:scale-95"
@@ -249,6 +249,15 @@ function PoleCard({ pole, index }: { pole: Pole; index: number }) {
             >
               <Phone className="h-4 w-4" />
               {t('call')}
+            </a>
+          ) : (
+            <a
+              href={`tel:${CLINIC_PHONE}`}
+              aria-label={t('call')}
+              className="inline-flex items-center justify-center rounded-full border p-2 transition-colors duration-200 hover:bg-foreground/5 touch-target min-w-[40px]"
+              style={{ borderColor: `${pole.accent}40`, color: pole.accent }}
+            >
+              <Phone className="h-4 w-4" />
             </a>
           )}
         </div>
