@@ -443,7 +443,8 @@ export const videosQuery = groq`
     description,
     description_ar,
     category,
-    "videoUrl": videoFile.asset->url,
+    "videoUrl": coalesce(externalUrl, videoFile.asset->url),
+    externalUrl,
     poster
   }
 `
