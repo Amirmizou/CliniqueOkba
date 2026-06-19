@@ -17,11 +17,6 @@ interface MobileActionBarProps {
   }
 }
 
-/**
- * Barre d'actions rapides mobile (patient en situation de besoin) :
- * Appeler / Prendre RDV (WhatsApp) / Itinéraire.
- * Apparaît après le hero pour ne pas doublonner les CTA du haut de page.
- */
 export default function MobileActionBar({ siteSettings }: MobileActionBarProps) {
   const t = useTranslations('actionBar')
   const [visible, setVisible] = useState(false)
@@ -52,50 +47,46 @@ export default function MobileActionBar({ siteSettings }: MobileActionBarProps) 
     <AnimatePresence>
       {visible && (
         <motion.nav
-          initial={{ y: 88, opacity: 0 }}
+          initial={{ y: 100, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
-          exit={{ y: 88, opacity: 0 }}
-          transition={{ duration: 0.35, ease: [0.23, 1, 0.32, 1] }}
-          aria-label="Actions rapides"
+          exit={{ y: 100, opacity: 0 }}
+          transition={{ duration: 0.3, ease: [0.23, 1, 0.32, 1] }}
+          aria-label={t('ariaLabel') || 'Actions rapides'}
           className="fixed inset-x-3 bottom-3 z-50 md:hidden"
           style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
         >
-          <div className="grid grid-cols-3 gap-1.5 rounded-2xl border border-border/50 bg-background/85 p-1.5 shadow-2xl shadow-black/20 backdrop-blur-xl">
+          <div className="grid grid-cols-3 gap-2 rounded-2xl border border-border/40 bg-background/90 p-2 shadow-2xl shadow-black/20 backdrop-blur-xl">
+            {/* Call */}
             <a
               href={phoneHref}
-              className="flex flex-col items-center justify-center gap-1 rounded-xl bg-gradient-to-b from-[#006633] to-[#00532a] py-2.5 text-white shadow-md active:scale-95 transition-transform"
+              aria-label={t('callAria') || `Appeler la clinique : ${phoneDisplay}`}
+              className="group flex min-h-[56px] flex-col items-center justify-center gap-1 rounded-xl bg-[#006633] px-2 py-3 text-white shadow-md transition-all active:scale-95 hover:bg-[#004d26] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#006633] focus-visible:ring-offset-2 cursor-pointer"
             >
-              <Phone className="h-5 w-5" />
+              <Phone className="h-5 w-5" aria-hidden="true" />
               <span className="text-[11px] font-semibold leading-none">{t('call')}</span>
             </a>
 
-            {waUrl ? (
-              <a
-                href={waUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex flex-col items-center justify-center gap-1 rounded-xl bg-gradient-to-b from-[#25D366] to-[#1da851] py-2.5 text-white shadow-md active:scale-95 transition-transform"
-              >
-                <MessageCircle className="h-5 w-5" />
-                <span className="text-[11px] font-semibold leading-none">{t('appointment')}</span>
-              </a>
-            ) : (
-              <a
-                href="#contact"
-                className="flex flex-col items-center justify-center gap-1 rounded-xl bg-gradient-to-b from-[#25D366] to-[#1da851] py-2.5 text-white shadow-md active:scale-95 transition-transform"
-              >
-                <MessageCircle className="h-5 w-5" />
-                <span className="text-[11px] font-semibold leading-none">{t('appointment')}</span>
-              </a>
-            )}
+            {/* WhatsApp / Appointment */}
+            <a
+              href={waUrl || '#contact'}
+              target={waUrl ? '_blank' : undefined}
+              rel={waUrl ? 'noopener noreferrer' : undefined}
+              aria-label={t('appointmentAria') || 'Prendre rendez-vous par WhatsApp'}
+              className="group flex min-h-[56px] flex-col items-center justify-center gap-1 rounded-xl bg-[#25D366] px-2 py-3 text-white shadow-md transition-all active:scale-95 hover:bg-[#1da851] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#25D366] focus-visible:ring-offset-2 cursor-pointer"
+            >
+              <MessageCircle className="h-5 w-5" aria-hidden="true" />
+              <span className="text-[11px] font-semibold leading-none">{t('appointment')}</span>
+            </a>
 
+            {/* Directions */}
             <a
               href={directionsUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex flex-col items-center justify-center gap-1 rounded-xl border border-border/60 bg-card py-2.5 text-foreground active:scale-95 transition-transform"
+              aria-label={t('directionsAria') || 'Obtenir un itinéraire vers la clinique'}
+              className="group flex min-h-[56px] flex-col items-center justify-center gap-1 rounded-xl border border-border/60 bg-card px-2 py-3 text-foreground transition-all active:scale-95 hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 cursor-pointer"
             >
-              <MapPin className="h-5 w-5 text-primary" />
+              <MapPin className="h-5 w-5 text-primary" aria-hidden="true" />
               <span className="text-[11px] font-semibold leading-none">{t('directions')}</span>
             </a>
           </div>

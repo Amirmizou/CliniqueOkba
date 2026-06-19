@@ -127,7 +127,15 @@
   }
 
   * {
-    @apply border-border outline-ring/50;
+    @apply border-border outline-ring;
+  }
+
+  /* WCAG 2.2 compliant focus indicators — 3px solid ring, offset ensures
+     the ring is visible against both light and dark backgrounds. */
+  :focus-visible {
+    outline: 3px solid oklch(0.48 0.16 145);
+    outline-offset: 3px;
+    border-radius: 4px;
   }
 
   body {
@@ -353,9 +361,9 @@ html {
   transition: all 0.3s ease;
 }
 
-.focus-ring:focus {
-  transform: scale(1.02);
-  box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.1);
+.focus-ring:focus-visible {
+  outline: 3px solid oklch(0.48 0.16 145);
+  outline-offset: 3px;
 }
 
 /* Loading animations */

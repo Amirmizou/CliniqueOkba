@@ -105,7 +105,8 @@ export default function TrustBand({ siteSettings }: TrustBandProps) {
             />
             <a
               href={phoneHref}
-              className="group flex items-center gap-3 border-t border-border/60 px-5 py-5 transition-colors hover:bg-primary/5 sm:border-l sm:border-t-0"
+              aria-label={`Appeler la clinique : ${phoneDisplay}`}
+              className="group flex cursor-pointer items-center gap-3 border-t border-border/60 px-5 py-5 transition-colors hover:bg-primary/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-inset sm:border-l sm:border-t-0"
             >
               <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-primary/10 text-primary transition-colors group-hover:bg-primary group-hover:text-white">
                 <Phone className="h-5 w-5" />
