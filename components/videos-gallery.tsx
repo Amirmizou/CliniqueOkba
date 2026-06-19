@@ -16,6 +16,9 @@ import { urlFor } from '@/sanity/lib/image'
 import { useReducedMotion } from '@/hooks/use-reduced-motion'
 import { AnimatedSection } from '@/components/ui/animated-section'
 import { LineReveal } from '@/components/ui/reveal-text'
+import dynamic from 'next/dynamic'
+
+const ReactPlayer = dynamic(() => import('react-player/lazy'), { ssr: false })
 
 const EASE = [0.22, 1, 0.36, 1] as const
 
@@ -33,7 +36,6 @@ export default function VideosGallery({ data }: { data?: VideoItem[] }) {
   const locale = useLocale()
   const isAr = locale === 'ar'
   const prefersReducedMotion = useReducedMotion()
-  const videoRef = useRef<HTMLVideoElement>(null)
 
   const [activeIndex, setActiveIndex] = useState(0)
   const [isPlaying, setIsPlaying] = useState(false)
@@ -68,8 +70,6 @@ export default function VideosGallery({ data }: { data?: VideoItem[] }) {
 
   const play = () => {
     setIsPlaying(true)
-    // Lance la lecture après le rendu du <video> avec controls
-    requestAnimationFrame(() => videoRef.current?.play().catch(() => {}))
   }
 
   return (
@@ -155,17 +155,16 @@ export default function VideosGallery({ data }: { data?: VideoItem[] }) {
                 className="relative aspect-video w-full"
               >
                 {isPlaying ? (
-                  <video
-                    ref={videoRef}
-                    src={active.videoUrl}
-                    poster={posterUrl(active)}
-                    controls
-                    playsInline
-                    preload="metadata"
-                    onEnded={() => setIsPlaying(false)}
-                    className="h-full w-full object-contain"
-                    aria-label={active.title}
-                  />
+                  <div className="h-full w-full bg-black">
+                    <ReactPlayer
+                      url={active.videoUrl}
+                      playing
+                      controls
+                      width="100%"
+                      height="100%"
+                      onEnded={() => setIsPlaying(false)}
+                    />
+                  </div>
                 ) : (
                   <button
                     type="button"
