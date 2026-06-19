@@ -1,7 +1,6 @@
 import SiteHeader from '@/components/site-header'
 import HeroCarousel from '@/components/hero-carousel'
 import About from '@/components/about'
-import VideoPresentation from '@/components/video-presentation'
 import VideosGallery from '@/components/videos-gallery'
 import LogoLoader from '@/components/logo-loader'
 import TrustBand from '@/components/trust-band'
@@ -133,12 +132,11 @@ export default async function Home(props: { params: Promise<{ locale: string }> 
           data={localizedData.aboutSection}
           sectionContent={sectionContentMap['about']}
         />
-        <VideoPresentation sectionContent={sectionContentMap['video']} />
-        <VideosGallery data={localizedData.videos} />
-        <SectionDivider variant="ecg" />
         <Poles data={localizedData.poles} />
         <SectionDivider variant="ecg" />
         <DoctorsShowcase data={localizedData.doctors} />
+        <SectionDivider variant="ecg" />
+        <VideosGallery data={localizedData.videos} />
         <SectionDivider variant="ecg" />
         {featuredEvent && (
           <>

@@ -1,6 +1,6 @@
 'use client'
 
-import { useRef, useState, type MouseEvent } from 'react'
+import { useState } from 'react'
 import { useTranslations, useLocale } from 'next-intl'
 import Image from 'next/image'
 import {
@@ -130,11 +130,13 @@ function DoctorCard({
   onOpen: (d: Doctor) => void
 }) {
   const t = useTranslations('doctors')
-  const [hovered, setHovered] = useState(false)
+  const locale = useLocale()
 
   const Icon = doctor.icon
   const waMessage = encodeURIComponent(
-    `Bonjour, je souhaite prendre rendez-vous avec ${doctor.name} (${doctor.specialty}) à la Clinique OKBA.`,
+    locale === 'ar'
+      ? `مرحباً، أرغب في حجز موعد مع ${doctor.name} (${doctor.specialty}) في عيادة OKBA.`
+      : `Bonjour, je souhaite prendre rendez-vous avec ${doctor.name} (${doctor.specialty}) à la Clinique OKBA.`,
   )
 
   return (
@@ -146,8 +148,6 @@ function DoctorCard({
       className="group relative h-full"
     >
       <div
-        onPointerEnter={(e) => e.pointerType === 'mouse' && setHovered(true)}
-        onPointerLeave={(e) => e.pointerType === 'mouse' && setHovered(false)}
         className="relative flex h-full flex-col overflow-hidden rounded-[1.75rem] border border-border/40 bg-white shadow-soft ring-1 ring-[#006633]/5 transition-all duration-300 hover:-translate-y-1 hover:shadow-elevated dark:border-white/10 dark:bg-slate-900"
       >
         {/* ----- Affiche ----- */}
@@ -200,8 +200,8 @@ function DoctorCard({
               </p>
             )}
             {doctor.experience && (
-              <span className="mt-2.5 inline-flex items-center gap-1.5 rounded-full bg-amber-400/95 px-2.5 py-1 text-[11px] font-bold text-amber-950 shadow">
-                <Award className="h-3 w-3" />
+              <span className="mt-2 inline-flex items-center gap-1.5 rounded-full bg-white/15 px-2.5 py-1 text-[11px] font-semibold text-white backdrop-blur-sm">
+                <Award className="h-3 w-3 text-amber-300" />
                 {doctor.experience}
               </span>
             )}
@@ -210,9 +210,9 @@ function DoctorCard({
 
         {/* ----- Panneau d'informations ----- */}
         <div className="flex flex-1 flex-col gap-4 p-5">
-          {/* Services */}
+          {/* Services — toujours visibles (max 7 + compteur) */}
           <div className="flex flex-wrap gap-1.5">
-            {doctor.services.slice(0, hovered ? doctor.services.length : 4).map((s) => (
+            {doctor.services.slice(0, 7).map((s) => (
               <span
                 key={s}
                 className="rounded-lg border px-2.5 py-1 text-[11px] font-medium text-foreground/80"
@@ -224,9 +224,12 @@ function DoctorCard({
                 {s}
               </span>
             ))}
-            {!hovered && doctor.services.length > 4 && (
-              <span className="rounded-lg px-2 py-1 text-[11px] font-semibold text-muted-foreground">
-                +{doctor.services.length - 4}
+            {doctor.services.length > 7 && (
+              <span
+                className="rounded-lg border px-2.5 py-1 text-[11px] font-semibold"
+                style={{ borderColor: `${doctor.accent}30`, color: doctor.accent }}
+              >
+                +{doctor.services.length - 7}
               </span>
             )}
           </div>
@@ -328,6 +331,7 @@ function PosterLightbox({
 export default function DoctorsShowcase({ data }: { data?: any[] }) {
   const t = useTranslations('doctors')
   const locale = useLocale()
+  const isAr = locale === 'ar'
   const [active, setActive] = useState<Doctor | null>(null)
   const list = resolveDoctors(data, locale)
 
@@ -368,15 +372,25 @@ export default function DoctorsShowcase({ data }: { data?: any[] }) {
         </AnimatedSection>
 
         {/* Grille (flex centré : s'équilibre quel que soit le nombre de médecins) */}
-        <div className="flex flex-nowrap overflow-x-auto pb-8 snap-x snap-mandatory gap-4 overscroll-x-contain sm:gap-6 sm:flex-wrap sm:justify-center sm:overflow-visible sm:pb-0 sm:snap-none [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
-          {list.map((doctor, i) => (
-            <div
-              key={doctor.id}
-              className="w-[85vw] shrink-0 snap-center sm:w-[calc(50%-0.75rem)] sm:shrink lg:w-[calc(33.333%-1rem)] xl:w-[calc(25%-1.125rem)]"
-            >
-              <DoctorCard doctor={doctor} index={i} onOpen={setActive} />
-            </div>
-          ))}
+        <div className="relative">
+          {/* Fondu droit — indicateur de scroll mobile */}
+          <div className="pointer-events-none absolute bottom-8 right-0 top-0 z-10 w-16 bg-gradient-to-l from-background to-transparent sm:hidden" aria-hidden="true" />
+
+          <div className="flex flex-nowrap overflow-x-auto pb-8 snap-x snap-proximity touch-pan-x gap-4 overscroll-x-contain sm:gap-6 sm:flex-wrap sm:justify-center sm:overflow-visible sm:pb-0 sm:snap-none sm:touch-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+            {list.map((doctor, i) => (
+              <div
+                key={doctor.id}
+                className="w-[85vw] shrink-0 snap-center sm:w-[calc(50%-0.75rem)] sm:shrink lg:w-[calc(33.333%-1rem)] xl:w-[calc(25%-1.125rem)]"
+              >
+                <DoctorCard doctor={doctor} index={i} onOpen={setActive} />
+              </div>
+            ))}
+          </div>
+
+          {/* Hint textuel swipe — mobile uniquement */}
+          <p className="mt-1 text-center text-xs text-muted-foreground/60 sm:hidden" aria-hidden="true">
+            {isAr ? '← اسحب لمزيد من الأطباء' : 'Glisser pour voir tous les médecins →'}
+          </p>
         </div>
       </div>
 

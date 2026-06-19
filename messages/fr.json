@@ -435,6 +435,13 @@
     "inImages": "En images",
     "equipments": "Nos Équipements de Pointe",
     "capabilities": "Capacités et Technologies",
-    "viewMore": "Voir plus de détails"
+    "viewMore": "Voir plus de détails",
+    "poleActive": "Pôle actif",
+    "prestationsLabel": "Prestations",
+    "equipmentsLabel": "Équipements",
+    "availableLabel": "Disponibilité",
+    "prestationsSection": "Nos Prestations",
+    "ctaTitle": "Prendre rendez-vous",
+    "ctaSubtitle": "Contactez directement notre équipe médicale"
   }
 }
