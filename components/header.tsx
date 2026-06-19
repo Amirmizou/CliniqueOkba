@@ -256,7 +256,7 @@ export default function Header({ siteSettings, poles }: HeaderProps) {
                     // setActiveTab(item.id) 
                   }}
                   className={cn(
-                    'relative px-5 py-2.5 text-sm font-semibold transition-colors duration-300 rounded-full flex items-center gap-2 group z-10',
+                    'relative px-5 py-2.5 text-sm font-semibold transition-colors duration-300 rounded-full flex items-center gap-2 group z-10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2',
                     isActive ? "text-primary drop-shadow-sm" : "text-foreground/90 hover:text-primary"
                   )}
                 >
@@ -285,7 +285,7 @@ export default function Header({ siteSettings, poles }: HeaderProps) {
             {/* Dropdown : Pôles */}
             <motion.div initial="initial" whileHover="hover" className="relative z-30">
               <button
-                className="relative px-5 py-2.5 text-sm font-semibold transition-colors duration-300 rounded-full text-foreground/90 hover:text-primary flex items-center gap-1 hover:bg-white/5"
+                className="relative px-5 py-2.5 text-sm font-semibold transition-colors duration-300 rounded-full text-foreground/90 hover:text-primary flex items-center gap-1 hover:bg-white/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
               >
                 {t('poles')}
                 <motion.div variants={{ initial: { rotate: 0 }, hover: { rotate: -180 } }} transition={{ duration: 0.3 }}>
@@ -338,7 +338,7 @@ export default function Header({ siteSettings, poles }: HeaderProps) {
             {/* Dropdown for additional pages */}
             <motion.div initial="initial" whileHover="hover" className="relative z-20">
               <button
-                className="relative px-5 py-2.5 text-sm font-semibold transition-colors duration-300 rounded-full text-foreground/90 hover:text-primary flex items-center gap-1 hover:bg-white/5"
+                className="relative px-5 py-2.5 text-sm font-semibold transition-colors duration-300 rounded-full text-foreground/90 hover:text-primary flex items-center gap-1 hover:bg-white/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
               >
                 {t('more')}
                 <motion.div variants={{ initial: { rotate: 0 }, hover: { rotate: -180 } }} transition={{ duration: 0.3 }}>
@@ -439,7 +439,7 @@ export default function Header({ siteSettings, poles }: HeaderProps) {
 
             {/* Mobile Menu Toggle */}
             <button
-              className='md:hidden flex h-11 w-11 items-center justify-center rounded-full hover:bg-secondary transition-colors touch-target'
+              className='md:hidden flex h-11 w-11 items-center justify-center rounded-full hover:bg-secondary transition-colors touch-target cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2'
               onClick={() => setIsOpen(!isOpen)}
               aria-label="Toggle menu"
             >

@@ -413,11 +413,11 @@ export default function Contact({ siteSettings, sectionContent }: ContactProps) 
                         value={formData.firstName}
                         onChange={handleChange}
                         onBlur={handleBlur}
-                        className={`bg-background w-full rounded-lg border px-4 py-3 text-base md:text-sm transition-all duration-300 focus:outline-none ${touched.firstName && errors.firstName
-                          ? 'border-red-500 focus:ring-red-500/50'
+                        className={`bg-background w-full rounded-lg border px-4 py-3 text-base md:text-sm transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-1 ${touched.firstName && errors.firstName
+                          ? 'border-red-500 focus:ring-red-500'
                           : touched.firstName && !errors.firstName
-                            ? 'border-green-500 focus:ring-green-500/50'
-                            : 'border-border focus:ring-primary/50'
+                            ? 'border-green-500 focus:ring-green-500'
+                            : 'border-border focus:ring-primary'
                           }`}
                         placeholder={tf('firstNamePlaceholder')}
                         disabled={isSubmitting}
@@ -453,11 +453,11 @@ export default function Contact({ siteSettings, sectionContent }: ContactProps) 
                         value={formData.lastName}
                         onChange={handleChange}
                         onBlur={handleBlur}
-                        className={`bg-background w-full rounded-lg border px-4 py-3 text-base md:text-sm transition-all duration-300 focus:outline-none ${touched.lastName && errors.lastName
-                          ? 'border-red-500 focus:ring-red-500/50'
+                        className={`bg-background w-full rounded-lg border px-4 py-3 text-base md:text-sm transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-1 ${touched.lastName && errors.lastName
+                          ? 'border-red-500 focus:ring-red-500'
                           : touched.lastName && !errors.lastName
-                            ? 'border-green-500 focus:ring-green-500/50'
-                            : 'border-border focus:ring-primary/50'
+                            ? 'border-green-500 focus:ring-green-500'
+                            : 'border-border focus:ring-primary'
                           }`}
                         placeholder={tf('lastNamePlaceholder')}
                         disabled={isSubmitting}
@@ -495,11 +495,11 @@ export default function Contact({ siteSettings, sectionContent }: ContactProps) 
                       value={formData.email}
                       onChange={handleChange}
                       onBlur={handleBlur}
-                      className={`bg-background w-full rounded-lg border px-4 py-3 text-base md:text-sm transition-all duration-300 focus:outline-none ${touched.email && errors.email
-                        ? 'border-red-500 focus:ring-red-500/50'
+                      className={`bg-background w-full rounded-lg border px-4 py-3 text-base md:text-sm transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-1 ${touched.email && errors.email
+                        ? 'border-red-500 focus:ring-red-500'
                         : touched.email && !errors.email
-                          ? 'border-green-500 focus:ring-green-500/50'
-                          : 'border-border focus:ring-primary/50'
+                          ? 'border-green-500 focus:ring-green-500'
+                          : 'border-border focus:ring-primary'
                         }`}
                       placeholder='votre@email.com'
                       disabled={isSubmitting}
@@ -537,11 +537,11 @@ export default function Contact({ siteSettings, sectionContent }: ContactProps) 
                       value={formData.phone}
                       onChange={handleChange}
                       onBlur={handleBlur}
-                      className={`bg-background w-full rounded-lg border px-4 py-3 text-base md:text-sm transition-all duration-300 focus:outline-none ${touched.phone && errors.phone
-                        ? 'border-red-500 focus:ring-red-500/50'
+                      className={`bg-background w-full rounded-lg border px-4 py-3 text-base md:text-sm transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-1 ${touched.phone && errors.phone
+                        ? 'border-red-500 focus:ring-red-500'
                         : touched.phone && !errors.phone && formData.phone
-                          ? 'border-green-500 focus:ring-green-500/50'
-                          : 'border-border focus:ring-primary/50'
+                          ? 'border-green-500 focus:ring-green-500'
+                          : 'border-border focus:ring-primary'
                         }`}
                       placeholder='+213 ...'
                       disabled={isSubmitting}
@@ -575,11 +575,11 @@ export default function Contact({ siteSettings, sectionContent }: ContactProps) 
                       onChange={handleChange}
                       onBlur={handleBlur}
                       rows={4}
-                      className={`bg-background w-full resize-none rounded-lg border px-4 py-3 text-base md:text-sm transition-all duration-300 focus:outline-none ${touched.message && errors.message
-                        ? 'border-red-500 focus:ring-red-500/50'
+                      className={`bg-background w-full resize-none rounded-lg border px-4 py-3 text-base md:text-sm transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-1 ${touched.message && errors.message
+                        ? 'border-red-500 focus:ring-red-500'
                         : touched.message && !errors.message
-                          ? 'border-green-500 focus:ring-green-500/50'
-                          : 'border-border focus:ring-primary/50'
+                          ? 'border-green-500 focus:ring-green-500'
+                          : 'border-border focus:ring-primary'
                         }`}
                       placeholder={tf('messagePlaceholder')}
                       disabled={isSubmitting}

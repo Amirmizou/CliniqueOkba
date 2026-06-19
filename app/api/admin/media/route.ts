@@ -35,21 +35,20 @@ export async function POST(request: Request) {
       )
     }
 
-    // Limite : 40 Mo image, 200 Mo vidéo.
-    // Sanity conserve TOUJOURS le fichier ORIGINAL en pleine résolution (aucune
-    // recompression à l'upload) ; les redimensionnements se font seulement à
-    // l'affichage. On garde donc une limite haute pour ne pas forcer le client
-    // à compresser ses photos avant l'envoi (= préservation de la qualité source).
-    const maxSize = isVideo ? 200 * 1024 * 1024 : 40 * 1024 * 1024
+    // Limite : 40 Mo image, 500 Mo vidéo.
+    // Sanity conserve le fichier ORIGINAL sans recompression.
+    // Pour les vidéos HD > 500 Mo, utiliser le champ "URL externe" dans la fiche.
+    const maxSize = isVideo ? 500 * 1024 * 1024 : 40 * 1024 * 1024
     if (file.size > maxSize) {
       return NextResponse.json(
-        { error: `Fichier trop volumineux (max ${isVideo ? '200 Mo' : '40 Mo'}).` },
+        { error: `Fichier trop volumineux (max ${isVideo ? '500 Mo' : '40 Mo'}). Pour les vidéos HD plus lourdes, utilisez le champ "URL externe".` },
         { status: 400 },
       )
     }
 
-    const buffer = Buffer.from(await file.arrayBuffer())
-    const asset = await writeClient.assets.upload(isImage ? 'image' : 'file', buffer, {
+    // Passer le File/Blob directement au client Sanity évite de charger
+    // l'intégralité du fichier en mémoire (important pour les grandes vidéos).
+    const asset = await writeClient.assets.upload(isImage ? 'image' : 'file', file, {
       filename: file.name,
       contentType: file.type,
     })

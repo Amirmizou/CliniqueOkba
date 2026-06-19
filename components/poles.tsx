@@ -93,10 +93,11 @@ function PoleCard({ pole, index }: { pole: Pole; index: number }) {
     <motion.div
       initial={{ opacity: 0, y: 40 }}
       whileInView={{ opacity: 1, y: 0 }}
+      whileTap={{ scale: 0.99 }}
       viewport={{ once: true, margin: '-60px' }}
       transition={{ duration: 0.6, delay: index * 0.08, ease: [0.22, 1, 0.36, 1] }}
       style={{ perspective: 1200 }}
-      className="group relative h-full"
+      className="group relative h-full cursor-default"
     >
       {/* Halo coloré (toujours visible pour le pôle vedette) */}
       <div
@@ -133,22 +134,28 @@ function PoleCard({ pole, index }: { pole: Pole; index: number }) {
           </span>
         )}
 
-        {/* Icône (battement de cœur) + badge */}
+        {/* Icône + badge */}
         <div className="mb-5 flex items-start justify-between">
-          <motion.div
-            className="flex h-14 w-14 items-center justify-center rounded-2xl text-white shadow-lg"
-            style={{ backgroundColor: pole.accent }}
-            animate={{ scale: [1, 1.08, 1, 1.05, 1] }}
-            transition={{
-              duration: 1.8,
-              times: [0, 0.12, 0.24, 0.36, 0.6],
-              repeat: Infinity,
-              repeatDelay: 2.6,
-              ease: 'easeOut',
-            }}
-          >
-            <Icon className="h-7 w-7" />
-          </motion.div>
+          <div className="relative h-14 w-14 shrink-0">
+            {/* Halo ambiant (glow derrière la pastille) */}
+            <div
+              aria-hidden="true"
+              className="absolute inset-0 rounded-2xl opacity-25 blur-xl transition-opacity duration-500 group-hover:opacity-55"
+              style={{ background: pole.accent }}
+            />
+            {/* Pastille icône avec gradient + reflet interne */}
+            <motion.div
+              className="relative flex h-full w-full items-center justify-center rounded-2xl text-white"
+              style={{
+                background: `linear-gradient(140deg, ${pole.accent}d0 0%, ${pole.accent} 100%)`,
+                boxShadow: `0 4px 18px ${pole.accent}50, inset 0 1px 0 rgba(255,255,255,0.18)`,
+              }}
+              whileHover={{ scale: 1.06, y: -1 }}
+              transition={{ duration: 0.22, ease: [0.23, 1, 0.32, 1] }}
+            >
+              <Icon className="h-7 w-7 drop-shadow-sm" />
+            </motion.div>
+          </div>
           {badge && (
             <span
               className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-bold ${
@@ -198,7 +205,7 @@ function PoleCard({ pole, index }: { pole: Pole; index: number }) {
                   initial={{ height: 0, opacity: 0 }}
                   animate={{ height: 'auto', opacity: 1 }}
                   exit={{ height: 0, opacity: 0 }}
-                  transition={{ duration: 0.3, ease: 'easeInOut' }}
+                  transition={{ duration: 0.35, ease: [0.32, 0.72, 0, 1] }}
                   className="overflow-hidden"
                 >
                   <div className="mt-3 space-y-2">
@@ -225,16 +232,16 @@ function PoleCard({ pole, index }: { pole: Pole; index: number }) {
         )}
 
         {/* CTA */}
-        <div className="mt-auto flex flex-wrap items-center gap-x-4 gap-y-2 pt-5">
+        <div className="mt-auto flex items-center gap-2 pt-5">
           <Link
             href={`/poles/${pole.slug}`}
-            className="inline-flex items-center gap-1.5 text-sm font-semibold transition-colors"
-            style={{ color: pole.accent }}
+            className="inline-flex flex-1 items-center justify-center gap-1.5 rounded-full px-3 py-2 text-sm font-semibold transition-all duration-200 hover:gap-2.5"
+            style={{ color: pole.accent, backgroundColor: `${pole.accent}12` }}
           >
             {t('discover')}
             <ArrowRight className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-1" />
           </Link>
-          {pole.urgent && (
+          {pole.urgent ? (
             <a
               href={`tel:${CLINIC_PHONE}`}
               className="inline-flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-semibold text-white shadow-md transition-transform duration-200 hover:scale-[1.03] active:scale-95"
@@ -242,6 +249,15 @@ function PoleCard({ pole, index }: { pole: Pole; index: number }) {
             >
               <Phone className="h-4 w-4" />
               {t('call')}
+            </a>
+          ) : (
+            <a
+              href={`tel:${CLINIC_PHONE}`}
+              aria-label={t('call')}
+              className="inline-flex items-center justify-center rounded-full border p-2 transition-colors duration-200 hover:bg-foreground/5 touch-target min-w-[40px]"
+              style={{ borderColor: `${pole.accent}40`, color: pole.accent }}
+            >
+              <Phone className="h-4 w-4" />
             </a>
           )}
         </div>

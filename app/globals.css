@@ -127,11 +127,26 @@
   }
 
   * {
-    @apply border-border outline-ring/50;
+    @apply border-border outline-ring;
+  }
+
+  /* WCAG 2.2 compliant focus indicators — 3px solid ring, offset ensures
+     the ring is visible against both light and dark backgrounds. */
+  :focus-visible {
+    outline: 3px solid oklch(0.48 0.16 145);
+    outline-offset: 3px;
+    border-radius: 4px;
   }
 
   body {
     @apply bg-background text-foreground;
+    line-height: 1.65;
+  }
+
+  /* L'arabe a besoin de plus d'interligne pour la lisibilité des diacritiques */
+  [dir="rtl"] body,
+  body[dir="rtl"] {
+    line-height: 1.8;
   }
 
   /* Titres en Lemon Milk (police d'affichage tout en majuscules).
@@ -173,14 +188,22 @@
     }
   }
 
+  /* RTL headings : Lemon Milk n'a aucun glyphe arabe → remplacer par
+     Montserrat Arabic pour éviter le fallback OS (système "mangue"). */
   [dir="rtl"] h1, [dir="rtl"] h2, [dir="rtl"] h3, [dir="rtl"] h4, [dir="rtl"] h5, [dir="rtl"] h6 {
     letter-spacing: normal;
+    font-family: var(--font-montserrat-arabic), system-ui, sans-serif;
   }
 
   /* Utilitaire pour appliquer la police d'affichage hors balises de titre
      (ex. nom de la clinique, gros chiffres clés). */
   .font-display {
     font-family: var(--font-heading);
+  }
+
+  /* RTL override du .font-display — même logique que les titres. */
+  [dir="rtl"] .font-display {
+    font-family: var(--font-montserrat-arabic), system-ui, sans-serif;
   }
 }
 
@@ -353,9 +376,9 @@ html {
   transition: all 0.3s ease;
 }
 
-.focus-ring:focus {
-  transform: scale(1.02);
-  box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.1);
+.focus-ring:focus-visible {
+  outline: 3px solid oklch(0.48 0.16 145);
+  outline-offset: 3px;
 }
 
 /* Loading animations */

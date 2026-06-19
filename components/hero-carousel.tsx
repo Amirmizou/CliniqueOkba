@@ -58,10 +58,10 @@ export default function HeroCarousel({ slides: rawSlides = [], siteSettings, sec
             id: slide._id || String(index),
             title: isAr ? (slide.title_ar || slide.title) : slide.title,
             subtitle: isAr ? (slide.subtitle_ar || slide.subtitle) : (slide.subtitle || ''),
-            // Suppression du hardcoding .width(1920).height(1080) pour laisser le loader gérer la taille (Mobile LCP Fix)
             image: slide.image ? urlFor(slide.image).url() : '',
+            videoUrl: slide.videoUrl || '',
         }))
-        .filter((slide) => slide.image !== '')
+        .filter((slide) => slide.image !== '' || slide.videoUrl !== '')
 
     const [currentIndex, setCurrentIndex] = useState(0)
     const [isAutoPlaying, setIsAutoPlaying] = useState(true)
@@ -179,29 +179,40 @@ export default function HeroCarousel({ slides: rawSlides = [], siteSettings, sec
                         className="absolute inset-0"
                     >
                         <motion.div
-                            initial={prefersReducedMotion ? undefined : { scale: 1.04 }}
-                            animate={prefersReducedMotion ? undefined : { scale: 1 }}
+                            initial={prefersReducedMotion || !!currentSlide.videoUrl ? undefined : { scale: 1.04 }}
+                            animate={prefersReducedMotion || !!currentSlide.videoUrl ? undefined : { scale: 1 }}
                             transition={{ duration: 10, ease: 'easeOut' }}
                             className="relative h-full w-full"
                         >
-                            <Image
-                                loader={sanityImageLoader}
-                                src={currentSlide.image}
-                                alt={currentSlide.title || 'Clinique OKBA'}
-                                fill
-                                className="object-cover object-center"
-                                priority
-                                quality={90}
-                                sizes="100vw"
-                                unoptimized={false}
-                            />
+                            {currentSlide.videoUrl ? (
+                                <video
+                                    src={currentSlide.videoUrl}
+                                    autoPlay
+                                    loop
+                                    muted
+                                    playsInline
+                                    className="absolute inset-0 h-full w-full object-cover object-center"
+                                />
+                            ) : (
+                                <Image
+                                    loader={sanityImageLoader}
+                                    src={currentSlide.image}
+                                    alt={currentSlide.title || 'Clinique OKBA'}
+                                    fill
+                                    className="object-cover object-center"
+                                    priority
+                                    quality={100}
+                                    sizes="100vw"
+                                    unoptimized={false}
+                                />
+                            )}
                         </motion.div>
                     </motion.div>
                 </AnimatePresence>
 
-                {/* Scrim de lisibilité (clair et médical) : assure la lisibilité du texte blanc sans assombrir la photo */}
-                <div className="absolute inset-0 bg-gradient-to-r from-teal-900/40 via-teal-900/10 to-transparent" />
-                <div className="absolute inset-0 bg-gradient-to-t from-slate-900/40 via-transparent to-slate-900/10" />
+                {/* Scrim de lisibilité — gradient latéral doux côté contenu, vignette basse légère */}
+                <div className="absolute inset-0 bg-gradient-to-r from-slate-900/55 via-slate-900/20 to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-t from-slate-900/35 via-transparent to-transparent" />
                 {/* Fondu bas vers le fond (transition vers la vague) */}
                 <div className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-background to-transparent" />
 

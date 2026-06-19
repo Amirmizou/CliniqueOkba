@@ -1,81 +1,135 @@
 import type { SVGProps } from 'react'
 
+// ─── Imagerie médicale : vue frontale anneau scanner CT ────────────────────
 export function ImagerieIcon(props: SVGProps<SVGSVGElement>) {
   return (
     <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>
-      <path d="M4 6a2 2 0 012-2h12a2 2 0 012 2v12a2 2 0 01-2 2H6a2 2 0 01-2-2V6z" stroke="currentColor" strokeWidth="1.5" strokeOpacity="0.3" />
-      <path d="M12 8v8M8 12h8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-      <path d="M4 12c0-4.418 3.582-8 8-8s8 3.582 8 8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeDasharray="4 4" />
-      <circle cx="12" cy="12" r="3" stroke="currentColor" strokeWidth="1.5" />
+      {/* Anneau gantry extérieur */}
+      <circle cx="12" cy="12" r="9.5" stroke="currentColor" strokeWidth="1.4" strokeOpacity="0.25" />
+      {/* Ouverture bore centrale */}
+      <circle cx="12" cy="12" r="5.5" stroke="currentColor" strokeWidth="1.6" />
+      {/* Point focal du scan */}
+      <circle cx="12" cy="12" r="2" fill="currentColor" />
+      {/* Repères 12h / 3h / 6h / 9h */}
+      <path
+        d="M12 2.5v2M21.5 12h-2M12 19.5v2M2.5 12h2"
+        stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"
+      />
     </svg>
   )
 }
 
+// ─── Dentaire : dent avec racines ─────────────────────────────────────────
 export function DentaireIcon(props: SVGProps<SVGSVGElement>) {
   return (
     <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>
-      <path d="M17 4c-1.5 0-2.8.9-3.5 2.2C12.8 4.9 11.5 4 10 4 7.2 4 5 6.2 5 9c0 3.5 2.5 5.5 2.5 9.5v1c0 1.4 1.1 2.5 2.5 2.5s2.5-1.1 2.5-2.5v-2c0-.6.4-1 1-1s1 .4 1 1v2c0 1.4 1.1 2.5 2.5 2.5s2.5-1.1 2.5-2.5v-1c0-4 2.5-6 2.5-9.5 0-2.8-2.2-5-5-5z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-      <path d="M16 8v-1.5M16 8v1.5M16 8h-1.5M16 8h1.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeOpacity="0.3" />
+      {/* Couronne + racines — forme anatomique */}
+      <path
+        d="M17 4c-1.5 0-2.8.9-3.5 2.2C12.8 4.9 11.5 4 10 4 7.2 4 5 6.2 5 9c0 3.5 2.5 5.5 2.5 9.5v1c0 1.4 1.1 2.5 2.5 2.5s2.5-1.1 2.5-2.5v-2c0-.6.4-1 1-1s1 .4 1 1v2c0 1.4 1.1 2.5 2.5 2.5s2.5-1.1 2.5-2.5v-1c0-4 2.5-6 2.5-9.5 0-2.8-2.2-5-5-5z"
+        stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"
+      />
+      {/* Reflet émail */}
+      <path d="M9.5 6.5l.5 1.5" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeOpacity="0.35" />
     </svg>
   )
 }
 
+// ─── Consultations : stéthoscope ─────────────────────────────────────────
 export function ConsultationsIcon(props: SVGProps<SVGSVGElement>) {
   return (
     <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>
-      <path d="M10 4h4M12 2v4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-      <path d="M4 11v3c0 3.866 3.134 7 7 7h2c3.866 0 7-3.134 7-7v-3" stroke="currentColor" strokeWidth="1.5" strokeOpacity="0.3" strokeLinecap="round" />
-      <path d="M16 16.5a3.5 3.5 0 11-7 0 3.5 3.5 0 017 0z" stroke="currentColor" strokeWidth="1.5" />
-      <path d="M12 16.5v4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-      <path d="M4 8a2 2 0 012-2h12a2 2 0 012 2v3H4V8z" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round" />
+      {/* Embouts auriculaires */}
+      <circle cx="6" cy="4.5" r="1.5" fill="currentColor" />
+      <circle cx="18" cy="4.5" r="1.5" fill="currentColor" />
+      {/* Tubes en arc (oreillettes → jonction) */}
+      <path
+        d="M6 4.5Q6 11 12 11Q18 11 18 4.5"
+        stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" fill="none"
+      />
+      {/* Tube vertical vers la membrane */}
+      <path d="M12 11v4.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+      {/* Membrane (diaphragme) */}
+      <circle cx="12" cy="19" r="3" stroke="currentColor" strokeWidth="1.5" />
+      {/* Membrane intérieure */}
+      <circle cx="12" cy="19" r="1.2" fill="currentColor" />
     </svg>
   )
 }
 
+// ─── Urgences : ECG dans anneau d'alerte ──────────────────────────────────
 export function UrgencesIcon(props: SVGProps<SVGSVGElement>) {
   return (
     <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>
-      <path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z" stroke="currentColor" strokeWidth="1.5" strokeOpacity="0.2" />
-      <path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-      <path d="M3 12h4.5l1.5-3 2.5 7 2-4h2.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-      <circle cx="19" cy="12" r="2" fill="currentColor" />
+      {/* Anneau de fond atténué */}
+      <circle cx="12" cy="12" r="10" stroke="currentColor" strokeOpacity="0.2" strokeWidth="1.5" />
+      {/* Arc d'urgence (sens horaire depuis 10h) */}
+      <path d="M12 2a10 10 0 0 1 10 10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+      {/* Tracé ECG */}
+      <path
+        d="M3 12h4l2-4.5 3 9.5 2-5.5 1 2h3"
+        stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"
+      />
+      {/* Point d'alerte */}
+      <circle cx="19.5" cy="8.5" r="2" fill="currentColor" />
     </svg>
   )
 }
 
+// ─── Laboratoire : flacon Erlenmeyer ────────────────────────────────────
 export function LaboratoireIcon(props: SVGProps<SVGSVGElement>) {
   return (
     <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>
-      <path d="M10 2v4M14 2v4M9 2h6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-      <path d="M10 6l-5 11c-1 2.5.5 5 3.5 5h7c3 0 4.5-2.5 3.5-5l-5-11V6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-      <path d="M6.5 14h11" stroke="currentColor" strokeWidth="1.5" strokeOpacity="0.3" strokeLinecap="round" />
-      <circle cx="10" cy="18" r="1" fill="currentColor" />
-      <circle cx="14" cy="16" r="1.5" fill="currentColor" strokeOpacity="0.8" />
+      {/* Col du flacon */}
+      <path d="M10 2h4M10 2v5.5M14 2v5.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+      {/* Corps conique + fond arrondi */}
+      <path
+        d="M10 7.5L5.2 17A2 2 0 0 0 7 20h10a2 2 0 0 0 1.8-2.9L14 7.5"
+        stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"
+      />
+      {/* Niveau de liquide */}
+      <path d="M7.2 15.5h9.6" stroke="currentColor" strokeOpacity="0.35" strokeWidth="1" strokeLinecap="round" />
+      {/* Bulles */}
+      <circle cx="10.5" cy="17.5" r="1" fill="currentColor" />
+      <circle cx="14" cy="17" r="1.4" fill="currentColor" fillOpacity="0.65" />
     </svg>
   )
 }
 
+// ─── Chirurgie : scalpel ─────────────────────────────────────────────────
 export function ChirurgieIcon(props: SVGProps<SVGSVGElement>) {
   return (
     <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>
-      <path d="M12 21c-4.5 0-8-4-8-9s3.5-9 8-9 8 4 8 9-3.5 9-8 9z" stroke="currentColor" strokeWidth="1.5" strokeOpacity="0.2" />
-      <path d="M12 16a4 4 0 100-8 4 4 0 000 8z" stroke="currentColor" strokeWidth="1.5" />
-      <path d="M12 14a2 2 0 100-4 2 2 0 000 4z" fill="currentColor" />
-      <path d="M21 12c-2.5 4.5-6 7-9 7s-6.5-2.5-9-7" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-      <path d="M21 12c-2.5-4.5-6-7-9-7" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+      {/* Manche */}
+      <path d="M5 21L14 9.5" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" />
+      {/* Lame (biseau rempli) */}
+      <path
+        d="M14 9.5l4-5.5c.6-.7 1.6-.4 1.5.5L17 9l-3 .5z"
+        fill="currentColor" strokeLinejoin="round"
+      />
+      {/* Tranchant — reflet */}
+      <path d="M14 9.5l2.5 1.5" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeOpacity="0.3" />
+      {/* Croix chirurgicale */}
+      <path d="M15.5 15v5M13 17.5h5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeOpacity="0.55" />
     </svg>
   )
 }
 
+// ─── Médecine nucléaire : atome ──────────────────────────────────────────
 export function NucleaireIcon(props: SVGProps<SVGSVGElement>) {
   return (
     <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>
       {/* Noyau */}
       <circle cx="12" cy="12" r="2" fill="currentColor" />
-      {/* Trois orbites électroniques croisées (atome) */}
-      <ellipse cx="12" cy="12" rx="10" ry="4" stroke="currentColor" strokeWidth="1.5" strokeOpacity="0.85" />
-      <ellipse cx="12" cy="12" rx="10" ry="4" stroke="currentColor" strokeWidth="1.5" strokeOpacity="0.5" transform="rotate(60 12 12)" />
-      <ellipse cx="12" cy="12" rx="10" ry="4" stroke="currentColor" strokeWidth="1.5" strokeOpacity="0.5" transform="rotate(120 12 12)" />
+      {/* Orbite horizontale */}
+      <ellipse cx="12" cy="12" rx="10" ry="3.8" stroke="currentColor" strokeWidth="1.5" strokeOpacity="0.9" />
+      {/* Orbite à 60° */}
+      <ellipse cx="12" cy="12" rx="10" ry="3.8" stroke="currentColor" strokeWidth="1.5" strokeOpacity="0.55" transform="rotate(60 12 12)" />
+      {/* Orbite à 120° */}
+      <ellipse cx="12" cy="12" rx="10" ry="3.8" stroke="currentColor" strokeWidth="1.5" strokeOpacity="0.55" transform="rotate(120 12 12)" />
+      {/* Électrons (un par orbite) */}
+      <circle cx="22" cy="12" r="1.4" fill="currentColor" fillOpacity="0.85" />
+      <circle cx="6.5" cy="6.6" r="1.4" fill="currentColor" fillOpacity="0.7" />
+      <circle cx="6.5" cy="17.4" r="1.4" fill="currentColor" fillOpacity="0.7" />
     </svg>
   )
 }

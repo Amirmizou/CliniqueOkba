@@ -18,7 +18,9 @@ export async function GET() {
     `*[_type == "heroSlide"] | order(order asc) {
       _id, title, title_ar, subtitle, subtitle_ar, order, active,
       "imageUrl": image.asset->url,
-      "imageAssetId": image.asset->_id
+      "imageAssetId": image.asset->_id,
+      "videoUrl": videoFile.asset->url,
+      "videoAssetId": videoFile.asset->_id
     }`,
   )
   return NextResponse.json({ slides })
@@ -30,7 +32,7 @@ export async function POST(request: Request) {
   }
   try {
     const body = await request.json()
-    const { _id, title, title_ar, subtitle, subtitle_ar, imageAssetId, order, active } = body
+    const { _id, title, title_ar, subtitle, subtitle_ar, imageAssetId, videoAssetId, order, active } = body
 
     const doc: Record<string, any> = {
       _type: 'heroSlide',
@@ -44,12 +46,16 @@ export async function POST(request: Request) {
     if (imageAssetId) {
       doc.image = { _type: 'image', asset: { _type: 'reference', _ref: imageAssetId } }
     }
+    if (videoAssetId) {
+      doc.videoFile = { _type: 'file', asset: { _type: 'reference', _ref: videoAssetId } }
+    }
 
     let result
     if (_id) {
-      // Mise à jour : on ne touche pas à l'image si aucune nouvelle n'est fournie
+      // Mise à jour : on ne touche pas aux médias si aucun nouveau n'est fourni
       const patch: Record<string, any> = { ...doc }
       if (!imageAssetId) delete patch.image
+      if (!videoAssetId) delete patch.videoFile
       delete patch._type
       result = await writeClient.patch(_id).set(patch).commit()
     } else {

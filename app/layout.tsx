@@ -19,7 +19,7 @@ export default async function RootLayout({
         <link rel="dns-prefetch" href="https://cdn.sanity.io" />
         <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
       </head>
-      <body className="font-sans antialiased">
+      <body className={`${locale === 'ar' ? montserratArabic.className : 'font-sans'} antialiased`}>
         {children}
       </body>
     </html>

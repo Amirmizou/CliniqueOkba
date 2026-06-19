@@ -3,6 +3,8 @@
 import { useEffect, useRef, useState } from 'react'
 import Image from 'next/image'
 import {
+  Film,
+  ImageIcon,
   Loader2,
   Plus,
   Save,
@@ -12,6 +14,7 @@ import {
   Eye,
   EyeOff,
   ArrowLeft,
+  X,
 } from 'lucide-react'
 import Link from 'next/link'
 import { LogoBadgeSpinner } from '@/components/ui/logo-badge'
@@ -26,9 +29,12 @@ interface Slide {
   active: boolean
   imageUrl?: string
   imageAssetId?: string
+  videoUrl?: string
+  videoAssetId?: string
   _dirty?: boolean
   _saving?: boolean
   _uploading?: boolean
+  _uploadKind?: 'image' | 'video'
 }
 
 const empty = (order: number): Slide => ({
@@ -64,15 +70,21 @@ export default function HeroEditor() {
 
   const addSlide = () => setSlides((prev) => [...prev, empty(prev.length)])
 
-  const uploadImage = async (i: number, file: File) => {
-    update(i, { _uploading: true })
+  const uploadMedia = async (i: number, file: File) => {
+    const isVideo = file.type.startsWith('video/')
+    update(i, { _uploading: true, _uploadKind: isVideo ? 'video' : 'image' })
     try {
       const fd = new FormData()
       fd.append('file', file)
       const res = await fetch('/api/admin/media', { method: 'POST', body: fd })
       const data = await res.json()
       if (!res.ok) throw new Error(data.error || 'Upload échoué')
-      update(i, { imageAssetId: data.assetId, imageUrl: data.url, _uploading: false })
+      if (isVideo) {
+        update(i, { videoAssetId: data.assetId, videoUrl: data.url, _uploading: false })
+      } else {
+        update(i, { imageAssetId: data.assetId, imageUrl: data.url, _uploading: false })
+      }
+      notify(`${isVideo ? 'Vidéo' : 'Image'} uploadée ✓`)
     } catch (e: any) {
       update(i, { _uploading: false })
       notify(e.message || 'Upload échoué', false)
@@ -124,9 +136,9 @@ export default function HeroEditor() {
 
       <div className="mb-6 flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-slate-800 dark:text-white">Carousel d'accueil</h1>
+          <h1 className="text-2xl font-bold text-slate-800 dark:text-white">Carousel d&apos;accueil</h1>
           <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
-            Slides du hero. Chaque slide a un titre et sous-titre en français et en arabe.
+            Chaque slide peut afficher une image haute résolution ou une vidéo (MP4/WebM, jusqu&apos;à 200 Mo).
           </p>
         </div>
         <button
@@ -180,11 +192,15 @@ export default function HeroEditor() {
               </div>
 
               <div className="grid gap-5 md:grid-cols-[200px_1fr]">
-                {/* Image */}
-                <ImagePicker
-                  url={s.imageUrl}
+                {/* Média (image ou vidéo) */}
+                <MediaPicker
+                  imageUrl={s.imageUrl}
+                  videoUrl={s.videoUrl}
                   uploading={s._uploading}
-                  onFile={(f) => uploadImage(i, f)}
+                  uploadKind={s._uploadKind}
+                  onFile={(f) => uploadMedia(i, f)}
+                  onClearVideo={() => update(i, { videoUrl: undefined, videoAssetId: undefined })}
+                  onClearImage={() => update(i, { imageUrl: undefined, imageAssetId: undefined })}
                 />
 
                 {/* Champs FR / AR */}
@@ -279,45 +295,170 @@ function Field({
   )
 }
 
-function ImagePicker({
-  url,
+function MediaPicker({
+  imageUrl,
+  videoUrl,
   uploading,
+  uploadKind,
   onFile,
+  onClearVideo,
+  onClearImage,
 }: {
-  url?: string
+  imageUrl?: string
+  videoUrl?: string
   uploading?: boolean
+  uploadKind?: 'image' | 'video'
   onFile: (f: File) => void
+  onClearVideo?: () => void
+  onClearImage?: () => void
 }) {
-  const ref = useRef<HTMLInputElement>(null)
+  const [isDragging, setIsDragging] = useState(false)
+  const imageRef = useRef<HTMLInputElement>(null)
+  const videoRef = useRef<HTMLInputElement>(null)
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault()
+    setIsDragging(false)
+    const file = e.dataTransfer.files[0]
+    if (file) onFile(file)
+  }
+
+  const hasVideo = !!videoUrl
+  const hasImage = !!imageUrl
+
   return (
     <div>
-      <div className="relative aspect-[3/4] w-full overflow-hidden rounded-xl border border-slate-200 bg-slate-100 dark:border-slate-700 dark:bg-slate-800">
-        {url ? (
-          <Image src={url} alt="" fill sizes="200px" className="object-cover" unoptimized />
-        ) : (
-          <div className="flex h-full items-center justify-center text-slate-400">
-            <Upload className="h-7 w-7" />
+      {/* Drop zone / preview */}
+      <div
+        className={`relative aspect-[3/4] w-full overflow-hidden rounded-xl transition-colors ${
+          isDragging
+            ? 'border-2 border-emerald-500 bg-emerald-50 dark:bg-emerald-950'
+            : hasVideo || hasImage
+            ? 'border border-slate-200 dark:border-slate-700'
+            : 'border-2 border-dashed border-slate-300 bg-slate-100 dark:border-slate-700 dark:bg-slate-800'
+        }`}
+        onDragOver={(e) => { e.preventDefault(); setIsDragging(true) }}
+        onDragLeave={() => setIsDragging(false)}
+        onDrop={handleDrop}
+      >
+        {/* Video preview */}
+        {hasVideo && (
+          <video
+            src={videoUrl}
+            className="absolute inset-0 h-full w-full object-cover"
+            autoPlay
+            loop
+            muted
+            playsInline
+          />
+        )}
+
+        {/* Image preview (shown below video if both exist) */}
+        {!hasVideo && hasImage && (
+          <Image src={imageUrl!} alt="" fill sizes="200px" className="object-cover" unoptimized />
+        )}
+
+        {/* Empty state */}
+        {!hasVideo && !hasImage && (
+          <div className="flex h-full flex-col items-center justify-center gap-3 px-4 text-slate-400">
+            <Upload className="h-8 w-8" />
+            <p className="text-center text-xs leading-relaxed">
+              Glissez une image ou<br />une vidéo ici
+            </p>
           </div>
         )}
+
+        {/* Media type badges */}
+        <div className="absolute left-2 top-2 flex flex-col gap-1">
+          {hasVideo && (
+            <span className="flex items-center gap-1 rounded-md bg-purple-600 px-1.5 py-0.5 text-[10px] font-bold text-white">
+              <Film className="h-3 w-3" /> VIDÉO
+              {onClearVideo && (
+                <button
+                  onClick={onClearVideo}
+                  className="ml-1 rounded hover:bg-white/20"
+                  aria-label="Retirer la vidéo"
+                >
+                  <X className="h-2.5 w-2.5" />
+                </button>
+              )}
+            </span>
+          )}
+          {hasImage && (
+            <span className="flex items-center gap-1 rounded-md bg-blue-600 px-1.5 py-0.5 text-[10px] font-bold text-white">
+              <ImageIcon className="h-3 w-3" /> IMAGE
+              {onClearImage && (
+                <button
+                  onClick={onClearImage}
+                  className="ml-1 rounded hover:bg-white/20"
+                  aria-label="Retirer l'image"
+                >
+                  <X className="h-2.5 w-2.5" />
+                </button>
+              )}
+            </span>
+          )}
+        </div>
+
+        {/* Upload overlay */}
         {uploading && (
-          <div className="absolute inset-0 flex items-center justify-center bg-black/40">
-            <Loader2 className="h-6 w-6 animate-spin text-white" />
+          <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-black/50">
+            <Loader2 className="h-7 w-7 animate-spin text-white" />
+            <span className="text-xs font-medium text-white">
+              Upload {uploadKind === 'video' ? 'vidéo' : 'image'}…
+            </span>
+          </div>
+        )}
+
+        {/* Drag overlay */}
+        {isDragging && (
+          <div className="absolute inset-0 flex items-center justify-center bg-emerald-500/25">
+            <span className="rounded-lg bg-white/90 px-3 py-1.5 text-sm font-semibold text-emerald-700 shadow">
+              Déposer ici
+            </span>
           </div>
         )}
       </div>
+
+      {/* Note if video present and image also exists */}
+      {hasVideo && hasImage && (
+        <p className="mt-1.5 text-[11px] text-purple-600 dark:text-purple-400">
+          La vidéo a priorité sur l&apos;image.
+        </p>
+      )}
+
+      {/* Picker buttons */}
       <input
-        ref={ref}
+        ref={imageRef}
         type="file"
-        accept="image/*"
+        accept="image/jpeg,image/png,image/webp,image/gif"
         className="hidden"
         onChange={(e) => e.target.files?.[0] && onFile(e.target.files[0])}
       />
-      <button
-        onClick={() => ref.current?.click()}
-        className="mt-2 w-full rounded-lg border border-slate-300 px-3 py-1.5 text-xs font-medium text-slate-600 hover:bg-slate-50 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800"
-      >
-        {url ? 'Changer l\'image' : 'Choisir une image'}
-      </button>
+      <input
+        ref={videoRef}
+        type="file"
+        accept="video/mp4,video/webm"
+        className="hidden"
+        onChange={(e) => e.target.files?.[0] && onFile(e.target.files[0])}
+      />
+      <div className="mt-2 grid grid-cols-2 gap-1.5">
+        <button
+          onClick={() => imageRef.current?.click()}
+          className="flex cursor-pointer items-center justify-center gap-1.5 rounded-lg border border-slate-300 px-2 py-1.5 text-xs font-medium text-slate-600 hover:bg-slate-50 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800"
+        >
+          <ImageIcon className="h-3.5 w-3.5" /> Image
+        </button>
+        <button
+          onClick={() => videoRef.current?.click()}
+          className="flex cursor-pointer items-center justify-center gap-1.5 rounded-lg border border-slate-300 px-2 py-1.5 text-xs font-medium text-slate-600 hover:bg-slate-50 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800"
+        >
+          <Film className="h-3.5 w-3.5" /> Vidéo (200 Mo)
+        </button>
+      </div>
+      <p className="mt-1.5 text-[10px] text-slate-400">
+        Images JPG/PNG/WebP jusqu&apos;à 40 Mo · Vidéos MP4/WebM jusqu&apos;à 200 Mo · Pleine résolution préservée
+      </p>
     </div>
   )
 }

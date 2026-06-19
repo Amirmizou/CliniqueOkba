@@ -1,11 +1,9 @@
 'use client'
 
-
 import { useTranslations } from 'next-intl'
 import ScrollAnimation from '@/components/ui/scroll-animation'
 import StaggerContainer from '@/components/ui/stagger-container'
-import { Star, Quote } from 'lucide-react'
-import { Card, CardContent } from '@/components/ui/card'
+import { Star, Quote, BadgeCheck } from 'lucide-react'
 import Image from 'next/image'
 import { urlFor } from '@/sanity/lib/image'
 
@@ -43,122 +41,132 @@ interface TestimonialsProps {
     sectionContent?: SectionContent
 }
 
-export default function Testimonials({ data = [], sectionContent }: TestimonialsProps) {
-    const t = useTranslations('testimonialsSection')
-    const testimonials = data.filter((tm: Testimonial) => tm.visible !== false)
+function StarRating({ rating }: { rating: number }) {
+    return (
+        <div className="flex items-center gap-0.5" aria-label={`${rating} étoiles sur 5`}>
+            {[...Array(5)].map((_, i) => (
+                <Star
+                    key={i}
+                    className={`h-3.5 w-3.5 ${i < rating ? 'fill-amber-400 text-amber-400' : 'fill-muted text-muted'}`}
+                />
+            ))}
+        </div>
+    )
+}
 
-    // Default content if not from Sanity
-    const title = sectionContent?.title || t('title')
-    const subtitle = sectionContent?.subtitle || t('subtitle')
-    const badge = sectionContent?.badge || t('badge')
-
-    // Helper to get image URL
-    const getImageUrl = (testimonial: Testimonial): string | null => {
+function Avatar({ testimonial }: { testimonial: Testimonial }) {
+    const getImageUrl = (): string | null => {
         if (testimonial.image) return testimonial.image
         if (testimonial.avatar) {
             if (typeof testimonial.avatar === 'string') return testimonial.avatar
             if (typeof testimonial.avatar === 'object' && testimonial.avatar.asset) {
-                return urlFor(testimonial.avatar).width(100).height(100).url()
+                return urlFor(testimonial.avatar).width(96).height(96).url()
             }
         }
         return null
     }
 
-
-
-    if (!testimonials || testimonials.length === 0) {
-        return null // Don't render section if no testimonials
-    }
+    const imageUrl = getImageUrl()
+    const initials = testimonial.name
+        .split(' ')
+        .map((n) => n[0])
+        .slice(0, 2)
+        .join('')
+        .toUpperCase()
 
     return (
-        <section id='testimonials' className='bg-muted/30 py-20'>
-            <div className='mx-auto max-w-7xl px-4 sm:px-6 lg:px-8'>
-                <ScrollAnimation variant="fadeUp" className='mb-16 text-center'>
+        <div className="relative h-11 w-11 shrink-0 overflow-hidden rounded-full ring-2 ring-primary/20">
+            {imageUrl ? (
+                <Image
+                    src={imageUrl}
+                    alt={testimonial.name}
+                    fill
+                    sizes="44px"
+                    className="object-cover"
+                />
+            ) : (
+                <div className="flex h-full w-full items-center justify-center bg-primary/10 text-sm font-bold text-primary">
+                    {initials}
+                </div>
+            )}
+        </div>
+    )
+}
+
+export default function Testimonials({ data = [], sectionContent }: TestimonialsProps) {
+    const t = useTranslations('testimonialsSection')
+    const testimonials = data.filter((tm: Testimonial) => tm.visible !== false)
+
+    const title = sectionContent?.title || t('title')
+    const subtitle = sectionContent?.subtitle || t('subtitle')
+    const badge = sectionContent?.badge || t('badge')
+
+    if (!testimonials || testimonials.length === 0) return null
+
+    return (
+        <section id="testimonials" className="bg-muted/30 py-20">
+            <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+                <ScrollAnimation variant="fadeUp" className="mb-16 text-center">
                     {badge && (
-                        <p className='text-primary text-sm font-semibold tracking-wide uppercase mb-2'>
+                        <span className="mb-3 inline-block rounded-full bg-primary/10 px-4 py-1.5 text-xs font-semibold uppercase tracking-widest text-primary">
                             {badge}
-                        </p>
+                        </span>
                     )}
-                    <h2 className='text-foreground text-3xl font-bold sm:text-4xl'>
+                    <h2 className="text-foreground text-3xl font-bold sm:text-4xl">
                         {title}
                     </h2>
-                    <p className='text-muted-foreground mt-4 text-lg'>
+                    <p className="mx-auto mt-4 max-w-2xl text-lg text-muted-foreground leading-relaxed">
                         {subtitle}
                     </p>
                 </ScrollAnimation>
 
-                <StaggerContainer className='grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3'>
+                <StaggerContainer className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
                     {testimonials.map((testimonial) => {
-                        const testimonialId = testimonial._id || testimonial.id || testimonial.name
-                        const testimonialContent = testimonial.content || testimonial.comment || ''
-                        const testimonialRole = testimonial.role || testimonial.service || 'Patient'
-                        const imageUrl = getImageUrl(testimonial)
+                        const id = testimonial._id || testimonial.id || testimonial.name
+                        const content = testimonial.content || testimonial.comment || ''
+                        const role = testimonial.role || testimonial.service || t('patient')
 
                         return (
-                            <ScrollAnimation key={testimonialId} variant="scaleUp" as="div">
-                                <Card className='glass-card h-full border-0 hover-lift relative overflow-hidden'>
-                                    {/* Decorative quote mark background */}
-                                    <div className="absolute top-4 right-4 text-primary/5">
-                                        <Quote size={80} />
+                            <ScrollAnimation key={id} variant="scaleUp" as="div">
+                                <div className="relative flex h-full flex-col rounded-2xl border border-border/50 bg-card p-6 shadow-sm transition-shadow duration-300 hover:shadow-md">
+                                    {/* Decorative quote — background only */}
+                                    <Quote
+                                        className="absolute right-5 top-5 h-12 w-12 text-primary/6"
+                                        aria-hidden="true"
+                                    />
+
+                                    {/* Top row: stars + verified */}
+                                    <div className="mb-4 flex items-center justify-between">
+                                        <StarRating rating={testimonial.rating} />
+                                        {testimonial.verified && (
+                                            <span className="flex items-center gap-1 text-[11px] font-medium text-emerald-600">
+                                                <BadgeCheck className="h-3.5 w-3.5" aria-hidden="true" />
+                                                {t('verified')}
+                                            </span>
+                                        )}
                                     </div>
 
-                                    {/* Verified badge */}
-                                    {testimonial.verified && (
-                                        <div className="absolute top-4 left-4 bg-green-500/10 text-green-600 text-xs font-medium px-2 py-1 rounded-full">
-                                            ✓ {t('verified')}
-                                        </div>
-                                    )}
+                                    {/* Testimonial text */}
+                                    <p className="flex-1 text-sm leading-relaxed text-foreground/80 italic">
+                                        &ldquo;{content}&rdquo;
+                                    </p>
 
-                                    <CardContent className='pt-8 pb-8 px-6 relative z-10'>
-                                        <div className='mb-6 flex justify-center'>
-                                            <div className='bg-primary/10 flex h-14 w-14 items-center justify-center rounded-full shadow-inner'>
-                                                <Quote className='text-primary h-6 w-6' />
-                                            </div>
-                                        </div>
+                                    {/* Divider */}
+                                    <div className="my-5 h-px bg-border/50" />
 
-                                        <div className='flex justify-center gap-1 mb-6'>
-                                            {[...Array(5)].map((_, i) => (
-                                                <Star
-                                                    key={i}
-                                                    className={`h-4 w-4 ${i < testimonial.rating
-                                                        ? 'fill-yellow-400 text-yellow-400'
-                                                        : 'fill-gray-200 text-gray-200'
-                                                        }`}
-                                                />
-                                            ))}
+                                    {/* Author */}
+                                    <div className="flex items-center gap-3">
+                                        <Avatar testimonial={testimonial} />
+                                        <div className="min-w-0">
+                                            <p className="truncate text-sm font-semibold text-foreground">
+                                                {testimonial.name}
+                                            </p>
+                                            <p className="truncate text-xs text-primary font-medium">
+                                                {role}
+                                            </p>
                                         </div>
-
-                                        <p className='text-muted-foreground mb-8 text-center italic text-lg leading-relaxed'>
-                                            "{testimonialContent}"
-                                        </p>
-
-                                        <div className='flex items-center justify-center gap-4 border-t border-border/50 pt-6'>
-                                            <div className='relative h-12 w-12 overflow-hidden rounded-full ring-2 ring-primary/20'>
-                                                {imageUrl ? (
-                                                    <Image
-                                                        src={imageUrl}
-                                                        alt={testimonial.name}
-                                                        fill
-                                                        sizes="48px"
-                                                        className='object-cover'
-                                                    />
-                                                ) : (
-                                                    <div className='flex h-full w-full items-center justify-center bg-primary/10 text-primary font-bold text-lg'>
-                                                        {testimonial.name.charAt(0)}
-                                                    </div>
-                                                )}
-                                            </div>
-                                            <div className='text-left'>
-                                                <h3 className='text-foreground font-bold'>
-                                                    {testimonial.name}
-                                                </h3>
-                                                <p className='text-primary text-sm font-medium'>
-                                                    {testimonialRole}
-                                                </p>
-                                            </div>
-                                        </div>
-                                    </CardContent>
-                                </Card>
+                                    </div>
+                                </div>
                             </ScrollAnimation>
                         )
                     })}
