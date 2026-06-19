@@ -210,9 +210,9 @@ export default function HeroCarousel({ slides: rawSlides = [], siteSettings, sec
                     </motion.div>
                 </AnimatePresence>
 
-                {/* Scrim de lisibilité (clair et médical) : assure la lisibilité du texte blanc sans assombrir la photo */}
-                <div className="absolute inset-0 bg-gradient-to-r from-teal-900/40 via-teal-900/10 to-transparent" />
-                <div className="absolute inset-0 bg-gradient-to-t from-slate-900/40 via-transparent to-slate-900/10" />
+                {/* Scrim de lisibilité — gradient latéral doux côté contenu, vignette basse légère */}
+                <div className="absolute inset-0 bg-gradient-to-r from-slate-900/55 via-slate-900/20 to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-t from-slate-900/35 via-transparent to-transparent" />
                 {/* Fondu bas vers le fond (transition vers la vague) */}
                 <div className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-background to-transparent" />
 
