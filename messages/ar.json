@@ -435,6 +435,13 @@
     "inImages": "في صور",
     "equipments": "أحدث معداتنا الطبية",
     "capabilities": "القدرات والتقنيات",
-    "viewMore": "عرض المزيد من التفاصيل"
+    "viewMore": "عرض المزيد من التفاصيل",
+    "poleActive": "قسم نشط",
+    "prestationsLabel": "الخدمات",
+    "equipmentsLabel": "المعدات",
+    "availableLabel": "التوفر",
+    "prestationsSection": "خدماتنا",
+    "ctaTitle": "احجز موعداً الآن",
+    "ctaSubtitle": "تواصل مباشرة مع فريقنا الطبي"
   }
 }
