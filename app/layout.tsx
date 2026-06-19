@@ -14,6 +14,7 @@ export default async function RootLayout({
   return (
     <html lang={locale} dir={dir} suppressHydrationWarning className={`${lemonMilk.variable} ${montserrat.variable} ${montserratArabic.variable}`} data-scroll-behavior="smooth">
       <head>
+        <script dangerouslySetInnerHTML={{ __html: 'window.puter = window.puter || {}; window.puter.quiet = true;' }} />
         <link rel="preconnect" href="https://cdn.sanity.io" />
         <link rel="dns-prefetch" href="https://cdn.sanity.io" />
         <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
