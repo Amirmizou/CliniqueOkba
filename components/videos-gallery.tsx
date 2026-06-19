@@ -18,7 +18,8 @@ import { AnimatedSection } from '@/components/ui/animated-section'
 import { LineReveal } from '@/components/ui/reveal-text'
 import dynamic from 'next/dynamic'
 
-const ReactPlayer = dynamic(() => import('react-player'), { ssr: false })
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const ReactPlayer = dynamic(() => import('react-player') as any, { ssr: false }) as any
 
 const EASE = [0.22, 1, 0.36, 1] as const
 
