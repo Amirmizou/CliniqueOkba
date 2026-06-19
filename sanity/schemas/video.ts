@@ -35,11 +35,16 @@ export default defineType({
         }),
         defineField({
             name: 'videoFile',
-            title: 'Fichier vidéo',
+            title: 'Fichier vidéo (upload direct)',
             type: 'file',
             options: { accept: 'video/mp4,video/webm' },
-            validation: (Rule) => Rule.required(),
-            description: 'MP4 recommandé (H.264). Compressez la vidéo avant envoi (max ~100 Mo).',
+            description: 'MP4 recommandé (H.264). Pour les vidéos > 500 Mo, préférez le champ URL externe ci-dessous.',
+        }),
+        defineField({
+            name: 'externalUrl',
+            title: 'URL externe (MP4/WebM direct) — pour les fichiers volumineux',
+            type: 'url',
+            description: 'Lien direct vers la vidéo hébergée sur un CDN, Google Drive ou tout autre hébergeur. Prioritaire sur le fichier uploadé. Recommandé pour les vidéos HD > 500 Mo.',
         }),
         defineField({
             name: 'poster',

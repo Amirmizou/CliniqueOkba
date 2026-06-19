@@ -4,14 +4,16 @@ import { isAuthenticated, revalidateSite } from '@/lib/admin/api'
 
 export const dynamic = 'force-dynamic'
 
-const STR = ['title', 'title_ar', 'description', 'description_ar', 'category'] as const
+const STR = ['title', 'title_ar', 'description', 'description_ar', 'category', 'externalUrl'] as const
 
 export async function GET() {
   if (!(await isAuthenticated())) return NextResponse.json({ error: 'Non autorisé' }, { status: 401 })
   const videos = await writeClient.fetch(
     `*[_type == "video"] | order(order asc) {
-      _id, title, title_ar, description, description_ar, category, order, active, poster,
-      "videoUrl": videoFile.asset->url, "videoRef": videoFile.asset._ref
+      _id, title, title_ar, description, description_ar, category, order, active, poster, externalUrl,
+      "videoUrl": coalesce(externalUrl, videoFile.asset->url),
+      "videoRef": videoFile.asset._ref,
+      "fileSize": videoFile.asset->size
     }`,
   )
   return NextResponse.json({ videos })
@@ -39,6 +41,8 @@ export async function POST(request: Request) {
     if (b.videoFile?._ref) {
       doc.videoFile = { _type: 'file', asset: { _type: 'reference', _ref: b.videoFile._ref } }
     }
+    // externalUrl prioritaire sur le fichier uploadé
+    doc.externalUrl = b.externalUrl || null
 
     let result
     if (b._id) {
