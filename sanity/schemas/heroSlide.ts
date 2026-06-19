@@ -28,12 +28,19 @@ export default defineType({
         }),
         defineField({
             name: 'image',
-            title: 'Image',
+            title: 'Image (ou laisser vide si vidéo)',
             type: 'image',
             options: {
                 hotspot: true,
             },
-            validation: (Rule) => Rule.required(),
+        }),
+        defineField({
+            name: 'videoFile',
+            title: 'Vidéo (optionnel — remplace l\'image si présente)',
+            type: 'file',
+            options: {
+                accept: 'video/mp4,video/webm',
+            },
         }),
         defineField({
             name: 'order',
