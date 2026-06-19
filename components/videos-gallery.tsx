@@ -18,7 +18,7 @@ import { AnimatedSection } from '@/components/ui/animated-section'
 import { LineReveal } from '@/components/ui/reveal-text'
 import dynamic from 'next/dynamic'
 
-const ReactPlayer = dynamic(() => import('react-player/lazy'), { ssr: false })
+const ReactPlayer = dynamic(() => import('react-player'), { ssr: false })
 
 const EASE = [0.22, 1, 0.36, 1] as const
 
