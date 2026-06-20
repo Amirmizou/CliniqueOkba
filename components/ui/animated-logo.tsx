@@ -268,7 +268,6 @@ export function AnimatedLogo({ className, size = 96 }: { className?: string; siz
             fill
             sizes={`${Math.round(size)}px`}
             className="object-contain p-2"
-            priority
           />
         </motion.div>
 

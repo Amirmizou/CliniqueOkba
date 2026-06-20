@@ -163,7 +163,6 @@ export function LogoBadge({
               fill
               sizes={`${Math.round(size)}px`}
               className="object-contain"
-              priority
             />
           </motion.div>
         </motion.div>

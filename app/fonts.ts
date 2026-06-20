@@ -75,7 +75,7 @@ export const lemonMilk = localFont({
         },
     ],
     display: 'swap',
-    preload: true,
+    preload: false,
     variable: '--font-lemon-milk',
     // Fallback lisible pendant le chargement et pour les caractères absents
     fallback: ['Montserrat', 'system-ui', 'arial'],
