@@ -126,6 +126,14 @@
     --font-title: var(--font-lemon-milk);
   }
 
+  /* RTL : reroute tous les tokens de police vers Montserrat Arabic.
+     Suffit pour que font-sans, font-heading et tout élément héritant
+     de --font-base / --font-title reçoivent automatiquement la police arabe. */
+  html[dir='rtl'] {
+    --font-base: var(--font-montserrat-arabic);
+    --font-title: var(--font-montserrat-arabic);
+  }
+
   * {
     @apply border-border outline-ring;
   }
