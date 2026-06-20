@@ -348,7 +348,11 @@
   "actionBar": {
     "call": "اتصال",
     "appointment": "موعد",
-    "directions": "الاتجاهات"
+    "directions": "الاتجاهات",
+    "ariaLabel": "إجراءات سريعة",
+    "callAria": "الاتصال بالعيادة",
+    "appointmentAria": "حجز موعد عبر واتساب",
+    "directionsAria": "الحصول على الاتجاهات إلى العيادة"
   },
   "map": {
     "directions": "الاتجاهات",

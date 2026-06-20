@@ -348,7 +348,11 @@
   "actionBar": {
     "call": "Appeler",
     "appointment": "RDV",
-    "directions": "Itinéraire"
+    "directions": "Itinéraire",
+    "ariaLabel": "Actions rapides",
+    "callAria": "Appeler la clinique",
+    "appointmentAria": "Prendre rendez-vous par WhatsApp",
+    "directionsAria": "Obtenir un itinéraire vers la clinique"
   },
   "map": {
     "directions": "Itinéraire",
