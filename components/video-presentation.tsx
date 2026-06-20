@@ -1,6 +1,6 @@
 'use client'
 
-import { useRef, useState, useEffect } from 'react'
+import { useRef, useState, useEffect, useCallback } from 'react'
 import Image from 'next/image'
 import {
   motion,
@@ -10,6 +10,7 @@ import {
   AnimatePresence,
 } from 'framer-motion'
 import { Play, Pause, Volume2, VolumeX } from 'lucide-react'
+import { UniversalPlayer } from '@/components/ui/universal-player'
 import { useTranslations } from 'next-intl'
 import { useReducedMotion } from '@/hooks/use-reduced-motion'
 import { urlFor } from '@/sanity/lib/image'
@@ -31,7 +32,6 @@ export default function VideoPresentation({
 }) {
   const t = useTranslations('videoSection')
   const sectionRef = useRef<HTMLElement>(null)
-  const videoRef = useRef<HTMLVideoElement>(null)
   const prefersReducedMotion = useReducedMotion()
 
   const [isPlaying, setIsPlaying] = useState(false)
@@ -41,8 +41,8 @@ export default function VideoPresentation({
   const [hasAutoPlayed, setHasAutoPlayed] = useState(false)
 
   // Détection d'entrée dans la vue → déclenche la lecture auto
-  // (cible la vidéo elle-même : déclenche quand ~40 % est visible)
-  const inView = useInView(videoRef, { amount: 0.4 })
+  // (cible la section : déclenche quand ~40 % est visible)
+  const inView = useInView(sectionRef, { amount: 0.4 })
 
   // Progression de défilement : pilote la transition blanc → noir (cinéma)
   const { scrollYProgress } = useScroll({
@@ -71,53 +71,28 @@ export default function VideoPresentation({
     : '/_next/image?url=%2Fvideos%2Fpromo-poster.png&w=1080&q=75' // LCP Fix : on force Next.js à compresser cette image lourde en WebP
 
   // Lecture automatique UNE SEULE FOIS quand la vidéo entre dans la vue
-  // (muette = autorisée par le navigateur). En quittant la vue : pause, mais
-  // pas de relance automatique au retour — le visiteur relance manuellement.
   useEffect(() => {
-    const v = videoRef.current
-    if (!v || prefersReducedMotion) return
+    if (prefersReducedMotion) return
     if (inView && !hasAutoPlayed) {
-      v.play().catch(() => {})
+      setIsPlaying(true)
       setHasAutoPlayed(true)
     } else if (!inView) {
-      v.pause()
+      setIsPlaying(false)
     }
   }, [inView, hasAutoPlayed, prefersReducedMotion])
 
-  // Synchronise l'état du bouton avec la vidéo
-  useEffect(() => {
-    const v = videoRef.current
-    if (!v) return
-    const onPlay = () => setIsPlaying(true)
-    const onPause = () => setIsPlaying(false)
-    v.addEventListener('play', onPlay)
-    v.addEventListener('pause', onPause)
-    return () => {
-      v.removeEventListener('play', onPlay)
-      v.removeEventListener('pause', onPause)
-    }
-  }, [])
-
   const togglePlay = () => {
-    const v = videoRef.current
-    if (!v) return
+    console.log('[Video Debug] togglePlay clicked. Current state:', isPlaying)
     setHasInteracted(true)
-    if (v.paused) {
-      // Si la vidéo est terminée, on la relit depuis le début
-      if (v.ended) v.currentTime = 0
-      v.play().catch(() => {})
-    } else {
-      v.pause()
-    }
+    setIsPlaying(!isPlaying)
   }
 
   const toggleMute = () => {
-    const v = videoRef.current
-    if (!v) return
     setHasInteracted(true)
-    v.muted = !v.muted
-    setIsMuted(v.muted)
+    setIsMuted(!isMuted)
   }
+
+  console.log('[Video Debug] VideoPresentation rendering. videoSrc:', videoSrc, 'isPlaying:', isPlaying)
 
   return (
     <section
@@ -263,20 +238,19 @@ export default function VideoPresentation({
               )}
 
               <div className="relative z-10 overflow-hidden rounded-none bg-black shadow-2xl sm:rounded-[1.9rem]">
-                <video
-                  ref={videoRef}
-                  key={videoSrc}
-                  className="aspect-video max-h-[88vh] w-full cursor-pointer object-cover"
-                  preload="none"
-                  playsInline
-                  muted={isMuted}
+                <UniversalPlayer
+                  url={videoSrc}
                   poster={posterSrc}
+                  muted={isMuted}
+                  loop={false}
+                  controls={false}
+                  playing={isPlaying}
+                  className="aspect-video max-h-[88vh] w-full cursor-pointer object-cover"
+                  onPlay={() => setIsPlaying(true)}
+                  onPause={() => setIsPlaying(false)}
                   onClick={togglePlay}
-                  aria-label="Vidéo de présentation de la Clinique OKBA"
-                >
-                  <source src={videoSrc} type="video/mp4" />
-                  Votre navigateur ne prend pas en charge la lecture vidéo.
-                </video>
+                  onEnded={() => setIsPlaying(false)}
+                />
 
                 {/* Voile dégradé pour lisibilité des contrôles */}
                 <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />

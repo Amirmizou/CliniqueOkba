@@ -12,7 +12,10 @@ import {
     ChevronRight,
     Phone,
     CalendarHeart,
+    Play,
+    Pause,
 } from 'lucide-react'
+import { UniversalPlayer } from '@/components/ui/universal-player'
 import Image from 'next/image'
 import { useTranslations, useLocale } from 'next-intl'
 import { useReducedMotion } from '@/hooks/use-reduced-motion'
@@ -185,13 +188,13 @@ export default function HeroCarousel({ slides: rawSlides = [], siteSettings, sec
                             className="relative h-full w-full"
                         >
                             {currentSlide.videoUrl ? (
-                                <video
-                                    src={currentSlide.videoUrl}
-                                    autoPlay
-                                    loop
-                                    muted
-                                    playsInline
-                                    className="absolute inset-0 h-full w-full object-cover object-center"
+                                <UniversalPlayer
+                                    url={currentSlide.videoUrl}
+                                    playing={isAutoPlaying}
+                                    muted={true}
+                                    loop={true}
+                                    controls={false}
+                                    className="absolute left-0 top-0 h-full w-full object-cover"
                                 />
                             ) : (
                                 <Image

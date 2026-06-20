@@ -17,6 +17,7 @@ import {
   Layers,
   Clock,
 } from 'lucide-react'
+import { UniversalPlayer } from '@/components/ui/universal-player'
 import { Link } from '@/navigation'
 import { ECGLine, ecgVariantForIcon } from '@/components/ui/ecg-line'
 import { PoleMotif, motifVariantForIcon } from '@/components/ui/pole-motif'
@@ -449,15 +450,15 @@ export default function PolePageContent({
                     className="relative aspect-video w-full"
                   >
                     {videoPlaying ? (
-                      <video
-                        src={current.videoUrl}
+                      <UniversalPlayer
+                        url={current.videoUrl}
                         poster={posterUrlOf(current)}
-                        controls
-                        autoPlay
-                        playsInline
-                        preload="metadata"
-                        onEnded={() => setVideoPlaying(false)}
+                        controls={true}
+                        playing={videoPlaying}
                         className="h-full w-full object-contain"
+                        onPlay={() => setVideoPlaying(true)}
+                        onPause={() => setVideoPlaying(false)}
+                        onEnded={() => setVideoPlaying(false)}
                         aria-label={current.title || pole.title}
                       />
                     ) : (

@@ -13,6 +13,7 @@ export const heroSlidesQuery = groq`
     subtitle,
     subtitle_ar,
     image,
+    "videoUrl": videoFile.asset->url,
     order
   }
 `
