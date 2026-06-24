@@ -1,10 +1,10 @@
 'use client'
 
-import { Stethoscope, Home, PhoneCall, Clock, CheckCircle2 } from 'lucide-react'
-import { Button } from '@/components/ui/button'
+import { Stethoscope, Home, PhoneCall, Clock, CheckCircle2, Syringe, HeartPulse, Thermometer, ArrowRight, Shield } from 'lucide-react'
 import { motion } from 'framer-motion'
 import Image from 'next/image'
 import { useLocale, useTranslations } from 'next-intl'
+import { ECGLine } from '@/components/ui/ecg-line'
 
 interface SectionContent {
   badge?: string
@@ -37,6 +37,9 @@ interface HomeCareProps {
   sectionContent?: SectionContent
 }
 
+/** Icônes pour les prestations par défaut */
+const SERVICE_ICONS = [Syringe, HeartPulse, Thermometer, Shield, Stethoscope, CheckCircle2]
+
 export default function HomeCare({ data, sectionContent }: HomeCareProps) {
   const scrollToContact = () => {
     const url = new URL(window.location.href)
@@ -51,7 +54,6 @@ export default function HomeCare({ data, sectionContent }: HomeCareProps) {
 
   const hasArabicLetters = (text?: string) => /[\u0600-\u06FF]/.test(text || '');
 
-  // Workaround pour Sanity: si la donnée n'est pas en arabe alors qu'on est sur la version arabe, on force la traduction locale
   const badge = sectionContent?.badge && (!isAr || hasArabicLetters(sectionContent.badge)) ? sectionContent.badge : data?.badge && (!isAr || hasArabicLetters(data.badge)) ? data.badge : t('badge')
   const title = sectionContent?.title && (!isAr || hasArabicLetters(sectionContent.title)) ? sectionContent.title : data?.title && (!isAr || hasArabicLetters(data.title)) ? data.title : t('title')
   const subtitle = sectionContent?.subtitle && (!isAr || hasArabicLetters(sectionContent.subtitle)) ? sectionContent.subtitle : data?.subtitle && (!isAr || hasArabicLetters(data.subtitle)) ? data.subtitle : data?.description || t('subtitle')
@@ -61,122 +63,181 @@ export default function HomeCare({ data, sectionContent }: HomeCareProps) {
   const contactPrompt = data?.contactPrompt && (!isAr || hasArabicLetters(data.contactPrompt)) ? data.contactPrompt : t('contactPrompt')
   const ctaText = data?.callToAction?.text && (!isAr || hasArabicLetters(data.callToAction.text)) ? data.callToAction.text : t('ctaText')
 
+  // Prestations par défaut si rien de Sanity
+  const defaultPrestations = isAr
+    ? ['حقن وإعطاء الأدوية', 'تغيير الضمادات', 'مراقبة العلامات الحيوية']
+    : ['Injections et administration de médicaments', 'Changement de pansements', 'Surveillance des constantes vitales']
+
+  const displayPrestations = prestations.length > 0 ? prestations : defaultPrestations
+
   return (
-    <section id='home-care' className='bg-background py-20'>
-      <div className='mx-auto max-w-7xl px-4 sm:px-6 lg:px-8'>
-        <div className='grid gap-12 lg:grid-cols-2 lg:items-center'>
-          
-          <div className='space-y-8'>
-            <div className='space-y-4'>
-              <p className='text-primary text-sm font-semibold tracking-wide uppercase'>
-                {badge}
-              </p>
-              <h2 className='text-foreground text-4xl font-bold'>
-                {title}
-              </h2>
-              <p className='text-muted-foreground text-lg'>
-                {subtitle}
-              </p>
-            </div>
+    <section id='home-care' className='relative overflow-hidden bg-gradient-to-b from-emerald-950 via-emerald-900 to-emerald-950 py-20 sm:py-24 md:py-28'>
+      {/* ── Décor de fond ── */}
+      <div className="pointer-events-none absolute inset-0">
+        {/* Glow top-left */}
+        <div className="absolute -top-40 -left-40 h-[500px] w-[500px] rounded-full bg-emerald-500/10 blur-[120px]" />
+        {/* Glow bottom-right */}
+        <div className="absolute -bottom-40 -right-40 h-[500px] w-[500px] rounded-full bg-teal-500/8 blur-[120px]" />
+        {/* Grid pattern */}
+        <div
+          className="absolute inset-0 opacity-[0.04]"
+          style={{
+            backgroundImage: 'radial-gradient(circle, rgba(255,255,255,0.3) 1px, transparent 1px)',
+            backgroundSize: '32px 32px',
+          }}
+        />
+      </div>
 
-            <div className='grid gap-6 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2'>
-              <motion.div
-                className='bg-card relative overflow-hidden rounded-2xl border p-6 shadow-sm'
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, amount: 0.3 }}
-                transition={{ duration: 0.5 }}
-              >
-                <div className='mb-4 flex items-center gap-3'>
-                  <Home className='text-primary h-6 w-6' />
-                  <h3 className='text-foreground text-xl font-semibold'>{t('prestations')}</h3>
-                </div>
-                <ul className='space-y-3'>
-                  {prestations.length > 0 ? (
-                    prestations.map((item) => (
-                      <li key={item} className='flex items-start gap-3'>
-                        <CheckCircle2 className='text-primary mt-0.5 h-5 w-5 flex-shrink-0' />
-                        <span className='text-foreground text-sm'>{item}</span>
-                      </li>
-                    ))
-                  ) : (
-                    <>
-                      <li className='flex items-start gap-3'>
-                        <CheckCircle2 className='text-primary mt-0.5 h-5 w-5 flex-shrink-0' />
-                        <span className='text-foreground text-sm'>{isAr ? 'حقن وإعطاء الأدوية' : 'Injections et administration de médicaments'}</span>
-                      </li>
-                      <li className='flex items-start gap-3'>
-                        <CheckCircle2 className='text-primary mt-0.5 h-5 w-5 flex-shrink-0' />
-                        <span className='text-foreground text-sm'>{isAr ? 'تغيير الضمادات' : 'Changement de pansements'}</span>
-                      </li>
-                      <li className='flex items-start gap-3'>
-                        <CheckCircle2 className='text-primary mt-0.5 h-5 w-5 flex-shrink-0' />
-                        <span className='text-foreground text-sm'>{isAr ? 'مراقبة العلامات الحيوية' : 'Surveillance des constantes vitales'}</span>
-                      </li>
-                    </>
-                  )}
-                </ul>
-              </motion.div>
+      <div className='relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8'>
 
-              <motion.div
-                className='bg-card relative overflow-hidden rounded-2xl border p-6 shadow-sm'
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, amount: 0.3 }}
-                transition={{ duration: 0.5, delay: 0.1 }}
-              >
-                <div className='mb-4 flex items-center gap-3'>
-                  <Stethoscope className='text-primary h-6 w-6' />
-                  <h3 className='text-foreground text-xl font-semibold'>{availabilityTitle}</h3>
-                </div>
-                <div className='space-y-4'>
-                  <div className='flex items-center gap-3'>
-                    <Clock className='text-primary h-5 w-5' />
-                    <p className='text-muted-foreground text-sm'>{availabilityText}</p>
-                  </div>
-                  <div className='flex items-start gap-3'>
-                    <PhoneCall className='text-primary mt-1 h-5 w-5' />
-                    <div className='flex flex-col'>
-                      <p className='text-muted-foreground text-sm'>{contactPrompt}</p>
-                      <div className="mt-2 flex flex-col sm:flex-row sm:gap-2 font-bold text-lg text-foreground" dir="ltr">
-                        <a href="tel:0563015916" className="hover:text-primary transition-colors">0563 01 59 16</a>
-                        <span className="hidden sm:inline text-muted-foreground">/</span>
-                        <a href="tel:0563015917" className="hover:text-primary transition-colors">0563 01 59 17</a>
-                      </div>
-                    </div>
-                  </div>
-                  <div className='pt-2'>
-                    <Button onClick={scrollToContact} className='bg-primary hover:bg-primary/90 text-primary-foreground w-full'>
-                      {ctaText}
-                    </Button>
-                  </div>
-                </div>
-              </motion.div>
-            </div>
+        {/* ── En-tête de section ── */}
+        <motion.div
+          className="mb-14 text-center"
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: '-60px' }}
+          transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+        >
+          <span className="mb-4 inline-flex items-center gap-2 rounded-full border border-emerald-400/20 bg-emerald-400/10 px-4 py-2 text-sm font-semibold text-emerald-300">
+            <Home className="h-4 w-4" />
+            {badge}
+          </span>
+          <h2 className="mt-4 text-3xl font-bold text-white sm:text-4xl md:text-5xl">
+            {title}
+          </h2>
+          <p className="mx-auto mt-4 max-w-2xl text-base text-emerald-100/60 sm:text-lg">
+            {subtitle}
+          </p>
+          {/* ECG accent */}
+          <div className="mx-auto mt-6 h-8 max-w-xs">
+            <ECGLine color="rgba(52,211,153,0.5)" height={32} />
           </div>
+        </motion.div>
 
+        {/* ── Layout principal : image + contenu ── */}
+        <div className='grid gap-10 lg:grid-cols-2 lg:items-center lg:gap-16'>
+
+          {/* Colonne image — ambulance avec overlay */}
           <motion.div
-            className='relative h-[400px] w-full overflow-hidden rounded-3xl lg:h-[600px] xl:h-[650px]'
-            initial={{ opacity: 0, scale: 0.95 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            viewport={{ once: true, amount: 0.3 }}
-            transition={{ duration: 0.6 }}
+            className='group relative order-2 lg:order-1'
+            initial={{ opacity: 0, x: -40 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true, margin: '-60px' }}
+            transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
           >
-            <Image
-              src="/images/spec/sad.jpeg"
-              alt={title || 'Soins à domicile'}
-              fill
-              className="object-cover"
-              sizes="(max-width: 1024px) 100vw, 50vw"
-            />
-            <div className="absolute inset-0 rounded-3xl ring-1 ring-inset ring-black/10" />
+            <div className="relative h-[400px] w-full overflow-hidden rounded-3xl lg:h-[540px]">
+              <Image
+                src="/images/spec/sad.jpeg"
+                alt={title || 'Soins à domicile'}
+                fill
+                className="object-cover transition-transform duration-700 group-hover:scale-[1.03]"
+                sizes="(max-width: 1024px) 100vw, 50vw"
+              />
+              {/* Overlay gradient */}
+              <div className="absolute inset-0 bg-gradient-to-t from-emerald-950/80 via-emerald-950/20 to-transparent" />
+              {/* Inner ring */}
+              <div className="absolute inset-0 rounded-3xl ring-1 ring-inset ring-white/10" />
+
+              {/* Badge flottant "24/7" */}
+              <div className="absolute bottom-6 left-6 flex items-center gap-3 rounded-2xl border border-white/10 bg-white/10 px-5 py-3.5 backdrop-blur-xl">
+                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-500 shadow-lg shadow-emerald-500/30">
+                  <Clock className="h-5 w-5 text-white" />
+                </div>
+                <div>
+                  <p className="text-sm font-bold text-white">7j/7</p>
+                  <p className="text-xs text-white/60">{availabilityText}</p>
+                </div>
+              </div>
+            </div>
           </motion.div>
 
+          {/* Colonne contenu */}
+          <div className='order-1 space-y-6 lg:order-2'>
+
+            {/* ── Prestations ── */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: '-40px' }}
+              transition={{ duration: 0.5, delay: 0.1 }}
+            >
+              <div className="mb-4 flex items-center gap-3">
+                <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-500/20">
+                  <Stethoscope className="h-5 w-5 text-emerald-400" />
+                </div>
+                <h3 className="text-lg font-bold text-white">{t('prestations')}</h3>
+              </div>
+              <div className="space-y-3">
+                {displayPrestations.map((item, i) => {
+                  const IconComp = SERVICE_ICONS[i % SERVICE_ICONS.length]
+                  return (
+                    <motion.div
+                      key={item}
+                      initial={{ opacity: 0, x: 20 }}
+                      whileInView={{ opacity: 1, x: 0 }}
+                      viewport={{ once: true }}
+                      transition={{ duration: 0.4, delay: 0.15 + i * 0.06 }}
+                      className="group/item flex items-center gap-4 rounded-2xl border border-white/5 bg-white/[0.04] p-4 backdrop-blur-sm transition-all duration-300 hover:border-emerald-400/20 hover:bg-white/[0.07]"
+                    >
+                      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-emerald-500/15 text-emerald-400 transition-colors duration-300 group-hover/item:bg-emerald-500/25">
+                        <IconComp className="h-5 w-5" />
+                      </div>
+                      <span className="text-sm font-medium text-emerald-50/90">{item}</span>
+                    </motion.div>
+                  )
+                })}
+              </div>
+            </motion.div>
+
+            {/* ── Contact & CTA ── */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: '-40px' }}
+              transition={{ duration: 0.5, delay: 0.3 }}
+              className="rounded-2xl border border-emerald-400/15 bg-gradient-to-br from-emerald-500/10 via-emerald-600/5 to-transparent p-6 backdrop-blur-sm"
+            >
+              <div className="mb-4 flex items-center gap-3">
+                <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-500/20">
+                  <PhoneCall className="h-5 w-5 text-emerald-400" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-bold text-white">{availabilityTitle}</h3>
+                  <p className="text-xs text-emerald-100/50">{contactPrompt}</p>
+                </div>
+              </div>
+
+              {/* Numéros de téléphone */}
+              <div className="mb-5 flex flex-col gap-2 sm:flex-row" dir="ltr">
+                <a
+                  href="tel:0563015916"
+                  className="inline-flex flex-1 items-center justify-center gap-2 rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-base font-bold text-white transition-all duration-200 hover:border-emerald-400/30 hover:bg-white/10"
+                >
+                  <PhoneCall className="h-4 w-4 text-emerald-400" />
+                  0563 01 59 16
+                </a>
+                <a
+                  href="tel:0563015917"
+                  className="inline-flex flex-1 items-center justify-center gap-2 rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-base font-bold text-white transition-all duration-200 hover:border-emerald-400/30 hover:bg-white/10"
+                >
+                  <PhoneCall className="h-4 w-4 text-emerald-400" />
+                  0563 01 59 17
+                </a>
+              </div>
+
+              {/* CTA button */}
+              <button
+                onClick={scrollToContact}
+                className="group/btn inline-flex w-full items-center justify-center gap-2 rounded-xl bg-emerald-500 px-6 py-3.5 text-sm font-bold text-white shadow-lg shadow-emerald-500/25 transition-all duration-300 hover:bg-emerald-400 hover:shadow-emerald-500/40 active:scale-[0.98]"
+              >
+                {ctaText}
+                <ArrowRight className="h-4 w-4 transition-transform duration-200 group-hover/btn:translate-x-1" />
+              </button>
+            </motion.div>
+
+          </div>
         </div>
       </div>
     </section>
   )
 }
-
-
-
