@@ -22,7 +22,8 @@
       "Bash(git -c core.quotepath=false status --short)",
       "Bash(git -c core.quotepath=false diff --stat)",
       "PowerShell(Get-CimInstance *)",
-      "PowerShell($c = Get-NetTCPConnection -LocalPort 3000 -State Listen -ErrorAction SilentlyContinue; if\\($c\\){ $c.OwningProcess | Select -Unique | %{ Stop-Process -Id $_ -Force -ErrorAction SilentlyContinue } }; \"stopped\")"
+      "PowerShell($c = Get-NetTCPConnection -LocalPort 3000 -State Listen -ErrorAction SilentlyContinue; if\\($c\\){ $c.OwningProcess | Select -Unique | %{ Stop-Process -Id $_ -Force -ErrorAction SilentlyContinue } }; \"stopped\")",
+      "Bash(git rev-list *)"
     ]
   }
 }

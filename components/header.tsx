@@ -184,8 +184,8 @@ export default function Header({ siteSettings, poles }: HeaderProps) {
   return (
     <>
       <header className="fixed inset-x-0 top-0 z-[100] flex justify-center px-4 pt-4 pointer-events-none">
-
-        {/* MOBILE & TABLET FALLBACK — barre + mini-gantry (hamburger = bore) */}
+        
+        {/* MOBILE & TABLET FALLBACK */}
         <div className="pointer-events-auto w-full max-w-7xl flex items-center justify-between rounded-2xl bg-white/95 backdrop-blur-md shadow-[0_8px_30px_rgb(0,0,0,0.12)] border border-gray-100 px-4 py-3 xl:hidden">
           <a href="/" className="flex items-center gap-3">
             <div className="relative h-10 w-10 rounded-full bg-white p-1 shadow-sm ring-1 ring-gray-100">
@@ -198,191 +198,82 @@ export default function Header({ siteSettings, poles }: HeaderProps) {
           </a>
           <div className="flex items-center gap-3">
             <LanguageSwitcher />
-            {/* Gantry réduit : arche claire + liseré rouge Siemens + bore sombre cliquable */}
-            <div
-              className="relative flex h-12 w-12 items-center justify-center"
-              style={{
-                borderRadius: '24px 24px 8px 8px',
-                background: 'radial-gradient(120% 120% at 32% 20%, #ffffff 0%, #eee 55%, #d7d7d7 100%)',
-                boxShadow: 'inset 1px 2px 3px rgba(255,255,255,1), inset -2px -3px 6px rgba(0,0,0,0.14), 0 2px 6px rgba(0,0,0,0.14)',
-              }}
+            <button
+              ref={menuButtonRef}
+              className="flex h-10 w-10 cursor-pointer items-center justify-center rounded-full bg-gray-100 text-gray-600 transition-colors hover:bg-gray-200"
+              onClick={() => setIsOpen((v) => !v)}
             >
-              {/* Liseré rouge Siemens */}
-              <span className="absolute right-1 top-2 bottom-2 w-[3px] rounded-full bg-[#EC0016] opacity-90 shadow-[0_0_6px_rgba(236,0,22,0.4)]" aria-hidden="true" />
-              {/* Bore = bouton menu */}
-              <button
-                ref={menuButtonRef}
-                onClick={() => setIsOpen((v) => !v)}
-                aria-label={isOpen ? 'Fermer le menu' : 'Ouvrir le menu'}
-                aria-expanded={isOpen}
-                aria-controls="mobile-menu"
-                className="flex h-8 w-8 cursor-pointer items-center justify-center rounded-full text-white transition-transform active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#EC0016]"
-                style={{
-                  background: 'radial-gradient(circle at 50% 40%, #2a2a2a 0%, #111 100%)',
-                  boxShadow: 'inset 0 2px 5px rgba(0,0,0,0.9), 0 1px 2px rgba(255,255,255,0.85)',
-                }}
-              >
-                {isOpen ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
-              </button>
-            </div>
+              {isOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+            </button>
           </div>
         </div>
 
-        {/* DESKTOP (xl+) : scanner complet au repos ↔ barre compacte au scroll */}
-        <div className="pointer-events-none relative mx-auto hidden h-[330px] w-full max-w-5xl xl:block">
+        {/* 3D SCANNER DESKTOP (Echelle réduite) */}
+        <div className={cn("pointer-events-auto relative w-full max-w-4xl mx-auto h-[110px] hidden xl:block transition-all duration-700 origin-top mt-4", isScrolled ? "scale-95 -translate-y-2 opacity-95" : "scale-100 translate-y-0 opacity-100")}>
+          
+          {/* BASE / PEDESTAL */}
+          <div className="absolute left-[15%] right-[25%] bottom-[0px] h-[30px] z-0 flex flex-col justify-end items-center">
+            {/* Accordéon */}
+            <div className="w-[80%] h-[20px] shadow-[inset_0_2px_4px_rgba(0,0,0,0.2)]"
+                 style={{ background: 'repeating-linear-gradient(180deg, #d4d4d4, #d4d4d4 3px, #e8e8e8 3px, #e8e8e8 6px)' }} />
+            {/* Socle */}
+            <div className="w-[85%] h-[10px] bg-gradient-to-b from-[#e0e0e0] to-[#c5c5c5] rounded-b-lg shadow-[0_10px_20px_rgba(0,0,0,0.15)]" />
+          </div>
 
-          {/* ============ SCANNER COMPLET (au repos) ============ */}
-          <div
-            className={cn(
-              'absolute inset-x-0 bottom-0 h-[320px] origin-top transition-all duration-500 ease-out',
-              isScrolled ? 'pointer-events-none scale-95 opacity-0' : 'pointer-events-auto scale-100 opacity-100',
-            )}
-          >
-            {/* BASE / PIÉDESTAL */}
-            <div className="absolute left-[15%] right-[25%] bottom-0 h-[24px] bg-[#d5d5d5] rounded-b-xl shadow-[0_15px_30px_rgba(0,0,0,0.15)] z-0 flex flex-col justify-end pb-1 border-b-2 border-[#b0b0b0]">
-              <div className="w-full h-2 bg-[#c0c0c0] rounded-full blur-[2px] opacity-50" />
+          {/* GANTRY (Anneau à droite) */}
+          <div className="absolute right-[20px] bottom-[5px] w-[140px] h-[110px] z-10 transition-transform duration-700 hover:scale-[1.02]" style={{
+            borderRadius: '70px 70px 10px 10px',
+            background: 'radial-gradient(120% 120% at 30% 20%, #ffffff 0%, #e8e8e8 60%, #c4c4c4 100%)',
+            boxShadow: '-8px 8px 15px rgba(0,0,0,0.15), inset 3px 5px 10px rgba(255,255,255,1), inset -3px -3px 10px rgba(0,0,0,0.1)'
+          }}>
+            {/* Logo */}
+            <div className="absolute top-[8px] left-1/2 -translate-x-1/2 flex flex-col items-center leading-none">
+              <span className="text-[7px] font-extrabold text-[#006633] tracking-widest uppercase whitespace-nowrap">{clinicNameText}</span>
+              <span className="text-[6px] font-bold text-[#EC0016] mt-[1px] uppercase tracking-[0.2em]">Scanner 3D</span>
             </div>
 
-            {/* Colonne support strié */}
-            <div
-              className="absolute left-[20%] right-[30%] bottom-[24px] h-[56px] z-10 shadow-[inset_0_4px_10px_rgba(0,0,0,0.1),_inset_0_-4px_10px_rgba(0,0,0,0.15)]"
-              style={{
-                background: 'repeating-linear-gradient(180deg, #d8d8d8, #d8d8d8 6px, #f4f4f4 6px, #f4f4f4 12px)',
-                borderRadius: '4px 4px 0 0',
-              }}
-            />
-
-            {/* GANTRY (anneau d'imagerie, à droite) */}
-            <div
-              className="absolute right-0 bottom-0 w-[340px] h-[320px] z-20 transition-transform duration-700 hover:scale-[1.01]"
-              style={{
-                borderRadius: '170px 170px 20px 20px',
-                background: 'radial-gradient(130% 120% at 32% 18%, #ffffff 0%, #f6f6f6 32%, #e6e6e6 68%, #d4d4d4 100%)',
-                boxShadow:
-                  '-15px 15px 35px rgba(0,0,0,0.14), inset 5px 7px 18px rgba(255,255,255,1), inset -6px -8px 28px rgba(0,0,0,0.08), 2px 0 0 rgba(255,255,255,0.5)',
-              }}
-            >
-              {/* Reflet glossy haut-gauche */}
-              <div
-                aria-hidden="true"
-                className="absolute inset-0 z-10"
-                style={{
-                  borderRadius: '170px 170px 20px 20px',
-                  background:
-                    'radial-gradient(70% 45% at 30% 12%, rgba(255,255,255,0.85) 0%, rgba(255,255,255,0) 60%)',
-                }}
-              />
-
-              {/* Logo / titre */}
-              <div className="absolute top-7 left-1/2 -translate-x-1/2 z-30 flex flex-col items-center">
-                <span className="font-display text-sm font-extrabold text-[#006633] tracking-widest uppercase whitespace-nowrap">
-                  {clinicNameText}
-                </span>
-                <span className="text-[8px] font-bold text-[#EC0016] tracking-[0.3em] uppercase mt-0.5 whitespace-nowrap">
-                  SPECT / CT
-                </span>
-              </div>
-
-              {/* Anneaux concentriques (détecteurs type CT) */}
-              <div aria-hidden="true" className="absolute top-[58px] left-1/2 -translate-x-1/2 w-[224px] h-[224px] rounded-full z-20 border border-black/[0.06] shadow-[inset_0_2px_6px_rgba(0,0,0,0.05)]" />
-              <div aria-hidden="true" className="absolute top-[74px] left-1/2 -translate-x-1/2 w-[192px] h-[192px] rounded-full z-20 border border-black/[0.07]" />
-
-              {/* Bore (tunnel) */}
-              <div
-                className="absolute top-[90px] left-1/2 -translate-x-1/2 w-[160px] h-[160px] rounded-full z-30"
-                style={{
-                  background: 'radial-gradient(circle at 50% 38%, #2a2a2a 0%, #161616 45%, #0a0a0a 100%)',
-                  boxShadow:
-                    'inset 0 12px 30px rgba(0,0,0,0.95), inset 0 -3px 8px rgba(255,255,255,0.06), 0 2px 6px rgba(255,255,255,0.95), inset 0 2px 3px rgba(0,0,0,0.6)',
-                  border: '1px solid #3a3a3a',
-                }}
-              >
-                {/* Halo interne du tunnel */}
-                <div aria-hidden="true" className="absolute inset-[14px] rounded-full border border-white/5" />
-                <div aria-hidden="true" className="absolute inset-[30px] rounded-full bg-[radial-gradient(circle,rgba(255,255,255,0.05),transparent_70%)]" />
-                {/* Témoin laser rouge */}
-                <div className="absolute top-1/2 right-4 -translate-y-1/2 w-1.5 h-1.5 rounded-full bg-[#EC0016] shadow-[0_0_10px_rgba(236,0,22,1)] animate-pulse" />
-              </div>
-
-              {/* Liseré rouge Siemens */}
-              <div className="absolute right-[22px] top-[38px] bottom-[28px] w-[3px] bg-[#EC0016] rounded-full opacity-90 shadow-[0_0_8px_rgba(236,0,22,0.4)] z-30" />
-
-              {/* Étiquette latérale */}
-              <div className="absolute right-[-14px] top-[140px] z-30 bg-[#EC0016] text-white px-2 py-0.5 text-[10px] font-bold rounded-l-md rotate-90 origin-right shadow-md whitespace-nowrap">
-                Clinique Okba
-              </div>
+            {/* Ouverture centrale (Bore) */}
+            <div className="absolute top-[35px] left-1/2 -translate-x-1/2 w-[55px] h-[55px] rounded-full" style={{
+              background: 'radial-gradient(circle at center, #000000 0%, #2a2a2a 100%)',
+              boxShadow: 'inset 0 4px 10px rgba(0,0,0,0.9), 0 1px 2px rgba(255,255,255,0.8)'
+            }}>
+                <div className="absolute top-[40%] right-2 w-1 h-1 rounded-full bg-red-500 shadow-[0_0_6px_rgba(239,68,68,1)] animate-pulse" />
             </div>
 
-            {/* PLATEAU (table, à gauche) + menu */}
-            <div
-              className="absolute right-[240px] left-0 bottom-[60px] h-[100px] z-30 flex flex-col justify-end"
-              style={{
-                borderRadius: '50px 0 0 50px',
-                background: 'linear-gradient(180deg, #fbfbfb 0%, #f4f4f4 100%)',
-                boxShadow:
-                  '0 4px 12px rgba(0,0,0,0.12), inset 0 2px 4px rgba(255,255,255,0.95), inset 0 -3px 10px rgba(0,0,0,0.05)',
-                border: '1px solid rgba(0,0,0,0.05)',
-              }}
-            >
-              <div className="absolute bottom-2 left-[20px] right-0 h-[4px] bg-[#EC0016] rounded-l-full shadow-[0_2px_4px_rgba(236,0,22,0.3)]" />
+            {/* Liseré rouge contour */}
+            <div className="absolute right-[8px] top-[15px] bottom-[10px] w-[1.5px] bg-[#EC0016] rounded-full shadow-[0_0_4px_rgba(236,0,22,0.3)]" />
 
-              <div className="absolute inset-0 flex items-center justify-between px-8 pt-2 pb-4">
-                <a href="/" className="flex items-center gap-3 shrink-0 mr-4 group">
-                  <div className="relative h-12 w-12 rounded-full bg-white p-1 shadow-sm ring-1 ring-gray-100 transition-transform group-hover:scale-105">
-                    <Image src="/logo.png" alt="Logo" fill className="object-contain p-1" />
-                  </div>
-                  <div className="flex flex-col">
-                    <span className="text-sm font-extrabold text-[#006633] leading-none uppercase">Centre</span>
-                    <span className="text-sm font-extrabold text-[#006633] leading-none uppercase mt-1">Diagnostic</span>
-                  </div>
-                </a>
-
-                <nav className="flex-1 flex items-center justify-around px-4" onMouseLeave={() => setHovered(null)} aria-label="Navigation principale">
-                  <NavIconLink icon={Home} label={t('center')} isActive={indicatorKey === 'about'} onClick={() => scrollToSection('#about')} onHover={() => setHovered('about')} />
-                  <NavIconLink icon={User} label={t('team')} isActive={false} onClick={() => scrollToSection('/equipe')} onHover={() => setHovered('team')} />
-                  <NavIconDropdown icon={Stethoscope} label={t('specialties')} isActive={indicatorKey === 'specialties'} onHover={() => setHovered('specialties')} poles={navPoles} />
-                  <NavIconLink icon={ClipboardList} label={t('exams')} isActive={false} onClick={() => scrollToSection('#specialties')} onHover={() => setHovered('specialties')} />
-                  <NavIconLink icon={Info} label={t('faq')} isActive={indicatorKey === 'faq'} onClick={() => scrollToSection('/faq')} onHover={() => setHovered('faq')} />
-                  <NavIconLink icon={Mail} label={t('contact')} isActive={indicatorKey === 'contact'} onClick={() => scrollToSection('#contact')} onHover={() => setHovered('contact')} />
-                </nav>
-
-                <div className="shrink-0 pl-6 border-l border-gray-300">
-                  <LanguageSwitcher />
-                </div>
-              </div>
+            {/* Badge */}
+            <div className="absolute right-[-8px] top-[60px] bg-[#EC0016] text-white px-1.5 py-[1px] text-[6px] font-bold rounded-l-sm rotate-90 origin-right shadow-sm whitespace-nowrap">
+              Clinique Okba
             </div>
           </div>
 
-          {/* ============ BARRE COMPACTE (au scroll) ============ */}
-          <div
-            className={cn(
-              'absolute inset-x-0 top-0 transition-all duration-500 ease-out',
-              isScrolled ? 'pointer-events-auto translate-y-0 opacity-100' : 'pointer-events-none -translate-y-3 opacity-0',
-            )}
-          >
-            <div
-              className="relative flex h-[72px] items-center gap-4 rounded-[36px] border border-black/[0.06] pl-5 pr-2 backdrop-blur-md"
-              style={{
-                background: 'linear-gradient(180deg, #fbfbfb 0%, #f4f4f4 100%)',
-                boxShadow: '0 4px 12px rgba(0,0,0,0.12), inset 0 2px 4px rgba(255,255,255,0.95)',
-              }}
-            >
-              {/* Liseré rouge plateau */}
-              <div aria-hidden="true" className="absolute bottom-2 left-6 right-[88px] h-[3px] rounded-full bg-[#EC0016]/80" />
+          {/* TABLE (Plateau à gauche) */}
+          <div className="absolute left-[40px] right-[100px] bottom-[20px] h-[60px] z-20 flex flex-col justify-end transition-transform duration-700 hover:-translate-x-1" style={{
+            borderRadius: '30px 0 0 30px',
+            background: 'linear-gradient(180deg, #ffffff 0%, #fcfcfc 40%, #e0e0e0 100%)',
+            boxShadow: '0 10px 20px -5px rgba(0,0,0,0.2), inset 0 3px 8px rgba(255,255,255,1), inset 0 -3px 8px rgba(0,0,0,0.05)'
+          }}>
+            {/* Ligne d'accentuation rouge */}
+            <div className="absolute bottom-[4px] left-[15px] right-0 h-[2px] bg-[#EC0016] rounded-l-full shadow-[0_1px_2px_rgba(236,0,22,0.3)]" />
 
-              {/* Logo */}
-              <a href="/" className="flex shrink-0 items-center gap-2.5 group">
-                <div className="relative h-10 w-10 rounded-full bg-white p-1 shadow-sm ring-1 ring-gray-100 transition-transform group-hover:scale-105">
+            {/* Contenu de la table */}
+            <div className="absolute inset-0 flex items-center justify-between px-6 pb-1">
+              
+              {/* Logo Area */}
+              <a href="/" className="flex items-center gap-2 shrink-0 mr-4 group">
+                <div className="relative h-8 w-8 rounded-full bg-white p-1 shadow-sm ring-1 ring-gray-100 transition-transform group-hover:scale-105">
                   <Image src="/logo.png" alt="Logo" fill className="object-contain p-1" />
                 </div>
-                <span className="hidden flex-col leading-none 2xl:flex">
-                  <span className="text-xs font-extrabold uppercase text-[#006633]">Centre</span>
-                  <span className="mt-0.5 text-xs font-extrabold uppercase text-[#006633]">Diagnostic</span>
-                </span>
+                <div className="flex flex-col">
+                  <span className="text-[10px] font-extrabold text-[#006633] leading-none uppercase">Centre</span>
+                  <span className="text-[10px] font-extrabold text-[#006633] leading-none uppercase mt-0.5">Diagnostic</span>
+                </div>
               </a>
 
-              {/* Menu compact */}
-              <nav className="flex flex-1 items-center justify-center gap-1" onMouseLeave={() => setHovered(null)} aria-label="Navigation principale (compacte)">
+              {/* Navigation */}
+              <nav className="flex-1 flex items-center justify-center gap-4 lg:gap-8" onMouseLeave={() => setHovered(null)}>
                 <NavIconLink icon={Home} label={t('center')} isActive={indicatorKey === 'about'} onClick={() => scrollToSection('#about')} onHover={() => setHovered('about')} />
                 <NavIconLink icon={User} label={t('team')} isActive={false} onClick={() => scrollToSection('/equipe')} onHover={() => setHovered('team')} />
                 <NavIconDropdown icon={Stethoscope} label={t('specialties')} isActive={indicatorKey === 'specialties'} onHover={() => setHovered('specialties')} poles={navPoles} />
@@ -391,28 +282,8 @@ export default function Header({ siteSettings, poles }: HeaderProps) {
                 <NavIconLink icon={Mail} label={t('contact')} isActive={indicatorKey === 'contact'} onClick={() => scrollToSection('#contact')} onHover={() => setHovered('contact')} />
               </nav>
 
-              <div className="flex shrink-0 items-center gap-2 pl-3 border-l border-gray-200">
+              <div className="shrink-0 pl-4 border-l border-gray-300">
                 <LanguageSwitcher />
-                {/* Mini-gantry décoratif (rappel du scanner) */}
-                <div
-                  aria-hidden="true"
-                  className="relative flex h-12 w-12 items-center justify-center rounded-full"
-                  style={{
-                    background: 'radial-gradient(120% 120% at 32% 20%, #ffffff 0%, #f0f0f0 55%, #d8d8d8 100%)',
-                    boxShadow: 'inset 1px 2px 4px rgba(255,255,255,1), inset -2px -3px 7px rgba(0,0,0,0.12), 0 2px 6px rgba(0,0,0,0.1)',
-                  }}
-                >
-                  <span className="absolute right-1 top-1/2 h-6 w-[3px] -translate-y-1/2 rounded-full bg-[#EC0016] opacity-90" />
-                  <span
-                    className="flex h-6 w-6 items-center justify-center rounded-full"
-                    style={{
-                      background: 'radial-gradient(circle at 50% 40%, #2a2a2a 0%, #111 100%)',
-                      boxShadow: 'inset 0 2px 5px rgba(0,0,0,0.9), 0 1px 2px rgba(255,255,255,0.85)',
-                    }}
-                  >
-                    <span className="h-1.5 w-1.5 rounded-full bg-[#EC0016] shadow-[0_0_8px_rgba(236,0,22,1)] animate-pulse" />
-                  </span>
-                </div>
               </div>
             </div>
           </div>
@@ -477,14 +348,14 @@ function NavIconLink({ icon: Icon, label, isActive, onClick, onHover }: any) {
       onMouseEnter={onHover}
       onFocus={onHover}
       className={cn(
-        'group relative flex flex-col items-center gap-2 rounded-xl p-2 transition-all duration-300 hover:-translate-y-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#EC0016]',
-        isActive ? 'text-[#EC0016]' : 'text-[#2b2b2b] hover:text-[#EC0016]'
+        'group relative flex flex-col items-center gap-1 rounded-xl p-1.5 transition-all duration-300 hover:-translate-y-0.5 focus-visible:outline-none',
+        isActive ? 'text-[#EC0016]' : 'text-gray-600 hover:text-[#EC0016]'
       )}
     >
-      <Icon className="w-6 h-6 stroke-[1.5px]" />
-      <span className="text-[11px] font-extrabold tracking-widest uppercase">{label}</span>
+      <Icon className="w-5 h-5 stroke-[1.5px]" />
+      <span className="text-[10px] font-extrabold tracking-wide uppercase">{label}</span>
       {isActive && (
-        <span className="absolute -bottom-2 h-1 w-6 bg-[#EC0016] rounded-full shadow-[0_0_8px_rgba(236,0,22,0.6)]" />
+        <span className="absolute -bottom-1 h-[2px] w-5 bg-[#EC0016] rounded-full shadow-[0_0_4px_rgba(236,0,22,0.6)]" />
       )}
     </button>
   )
@@ -505,16 +376,16 @@ function NavIconDropdown({ icon: Icon, label, isActive, onHover, poles }: any) {
         onClick={() => setOpen((v) => !v)}
         onFocus={onHover}
         className={cn(
-          'group relative flex flex-col items-center gap-2 rounded-xl p-2 transition-all duration-300 hover:-translate-y-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#EC0016]',
-          isActive || open ? 'text-[#EC0016]' : 'text-[#2b2b2b] hover:text-[#EC0016]'
+          'group relative flex flex-col items-center gap-1 rounded-xl p-1.5 transition-all duration-300 hover:-translate-y-0.5 focus-visible:outline-none',
+          isActive || open ? 'text-[#EC0016]' : 'text-gray-600 hover:text-[#EC0016]'
         )}
       >
-        <Icon className="w-6 h-6 stroke-[1.5px]" />
-        <span className="text-[11px] font-extrabold tracking-widest uppercase flex items-center gap-1">
+        <Icon className="w-5 h-5 stroke-[1.5px]" />
+        <span className="text-[10px] font-extrabold tracking-wide uppercase flex items-center gap-0.5">
           {label}
         </span>
         {(isActive || open) && (
-          <span className="absolute -bottom-2 h-1 w-6 bg-[#EC0016] rounded-full shadow-[0_0_8px_rgba(236,0,22,0.6)]" />
+          <span className="absolute -bottom-1 h-[2px] w-5 bg-[#EC0016] rounded-full shadow-[0_0_4px_rgba(236,0,22,0.6)]" />
         )}
       </button>
 
@@ -524,9 +395,9 @@ function NavIconDropdown({ icon: Icon, label, isActive, onHover, poles }: any) {
             initial={{ opacity: 0, y: 10, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 10, scale: 0.95 }}
-            className="absolute top-full left-1/2 -translate-x-1/2 pt-6 w-[280px] z-50"
+            className="absolute top-full left-1/2 -translate-x-1/2 pt-4 w-[280px] z-50"
           >
-            <div className="overflow-hidden rounded-2xl bg-white shadow-2xl ring-1 ring-black/5 p-2">
+            <div className="overflow-hidden rounded-xl bg-white shadow-xl ring-1 ring-black/5 p-2">
               <div className="grid grid-cols-1 gap-1">
                 {poles.map((pole: any) => {
                   const PoleIcon = POLE_ICONS[pole.iconName] || Stethoscope
@@ -534,15 +405,15 @@ function NavIconDropdown({ icon: Icon, label, isActive, onHover, poles }: any) {
                     <a
                       key={pole.slug}
                       href={`/poles/${pole.slug}`}
-                      className="group/item flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm transition-colors duration-200 hover:bg-gray-50"
+                      className="group/item flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors duration-200 hover:bg-gray-50"
                     >
                       <span
-                        className="flex h-9 w-9 items-center justify-center rounded-lg text-white shadow-sm"
+                        className="flex h-8 w-8 items-center justify-center rounded-md text-white shadow-sm"
                         style={{ backgroundColor: pole.accent }}
                       >
                         <PoleIcon className="h-4 w-4" />
                       </span>
-                      <span className="font-bold text-[#2b2b2b]">{pole.title}</span>
+                      <span className="font-bold text-gray-800">{pole.title}</span>
                     </a>
                   )
                 })}
