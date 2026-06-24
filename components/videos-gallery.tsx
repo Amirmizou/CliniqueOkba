@@ -154,7 +154,7 @@ export default function VideosGallery({ data }: { data?: VideoItem[] }) {
               >
                 {isPlaying ? (
                   <UniversalPlayer
-                    url={active.videoUrl}
+                    url={active.videoUrl!}
                     playing={true}
                     controls={true}
                     className="h-full w-full object-contain bg-black"
