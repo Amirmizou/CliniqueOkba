@@ -223,7 +223,7 @@ export default function Header({ siteSettings, poles }: HeaderProps) {
           <div className="absolute right-[5px] bottom-[10px] w-[60px] h-[120px] rounded-tr-[30px] rounded-br-[10px] bg-gradient-to-r from-[#ececec] to-[#dcdcdc] shadow-[5px_5px_15px_rgba(0,0,0,0.1)] z-10" />
           
           {/* Badge Clinique Okba */}
-          <div className="absolute right-[0px] bottom-[65px] bg-[#eb7800] text-white px-2 py-[2px] text-[6px] font-bold rounded-sm shadow-sm whitespace-nowrap z-50">
+          <div className="absolute right-[0px] bottom-[65px] bg-[#006633] text-white px-2 py-[2px] text-[6px] font-bold rounded-sm shadow-sm whitespace-nowrap z-50">
             Clinique Okba
           </div>
 
@@ -243,7 +243,7 @@ export default function Header({ siteSettings, poles }: HeaderProps) {
             boxShadow: '0 10px 20px -5px rgba(0,0,0,0.2), inset 0 3px 8px rgba(255,255,255,1), inset 0 -3px 8px rgba(0,0,0,0.05)'
           }}>
             {/* Ligne d'accentuation (court jusque dans le bore → lien avec le gantry) */}
-            <div className="absolute bottom-[4px] left-[15px] right-0 h-[2px] bg-[#eb7800] rounded-l-full shadow-[0_1px_2px_rgba(235,120,0,0.3)]" />
+            <div className="absolute bottom-[4px] left-[15px] right-0 h-[2px] bg-[#006633] rounded-l-full shadow-[0_1px_2px_rgba(0,102,51,0.3)]" />
 
             {/* Rails de la table qui filent dans le tunnel (lien plateau → gantry) */}
             <div aria-hidden="true" className="pointer-events-none absolute top-[16px] left-[58%] right-0 h-[2px] rounded-full bg-black/[0.06]" />
@@ -259,8 +259,8 @@ export default function Header({ siteSettings, poles }: HeaderProps) {
               </div>
 
               {/* Logo Area */}
-              <a href="/" className="flex items-center gap-2 shrink-0 mr-6 group">
-                <div className="relative h-8 w-8 rounded-full bg-white p-1 shadow-sm ring-1 ring-gray-100 transition-transform group-hover:scale-105">
+              <a href="/" className="flex items-center gap-2.5 shrink-0 mr-6 group">
+                <div className="relative h-12 w-12 rounded-full bg-white p-1 shadow-sm ring-1 ring-gray-100 transition-transform group-hover:scale-105">
                   <Image src="/logo.png" alt="Logo" fill className="object-contain p-1" />
                 </div>
                 <div className="flex flex-col">
@@ -281,8 +281,15 @@ export default function Header({ siteSettings, poles }: HeaderProps) {
               </nav>
             </div>
             
-            {/* Anneau de jonction luminescent (Liaison entre le plateau et le gantry) */}
-            <div className="absolute right-0 top-0 bottom-0 w-[15px] bg-gradient-to-r from-transparent to-[#e0e0e0] z-40 rounded-r-full shadow-[5px_0_10px_rgba(235,120,0,0.2)] border-r-2 border-[#eb7800]/30" />
+            {/* Fondu plateau → gantry : la surface se dissout dans le tunnel, sans couture */}
+            <div
+              aria-hidden="true"
+              className="pointer-events-none absolute right-0 top-0 bottom-0 w-[95px] z-40 rounded-r-[30px]"
+              style={{
+                background:
+                  'linear-gradient(to right, rgba(255,255,255,0) 0%, rgba(244,244,244,0.5) 45%, rgba(228,228,228,0.85) 78%, rgba(214,214,214,0.95) 100%)',
+              }}
+            />
           </div>
 
           {/* CERCLE PRINCIPAL AVEC MASQUE (Devant la table) - z-40 */}
@@ -299,15 +306,14 @@ export default function Header({ siteSettings, poles }: HeaderProps) {
           {/* Ombre portée du bord du trou sur la table pour le réalisme (z-40) */}
           <div className="absolute right-[35px] bottom-[20px] w-[100px] h-[100px] rounded-full z-40 pointer-events-none shadow-[inset_6px_6px_10px_rgba(0,0,0,0.2)]" />
 
-          {/* Liseré orange continu autour de l'anneau (fil conducteur table ↔ gantry) */}
-          <div className="absolute right-[15px] bottom-[0px] w-[140px] h-[140px] rounded-full z-40 pointer-events-none" style={{ boxShadow: 'inset 0 0 0 2px rgba(235,120,0,0.6)' }} />
+          {/* Liseré vert continu autour de l'anneau (fil conducteur table ↔ gantry) */}
+          <div className="absolute right-[15px] bottom-[0px] w-[140px] h-[140px] rounded-full z-40 pointer-events-none" style={{ boxShadow: 'inset 0 0 0 2px rgba(0,102,51,0.6)' }} />
           {/* Liseré du bord interne du bore */}
-          <div className="absolute right-[37px] bottom-[22px] w-[96px] h-[96px] rounded-full z-40 pointer-events-none" style={{ boxShadow: 'inset 0 0 0 1.5px rgba(235,120,0,0.45)' }} />
+          <div className="absolute right-[37px] bottom-[22px] w-[96px] h-[96px] rounded-full z-40 pointer-events-none" style={{ boxShadow: 'inset 0 0 0 1.5px rgba(0,102,51,0.45)' }} />
 
           {/* 3. Tête Supérieure (avec Logo) - z-50 */}
-          <div className="absolute right-[45px] top-[-10px] w-[80px] h-[40px] rounded-t-[10px] bg-gradient-to-b from-[#ffffff] to-[#e6e6e6] shadow-[0_-5px_10px_rgba(0,0,0,0.05),_0_5px_10px_rgba(0,0,0,0.1)] z-50 flex flex-col items-center justify-start pt-1.5 border-b border-gray-200">
-            <span className="text-[7px] font-extrabold text-[#006633] tracking-widest uppercase whitespace-nowrap">{clinicNameText}</span>
-            <span className="text-[6px] font-bold text-[#eb7800] mt-[1px] uppercase tracking-[0.2em]">Scanner 3D</span>
+          <div className="absolute right-[45px] top-[-10px] w-[80px] h-[40px] rounded-t-[10px] bg-gradient-to-b from-[#ffffff] to-[#e6e6e6] shadow-[0_-5px_10px_rgba(0,0,0,0.05),_0_5px_10px_rgba(0,0,0,0.1)] z-50 flex flex-col items-center justify-center border-b border-gray-200">
+            <span className="text-[8px] font-extrabold text-[#006633] tracking-widest uppercase whitespace-nowrap">{clinicNameText}</span>
             <div className="w-[60%] h-[1px] bg-[#d5d5d5] rounded-full mt-1.5 shadow-[inset_0_1px_1px_rgba(0,0,0,0.1)]" />
           </div>
 
