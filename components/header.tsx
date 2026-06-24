@@ -103,6 +103,7 @@ export default function Header({ siteSettings, poles }: HeaderProps) {
   const navPoles = resolveNavPoles(poles, locale)
   const [isOpen, setIsOpen] = useState(false)
   const [isScrolled, setIsScrolled] = useState(false)
+  const [isHidden, setIsHidden] = useState(false)
   const [activeTab, setActiveTab] = useState('home')
   const [hovered, setHovered] = useState<string | null>(null)
   const { scrollY } = useScroll()
@@ -159,6 +160,13 @@ export default function Header({ siteSettings, poles }: HeaderProps) {
 
   useMotionValueEvent(scrollY, 'change', (latest) => {
     setIsScrolled(latest > 24)
+    
+    const previous = scrollY.getPrevious() || 0
+    if (latest > previous && latest > 150) {
+      setIsHidden(true)
+    } else if (latest < previous) {
+      setIsHidden(false)
+    }
   })
 
   const scrollToSection = (href: string) => {
@@ -183,7 +191,10 @@ export default function Header({ siteSettings, poles }: HeaderProps) {
 
   return (
     <>
-      <header className="fixed inset-x-0 top-0 z-[100] flex justify-center px-4 pt-4 pointer-events-none">
+      <header className={cn(
+        "fixed inset-x-0 top-0 z-[100] flex justify-center px-4 pt-4 pointer-events-none transition-transform duration-500",
+        isHidden && !isOpen ? "-translate-y-[150%]" : "translate-y-0"
+      )}>
         
         {/* MOBILE & TABLET FALLBACK */}
         <div className="pointer-events-auto w-full max-w-7xl flex items-center justify-between rounded-2xl bg-white/95 backdrop-blur-md shadow-[0_8px_30px_rgb(0,0,0,0.12)] border border-gray-100 px-4 py-3 xl:hidden">
