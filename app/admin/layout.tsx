@@ -11,7 +11,9 @@ export default function AdminLayout({
 }) {
     return (
         <SessionProvider>
-            {children}
+            <div className="admin-panel min-h-screen bg-background">
+                {children}
+            </div>
         </SessionProvider>
     )
 }

@@ -213,6 +213,16 @@
   [dir="rtl"] .font-display {
     font-family: var(--font-montserrat-arabic), system-ui, sans-serif;
   }
+
+  /* --- Surcharge pour l'interface d'administration --- */
+  /* Supprimer la police Lemon Milk (affichage) dans le back-office */
+  .admin-panel {
+    --font-heading: var(--font-base);
+  }
+  .admin-panel h1, .admin-panel h2, .admin-panel h3, .admin-panel h4, .admin-panel h5, .admin-panel h6, .admin-panel .font-display {
+    font-family: var(--font-base);
+    letter-spacing: normal;
+  }
 }
 
 /* ==========================================================================
