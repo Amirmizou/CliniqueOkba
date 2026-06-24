@@ -233,10 +233,9 @@ export default function Header({ siteSettings, poles }: HeaderProps) {
           {/* 1. Extension Droite (z-10) */}
           <div className="absolute right-[5px] bottom-[10px] w-[60px] h-[120px] rounded-tr-[30px] rounded-br-[10px] bg-gradient-to-r from-[#ececec] to-[#dcdcdc] shadow-[5px_5px_15px_rgba(0,0,0,0.1)] z-10" />
           
-          {/* Badge Clinique Okba - Symbia Pro.specta */}
-          <div className="absolute right-[0px] bottom-[65px] bg-[#006633] text-white px-2 py-0.5 flex flex-col items-center justify-center rounded-sm shadow-sm z-50 pointer-events-none">
+          {/* Badge Clinique Okba */}
+          <div className="absolute right-[0px] bottom-[65px] bg-[#006633] text-white px-2 py-1 flex flex-col items-center justify-center rounded-sm shadow-sm z-50 pointer-events-none">
             <span className="text-[6px] font-extrabold tracking-widest uppercase leading-none">{clinicNameText}</span>
-            <span className="text-[5px] font-bold text-[#eb7800] uppercase tracking-[0.2em] mt-[1px]">Scanner 3D</span>
           </div>
 
           {/* FOND DU TROU SOMBRE (Derrière la table) - z-20 */}
@@ -322,20 +321,14 @@ export default function Header({ siteSettings, poles }: HeaderProps) {
           {/* Liseré du bord interne du bore */}
           <div className="absolute right-[37px] bottom-[22px] w-[96px] h-[96px] rounded-full z-40 pointer-events-none" style={{ boxShadow: 'inset 0 0 0 1.5px rgba(0,102,51,0.45)' }} />
 
-          {/* LOGO STATIQUE SUR LE CHASSIS (en haut de l'anneau principal) - z-50 */}
-          <div className="absolute right-[55px] top-[-5px] w-[60px] flex flex-col items-center justify-center z-50 opacity-80 pointer-events-none">
-             <span className="text-[5px] font-extrabold text-gray-500 tracking-widest uppercase leading-none">Siemens</span>
-             <span className="text-[4px] font-bold text-gray-400 uppercase tracking-[0.1em] mt-[1px]">Healthineers</span>
-          </div>
-
-          {/* ROTATING SPECT HEADS - z-25 (Derrière la table Z-30 et le masque Z-40, mais devant le fond du trou Z-20) */}
-          <div className="absolute right-[15px] bottom-[0px] w-[140px] h-[140px] z-[25] animate-[spin_20s_linear_infinite] pointer-events-none">
+          {/* ROTATING SPECT HEADS - z-[45] (Orbite autour de l'anneau, passe devant la table) */}
+          <div className="absolute right-[15px] bottom-[0px] w-[140px] h-[140px] z-[45] animate-[spin_20s_linear_infinite] pointer-events-none">
             {/* Tête de Détection 1 */}
-            <div className="absolute top-[8px] left-1/2 w-[65px] h-[22px] -translate-x-1/2 rounded-t-[6px] bg-gradient-to-b from-[#ffffff] to-[#e6e6e6] shadow-[0_-5px_10px_rgba(0,0,0,0.25),inset_0_2px_4px_rgba(255,255,255,1)] border-b border-[#aaaaaa] flex flex-col items-center justify-start pt-1">
+            <div className="absolute top-[-10px] left-1/2 w-[70px] h-[30px] -translate-x-1/2 rounded-[8px] bg-gradient-to-b from-[#ffffff] to-[#e6e6e6] shadow-[0_5px_15px_rgba(0,0,0,0.2),inset_0_2px_4px_rgba(255,255,255,1)] border border-[#cccccc] flex flex-col items-center justify-start pt-1">
               <div className="w-full h-[2px] bg-[#EC0016] mt-auto" />
             </div>
             {/* Tête de Détection 2 */}
-            <div className="absolute bottom-[8px] left-1/2 w-[65px] h-[22px] -translate-x-1/2 rounded-b-[6px] bg-gradient-to-t from-[#ffffff] to-[#e6e6e6] shadow-[0_5px_10px_rgba(0,0,0,0.25),inset_0_-2px_4px_rgba(255,255,255,1)] border-t border-[#aaaaaa] flex flex-col items-center justify-end pb-1">
+            <div className="absolute bottom-[-10px] left-1/2 w-[70px] h-[30px] -translate-x-1/2 rounded-[8px] bg-gradient-to-t from-[#ffffff] to-[#e6e6e6] shadow-[0_-5px_15px_rgba(0,0,0,0.2),inset_0_-2px_4px_rgba(255,255,255,1)] border border-[#cccccc] flex flex-col items-center justify-end pb-1">
               <div className="w-full h-[2px] bg-[#EC0016] mb-auto" />
             </div>
           </div>
