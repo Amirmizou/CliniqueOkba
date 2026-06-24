@@ -242,7 +242,7 @@ export default function HeroCarousel({ slides: rawSlides = [], siteSettings, sec
             {/* ---------------------------------------------------------- */}
             <motion.div
                 style={prefersReducedMotion ? undefined : { y: yContent, opacity: contentOpacity }}
-                className="relative z-20 mx-auto flex w-full max-w-7xl flex-1 items-center px-4 pt-28 pb-16 sm:px-6 lg:px-8"
+                className="relative z-20 mx-auto flex w-full max-w-7xl flex-1 items-center px-4 pt-32 lg:pt-[180px] pb-16 sm:px-6 lg:px-8"
             >
                 <div className="grid w-full items-center gap-10 lg:grid-cols-12">
                     {/* Colonne texte */}
