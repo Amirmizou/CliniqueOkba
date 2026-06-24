@@ -12,7 +12,8 @@
       "Bash(grep -nA10 \"CATEGORY_LABELS\" lib/news.ts)",
       "WebFetch(domain:github.com)",
       "Bash(node -e \"const a=require\\('./messages/fr.json'\\); console.log\\(JSON.stringify\\(a.hero,null,1\\)\\)\")",
-      "Bash(node -e \"const a=require\\('./messages/ar.json'\\); console.log\\(JSON.stringify\\(a.hero,null,1\\)\\)\")"
+      "Bash(node -e \"const a=require\\('./messages/ar.json'\\); console.log\\(JSON.stringify\\(a.hero,null,1\\)\\)\")",
+      "Bash(node _shoot.mjs \"C:/Users/CLINIQ~1/AppData/Local/Temp/claude/D--SiteWebOkba/61bfcbb9-f093-45f5-86b4-06aacab1dc4b/scratchpad/shots\")"
     ]
   }
 }

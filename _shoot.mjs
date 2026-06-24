@@ -31,7 +31,17 @@ for (const [vname, w, h] of viewports) {
       } catch {
         try { await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 45000 }) } catch (e) { console.log('FAIL', url, e.message); continue }
       }
-      await page.waitForTimeout(2500)
+      await page.waitForTimeout(2000)
+      await page.evaluate(async () => {
+        const sleep = (ms) => new Promise((r) => setTimeout(r, ms))
+        const step = Math.round(window.innerHeight * 0.8)
+        for (let y = 0; y <= document.body.scrollHeight; y += step) {
+          window.scrollTo(0, y); await sleep(200)
+        }
+        window.scrollTo(0, document.body.scrollHeight); await sleep(400)
+        window.scrollTo(0, 0); await sleep(400)
+      })
+      await page.waitForTimeout(1000)
       const file = `${OUT}/${vname}-${loc}-${name}.png`
       try {
         await page.screenshot({ path: file, fullPage: true })

@@ -53,9 +53,9 @@ export async function POST(request: Request) {
     }
     revalidateSite()
     return NextResponse.json({ ok: true, doctor: result })
-  } catch (e) {
+  } catch (e: any) {
     console.error('Erreur sauvegarde médecin:', e)
-    return NextResponse.json({ error: 'Échec de la sauvegarde' }, { status: 500 })
+    return NextResponse.json({ error: e.message || 'Échec de la sauvegarde' }, { status: 500 })
   }
 }
 
