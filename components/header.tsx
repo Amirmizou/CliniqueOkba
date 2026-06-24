@@ -34,6 +34,7 @@ import Image from 'next/image'
 import { motion, AnimatePresence, useScroll, useMotionValueEvent } from 'framer-motion'
 import { cn } from '@/lib/utils'
 import { poles as localPoles } from '@/data/poles'
+import Link from 'next/link'
 
 const POLE_ICONS: Record<string, LucideIcon> = {
   ScanLine,
@@ -293,7 +294,7 @@ export default function Header({ siteSettings, poles }: HeaderProps) {
               {/* Navigation */}
               <nav className="flex-1 flex items-center justify-start gap-4 lg:gap-8 pr-[210px]" onMouseLeave={() => setHovered(null)}>
                 <NavIconLink icon={Home} label={t('center')} isActive={indicatorKey === 'about'} onClick={() => scrollToSection('#about')} onHover={() => setHovered('about')} />
-                <NavIconDropdown icon={Stethoscope} label={t('specialties')} isActive={indicatorKey === 'specialties'} onHover={() => setHovered('specialties')} poles={navPoles} />
+                <NavIconDropdown icon={Stethoscope} label={t('specialties')} isActive={indicatorKey === 'specialties'} onHover={() => setHovered('specialties')} onClick={() => scrollToSection('#specialties')} poles={navPoles} locale={locale} />
                 <NavIconLink icon={Activity} label={t('equipment')} isActive={indicatorKey === 'equipements'} onClick={() => scrollToSection('#equipements')} onHover={() => setHovered('equipements')} />
                 <NavIconLink icon={Users} label={t('doctors')} isActive={indicatorKey === 'medecins'} onClick={() => scrollToSection('#medecins')} onHover={() => setHovered('medecins')} />
                 <NavIconLink icon={Info} label={t('faq')} isActive={indicatorKey === 'faq'} onClick={() => scrollToSection('#faq')} onHover={() => setHovered('faq')} />
@@ -408,19 +409,22 @@ function NavIconLink({ icon: Icon, label, isActive, onClick, onHover }: any) {
   )
 }
 
-function NavIconDropdown({ icon: Icon, label, isActive, onHover, poles }: any) {
+function NavIconDropdown({ icon: Icon, label, isActive, onHover, onClick, poles, locale }: any) {
   const [open, setOpen] = useState(false)
   return (
     <div
       className="relative flex justify-center"
       onMouseEnter={() => {
         setOpen(true)
-        onHover()
+        if (onHover) onHover()
       }}
       onMouseLeave={() => setOpen(false)}
     >
       <button
-        onClick={() => setOpen((v) => !v)}
+        onClick={(e) => {
+          setOpen((v) => !v)
+          if (onClick) onClick(e)
+        }}
         onFocus={onHover}
         className={cn(
           'group relative flex flex-col items-center gap-1 rounded-xl p-1.5 transition-all duration-300 hover:-translate-y-0.5 focus-visible:outline-none',
@@ -449,10 +453,11 @@ function NavIconDropdown({ icon: Icon, label, isActive, onHover, poles }: any) {
                 {poles.map((pole: any) => {
                   const PoleIcon = POLE_ICONS[pole.iconName] || Stethoscope
                   return (
-                    <a
+                    <Link
                       key={pole.slug}
-                      href={`/poles/${pole.slug}`}
+                      href={`/${locale}/poles/${pole.slug}`}
                       className="group/item flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors duration-200 hover:bg-gray-50"
+                      onClick={() => setOpen(false)}
                     >
                       <span
                         className="flex h-8 w-8 items-center justify-center rounded-md text-white shadow-sm"
@@ -461,7 +466,7 @@ function NavIconDropdown({ icon: Icon, label, isActive, onHover, poles }: any) {
                         <PoleIcon className="h-4 w-4" />
                       </span>
                       <span className="font-bold text-gray-800">{pole.title}</span>
-                    </a>
+                    </Link>
                   )
                 })}
               </div>
