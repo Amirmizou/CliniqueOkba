@@ -451,7 +451,7 @@ export default function PolePageContent({
                   >
                     {videoPlaying ? (
                       <UniversalPlayer
-                        url={current.videoUrl}
+                        url={current.videoUrl!}
                         poster={posterUrlOf(current)}
                         controls={true}
                         playing={videoPlaying}
