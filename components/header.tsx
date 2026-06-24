@@ -212,10 +212,10 @@ export default function Header({ siteSettings, poles }: HeaderProps) {
         <div className={cn("pointer-events-auto relative w-full max-w-4xl mx-auto h-[140px] hidden xl:block transition-all duration-700 origin-top mt-4", isScrolled ? "scale-95 -translate-y-2 opacity-95" : "scale-100 translate-y-0 opacity-100")}>
           
           {/* BASE / PEDESTAL */}
-          <div className="absolute left-[15%] right-[25%] bottom-[0px] h-[30px] z-0 flex flex-col justify-end items-center">
-            <div className="w-[80%] h-[20px] shadow-[inset_0_2px_4px_rgba(0,0,0,0.2)]"
+          <div className="absolute left-[15%] right-[100px] bottom-[0px] h-[30px] z-0 flex flex-col justify-end items-center">
+            <div className="w-[100%] h-[20px] shadow-[inset_0_2px_4px_rgba(0,0,0,0.2)]"
                  style={{ background: 'repeating-linear-gradient(180deg, #d4d4d4, #d4d4d4 3px, #e8e8e8 3px, #e8e8e8 6px)' }} />
-            <div className="w-[85%] h-[10px] bg-gradient-to-b from-[#e0e0e0] to-[#c5c5c5] rounded-b-lg shadow-[0_10px_20px_rgba(0,0,0,0.15)]" />
+            <div className="w-[100%] h-[10px] bg-gradient-to-b from-[#e0e0e0] to-[#c5c5c5] rounded-b-lg shadow-[0_10px_20px_rgba(0,0,0,0.15)]" />
           </div>
 
           {/* GANTRY COMPOSITE (Vue de Face) */}
@@ -264,7 +264,8 @@ export default function Header({ siteSettings, poles }: HeaderProps) {
               </a>
 
               {/* Navigation */}
-              <nav className="flex-1 flex items-center justify-start gap-4 lg:gap-8 pr-[60px]" onMouseLeave={() => setHovered(null)}>
+              {/* pr-[140px] ensures the menu items stop well before the gantry ring overlaps them */}
+              <nav className="flex-1 flex items-center justify-start gap-4 lg:gap-8 pr-[140px]" onMouseLeave={() => setHovered(null)}>
                 <NavIconLink icon={Home} label={t('center')} isActive={indicatorKey === 'about'} onClick={() => scrollToSection('#about')} onHover={() => setHovered('about')} />
                 <NavIconLink icon={User} label={t('team')} isActive={false} onClick={() => scrollToSection('/equipe')} onHover={() => setHovered('team')} />
                 <NavIconDropdown icon={Stethoscope} label={t('specialties')} isActive={indicatorKey === 'specialties'} onHover={() => setHovered('specialties')} poles={navPoles} />
@@ -273,6 +274,9 @@ export default function Header({ siteSettings, poles }: HeaderProps) {
                 <NavIconLink icon={Mail} label={t('contact')} isActive={indicatorKey === 'contact'} onClick={() => scrollToSection('#contact')} onHover={() => setHovered('contact')} />
               </nav>
             </div>
+            
+            {/* Anneau de jonction luminescent (Liaison entre le plateau et le gantry) */}
+            <div className="absolute right-0 top-0 bottom-0 w-[15px] bg-gradient-to-r from-transparent to-[#e0e0e0] z-40 rounded-r-full shadow-[5px_0_10px_rgba(235,120,0,0.2)] border-r-2 border-[#eb7800]/30" />
           </div>
 
           {/* CERCLE PRINCIPAL AVEC MASQUE (Devant la table) - z-40 */}
