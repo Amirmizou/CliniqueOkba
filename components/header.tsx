@@ -236,20 +236,30 @@ export default function Header({ siteSettings, poles }: HeaderProps) {
           </div>
 
           {/* TABLE (Plateau à gauche) - z-30 */}
-          {/* S'encastre complètement à travers le trou. La table s'arrête net au milieu du trou : right-[80px] */}
-          <div className="absolute left-[20px] right-[80px] bottom-[40px] h-[60px] z-30 flex flex-col justify-end transition-transform duration-700 hover:-translate-x-1" style={{
+          {/* La table s'enfonce dans le trou et se fond grâce au mask-image et au blur (chevauchement doux via right-[75px]) */}
+          <div className="absolute left-[20px] right-[75px] bottom-[40px] h-[60px] z-30 flex flex-col justify-end transition-transform duration-700 hover:-translate-x-1" style={{
             borderRadius: '30px 0 0 30px',
             background: 'linear-gradient(180deg, #ffffff 0%, #fcfcfc 40%, #e0e0e0 100%)',
-            boxShadow: '0 10px 20px -5px rgba(0,0,0,0.2), inset 0 3px 8px rgba(255,255,255,1), inset 0 -3px 8px rgba(0,0,0,0.05)'
+            boxShadow: '0 10px 20px -5px rgba(0,0,0,0.2), inset 0 3px 8px rgba(255,255,255,1), inset 0 -3px 8px rgba(0,0,0,0.05)',
+            WebkitMaskImage: 'linear-gradient(to right, black 75%, transparent 100%)',
+            maskImage: 'linear-gradient(to right, black 75%, transparent 100%)'
           }}>
-            {/* Ligne d'accentuation (court jusque dans le bore → lien avec le gantry) */}
-            <div className="absolute bottom-[4px] left-[15px] right-0 h-[2px] bg-[#006633] rounded-l-full shadow-[0_1px_2px_rgba(0,102,51,0.3)]" />
+            {/* Ligne d'accentuation Siemens (#EC0016) qui s'estompe naturellement avec le masque global */}
+            <div className="absolute bottom-[4px] left-[15px] right-0 h-[2px] bg-[#EC0016] rounded-l-full shadow-[0_1px_2px_rgba(236,0,22,0.3)]" />
 
-            {/* Rails de la table qui filent dans le tunnel (lien plateau → gantry) */}
+            {/* Rails de la table qui filent dans le tunnel */}
             <div aria-hidden="true" className="pointer-events-none absolute top-[16px] left-[58%] right-0 h-[2px] rounded-full bg-black/[0.06]" />
             <div aria-hidden="true" className="pointer-events-none absolute top-[24px] left-[58%] right-0 h-[2px] rounded-full bg-black/[0.06]" />
-            {/* Ombre d'insertion : la table s'enfonce dans le bore */}
-            <div aria-hidden="true" className="pointer-events-none absolute right-0 top-1/2 h-[44px] w-[40px] -translate-y-1/2 rounded-l-[20px]" style={{ boxShadow: 'inset -10px 0 14px rgba(0,0,0,0.28)' }} />
+            
+            {/* Ombre d'ouverture dans le gantry : simule le bore qui avale la table */}
+            <div aria-hidden="true" className="pointer-events-none absolute right-0 top-0 bottom-0 w-[50px] z-10" style={{
+               background: 'linear-gradient(to left, rgba(0,0,0,0.55) 0%, transparent 100%)'
+            }} />
+
+            {/* Chevauchement doux : Blur localisé sur la couture */}
+            <div aria-hidden="true" className="pointer-events-none absolute right-0 top-0 bottom-0 w-[30px] z-20" style={{
+               backdropFilter: 'blur(1px)'
+            }} />
 
             {/* Contenu de la table */}
             <div className="absolute inset-0 flex items-center px-4 pb-1">
@@ -270,7 +280,6 @@ export default function Header({ siteSettings, poles }: HeaderProps) {
               </a>
 
               {/* Navigation */}
-              {/* pr-[140px] ensures the menu items stop well before the gantry ring overlaps them */}
               <nav className="flex-1 flex items-center justify-start gap-4 lg:gap-8 pr-[210px]" onMouseLeave={() => setHovered(null)}>
                 <NavIconLink icon={Home} label={t('center')} isActive={indicatorKey === 'about'} onClick={() => scrollToSection('#about')} onHover={() => setHovered('about')} />
                 <NavIconLink icon={User} label={t('team')} isActive={false} onClick={() => scrollToSection('/equipe')} onHover={() => setHovered('team')} />
@@ -280,16 +289,6 @@ export default function Header({ siteSettings, poles }: HeaderProps) {
                 <NavIconLink icon={Mail} label={t('contact')} isActive={indicatorKey === 'contact'} onClick={() => scrollToSection('#contact')} onHover={() => setHovered('contact')} />
               </nav>
             </div>
-            
-            {/* Fondu plateau → gantry : la surface se dissout dans le tunnel, sans couture */}
-            <div
-              aria-hidden="true"
-              className="pointer-events-none absolute right-0 top-0 bottom-0 w-[95px] z-40 rounded-r-[30px]"
-              style={{
-                background:
-                  'linear-gradient(to right, rgba(255,255,255,0) 0%, rgba(244,244,244,0.5) 45%, rgba(228,228,228,0.85) 78%, rgba(214,214,214,0.95) 100%)',
-              }}
-            />
           </div>
 
           {/* CERCLE PRINCIPAL AVEC MASQUE (Devant la table) - z-40 */}
