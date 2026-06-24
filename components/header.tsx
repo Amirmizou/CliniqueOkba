@@ -293,10 +293,10 @@ export default function Header({ siteSettings, poles }: HeaderProps) {
               {/* Navigation */}
               <nav className="flex-1 flex items-center justify-start gap-4 lg:gap-8 pr-[210px]" onMouseLeave={() => setHovered(null)}>
                 <NavIconLink icon={Home} label={t('center')} isActive={indicatorKey === 'about'} onClick={() => scrollToSection('#about')} onHover={() => setHovered('about')} />
-                <NavIconLink icon={User} label={t('team')} isActive={false} onClick={() => scrollToSection('/equipe')} onHover={() => setHovered('team')} />
                 <NavIconDropdown icon={Stethoscope} label={t('specialties')} isActive={indicatorKey === 'specialties'} onHover={() => setHovered('specialties')} poles={navPoles} />
-                <NavIconLink icon={ClipboardList} label={t('exams')} isActive={false} onClick={() => scrollToSection('#specialties')} onHover={() => setHovered('specialties')} />
-                <NavIconLink icon={Info} label={t('faq')} isActive={indicatorKey === 'faq'} onClick={() => scrollToSection('/faq')} onHover={() => setHovered('faq')} />
+                <NavIconLink icon={Activity} label={t('equipment')} isActive={indicatorKey === 'equipements'} onClick={() => scrollToSection('#equipements')} onHover={() => setHovered('equipements')} />
+                <NavIconLink icon={Users} label={t('doctors')} isActive={indicatorKey === 'medecins'} onClick={() => scrollToSection('#medecins')} onHover={() => setHovered('medecins')} />
+                <NavIconLink icon={Info} label={t('faq')} isActive={indicatorKey === 'faq'} onClick={() => scrollToSection('#faq')} onHover={() => setHovered('faq')} />
                 <NavIconLink icon={Mail} label={t('contact')} isActive={indicatorKey === 'contact'} onClick={() => scrollToSection('#contact')} onHover={() => setHovered('contact')} />
               </nav>
             </div>
@@ -352,8 +352,9 @@ export default function Header({ siteSettings, poles }: HeaderProps) {
               {[
                 { key: 'center', href: '#about', icon: Home },
                 { key: 'specialties', href: '#specialties', icon: Stethoscope },
-                { key: 'equipements', href: '#equipements', icon: Activity },
-                { key: 'medecins', href: '#medecins', icon: Users },
+                { key: 'equipment', href: '#equipements', icon: Activity },
+                { key: 'doctors', href: '#medecins', icon: Users },
+                { key: 'faq', href: '#faq', icon: Info },
                 { key: 'contact', href: '#contact', icon: Mail },
               ].map((item) => (
                 <motion.button
