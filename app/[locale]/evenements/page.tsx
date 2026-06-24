@@ -1,7 +1,7 @@
 import { Suspense } from 'react'
 import SiteHeader from '@/components/site-header'
 import SiteFooter from '@/components/site-footer'
-import { getTranslations } from 'next-intl/server'
+import { getTranslations, setRequestLocale } from 'next-intl/server'
 import { getEvents, getSiteSettings } from '@/sanity/lib/fetch'
 import { localizeSanityData } from '@/sanity/lib/localize'
 import { urlFor } from '@/sanity/lib/image'
@@ -184,6 +184,7 @@ export default async function EvenementsPage({
     params: Promise<{ locale: string }>
 }) {
     const { locale } = await params
+    setRequestLocale(locale)
     const t = await getTranslations('events')
     const siteSettings = localizeSanityData(await getSiteSettings(), locale)
     return (

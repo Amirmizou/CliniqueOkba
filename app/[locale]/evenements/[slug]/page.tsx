@@ -12,7 +12,7 @@ import { Badge } from '@/components/ui/badge'
 import { PortableText } from '@portabletext/react'
 import ScrollAnimation from '@/components/ui/scroll-animation'
 import { type ClinicEvent } from '@/lib/events'
-import { getTranslations } from 'next-intl/server'
+import { getTranslations, setRequestLocale } from 'next-intl/server'
 
 export async function generateStaticParams() {
     const events: { slug: { current: string } }[] = await getEvents()
@@ -72,6 +72,7 @@ function formatDateTime(value: string, dateLocale: string) {
 
 export default async function EventPage({ params }: { params: Promise<{ slug: string; locale: string }> }) {
     const { slug, locale } = await params
+    setRequestLocale(locale)
     const event: ClinicEvent & { content?: any[] } = localizeSanityData(
         await getEventBySlug(slug),
         locale,

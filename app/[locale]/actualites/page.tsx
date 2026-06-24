@@ -10,7 +10,7 @@ import { Calendar, ArrowRight, Newspaper, User } from 'lucide-react'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import ScrollAnimation from '@/components/ui/scroll-animation'
-import { getTranslations } from 'next-intl/server'
+import { getTranslations, setRequestLocale } from 'next-intl/server'
 
 interface Article {
     _id: string
@@ -132,6 +132,7 @@ export default async function ActualitesPage({
     params: Promise<{ locale: string }>
 }) {
     const { locale } = await params
+    setRequestLocale(locale)
     const t = await getTranslations('news')
     const siteSettings = localizeSanityData(await getSiteSettings(), locale)
     return (

@@ -2,7 +2,7 @@ import SiteHeader from '@/components/site-header'
 import SiteFooter from '@/components/site-footer'
 import DoctorsShowcase from '@/components/doctors-showcase'
 import ScrollAnimation from '@/components/ui/scroll-animation'
-import { getTranslations } from 'next-intl/server'
+import { getTranslations, setRequestLocale } from 'next-intl/server'
 import { getSiteSettings, getDoctors, getAllSectionContents } from '@/sanity/lib/fetch'
 import { localizeSanityData } from '@/sanity/lib/localize'
 import { urlFor } from '@/sanity/lib/image'
@@ -20,6 +20,7 @@ export default async function EquipePage({
     params: Promise<{ locale: string }>
 }) {
     const { locale } = await params
+    setRequestLocale(locale)
     const t = await getTranslations('equipe')
     const [siteSettingsRaw, doctorsRaw, sectionContentsRaw] = await Promise.all([
         getSiteSettings(),

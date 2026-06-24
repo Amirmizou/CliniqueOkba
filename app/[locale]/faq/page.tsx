@@ -1,7 +1,7 @@
 import { Suspense } from 'react'
 import SiteHeader from '@/components/site-header'
 import SiteFooter from '@/components/site-footer'
-import { getTranslations } from 'next-intl/server'
+import { getTranslations, setRequestLocale } from 'next-intl/server'
 import { getFaq, getSiteSettings } from '@/sanity/lib/fetch'
 import { localizeSanityData } from '@/sanity/lib/localize'
 import { HelpCircle, Phone, MapPin } from 'lucide-react'
@@ -98,6 +98,7 @@ export default async function FAQPage({
     params: Promise<{ locale: string }>
 }) {
     const { locale } = await params
+    setRequestLocale(locale)
     const t = await getTranslations('faqPage')
     const siteSettings = localizeSanityData(await getSiteSettings(), locale)
     const phoneDisplay = (siteSettings?.phone || siteConfig.contact.phone)
