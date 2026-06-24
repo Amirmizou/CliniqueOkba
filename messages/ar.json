@@ -2,7 +2,12 @@
   "nav": {
     "home": "الرئيسية",
     "about": "من نحن",
+    "center": "المركز",
     "specialties": "التخصصات",
+    "exams": "الفحوصات",
+    "equipment": "التجهيزات",
+    "doctors": "الأطباء",
+    "appointment": "حجز موعد",
     "services": "الخدمات",
     "homeCare": "الرعاية المنزلية",
     "gallery": "المعرض",

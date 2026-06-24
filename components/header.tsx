@@ -184,8 +184,8 @@ export default function Header({ siteSettings, poles }: HeaderProps) {
   return (
     <>
       <header className="fixed inset-x-0 top-0 z-[100] flex justify-center px-4 pt-4 pointer-events-none">
-        
-        {/* MOBILE & TABLET FALLBACK */}
+
+        {/* MOBILE & TABLET FALLBACK — barre + mini-gantry (hamburger = bore) */}
         <div className="pointer-events-auto w-full max-w-7xl flex items-center justify-between rounded-2xl bg-white/95 backdrop-blur-md shadow-[0_8px_30px_rgb(0,0,0,0.12)] border border-gray-100 px-4 py-3 xl:hidden">
           <a href="/" className="flex items-center gap-3">
             <div className="relative h-10 w-10 rounded-full bg-white p-1 shadow-sm ring-1 ring-gray-100">
@@ -198,95 +198,184 @@ export default function Header({ siteSettings, poles }: HeaderProps) {
           </a>
           <div className="flex items-center gap-3">
             <LanguageSwitcher />
-            <button
-              ref={menuButtonRef}
-              className="flex h-10 w-10 cursor-pointer items-center justify-center rounded-full bg-gray-100 text-gray-600 transition-colors hover:bg-gray-200"
-              onClick={() => setIsOpen((v) => !v)}
+            {/* Mini-gantry : boîtier d'anneau clair + bore sombre cliquable */}
+            <div
+              className="relative flex h-11 w-11 items-center justify-center rounded-full"
+              style={{
+                background: 'radial-gradient(120% 120% at 30% 20%, #ffffff 0%, #f0f0f0 55%, #d9d9d9 100%)',
+                boxShadow: 'inset 1px 2px 3px rgba(255,255,255,1), inset -2px -2px 5px rgba(0,0,0,0.12), 0 2px 6px rgba(0,0,0,0.12)',
+              }}
             >
-              {isOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-            </button>
+              <span className="absolute right-0.5 top-1/2 h-5 w-[3px] -translate-y-1/2 rounded-full bg-[#EC0016] opacity-90" aria-hidden="true" />
+              <button
+                ref={menuButtonRef}
+                onClick={() => setIsOpen((v) => !v)}
+                aria-label={isOpen ? 'Fermer le menu' : 'Ouvrir le menu'}
+                aria-expanded={isOpen}
+                aria-controls="mobile-menu"
+                className="flex h-8 w-8 cursor-pointer items-center justify-center rounded-full text-white transition-transform active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#EC0016]"
+                style={{
+                  background: 'radial-gradient(circle at center, #1a1a1a 0%, #333 100%)',
+                  boxShadow: 'inset 0 2px 5px rgba(0,0,0,0.9), 0 1px 2px rgba(255,255,255,0.8)',
+                }}
+              >
+                {isOpen ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
+              </button>
+            </div>
           </div>
         </div>
 
-        {/* 3D SCANNER DESKTOP */}
-        <div className={cn("pointer-events-auto relative w-full max-w-5xl mx-auto h-[320px] hidden xl:block mt-8 transition-all duration-700 origin-top", isScrolled ? "scale-90 -translate-y-8" : "scale-100 translate-y-0")}>
-          
-          {/* BASE / PEDESTAL */}
-          <div className="absolute left-[15%] right-[25%] bottom-0 h-[24px] bg-[#d5d5d5] rounded-b-xl shadow-[0_15px_30px_rgba(0,0,0,0.15)] z-0 flex flex-col justify-end pb-1 border-b-2 border-[#b0b0b0]">
-            <div className="w-full h-2 bg-[#c0c0c0] rounded-full blur-[2px] opacity-50" />
+        {/* DESKTOP (xl+) : scanner complet au repos ↔ barre compacte au scroll */}
+        <div className="pointer-events-none relative mx-auto hidden h-[330px] w-full max-w-5xl xl:block">
+
+          {/* ============ SCANNER COMPLET (au repos) ============ */}
+          <div
+            className={cn(
+              'absolute inset-x-0 bottom-0 h-[320px] origin-top transition-all duration-500 ease-out',
+              isScrolled ? 'pointer-events-none scale-95 opacity-0' : 'pointer-events-auto scale-100 opacity-100',
+            )}
+          >
+            {/* BASE / PIÉDESTAL */}
+            <div className="absolute left-[15%] right-[25%] bottom-0 h-[24px] bg-[#d5d5d5] rounded-b-xl shadow-[0_15px_30px_rgba(0,0,0,0.15)] z-0 flex flex-col justify-end pb-1 border-b-2 border-[#b0b0b0]">
+              <div className="w-full h-2 bg-[#c0c0c0] rounded-full blur-[2px] opacity-50" />
+            </div>
+
+            {/* Colonne support strié */}
+            <div
+              className="absolute left-[20%] right-[30%] bottom-[24px] h-[56px] z-10 shadow-[inset_0_4px_10px_rgba(0,0,0,0.1),_inset_0_-4px_10px_rgba(0,0,0,0.15)]"
+              style={{
+                background: 'repeating-linear-gradient(180deg, #d8d8d8, #d8d8d8 6px, #f4f4f4 6px, #f4f4f4 12px)',
+                borderRadius: '4px 4px 0 0',
+              }}
+            />
+
+            {/* GANTRY (anneau d'imagerie, à droite) */}
+            <div
+              className="absolute right-0 bottom-0 w-[340px] h-[320px] z-20 transition-transform duration-700 hover:scale-[1.01]"
+              style={{
+                borderRadius: '170px 170px 20px 20px',
+                background: 'radial-gradient(130% 120% at 32% 18%, #ffffff 0%, #f6f6f6 32%, #e6e6e6 68%, #d4d4d4 100%)',
+                boxShadow:
+                  '-15px 15px 35px rgba(0,0,0,0.14), inset 5px 7px 18px rgba(255,255,255,1), inset -6px -8px 28px rgba(0,0,0,0.08), 2px 0 0 rgba(255,255,255,0.5)',
+              }}
+            >
+              {/* Reflet glossy haut-gauche */}
+              <div
+                aria-hidden="true"
+                className="absolute inset-0 z-10"
+                style={{
+                  borderRadius: '170px 170px 20px 20px',
+                  background:
+                    'radial-gradient(70% 45% at 30% 12%, rgba(255,255,255,0.85) 0%, rgba(255,255,255,0) 60%)',
+                }}
+              />
+
+              {/* Logo / titre */}
+              <div className="absolute top-7 left-1/2 -translate-x-1/2 z-30 flex flex-col items-center">
+                <span className="font-display text-sm font-extrabold text-[#006633] tracking-widest uppercase whitespace-nowrap">
+                  {clinicNameText}
+                </span>
+                <span className="text-[8px] font-bold text-[#EC0016] tracking-[0.3em] uppercase mt-0.5 whitespace-nowrap">
+                  SPECT / CT
+                </span>
+              </div>
+
+              {/* Anneaux concentriques (détecteurs type CT) */}
+              <div aria-hidden="true" className="absolute top-[58px] left-1/2 -translate-x-1/2 w-[224px] h-[224px] rounded-full z-20 border border-black/[0.06] shadow-[inset_0_2px_6px_rgba(0,0,0,0.05)]" />
+              <div aria-hidden="true" className="absolute top-[74px] left-1/2 -translate-x-1/2 w-[192px] h-[192px] rounded-full z-20 border border-black/[0.07]" />
+
+              {/* Bore (tunnel) */}
+              <div
+                className="absolute top-[90px] left-1/2 -translate-x-1/2 w-[160px] h-[160px] rounded-full z-30"
+                style={{
+                  background: 'radial-gradient(circle at 50% 38%, #2a2a2a 0%, #161616 45%, #0a0a0a 100%)',
+                  boxShadow:
+                    'inset 0 12px 30px rgba(0,0,0,0.95), inset 0 -3px 8px rgba(255,255,255,0.06), 0 2px 6px rgba(255,255,255,0.95), inset 0 2px 3px rgba(0,0,0,0.6)',
+                  border: '1px solid #3a3a3a',
+                }}
+              >
+                {/* Halo interne du tunnel */}
+                <div aria-hidden="true" className="absolute inset-[14px] rounded-full border border-white/5" />
+                <div aria-hidden="true" className="absolute inset-[30px] rounded-full bg-[radial-gradient(circle,rgba(255,255,255,0.05),transparent_70%)]" />
+                {/* Témoin laser rouge */}
+                <div className="absolute top-1/2 right-4 -translate-y-1/2 w-1.5 h-1.5 rounded-full bg-[#EC0016] shadow-[0_0_10px_rgba(236,0,22,1)] animate-pulse" />
+              </div>
+
+              {/* Liseré rouge Siemens */}
+              <div className="absolute right-[22px] top-[38px] bottom-[28px] w-[3px] bg-[#EC0016] rounded-full opacity-90 shadow-[0_0_8px_rgba(236,0,22,0.4)] z-30" />
+
+              {/* Étiquette latérale */}
+              <div className="absolute right-[-14px] top-[140px] z-30 bg-[#EC0016] text-white px-2 py-0.5 text-[10px] font-bold rounded-l-md rotate-90 origin-right shadow-md whitespace-nowrap">
+                Clinique Okba
+              </div>
+            </div>
+
+            {/* PLATEAU (table, à gauche) + menu */}
+            <div
+              className="absolute right-[240px] left-0 bottom-[60px] h-[100px] z-30 flex flex-col justify-end"
+              style={{
+                borderRadius: '50px 0 0 50px',
+                background: 'linear-gradient(180deg, #ffffff 0%, #fdfdfd 40%, #e8e8e8 100%)',
+                boxShadow:
+                  '0 20px 40px -15px rgba(0,0,0,0.25), inset 0 6px 12px rgba(255,255,255,1), inset 0 -4px 15px rgba(0,0,0,0.06)',
+              }}
+            >
+              <div className="absolute bottom-2 left-[20px] right-0 h-[4px] bg-[#EC0016] rounded-l-full shadow-[0_2px_4px_rgba(236,0,22,0.3)]" />
+
+              <div className="absolute inset-0 flex items-center justify-between px-8 pt-2 pb-4">
+                <a href="/" className="flex items-center gap-3 shrink-0 mr-4 group">
+                  <div className="relative h-12 w-12 rounded-full bg-white p-1 shadow-sm ring-1 ring-gray-100 transition-transform group-hover:scale-105">
+                    <Image src="/logo.png" alt="Logo" fill className="object-contain p-1" />
+                  </div>
+                  <div className="flex flex-col">
+                    <span className="text-sm font-extrabold text-[#006633] leading-none uppercase">Centre</span>
+                    <span className="text-sm font-extrabold text-[#006633] leading-none uppercase mt-1">Diagnostic</span>
+                  </div>
+                </a>
+
+                <nav className="flex-1 flex items-center justify-around px-4" onMouseLeave={() => setHovered(null)} aria-label="Navigation principale">
+                  <NavIconLink icon={Home} label={t('center')} isActive={indicatorKey === 'about'} onClick={() => scrollToSection('#about')} onHover={() => setHovered('about')} />
+                  <NavIconLink icon={User} label={t('team')} isActive={false} onClick={() => scrollToSection('/equipe')} onHover={() => setHovered('team')} />
+                  <NavIconDropdown icon={Stethoscope} label={t('specialties')} isActive={indicatorKey === 'specialties'} onHover={() => setHovered('specialties')} poles={navPoles} />
+                  <NavIconLink icon={ClipboardList} label={t('exams')} isActive={false} onClick={() => scrollToSection('#specialties')} onHover={() => setHovered('specialties')} />
+                  <NavIconLink icon={Info} label={t('faq')} isActive={indicatorKey === 'faq'} onClick={() => scrollToSection('/faq')} onHover={() => setHovered('faq')} />
+                  <NavIconLink icon={Mail} label={t('contact')} isActive={indicatorKey === 'contact'} onClick={() => scrollToSection('#contact')} onHover={() => setHovered('contact')} />
+                </nav>
+
+                <div className="shrink-0 pl-6 border-l border-gray-300">
+                  <LanguageSwitcher />
+                </div>
+              </div>
+            </div>
           </div>
 
-          <div 
-            className="absolute left-[20%] right-[30%] bottom-[24px] h-[56px] z-10 shadow-[inset_0_4px_10px_rgba(0,0,0,0.1),_inset_0_-4px_10px_rgba(0,0,0,0.15)]"
-            style={{
-              background: 'repeating-linear-gradient(180deg, #d8d8d8, #d8d8d8 6px, #f4f4f4 6px, #f4f4f4 12px)',
-              borderRadius: '4px 4px 0 0'
-            }}
-          />
+          {/* ============ BARRE COMPACTE (au scroll) ============ */}
+          <div
+            className={cn(
+              'absolute inset-x-0 top-0 transition-all duration-500 ease-out',
+              isScrolled ? 'pointer-events-auto translate-y-0 opacity-100' : 'pointer-events-none -translate-y-3 opacity-0',
+            )}
+          >
+            <div
+              className="relative flex h-[72px] items-center gap-4 rounded-[36px] border border-gray-100 bg-white/95 pl-5 pr-2 backdrop-blur-md"
+              style={{ boxShadow: '0 14px 36px -14px rgba(0,0,0,0.28), inset 0 2px 6px rgba(255,255,255,1), inset 0 -3px 10px rgba(0,0,0,0.05)' }}
+            >
+              {/* Liseré rouge plateau */}
+              <div aria-hidden="true" className="absolute bottom-2 left-6 right-[88px] h-[3px] rounded-full bg-[#EC0016]/80" />
 
-          {/* GANTRY (Right Scanner Ring) */}
-          <div className="absolute right-0 bottom-0 w-[340px] h-[320px] z-20 transition-transform duration-700 hover:scale-[1.01]" style={{
-            borderRadius: '170px 170px 20px 20px',
-            background: 'linear-gradient(135deg, #ffffff 0%, #f9f9f9 30%, #e0e0e0 100%)',
-            boxShadow: '-15px 15px 35px rgba(0,0,0,0.12), inset 4px 6px 15px rgba(255,255,255,1), inset -5px -5px 25px rgba(0,0,0,0.06), 2px 0 0 rgba(255,255,255,0.5)'
-          }}>
-            {/* Logo on Top */}
-            <div className="absolute top-8 left-1/2 -translate-x-1/2 flex flex-col items-center">
-              <span className="font-display text-sm font-extrabold text-[#006633] tracking-widest uppercase whitespace-nowrap">
-                {clinicNameText}
-              </span>
-              <span className="text-[8px] font-bold text-[#EC0016] tracking-[0.3em] uppercase mt-0.5 whitespace-nowrap">
-                Scanner 3D
-              </span>
-            </div>
-
-            {/* Inner Bore (Hole) */}
-            <div className="absolute top-[90px] left-1/2 -translate-x-1/2 w-[160px] h-[160px] rounded-full z-30" style={{
-              background: 'radial-gradient(circle at center, #111 0%, #333 100%)',
-              boxShadow: 'inset 0 10px 25px rgba(0,0,0,0.9), 0 2px 5px rgba(255,255,255,0.9), inset 0 2px 2px rgba(0,0,0,0.5)',
-              border: '1px solid #444'
-            }}>
-               <div className="absolute top-[40%] right-3 w-1.5 h-1.5 rounded-full bg-red-500 shadow-[0_0_8px_rgba(239,68,68,1)] animate-pulse" />
-            </div>
-
-            {/* Red Arc Strip */}
-            <div className="absolute right-[24px] top-[40px] bottom-[30px] w-[3px] bg-[#EC0016] rounded-full opacity-90 shadow-[0_0_8px_rgba(236,0,22,0.4)]" />
-
-            {/* Side Label */}
-            <div className="absolute right-[-14px] top-[140px] bg-[#EC0016] text-white px-2 py-0.5 text-[10px] font-bold rounded-l-md rotate-90 origin-right shadow-md whitespace-nowrap">
-              Clinique Okba
-            </div>
-          </div>
-
-          {/* TABLE (Left Side) */}
-          <div className="absolute right-[240px] left-0 bottom-[60px] h-[100px] z-30 flex flex-col justify-end transition-transform duration-700 hover:-translate-x-1" style={{
-            borderRadius: '50px 0 0 50px',
-            background: 'linear-gradient(180deg, #ffffff 0%, #fdfdfd 40%, #e8e8e8 100%)',
-            boxShadow: '0 20px 40px -15px rgba(0,0,0,0.25), inset 0 6px 12px rgba(255,255,255,1), inset 0 -4px 15px rgba(0,0,0,0.06)'
-          }}>
-            {/* Accent Line */}
-            <div className="absolute bottom-2 left-[20px] right-0 h-[4px] bg-[#EC0016] rounded-l-full shadow-[0_2px_4px_rgba(236,0,22,0.3)]" />
-
-            {/* Table Content */}
-            <div className="absolute inset-0 flex items-center justify-between px-8 pt-2 pb-4">
-              
-              {/* Logo Area */}
-              <a href="/" className="flex items-center gap-3 shrink-0 mr-4 group">
-                <div className="relative h-12 w-12 rounded-full bg-white p-1 shadow-sm ring-1 ring-gray-100 transition-transform group-hover:scale-105">
+              {/* Logo */}
+              <a href="/" className="flex shrink-0 items-center gap-2.5 group">
+                <div className="relative h-10 w-10 rounded-full bg-white p-1 shadow-sm ring-1 ring-gray-100 transition-transform group-hover:scale-105">
                   <Image src="/logo.png" alt="Logo" fill className="object-contain p-1" />
                 </div>
-                <div className="flex flex-col">
-                  <span className="text-sm font-extrabold text-[#006633] leading-none uppercase">
-                    Centre
-                  </span>
-                  <span className="text-sm font-extrabold text-[#006633] leading-none uppercase mt-1">
-                    Diagnostic
-                  </span>
-                </div>
+                <span className="hidden flex-col leading-none 2xl:flex">
+                  <span className="text-xs font-extrabold uppercase text-[#006633]">Centre</span>
+                  <span className="mt-0.5 text-xs font-extrabold uppercase text-[#006633]">Diagnostic</span>
+                </span>
               </a>
 
-              {/* Navigation */}
-              <nav className="flex-1 flex items-center justify-around px-4" onMouseLeave={() => setHovered(null)}>
+              {/* Menu compact */}
+              <nav className="flex flex-1 items-center justify-center gap-1" onMouseLeave={() => setHovered(null)} aria-label="Navigation principale (compacte)">
                 <NavIconLink icon={Home} label={t('center')} isActive={indicatorKey === 'about'} onClick={() => scrollToSection('#about')} onHover={() => setHovered('about')} />
                 <NavIconLink icon={User} label={t('team')} isActive={false} onClick={() => scrollToSection('/equipe')} onHover={() => setHovered('team')} />
                 <NavIconDropdown icon={Stethoscope} label={t('specialties')} isActive={indicatorKey === 'specialties'} onHover={() => setHovered('specialties')} poles={navPoles} />
@@ -295,8 +384,28 @@ export default function Header({ siteSettings, poles }: HeaderProps) {
                 <NavIconLink icon={Mail} label={t('contact')} isActive={indicatorKey === 'contact'} onClick={() => scrollToSection('#contact')} onHover={() => setHovered('contact')} />
               </nav>
 
-              <div className="shrink-0 pl-6 border-l border-gray-300">
+              <div className="flex shrink-0 items-center gap-2 pl-3 border-l border-gray-200">
                 <LanguageSwitcher />
+                {/* Mini-gantry décoratif (rappel du scanner) */}
+                <div
+                  aria-hidden="true"
+                  className="relative flex h-12 w-12 items-center justify-center rounded-full"
+                  style={{
+                    background: 'radial-gradient(120% 120% at 32% 20%, #ffffff 0%, #f0f0f0 55%, #d8d8d8 100%)',
+                    boxShadow: 'inset 1px 2px 4px rgba(255,255,255,1), inset -2px -3px 7px rgba(0,0,0,0.12), 0 2px 6px rgba(0,0,0,0.1)',
+                  }}
+                >
+                  <span className="absolute right-1 top-1/2 h-6 w-[3px] -translate-y-1/2 rounded-full bg-[#EC0016] opacity-90" />
+                  <span
+                    className="flex h-6 w-6 items-center justify-center rounded-full"
+                    style={{
+                      background: 'radial-gradient(circle at 50% 40%, #2a2a2a 0%, #111 100%)',
+                      boxShadow: 'inset 0 2px 5px rgba(0,0,0,0.9), 0 1px 2px rgba(255,255,255,0.85)',
+                    }}
+                  >
+                    <span className="h-1.5 w-1.5 rounded-full bg-[#EC0016] shadow-[0_0_8px_rgba(236,0,22,1)] animate-pulse" />
+                  </span>
+                </div>
               </div>
             </div>
           </div>

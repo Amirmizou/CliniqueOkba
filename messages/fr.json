@@ -2,7 +2,12 @@
   "nav": {
     "home": "Accueil",
     "about": "À propos",
+    "center": "Le Centre",
     "specialties": "Spécialités",
+    "exams": "Examens",
+    "equipment": "Équipements",
+    "doctors": "Médecins",
+    "appointment": "Prendre rendez-vous",
     "services": "Services",
     "homeCare": "Soins à domicile",
     "gallery": "Galerie",
