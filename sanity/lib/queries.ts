@@ -148,6 +148,7 @@ export const polesQuery = groq`
     items_ar,
     iconName,
     accentColor,
+    "imageUrl": image.asset->url,
     galleryCategories,
     "videos": videos[]{
       title,
