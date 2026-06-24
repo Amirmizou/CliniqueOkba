@@ -1,14 +1,13 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import {
   Menu,
   X,
-  Phone,
-  Calendar,
-  CalendarDays,
+  CalendarHeart,
   ChevronDown,
   Newspaper,
+  CalendarDays,
   Users,
   HelpCircle,
   ScanLine,
@@ -24,10 +23,9 @@ import {
   Activity,
   type LucideIcon,
 } from 'lucide-react'
-import { Button } from '@/components/ui/button'
 import { ThemeToggle } from '@/components/theme-toggle'
 import { LanguageSwitcher } from '@/components/language-switcher'
-import { Link, useRouter } from '@/navigation'
+import { Link } from '@/navigation'
 import { useTranslations, useLocale } from 'next-intl'
 import Image from 'next/image'
 import { motion, AnimatePresence, useScroll, useMotionValueEvent } from 'framer-motion'
@@ -65,16 +63,16 @@ function resolveNavPoles(data: any[] | undefined, locale: string): NavPole[] {
     const local = localPoles.find((lp) => lp.slug === slug)
 
     let title = (locale === 'ar' && p.title_ar) ? p.title_ar : (p.title || '')
-    const hasArabicChars = /[\u0600-\u06FF]/.test(title)
-    
-    // Si on est en arabe mais que le texte n'a pas de caractères arabes, 
+    const hasArabicChars = /[؀-ۿ]/.test(title)
+
+    // Si on est en arabe mais que le texte n'a pas de caractères arabes,
     // on va chercher dans les données locales.
     if (locale === 'ar' && !hasArabicChars && local?.title_ar) {
       title = local.title_ar
     }
 
     let badge = (locale === 'ar' && p.badge_ar) ? p.badge_ar : (p.badge || undefined)
-    const badgeHasArabic = badge ? /[\u0600-\u06FF]/.test(badge) : false
+    const badgeHasArabic = badge ? /[؀-ۿ]/.test(badge) : false
     if (locale === 'ar' && badge && !badgeHasArabic && local?.badge_ar) {
       badge = local.badge_ar
     }
@@ -100,398 +98,403 @@ interface HeaderProps {
   poles?: any[]
 }
 
+/* --------------------------------------------------------------------------
+ * Onde IRM — ligne fine + balayage scanner intégrés dans la navbar.
+ * Effets purement CSS (transform / stroke-dashoffset), neutralisés par
+ * `prefers-reduced-motion` (voir globals.css). Décoratif → aria-hidden.
+ * ------------------------------------------------------------------------ */
+function IrmWave({ active }: { active: boolean }) {
+  return (
+    <div
+      aria-hidden="true"
+      className="pointer-events-none absolute inset-x-0 bottom-0 h-6 overflow-hidden rounded-b-[inherit]"
+      style={{
+        maskImage: 'linear-gradient(to right, transparent, black 12%, black 88%, transparent)',
+        WebkitMaskImage: 'linear-gradient(to right, transparent, black 12%, black 88%, transparent)',
+      }}
+    >
+      {/* Tracé d'onde (sinusoïde douce, signature « imagerie ») */}
+      <svg
+        className="absolute inset-x-0 bottom-1 h-4 w-full text-primary/40"
+        viewBox="0 0 1200 24"
+        preserveAspectRatio="none"
+        fill="none"
+      >
+        <path
+          className="irm-trace"
+          d="M0 12 Q30 4 60 12 T120 12 T180 12 T240 12 T300 12 T360 12 T420 12 T480 12 T540 12 T600 12 T660 12 T720 12 T780 12 T840 12 T900 12 T960 12 T1020 12 T1080 12 T1140 12 T1200 12"
+          stroke="currentColor"
+          strokeWidth="1.5"
+          strokeLinecap="round"
+        />
+      </svg>
+
+      {/* Halo de balayage gauche → droite */}
+      <div
+        className={cn(
+          'absolute bottom-0 left-0 h-full w-28 blur-[2px] transition-opacity duration-500',
+          active ? 'opacity-90' : 'opacity-60',
+        )}
+      >
+        <div className="irm-scan h-full w-full bg-[linear-gradient(90deg,transparent,rgba(0,102,51,0.55)_45%,rgba(253,230,138,0.9)_50%,rgba(0,102,51,0.55)_55%,transparent)]" />
+      </div>
+    </div>
+  )
+}
+
 export default function Header({ siteSettings, poles }: HeaderProps) {
   const t = useTranslations('nav')
   const locale = useLocale()
   const navPoles = resolveNavPoles(poles, locale)
   const [isOpen, setIsOpen] = useState(false)
-  const [hidden, setHidden] = useState(false)
-  const [activeTab, setActiveTab] = useState('home')
-  const { scrollY } = useScroll()
   const [isScrolled, setIsScrolled] = useState(false)
+  const [activeTab, setActiveTab] = useState('home')
+  const [hovered, setHovered] = useState<string | null>(null)
+  const { scrollY } = useScroll()
+  const menuButtonRef = useRef<HTMLButtonElement>(null)
 
-  // Prevent body scroll when mobile menu is open
+  // Liens principaux (centrés). Câblés sur les ancres réelles du site.
+  const navItems = [
+    { key: 'center', href: '#about', id: 'about' },
+    { key: 'exams', href: '#specialties', id: 'specialties' },
+    { key: 'equipment', href: '#equipements', id: 'equipements' },
+    { key: 'doctors', href: '#medecins', id: 'medecins' },
+    { key: 'contact', href: '#contact', id: 'contact' },
+  ]
+
+  // Verrou de scroll quand le menu mobile est ouvert
   useEffect(() => {
-    if (isOpen) {
-      document.body.style.overflow = 'hidden'
-    } else {
-      document.body.style.overflow = 'unset'
-    }
+    document.body.style.overflow = isOpen ? 'hidden' : 'unset'
     return () => {
       document.body.style.overflow = 'unset'
     }
   }, [isOpen])
 
-  // Intersection Observer for active section detection
+  // Fermeture clavier (Échap) + restauration du focus
   useEffect(() => {
-    const sections = ['home', 'about', 'specialties', 'equipements', 'contact']
+    if (!isOpen) return
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setIsOpen(false)
+        menuButtonRef.current?.focus()
+      }
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [isOpen])
 
+  // Détection de la section active (surligne le bon lien)
+  useEffect(() => {
+    const sections = ['home', 'about', 'specialties', 'equipements', 'medecins', 'contact']
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            setActiveTab(entry.target.id)
-          }
+          if (entry.isIntersecting) setActiveTab(entry.target.id)
         })
       },
-      { threshold: 0.3, rootMargin: '-100px 0px -50% 0px' }
+      { threshold: 0.3, rootMargin: '-100px 0px -50% 0px' },
     )
-
     sections.forEach((id) => {
-      const element = document.getElementById(id)
-      if (element) observer.observe(element)
+      const el = document.getElementById(id)
+      if (el) observer.observe(el)
     })
-
     return () => observer.disconnect()
   }, [])
 
-  // Handle hash on page load
+  // Gestion du hash au chargement
   useEffect(() => {
     const hash = window.location.hash
     if (hash) {
-      // Wait a bit for the page to render
       setTimeout(() => {
-        const element = document.querySelector(hash)
-        if (element) {
-          element.scrollIntoView({ behavior: 'smooth' })
+        const el = document.querySelector(hash)
+        if (el) {
+          el.scrollIntoView({ behavior: 'smooth' })
           setActiveTab(hash.replace('#', ''))
         }
       }, 100)
     }
   }, [])
 
-  useMotionValueEvent(scrollY, "change", (latest) => {
-    const previous = scrollY.getPrevious() ?? 0
-    if (latest > previous && latest > 150) {
-      setHidden(true)
-    } else {
-      setHidden(false)
-    }
-    setIsScrolled(latest > 20)
+  // Compactage au scroll (remplace l'ancien masquage) : plus opaque + ombre
+  useMotionValueEvent(scrollY, 'change', (latest) => {
+    setIsScrolled(latest > 24)
   })
-
-  const navItems = [
-    { label: t('home'), href: '#home', id: 'home' },
-    { label: t('about'), href: '#about', id: 'about' },
-    { label: t('gallery'), href: '#equipements', id: 'equipements' },
-    { label: t('contact'), href: '#contact', id: 'contact' },
-  ]
 
   const scrollToSection = (href: string) => {
     setIsOpen(false)
-
-    // Check if we're on the homepage
     const isHomepage = window.location.pathname === '/' || window.location.pathname === '/ar'
-
     if (isHomepage) {
-      // On homepage, just scroll
-      const element = document.querySelector(href)
-      if (element) {
-        element.scrollIntoView({ behavior: 'smooth' })
+      const el = document.querySelector(href)
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth' })
         setActiveTab(href.replace('#', ''))
       }
     } else {
-      // On another page, navigate to homepage with hash
       window.location.href = `/${href}`
     }
   }
 
+  // L'indicateur lumineux suit le lien survolé, sinon la section active
+  const indicatorKey = hovered ?? activeTab
+
   return (
     <>
-      <motion.header
-        variants={{
-          visible: { y: 0, opacity: 1 },
-          hidden: { y: -100, opacity: 0 }
-        }}
-        animate={hidden ? "hidden" : "visible"}
-        transition={{ duration: 0.35, ease: "easeInOut" }}
-        className="fixed top-0 left-0 right-0 z-[100] flex justify-center pt-4 px-4 pointer-events-none"
-      >
-        <div className={cn(
-          "pointer-events-auto flex items-center justify-between gap-2 sm:gap-4 px-3 py-2 rounded-full transition-all duration-500 ease-out border w-full max-w-6xl",
-          isScrolled
-            ? "bg-white/70 dark:bg-black/70 backdrop-blur-[24px] border-border/40 shadow-[0_8px_30px_rgb(0,0,0,0.12)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.3)]"
-            : "bg-white/40 dark:bg-black/40 backdrop-blur-lg border-white/40 dark:border-white/10 shadow-[0_8px_30px_rgb(0,0,0,0.05)]"
-        )}>
-          {/* Logo Section */}
-          <a
-            href='/'
-            className='group flex cursor-pointer items-center gap-3'
+      <header className="fixed inset-x-0 top-0 z-[100] flex justify-center px-2 pt-2 sm:px-4 sm:pt-4 pointer-events-none">
+        {/* L'ensemble Scanner (Table + Gantry) */}
+        <div className="pointer-events-auto relative w-full max-w-7xl flex items-center justify-end transition-all duration-500 ease-out">
+          
+          {/* Plateau (Table) - S'étend vers la gauche */}
+          <div
+            className={cn(
+              'relative flex flex-1 items-center justify-between z-10 transition-all duration-500 ease-out',
+              'rounded-l-2xl sm:rounded-l-3xl border border-white/60 dark:border-white/10',
+              'bg-[#f8f9fa] dark:bg-slate-900',
+              // Effet lévitation et matérialité
+              'shadow-[0_15px_35px_-5px_rgba(0,0,0,0.1),_inset_0_2px_4px_rgba(255,255,255,0.8)] dark:shadow-[0_15px_35px_-5px_rgba(0,0,0,0.4),_inset_0_2px_4px_rgba(255,255,255,0.05)]',
+              // Recouvre un peu le gantry pour fusionner
+              'mr-[-1.5rem] sm:mr-[-2rem] pl-2 sm:pl-4 pr-7 sm:pr-10',
+              isScrolled ? 'h-14 sm:h-16 shadow-[0_10px_40px_-12px_rgba(0,0,0,0.15)]' : 'h-16 sm:h-20'
+            )}
           >
-            <motion.div
-              className='relative h-10 w-10 sm:h-11 sm:w-11 overflow-hidden rounded-full bg-white p-1 shadow-md ring-1 ring-black/10 flex-shrink-0'
-              whileHover={{ scale: 1.05, rotate: 5 }}
-              whileTap={{ scale: 0.95 }}
+            {/* Logo (gauche) */}
+            <a href="/" className="group flex shrink-0 cursor-pointer items-center gap-3" aria-label="Clinique OKBA — accueil">
+              <motion.div
+                className={cn(
+                  'relative overflow-hidden rounded-full bg-white p-1 shadow-md ring-1 ring-black/5 dark:ring-white/10 transition-all duration-500',
+                  isScrolled ? 'h-9 w-9 sm:h-10 sm:w-10' : 'h-10 w-10 sm:h-12 sm:w-12',
+                )}
+                whileHover={{ scale: 1.05, rotate: 4 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                <Image src="/logo.png" alt="Clinique OKBA" fill sizes="48px" className="object-contain p-0.5" priority />
+              </motion.div>
+              <div className="hidden flex-col leading-none xl:flex">
+                <span className="font-display text-sm font-extrabold tracking-tight text-foreground">
+                  {siteSettings?.clinicName && (locale !== 'ar' || /[؀-ۿ]/.test(siteSettings.clinicName))
+                    ? siteSettings.clinicName
+                    : (locale === 'ar' ? 'المصحة الطبية عقبة' : 'Clinique OKBA')}
+                </span>
+                <span className="mt-0.5 text-[9px] font-bold uppercase tracking-[0.2em] text-[#EC0016]">{t('tagline')}</span>
+              </div>
+            </a>
+
+            {/* Menu centré (flux flex : occupe l'espace central) */}
+            <nav
+              aria-label="Navigation principale"
+              className="hidden min-w-0 flex-1 items-center justify-center gap-0.5 xl:flex"
+              onMouseLeave={() => setHovered(null)}
             >
-              <Image
-                src='/logo.png'
-                alt='Clinique OKBA'
-                fill
-                sizes="44px"
-                className='object-contain p-0.5'
-                priority
+              {/* Le Centre */}
+              <NavLink
+                label={t('center')}
+                isActive={indicatorKey === 'about'}
+                onClick={() => scrollToSection('#about')}
+                onHover={() => setHovered('about')}
               />
-            </motion.div>
-            <div className="hidden sm:flex flex-col leading-none transition-all duration-300 opacity-100">
-              <span className='font-display text-sm font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-foreground to-foreground/70 tracking-tight'>
-                {siteSettings?.clinicName && (!locale || locale !== 'ar' || /[\u0600-\u06FF]/.test(siteSettings.clinicName)) 
-                  ? siteSettings.clinicName 
-                  : (locale === 'ar' ? 'المصحة الطبية عقبة' : 'Clinique OKBA')}
-              </span>
-              <span className='text-[9px] text-primary font-bold tracking-widest uppercase mt-0.5'>{t('tagline')}</span>
-            </div>
-          </a>
 
-          {/* Desktop Navigation - The "Island" */}
-          <nav className='hidden md:flex items-center gap-2 bg-white/50 dark:bg-black/20 p-1.5 rounded-full border border-white/40 dark:border-white/10 shadow-sm'>
-            {navItems.map((item) => {
-              const isActive = activeTab === item.id || activeTab === item.id.replace('#', '')
-
-              return (
-                <button
-                  key={item.label} // Changed key to label to be safe
-                  onClick={() => scrollToSection(item.href || '#')}
-                  onMouseEnter={() => {
-                    // Optional: Pre-select on hover for snappier feel
-                    // setActiveTab(item.id) 
-                  }}
-                  className={cn(
-                    'relative px-5 py-2.5 text-sm font-semibold transition-colors duration-300 rounded-full flex items-center gap-2 group z-10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2',
-                    isActive ? "text-primary drop-shadow-sm" : "text-foreground/90 hover:text-primary"
-                  )}
-                >
-                  {/* Active Indicator (The "Liquid Pill") - Premium */}
-                  {isActive && (
-                    <motion.div
-                      layoutId="activeSection"
-                      className="absolute inset-0 bg-primary/10 shadow-[inset_0_1px_1px_rgba(255,255,255,0.2)] rounded-full z-[-1] border border-primary/20"
-                      transition={{ type: "spring", stiffness: 400, damping: 30 }}
-                    />
-                  )}
-
-                  {/* Text Content */}
-                  <span className="relative z-10 font-medium tracking-wide">{item.label}</span>
-
-                  {/* Hover Glow Effect */}
-                  {!isActive && (
-                    <div className="absolute inset-0 rounded-full bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
-                  )}
-                </button>
-              )
-            })}
-
-            <div className="hidden md:block w-px h-6 bg-border/50 mx-1" /> {/* Divider */}
-
-            {/* Dropdown : Pôles */}
-            <motion.div initial="initial" whileHover="hover" className="relative z-30">
-              <button
-                className="relative px-5 py-2.5 text-sm font-semibold transition-colors duration-300 rounded-full text-foreground/90 hover:text-primary flex items-center gap-1 hover:bg-white/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+              {/* Spécialités — déroulant des pôles */}
+              <NavDropdown
+                label={t('specialties')}
+                isActive={indicatorKey === 'specialties'}
+                onHover={() => setHovered('specialties')}
+                align="center"
+                width="w-[22rem]"
               >
-                {t('poles')}
-                <motion.div variants={{ initial: { rotate: 0 }, hover: { rotate: -180 } }} transition={{ duration: 0.3 }}>
-                  <ChevronDown className="h-3 w-3" />
-                </motion.div>
-              </button>
-
-              <motion.div 
-                className="absolute top-full start-1/2 -translate-x-1/2 pt-6 w-[22rem]"
-                variants={{
-                  initial: { opacity: 0, y: 15, scale: 0.95, pointerEvents: "none" },
-                  hover: { opacity: 1, y: 0, scale: 1, pointerEvents: "auto" }
-                }}
-                transition={{ type: "spring", stiffness: 400, damping: 25 }}
-              >
-                <div className="glass-card p-2 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.12)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.3)] border border-white/40 dark:border-white/10 overflow-hidden bg-white/95 dark:bg-black/95 backdrop-blur-[24px]">
-                  <div className="grid grid-cols-1 gap-1">
-                    {navPoles.map((pole) => {
-                      const Icon = POLE_ICONS[pole.iconName] || Stethoscope
-                      return (
-                        <Link
-                          key={pole.slug}
-                          href={`/poles/${pole.slug}`}
-                          className="flex items-center gap-3 px-3 py-2.5 text-sm rounded-xl hover:bg-primary/5 transition-all duration-200 group/item"
+                <div className="grid grid-cols-1 gap-1">
+                  {navPoles.map((pole) => {
+                    const Icon = POLE_ICONS[pole.iconName] || Stethoscope
+                    return (
+                      <Link
+                        key={pole.slug}
+                        href={`/poles/${pole.slug}`}
+                        className="group/item flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm transition-colors duration-200 hover:bg-[#EC0016]/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#EC0016]"
+                      >
+                        <span
+                          className="flex h-9 w-9 items-center justify-center rounded-lg text-white shadow-sm transition-transform group-hover/item:scale-110"
+                          style={{ backgroundColor: pole.accent }}
                         >
-                          <div
-                            className="flex h-9 w-9 items-center justify-center rounded-lg text-white shadow-sm transition-transform group-hover/item:scale-110"
-                            style={{ backgroundColor: pole.accent }}
-                          >
-                            <Icon className="h-4 w-4" />
-                          </div>
-                          <div className="flex flex-col">
-                            <span className="font-semibold text-foreground leading-tight">
-                              {pole.title}
-                            </span>
-                            {pole.badge && (
-                              <span className="text-[10px] font-medium opacity-70">
-                                {pole.badge}
-                              </span>
-                            )}
-                          </div>
-                        </Link>
-                      )
-                    })}
-                  </div>
+                          <Icon className="h-4 w-4" />
+                        </span>
+                        <span className="flex flex-col">
+                          <span className="font-semibold leading-tight text-foreground">{pole.title}</span>
+                          {pole.badge && <span className="text-[10px] font-medium opacity-70">{pole.badge}</span>}
+                        </span>
+                      </Link>
+                    )
+                  })}
                 </div>
-              </motion.div>
-            </motion.div>
+              </NavDropdown>
 
-            {/* Dropdown for additional pages */}
-            <motion.div initial="initial" whileHover="hover" className="relative z-20">
-              <button
-                className="relative px-5 py-2.5 text-sm font-semibold transition-colors duration-300 rounded-full text-foreground/90 hover:text-primary flex items-center gap-1 hover:bg-white/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
-              >
-                {t('more')}
-                <motion.div variants={{ initial: { rotate: 0 }, hover: { rotate: -180 } }} transition={{ duration: 0.3 }}>
-                  <ChevronDown className="h-3 w-3" />
-                </motion.div>
-              </button>
+              {/* Examens (→ section Pôles) */}
+              <NavLink
+                label={t('exams')}
+                isActive={false}
+                onClick={() => scrollToSection('#specialties')}
+                onHover={() => setHovered('specialties')}
+              />
 
-              {/* Dropdown Menu */}
-              <motion.div 
-                className="absolute top-full end-0 pt-6 w-64"
-                variants={{
-                  initial: { opacity: 0, y: 15, scale: 0.95, pointerEvents: "none" },
-                  hover: { opacity: 1, y: 0, scale: 1, pointerEvents: "auto" }
-                }}
-                transition={{ type: "spring", stiffness: 400, damping: 25 }}
+              {/* Équipements */}
+              <NavLink
+                label={t('equipment')}
+                isActive={indicatorKey === 'equipements'}
+                onClick={() => scrollToSection('#equipements')}
+                onHover={() => setHovered('equipements')}
+              />
+
+              {/* Médecins */}
+              <NavLink
+                label={t('doctors')}
+                isActive={indicatorKey === 'medecins'}
+                onClick={() => scrollToSection('#medecins')}
+                onHover={() => setHovered('medecins')}
+              />
+
+              {/* Contact */}
+              <NavLink
+                label={t('contact')}
+                isActive={indicatorKey === 'contact'}
+                onClick={() => scrollToSection('#contact')}
+                onHover={() => setHovered('contact')}
+              />
+
+              {/* Plus — pages secondaires */}
+              <NavDropdown
+                label={t('more')}
+                isActive={false}
+                onHover={() => setHovered(null)}
+                align="end"
+                width="w-64"
               >
-                <div className="glass-card p-2 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.12)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.3)] border border-white/40 dark:border-white/10 overflow-hidden bg-white/95 dark:bg-black/95 backdrop-blur-[24px]">
-                  <div className="space-y-1">
-                    <a href="/actualites" className="flex items-center gap-4 px-4 py-3 text-sm rounded-xl hover:bg-primary/5 text-muted-foreground hover:text-primary transition-all duration-200 group/item">
-                      <div className="p-2 rounded-lg bg-primary/10 text-primary group-hover/item:bg-primary group-hover/item:text-white transition-colors shadow-sm">
-                        <Newspaper className="h-4 w-4" />
-                      </div>
-                      <div className="flex flex-col">
-                        <span className="font-semibold text-foreground group-hover/item:text-primary">{t('news')}</span>
-                        <span className="text-[10px] opacity-70">{t('newsDesc')}</span>
-                      </div>
-                    </a>
-                    <a href="/evenements" className="flex items-center gap-4 px-4 py-3 text-sm rounded-xl hover:bg-primary/5 text-muted-foreground hover:text-primary transition-all duration-200 group/item">
-                      <div className="p-2 rounded-lg bg-primary/10 text-primary group-hover/item:bg-primary group-hover/item:text-white transition-colors shadow-sm">
-                        <CalendarDays className="h-4 w-4" />
-                      </div>
-                      <div className="flex flex-col">
-                        <span className="font-semibold text-foreground group-hover/item:text-primary">{t('events')}</span>
-                        <span className="text-[10px] opacity-70">{t('eventsDesc')}</span>
-                      </div>
-                    </a>
-                    <a href="/equipe" className="flex items-center gap-4 px-4 py-3 text-sm rounded-xl hover:bg-primary/5 text-muted-foreground hover:text-primary transition-all duration-200 group/item">
-                      <div className="p-2 rounded-lg bg-primary/10 text-primary group-hover/item:bg-primary group-hover/item:text-white transition-colors shadow-sm">
-                        <Users className="h-4 w-4" />
-                      </div>
-                      <div className="flex flex-col">
-                        <span className="font-semibold text-foreground group-hover/item:text-primary">{t('team')}</span>
-                        <span className="text-[10px] opacity-70">{t('teamDesc')}</span>
-                      </div>
-                    </a>
-                    <a href="/faq" className="flex items-center gap-4 px-4 py-3 text-sm rounded-xl hover:bg-primary/5 text-muted-foreground hover:text-primary transition-all duration-200 group/item">
-                      <div className="p-2 rounded-lg bg-primary/10 text-primary group-hover/item:bg-primary group-hover/item:text-white transition-colors shadow-sm">
-                        <HelpCircle className="h-4 w-4" />
-                      </div>
-                      <div className="flex flex-col">
-                        <span className="font-semibold text-foreground group-hover/item:text-primary">{t('faq')}</span>
-                        <span className="text-[10px] opacity-70">{t('faqDesc')}</span>
-                      </div>
-                    </a>
-                  </div>
+                <div className="space-y-1">
+                  <MorePageLink href="/actualites" icon={Newspaper} title={t('news')} desc={t('newsDesc')} />
+                  <MorePageLink href="/evenements" icon={CalendarDays} title={t('events')} desc={t('eventsDesc')} />
+                  <MorePageLink href="/equipe" icon={Users} title={t('team')} desc={t('teamDesc')} />
+                  <MorePageLink href="/faq" icon={HelpCircle} title={t('faq')} desc={t('faqDesc')} />
                 </div>
-              </motion.div>
-            </motion.div>
-          </nav>
+              </NavDropdown>
+            </nav>
 
-          {/* Actions */}
-          <div className='flex items-center gap-1 sm:gap-2'>
-            {/* Language toggle */}
-            <div className="flex items-center gap-1 pe-1 sm:pe-2 border-e border-border/50 me-1 sm:me-2">
-              <div className="flex items-center justify-center">
+            {/* Actions (droite de la table) */}
+            <div className="flex shrink-0 items-center gap-1 sm:gap-2">
+              <div className="flex items-center">
                 <LanguageSwitcher />
               </div>
+
+              {/* CTA — Prendre rendez-vous */}
+              <button
+                onClick={() => scrollToSection('#contact')}
+                className={cn(
+                  'group relative hidden sm:inline-flex h-9 sm:h-10 cursor-pointer items-center justify-center gap-2 overflow-hidden rounded-full bg-[#1a1a1a] dark:bg-white font-semibold text-white dark:text-black shadow-md transition-all duration-300 hover:bg-[#EC0016] dark:hover:bg-[#EC0016] hover:text-white dark:hover:text-white hover:shadow-lg hover:shadow-[#EC0016]/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#EC0016] focus-visible:ring-offset-2 active:scale-[0.98] touch-target',
+                  'px-3 sm:px-4 ml-1 sm:ml-2',
+                )}
+              >
+                <span className="absolute inset-0 -translate-x-[200%] bg-gradient-to-r from-transparent via-white/20 to-transparent transition-transform duration-1000 group-hover:translate-x-[200%]" />
+                <CalendarHeart className="relative h-4 w-4" />
+                <span className="relative hidden tracking-wide lg:inline text-sm">{t('appointment')}</span>
+              </button>
             </div>
 
-            {/* Elegant Call to Action Button */}
-            <motion.div
-              className="relative overflow-hidden rounded-full"
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
+            {/* Onde IRM signature encastrée dans la table */}
+            <IrmWave active={hovered !== null} />
+          </div>
+
+          {/* Gantry (Anneau) - Droite */}
+          <div
+            className={cn(
+              'relative z-20 flex shrink-0 items-center justify-center overflow-hidden transition-all duration-500 ease-out',
+              'rounded-l-[40px] rounded-r-[20px] sm:rounded-full border-[3px] border-white dark:border-slate-800',
+              'bg-gradient-to-br from-white via-gray-100 to-gray-300 dark:from-slate-700 dark:via-slate-800 dark:to-slate-950',
+              'shadow-[12px_0_35px_-10px_rgba(0,0,0,0.25),_-5px_0_15px_-5px_rgba(0,0,0,0.1)] dark:shadow-[10px_0_40px_-10px_rgba(0,0,0,0.6)]',
+              isScrolled ? 'h-16 w-[4.5rem] sm:h-20 sm:w-20' : 'h-20 w-[5rem] sm:h-24 sm:w-24'
+            )}
+          >
+            {/* Liseré rouge Siemens */}
+            <div className="absolute left-[20%] sm:left-[15%] top-0 bottom-0 w-1 sm:w-1.5 bg-gradient-to-b from-[#EC0016] via-[#ff3b4e] to-[#EC0016] shadow-[0_0_12px_rgba(236,0,22,0.6)]" />
+            
+            {/* Trou central du bore (sombre) */}
+            <div
+              className={cn(
+                'relative flex items-center justify-center rounded-full bg-gradient-to-br from-gray-900 to-black shadow-[inset_0_5px_20px_rgba(0,0,0,0.9)] border border-gray-600/20',
+                isScrolled ? 'h-10 w-10 sm:h-12 sm:w-12 ml-2 sm:ml-0' : 'h-12 w-12 sm:h-14 sm:w-14 ml-2 sm:ml-0'
+              )}
             >
-              <Button
-                size='sm'
-                className={cn(
-                  "relative rounded-full font-semibold shadow-lg transition-all duration-300 overflow-hidden group border-0 z-10",
-                  "bg-[#006633] text-white hover:bg-[#004d26]",
-                  "hover:shadow-[#006633]/30 hover:shadow-xl h-11 px-5 sm:px-6 touch-target"
-                )}
-                onClick={() => scrollToSection('#contact')}
+              {/* Le bouton hamburger trouve logiquement sa place au centre du Gantry sur mobile */}
+              <button
+                ref={menuButtonRef}
+                className="flex h-full w-full cursor-pointer items-center justify-center rounded-full text-white/70 transition-colors hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#EC0016] xl:hidden touch-target"
+                onClick={() => setIsOpen((v) => !v)}
+                aria-label={isOpen ? 'Fermer le menu' : 'Ouvrir le menu'}
+                aria-expanded={isOpen}
+                aria-controls="mobile-menu"
               >
-                {/* Shine effect on hover */}
-                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent translate-x-[-200%] group-hover:translate-x-[200%] transition-transform duration-1000" />
-
-                {/* Icône statique */}
-                <span className="relative z-10">
-                  <Phone className="w-4 h-4 mr-2 drop-shadow-lg" />
-                </span>
-
-                <span className="relative z-10 hidden sm:inline drop-shadow-lg tracking-wide">
-                  {t('emergency')}
-                </span>
-              </Button>
-            </motion.div>
-
-            {/* Mobile Menu Toggle */}
-            <button
-              className='md:hidden flex h-11 w-11 items-center justify-center rounded-full hover:bg-secondary transition-colors touch-target cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2'
-              onClick={() => setIsOpen(!isOpen)}
-              aria-label="Toggle menu"
-            >
-              <div className='relative w-6 h-6'>
-                <Menu className={cn("absolute inset-0 transition-all duration-300", isOpen ? "opacity-0 rotate-90" : "opacity-100 rotate-0")} />
-                <X className={cn("absolute inset-0 transition-all duration-300", isOpen ? "opacity-100 rotate-0" : "opacity-0 -rotate-90")} />
-              </div>
-            </button>
+                <div className="relative h-5 w-5 sm:h-6 sm:w-6">
+                  <Menu className={cn('absolute inset-0 transition-all duration-300', isOpen ? 'rotate-90 opacity-0' : 'rotate-0 opacity-100')} />
+                  <X className={cn('absolute inset-0 transition-all duration-300', isOpen ? 'rotate-0 opacity-100' : '-rotate-90 opacity-0')} />
+                </div>
+              </button>
+              
+              {/* Indicateur lumineux interne sur desktop (simule l'activité du scanner) */}
+              <div className="hidden xl:block h-2 w-2 sm:h-3 sm:w-3 rounded-full bg-blue-500/30 shadow-[0_0_20px_rgba(59,130,246,0.6)] border border-blue-400/40" />
+            </div>
           </div>
         </div>
-      </motion.header>
+      </header>
 
-      {/* Mobile Menu Overlay */}
+      {/* ------------------------------------------------------------------ */}
+      {/*  Menu mobile plein écran                                           */}
+      {/* ------------------------------------------------------------------ */}
       <AnimatePresence>
         {isOpen && (
           <motion.div
-            initial={{ opacity: 0, backdropFilter: "blur(0px)" }}
-            animate={{ opacity: 1, backdropFilter: "blur(12px)" }}
-            exit={{ opacity: 0, backdropFilter: "blur(0px)" }}
-            className="fixed inset-0 z-40 bg-background/60 md:hidden pt-24 px-6 overflow-y-auto"
+            id="mobile-menu"
+            role="dialog"
+            aria-modal="true"
+            aria-label="Menu de navigation"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[90] overflow-y-auto bg-background/95 px-6 pb-12 pt-24 backdrop-blur-xl xl:hidden"
           >
+            {/* Onde IRM en haut du menu mobile (identité) */}
+            <div aria-hidden className="pointer-events-none absolute inset-x-0 top-20 h-8 overflow-hidden">
+              <svg className="h-full w-full text-primary/30" viewBox="0 0 1200 24" preserveAspectRatio="none" fill="none">
+                <path
+                  className="irm-trace"
+                  d="M0 12 Q30 4 60 12 T120 12 T180 12 T240 12 T300 12 T360 12 T420 12 T480 12 T540 12 T600 12 T660 12 T720 12 T780 12 T840 12 T900 12 T960 12 T1020 12 T1080 12 T1140 12 T1200 12"
+                  stroke="currentColor"
+                  strokeWidth="1.5"
+                />
+              </svg>
+            </div>
+
             <motion.nav
-              initial={{ y: -20, opacity: 0 }}
+              aria-label="Navigation mobile"
+              initial={{ y: -16, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
-              exit={{ y: -20, opacity: 0 }}
-              transition={{ delay: 0.1 }}
-              className="flex flex-col gap-2 pb-8"
+              exit={{ y: -16, opacity: 0 }}
+              transition={{ delay: 0.08 }}
+              className="mx-auto flex max-w-md flex-col gap-2"
             >
               {navItems.map((item, i) => (
                 <motion.button
-                  key={item.id}
-                  initial={{ x: -20, opacity: 0 }}
+                  key={item.key}
+                  autoFocus={i === 0}
+                  initial={{ x: -16, opacity: 0 }}
                   animate={{ x: 0, opacity: 1 }}
-                  transition={{ delay: 0.1 + (i * 0.05) }}
+                  transition={{ delay: 0.1 + i * 0.05 }}
                   onClick={() => scrollToSection(item.href)}
-                  className="flex items-center justify-between p-4 rounded-2xl bg-card/50 border border-border/50 hover:bg-primary/5 hover:border-primary/20 transition-all group touch-friendly"
+                  className="group flex items-center justify-between rounded-2xl border border-border/50 bg-card/50 p-4 transition-all hover:border-[#EC0016]/30 hover:bg-[#EC0016]/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#EC0016] touch-friendly"
                 >
-                  <span className="text-xl font-medium group-hover:text-primary transition-colors">{item.label}</span>
-                  <div className="w-8 h-8 rounded-full bg-background flex items-center justify-center group-hover:scale-110 transition-transform">
-                    <div className="w-2 h-2 rounded-full bg-primary/20 group-hover:bg-primary transition-colors" />
-                  </div>
+                  <span className="text-xl font-medium transition-colors group-hover:text-[#EC0016]">{t(item.key)}</span>
+                  <span className="flex h-8 w-8 items-center justify-center rounded-full bg-background transition-transform group-hover:scale-110">
+                    <span className="h-2 w-2 rounded-full bg-[#EC0016]/30 transition-colors group-hover:bg-[#EC0016]" />
+                  </span>
                 </motion.button>
               ))}
 
               {/* Pôles */}
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.35 }}
-                className="pt-4 border-t border-border/30"
-              >
-                <p className="text-xs text-muted-foreground uppercase tracking-wider mb-2 px-2">{t('ourPoles')}</p>
+              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.35 }} className="border-t border-border/30 pt-4">
+                <p className="mb-2 px-2 text-xs uppercase tracking-wider text-muted-foreground">{t('ourPoles')}</p>
                 <div className="grid grid-cols-1 gap-2">
                   {navPoles.map((pole) => {
                     const Icon = POLE_ICONS[pole.iconName] || Stethoscope
@@ -500,58 +503,33 @@ export default function Header({ siteSettings, poles }: HeaderProps) {
                         key={pole.slug}
                         href={`/poles/${pole.slug}`}
                         onClick={() => setIsOpen(false)}
-                        className="flex items-center gap-4 p-3 rounded-xl bg-card/50 border border-border/50 hover:bg-primary/5 hover:border-primary/20 transition-all touch-friendly"
+                        className="flex items-center gap-4 rounded-xl border border-border/50 bg-card/50 p-3 transition-all hover:border-[#EC0016]/30 hover:bg-[#EC0016]/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#EC0016] touch-friendly"
                       >
-                        <div
-                          className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg text-white shadow-sm"
-                          style={{ backgroundColor: pole.accent }}
-                        >
+                        <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg text-white shadow-sm" style={{ backgroundColor: pole.accent }}>
                           <Icon className="h-5 w-5" />
-                        </div>
-                        <span className="font-medium text-lg">{pole.title}</span>
+                        </span>
+                        <span className="text-lg font-medium">{pole.title}</span>
                       </a>
                     )
                   })}
                 </div>
               </motion.div>
 
-              {/* Additional Pages */}
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.4 }}
-                className="pt-4 border-t border-border/30"
-              >
-                <p className="text-xs text-muted-foreground uppercase tracking-wider mb-2 px-2">{t('more')}</p>
+              {/* Pages secondaires */}
+              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.4 }} className="border-t border-border/30 pt-4">
+                <p className="mb-2 px-2 text-xs uppercase tracking-wider text-muted-foreground">{t('more')}</p>
                 <div className="space-y-2">
-                  <a href="/actualites" onClick={() => setIsOpen(false)} className="flex items-center gap-3 p-3 rounded-xl bg-card/50 border border-border/50 hover:bg-primary/5 hover:border-primary/20 transition-all">
-                    <Newspaper className="h-5 w-5 text-primary" />
-                    <span className="font-medium">{t('news')}</span>
-                  </a>
-                  <a href="/evenements" onClick={() => setIsOpen(false)} className="flex items-center gap-3 p-3 rounded-xl bg-card/50 border border-border/50 hover:bg-primary/5 hover:border-primary/20 transition-all">
-                    <CalendarDays className="h-5 w-5 text-primary" />
-                    <span className="font-medium">{t('events')}</span>
-                  </a>
-                  <a href="/equipe" onClick={() => setIsOpen(false)} className="flex items-center gap-3 p-3 rounded-xl bg-card/50 border border-border/50 hover:bg-primary/5 hover:border-primary/20 transition-all">
-                    <Users className="h-5 w-5 text-primary" />
-                    <span className="font-medium">{t('team')}</span>
-                  </a>
-                  <a href="/faq" onClick={() => setIsOpen(false)} className="flex items-center gap-3 p-3 rounded-xl bg-card/50 border border-border/50 hover:bg-primary/5 hover:border-primary/20 transition-all">
-                    <HelpCircle className="h-5 w-5 text-primary" />
-                    <span className="font-medium">{t('faq')}</span>
-                  </a>
+                  <MobilePageLink href="/actualites" icon={Newspaper} label={t('news')} onClick={() => setIsOpen(false)} />
+                  <MobilePageLink href="/evenements" icon={CalendarDays} label={t('events')} onClick={() => setIsOpen(false)} />
+                  <MobilePageLink href="/equipe" icon={Users} label={t('team')} onClick={() => setIsOpen(false)} />
+                  <MobilePageLink href="/faq" icon={HelpCircle} label={t('faq')} onClick={() => setIsOpen(false)} />
                 </div>
               </motion.div>
 
-              {/* Apparence et Langue (Mobile) */}
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.45 }}
-                className="pt-4 border-t border-border/30 pb-10 safe-area-inset-bottom"
-              >
-                <p className="text-xs text-muted-foreground uppercase tracking-wider mb-2 px-2">{t('settings')}</p>
-                <div className="flex items-center justify-between p-4 rounded-xl bg-card/50 border border-border/50">
+              {/* Apparence */}
+              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.45 }} className="safe-area-inset-bottom border-t border-border/30 pb-8 pt-4">
+                <p className="mb-2 px-2 text-xs uppercase tracking-wider text-muted-foreground">{t('settings')}</p>
+                <div className="flex items-center justify-between rounded-xl border border-border/50 bg-card/50 p-4">
                   <span className="font-medium">{t('appearance')}</span>
                   <ThemeToggle />
                 </div>
@@ -561,5 +539,152 @@ export default function Header({ siteSettings, poles }: HeaderProps) {
         )}
       </AnimatePresence>
     </>
+  )
+}
+
+/* -------------------------------------------------------------------------- */
+/*  Lien de navigation + indicateur lumineux (onde réactive Siemens)          */
+/* -------------------------------------------------------------------------- */
+function NavLink({
+  label,
+  isActive,
+  onClick,
+  onHover,
+}: {
+  label: string
+  isActive: boolean
+  onClick: () => void
+  onHover: () => void
+}) {
+  return (
+    <button
+      onClick={onClick}
+      onMouseEnter={onHover}
+      onFocus={onHover}
+      className={cn(
+        'relative whitespace-nowrap rounded-full px-3 py-2 text-sm font-semibold transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#EC0016] focus-visible:ring-offset-2',
+        isActive ? 'text-[#EC0016] drop-shadow-[0_0_8px_rgba(236,0,22,0.3)]' : 'text-foreground/85 hover:text-[#EC0016] hover:drop-shadow-[0_0_8px_rgba(236,0,22,0.3)]',
+      )}
+    >
+      <span className="relative z-10 tracking-wide">{label}</span>
+      <NavIndicator show={isActive} />
+    </button>
+  )
+}
+
+/* Indicateur : point lumineux encastré (style LED Siemens) */
+function NavIndicator({ show }: { show: boolean }) {
+  return (
+    <AnimatePresence>
+      {show && (
+        <motion.span
+          layoutId="irm-nav-indicator"
+          className="absolute inset-x-2 -bottom-0.5 z-0 flex justify-center"
+          transition={{ type: 'spring', stiffness: 420, damping: 32 }}
+        >
+          <span className="relative h-1 w-6 rounded-full bg-gradient-to-r from-[#EC0016] to-[#ff4d5e]">
+            <span className="irm-pulse absolute -top-0.5 left-1/2 h-2 w-2 -translate-x-1/2 rounded-full bg-[#EC0016]/80 shadow-[0_0_10px_rgba(236,0,22,0.8)]" />
+          </span>
+        </motion.span>
+      )}
+    </AnimatePresence>
+  )
+}
+
+/* -------------------------------------------------------------------------- */
+/*  Déroulant de navigation (survol + clavier)                                */
+/* -------------------------------------------------------------------------- */
+function NavDropdown({
+  label,
+  isActive,
+  onHover,
+  align,
+  width,
+  children,
+}: {
+  label: string
+  isActive: boolean
+  onHover: () => void
+  align: 'center' | 'end'
+  width: string
+  children: React.ReactNode
+}) {
+  const [open, setOpen] = useState(false)
+  return (
+    <div
+      className="relative"
+      onMouseEnter={() => {
+        setOpen(true)
+        onHover()
+      }}
+      onMouseLeave={() => setOpen(false)}
+    >
+      <button
+        onClick={() => setOpen((v) => !v)}
+        onFocus={onHover}
+        aria-haspopup="true"
+        aria-expanded={open}
+        className={cn(
+          'relative flex items-center gap-1 whitespace-nowrap rounded-full px-3 py-2 text-sm font-semibold transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#EC0016] focus-visible:ring-offset-2',
+          isActive ? 'text-[#EC0016] drop-shadow-[0_0_8px_rgba(236,0,22,0.3)]' : 'text-foreground/85 hover:text-[#EC0016] hover:drop-shadow-[0_0_8px_rgba(236,0,22,0.3)]',
+        )}
+      >
+        <span className="relative z-10 tracking-wide">{label}</span>
+        <ChevronDown className={cn('h-3 w-3 transition-transform duration-300', open && 'rotate-180')} />
+        <NavIndicator show={isActive} />
+      </button>
+
+      <AnimatePresence>
+        {open && (
+          <motion.div
+            initial={{ opacity: 0, y: 12, scale: 0.97 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 8, scale: 0.97 }}
+            transition={{ type: 'spring', stiffness: 400, damping: 28 }}
+            className={cn(
+              'absolute top-full pt-4',
+              align === 'center' ? 'left-1/2 -translate-x-1/2' : 'end-0',
+              width,
+            )}
+          >
+            <div className="overflow-hidden rounded-2xl border border-white/40 bg-white/95 p-2 shadow-[0_8px_30px_rgb(0,0,0,0.12)] backdrop-blur-2xl dark:border-white/10 dark:bg-slate-950/95 dark:shadow-[0_8px_30px_rgb(0,0,0,0.3)]">
+              {children}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  )
+}
+
+/* Liens du déroulant « Plus » (desktop) */
+function MorePageLink({ href, icon: Icon, title, desc }: { href: string; icon: LucideIcon; title: string; desc: string }) {
+  return (
+    <a
+      href={href}
+      className="group/item flex items-center gap-4 rounded-xl px-4 py-3 text-sm text-muted-foreground transition-all duration-200 hover:bg-primary/5 hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+    >
+      <span className="rounded-lg bg-primary/10 p-2 text-primary shadow-sm transition-colors group-hover/item:bg-primary group-hover/item:text-white">
+        <Icon className="h-4 w-4" />
+      </span>
+      <span className="flex flex-col">
+        <span className="font-semibold text-foreground group-hover/item:text-primary">{title}</span>
+        <span className="text-[10px] opacity-70">{desc}</span>
+      </span>
+    </a>
+  )
+}
+
+/* Liens de pages (menu mobile) */
+function MobilePageLink({ href, icon: Icon, label, onClick }: { href: string; icon: LucideIcon; label: string; onClick: () => void }) {
+  return (
+    <a
+      href={href}
+      onClick={onClick}
+      className="flex items-center gap-3 rounded-xl border border-border/50 bg-card/50 p-3 transition-all hover:border-primary/30 hover:bg-primary/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+    >
+      <Icon className="h-5 w-5 text-primary" />
+      <span className="font-medium">{label}</span>
+    </a>
   )
 }
