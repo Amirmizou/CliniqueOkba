@@ -41,6 +41,8 @@ export interface Doctor {
   accent: string
   /** Dégradé Tailwind d'accompagnement */
   gradient: string
+  /** Vidéos de présentation (liens YouTube / Facebook / MP4) */
+  videos?: string[]
 }
 
 export const doctors: Doctor[] = [

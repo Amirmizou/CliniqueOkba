@@ -93,6 +93,14 @@ export default defineType({
             of: [{ type: 'string' }],
         }),
         defineField({
+            name: 'videos',
+            title: 'Vidéos (liens)',
+            type: 'array',
+            of: [{ type: 'url' }],
+            description:
+                'Liens de présentation du médecin (YouTube, Facebook ou MP4). Affichés dans une fenêtre vidéo sur la carte.',
+        }),
+        defineField({
             name: 'consultationHours',
             title: 'Horaires de consultation',
             type: 'string',

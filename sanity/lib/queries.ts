@@ -393,7 +393,8 @@ export const doctorsQuery = groq`
     consultationHours,
     consultationHours_ar,
     accentColor,
-    iconName
+    iconName,
+    videos
   }
 `
 
