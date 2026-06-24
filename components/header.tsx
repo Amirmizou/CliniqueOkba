@@ -209,7 +209,7 @@ export default function Header({ siteSettings, poles }: HeaderProps) {
         </div>
 
         {/* 3D SCANNER DESKTOP */}
-        <div className={cn("pointer-events-auto relative w-full max-w-4xl mx-auto h-[140px] hidden xl:block transition-all duration-700 origin-top mt-4", isScrolled ? "scale-95 -translate-y-2 opacity-95" : "scale-100 translate-y-0 opacity-100")}>
+        <div className={cn("pointer-events-auto relative w-full max-w-5xl mx-auto h-[140px] hidden xl:block transition-all duration-700 origin-top mt-4", isScrolled ? "scale-95 -translate-y-2 opacity-95" : "scale-100 translate-y-0 opacity-100")}>
           
           {/* BASE / PEDESTAL */}
           <div className="absolute left-[15%] right-[100px] bottom-[0px] h-[30px] z-0 flex flex-col justify-end items-center">
@@ -242,8 +242,14 @@ export default function Header({ siteSettings, poles }: HeaderProps) {
             background: 'linear-gradient(180deg, #ffffff 0%, #fcfcfc 40%, #e0e0e0 100%)',
             boxShadow: '0 10px 20px -5px rgba(0,0,0,0.2), inset 0 3px 8px rgba(255,255,255,1), inset 0 -3px 8px rgba(0,0,0,0.05)'
           }}>
-            {/* Ligne d'accentuation */}
+            {/* Ligne d'accentuation (court jusque dans le bore → lien avec le gantry) */}
             <div className="absolute bottom-[4px] left-[15px] right-0 h-[2px] bg-[#eb7800] rounded-l-full shadow-[0_1px_2px_rgba(235,120,0,0.3)]" />
+
+            {/* Rails de la table qui filent dans le tunnel (lien plateau → gantry) */}
+            <div aria-hidden="true" className="pointer-events-none absolute top-[16px] left-[58%] right-0 h-[2px] rounded-full bg-black/[0.06]" />
+            <div aria-hidden="true" className="pointer-events-none absolute top-[24px] left-[58%] right-0 h-[2px] rounded-full bg-black/[0.06]" />
+            {/* Ombre d'insertion : la table s'enfonce dans le bore */}
+            <div aria-hidden="true" className="pointer-events-none absolute right-0 top-1/2 h-[44px] w-[40px] -translate-y-1/2 rounded-l-[20px]" style={{ boxShadow: 'inset -10px 0 14px rgba(0,0,0,0.28)' }} />
 
             {/* Contenu de la table */}
             <div className="absolute inset-0 flex items-center px-4 pb-1">
@@ -265,7 +271,7 @@ export default function Header({ siteSettings, poles }: HeaderProps) {
 
               {/* Navigation */}
               {/* pr-[140px] ensures the menu items stop well before the gantry ring overlaps them */}
-              <nav className="flex-1 flex items-center justify-start gap-4 lg:gap-8 pr-[140px]" onMouseLeave={() => setHovered(null)}>
+              <nav className="flex-1 flex items-center justify-start gap-4 lg:gap-8 pr-[210px]" onMouseLeave={() => setHovered(null)}>
                 <NavIconLink icon={Home} label={t('center')} isActive={indicatorKey === 'about'} onClick={() => scrollToSection('#about')} onHover={() => setHovered('about')} />
                 <NavIconLink icon={User} label={t('team')} isActive={false} onClick={() => scrollToSection('/equipe')} onHover={() => setHovered('team')} />
                 <NavIconDropdown icon={Stethoscope} label={t('specialties')} isActive={indicatorKey === 'specialties'} onHover={() => setHovered('specialties')} poles={navPoles} />
@@ -292,6 +298,11 @@ export default function Header({ siteSettings, poles }: HeaderProps) {
 
           {/* Ombre portée du bord du trou sur la table pour le réalisme (z-40) */}
           <div className="absolute right-[35px] bottom-[20px] w-[100px] h-[100px] rounded-full z-40 pointer-events-none shadow-[inset_6px_6px_10px_rgba(0,0,0,0.2)]" />
+
+          {/* Liseré orange continu autour de l'anneau (fil conducteur table ↔ gantry) */}
+          <div className="absolute right-[15px] bottom-[0px] w-[140px] h-[140px] rounded-full z-40 pointer-events-none" style={{ boxShadow: 'inset 0 0 0 2px rgba(235,120,0,0.6)' }} />
+          {/* Liseré du bord interne du bore */}
+          <div className="absolute right-[37px] bottom-[22px] w-[96px] h-[96px] rounded-full z-40 pointer-events-none" style={{ boxShadow: 'inset 0 0 0 1.5px rgba(235,120,0,0.45)' }} />
 
           {/* 3. Tête Supérieure (avec Logo) - z-50 */}
           <div className="absolute right-[45px] top-[-10px] w-[80px] h-[40px] rounded-t-[10px] bg-gradient-to-b from-[#ffffff] to-[#e6e6e6] shadow-[0_-5px_10px_rgba(0,0,0,0.05),_0_5px_10px_rgba(0,0,0,0.1)] z-50 flex flex-col items-center justify-start pt-1.5 border-b border-gray-200">
