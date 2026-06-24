@@ -208,73 +208,51 @@ export default function Header({ siteSettings, poles }: HeaderProps) {
           </div>
         </div>
 
-        {/* 3D SCANNER DESKTOP (Echelle réduite) */}
-        <div className={cn("pointer-events-auto relative w-full max-w-4xl mx-auto h-[140px] hidden xl:block transition-all duration-700 origin-top mt-4", isScrolled ? "scale-95 -translate-y-2 opacity-95" : "scale-100 translate-y-0 opacity-100")}>
+        {/* 3D SCANNER DESKTOP */}
+        <div className={cn("pointer-events-auto relative w-full max-w-4xl mx-auto h-[150px] hidden xl:block transition-all duration-700 origin-top mt-4", isScrolled ? "scale-95 -translate-y-2 opacity-95" : "scale-100 translate-y-0 opacity-100")}>
           
           {/* BASE / PEDESTAL */}
           <div className="absolute left-[15%] right-[30%] bottom-[0px] h-[30px] z-0 flex flex-col justify-end items-center">
-            {/* Accordéon */}
             <div className="w-[80%] h-[20px] shadow-[inset_0_2px_4px_rgba(0,0,0,0.2)]"
                  style={{ background: 'repeating-linear-gradient(180deg, #d4d4d4, #d4d4d4 3px, #e8e8e8 3px, #e8e8e8 6px)' }} />
-            {/* Socle */}
             <div className="w-[85%] h-[10px] bg-gradient-to-b from-[#e0e0e0] to-[#c5c5c5] rounded-b-lg shadow-[0_10px_20px_rgba(0,0,0,0.15)]" />
           </div>
 
           {/* GANTRY COMPOSITE (Vue de Face) */}
-          <div className="absolute right-[20px] bottom-[5px] w-[180px] h-[130px]">
-            
-            {/* 1. Extension Droite */}
-            <div className="absolute right-[-10px] top-[30px] bottom-[10px] w-[60px] rounded-tr-[30px] rounded-br-[10px] bg-gradient-to-r from-[#ececec] to-[#dcdcdc] shadow-[5px_5px_15px_rgba(0,0,0,0.1)] z-10" />
-            
-            {/* Badge Symbia/Clinique Okba (Orange comme sur l'image) */}
-            <div className="absolute right-[-15px] top-[60px] bg-[#eb7800] text-white px-2 py-[2px] text-[6px] font-bold rounded-sm shadow-sm whitespace-nowrap z-40">
-              Clinique Okba
-            </div>
-
-            {/* 2. Cercle Principal */}
-            <div className="absolute right-[20px] bottom-[0px] w-[130px] h-[130px] rounded-full bg-gradient-to-br from-[#ffffff] via-[#f0f0f0] to-[#cccccc] shadow-[-10px_10px_20px_rgba(0,0,0,0.15),_inset_5px_5px_15px_rgba(255,255,255,1)] z-20">
-              
-              {/* Ouverture (Trou sombre) - z-0 pour être SOUS la table */}
-              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[60px] h-[60px] rounded-full shadow-[inset_0_5px_15px_rgba(0,0,0,0.9)] z-0" style={{
-                background: 'radial-gradient(circle at center, #0a0a0a 0%, #2a2a2a 100%)'
-              }}>
-                 <div className="absolute top-[40%] right-2 w-1 h-1 rounded-full bg-red-500 shadow-[0_0_6px_rgba(239,68,68,1)] animate-pulse" />
-              </div>
-              
-              {/* Anneau intérieur (Bord du trou) - z-40 pour passer AU-DESSUS de la table */}
-              {/* L'ombre intérieure crée le volume du tunnel au-dessus de la table */}
-              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[65px] h-[65px] rounded-full shadow-[inset_-2px_2px_5px_rgba(255,255,255,0.8),_0px_0px_5px_rgba(0,0,0,0.2)] z-40 pointer-events-none border-[3px] border-transparent" />
-            </div>
-
-            {/* 3. Tête Supérieure (avec Logo) */}
-            <div className="absolute right-[45px] top-[-10px] w-[80px] h-[40px] rounded-t-[10px] bg-gradient-to-b from-[#ffffff] to-[#e6e6e6] shadow-[0_-5px_10px_rgba(0,0,0,0.05),_0_5px_10px_rgba(0,0,0,0.15)] z-30 flex flex-col items-center justify-start pt-1.5 border-b border-gray-200">
-              <span className="text-[7px] font-extrabold text-[#006633] tracking-widest uppercase whitespace-nowrap">{clinicNameText}</span>
-              <span className="text-[6px] font-bold text-[#eb7800] mt-[1px] uppercase tracking-[0.2em]">Scanner 3D</span>
-              <div className="w-[60%] h-[1px] bg-[#d5d5d5] rounded-full mt-1.5 shadow-[inset_0_1px_1px_rgba(0,0,0,0.1)]" />
-            </div>
-
+          {/* 1. Extension Droite (z-10) */}
+          <div className="absolute right-[10px] bottom-[10px] w-[60px] h-[120px] rounded-tr-[30px] rounded-br-[10px] bg-gradient-to-r from-[#ececec] to-[#dcdcdc] shadow-[5px_5px_15px_rgba(0,0,0,0.1)] z-10" />
+          
+          {/* Badge Clinique Okba */}
+          <div className="absolute right-[5px] bottom-[65px] bg-[#eb7800] text-white px-2 py-[2px] text-[6px] font-bold rounded-sm shadow-sm whitespace-nowrap z-50">
+            Clinique Okba
           </div>
 
-          {/* Sélecteur de Langue Flottant (Sorti de la table) */}
-          <div className="absolute left-[40px] top-[15px] z-50">
-            <LanguageSwitcher />
+          {/* FOND DU TROU SOMBRE (Derrière la table) - z-20 */}
+          <div className="absolute right-[50px] bottom-[30px] w-[80px] h-[80px] rounded-full shadow-[inset_0_5px_15px_rgba(0,0,0,0.9)] z-20" style={{
+            background: 'radial-gradient(circle at center, #0a0a0a 0%, #2a2a2a 100%)'
+          }}>
+             <div className="absolute top-[40%] right-3 w-1 h-1 rounded-full bg-red-500 shadow-[0_0_6px_rgba(239,68,68,1)] animate-pulse" />
           </div>
 
-          {/* TABLE (Plateau à gauche) - S'encastre dans le trou */}
-          {/* right-[105px] la fait glisser pile dans l'axe du trou sombre */}
-          <div className="absolute left-[40px] right-[105px] bottom-[35px] h-[60px] z-30 flex flex-col justify-end transition-transform duration-700 hover:-translate-x-1" style={{
+          {/* TABLE (Plateau à gauche) - z-30 */}
+          {/* S'encastre complètement à travers le trou (right: 40px) */}
+          <div className="absolute left-[40px] right-[40px] bottom-[40px] h-[60px] z-30 flex flex-col justify-end transition-transform duration-700 hover:-translate-x-1" style={{
             borderRadius: '30px 0 0 30px',
             background: 'linear-gradient(180deg, #ffffff 0%, #fcfcfc 40%, #e0e0e0 100%)',
             boxShadow: '0 10px 20px -5px rgba(0,0,0,0.2), inset 0 3px 8px rgba(255,255,255,1), inset 0 -3px 8px rgba(0,0,0,0.05)'
           }}>
-            {/* Ligne d'accentuation (orange) */}
+            {/* Ligne d'accentuation */}
             <div className="absolute bottom-[4px] left-[15px] right-0 h-[2px] bg-[#eb7800] rounded-l-full shadow-[0_1px_2px_rgba(235,120,0,0.3)]" />
 
             {/* Contenu de la table */}
-            <div className="absolute inset-0 flex items-center justify-between px-6 pb-1">
-              
+            <div className="absolute inset-0 flex items-center px-4 pb-1">
+              {/* Sélecteur de langue (Premier élément) */}
+              <div className="shrink-0 mr-4">
+                <LanguageSwitcher />
+              </div>
+
               {/* Logo Area */}
-              <a href="/" className="flex items-center gap-2 shrink-0 mr-4 group">
+              <a href="/" className="flex items-center gap-2 shrink-0 mr-6 group">
                 <div className="relative h-8 w-8 rounded-full bg-white p-1 shadow-sm ring-1 ring-gray-100 transition-transform group-hover:scale-105">
                   <Image src="/logo.png" alt="Logo" fill className="object-contain p-1" />
                 </div>
@@ -285,7 +263,7 @@ export default function Header({ siteSettings, poles }: HeaderProps) {
               </a>
 
               {/* Navigation */}
-              <nav className="flex-1 flex items-center justify-center gap-4 lg:gap-8 pr-6" onMouseLeave={() => setHovered(null)}>
+              <nav className="flex-1 flex items-center justify-start gap-4 lg:gap-8 pr-[80px]" onMouseLeave={() => setHovered(null)}>
                 <NavIconLink icon={Home} label={t('center')} isActive={indicatorKey === 'about'} onClick={() => scrollToSection('#about')} onHover={() => setHovered('about')} />
                 <NavIconLink icon={User} label={t('team')} isActive={false} onClick={() => scrollToSection('/equipe')} onHover={() => setHovered('team')} />
                 <NavIconDropdown icon={Stethoscope} label={t('specialties')} isActive={indicatorKey === 'specialties'} onHover={() => setHovered('specialties')} poles={navPoles} />
@@ -293,9 +271,29 @@ export default function Header({ siteSettings, poles }: HeaderProps) {
                 <NavIconLink icon={Info} label={t('faq')} isActive={indicatorKey === 'faq'} onClick={() => scrollToSection('/faq')} onHover={() => setHovered('faq')} />
                 <NavIconLink icon={Mail} label={t('contact')} isActive={indicatorKey === 'contact'} onClick={() => scrollToSection('#contact')} onHover={() => setHovered('contact')} />
               </nav>
-
             </div>
           </div>
+
+          {/* CERCLE PRINCIPAL AVEC MASQUE (Devant la table) - z-40 */}
+          <div className="absolute right-[20px] bottom-[0px] w-[140px] h-[140px] rounded-full bg-gradient-to-br from-[#ffffff] via-[#f0f0f0] to-[#cccccc] shadow-[0_10px_20px_rgba(0,0,0,0.15)] z-40 pointer-events-none" 
+               style={{
+                 WebkitMaskImage: 'radial-gradient(circle at center, transparent 39.5px, black 40px)',
+                 maskImage: 'radial-gradient(circle at center, transparent 39.5px, black 40px)'
+               }}>
+            {/* Liseré Rouge Optionnel sur l'arête intérieure */}
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[80px] h-[80px] rounded-full shadow-[inset_0_0_0_1px_rgba(236,0,22,0.3)] opacity-50" />
+          </div>
+
+          {/* Ombre portée du bord du trou sur la table pour le réalisme (z-40) */}
+          <div className="absolute right-[50px] bottom-[30px] w-[80px] h-[80px] rounded-full z-40 pointer-events-none shadow-[inset_6px_6px_10px_rgba(0,0,0,0.2)]" />
+
+          {/* 3. Tête Supérieure (avec Logo) - z-50 */}
+          <div className="absolute right-[50px] top-[-10px] w-[80px] h-[40px] rounded-t-[10px] bg-gradient-to-b from-[#ffffff] to-[#e6e6e6] shadow-[0_-5px_10px_rgba(0,0,0,0.05),_0_5px_10px_rgba(0,0,0,0.1)] z-50 flex flex-col items-center justify-start pt-1.5 border-b border-gray-200">
+            <span className="text-[7px] font-extrabold text-[#006633] tracking-widest uppercase whitespace-nowrap">{clinicNameText}</span>
+            <span className="text-[6px] font-bold text-[#eb7800] mt-[1px] uppercase tracking-[0.2em]">Scanner 3D</span>
+            <div className="w-[60%] h-[1px] bg-[#d5d5d5] rounded-full mt-1.5 shadow-[inset_0_1px_1px_rgba(0,0,0,0.1)]" />
+          </div>
+
         </div>
       </header>
 
