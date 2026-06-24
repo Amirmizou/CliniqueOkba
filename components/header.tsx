@@ -198,15 +198,18 @@ export default function Header({ siteSettings, poles }: HeaderProps) {
           </a>
           <div className="flex items-center gap-3">
             <LanguageSwitcher />
-            {/* Mini-gantry : boîtier d'anneau clair + bore sombre cliquable */}
+            {/* Gantry réduit : arche claire + liseré rouge Siemens + bore sombre cliquable */}
             <div
-              className="relative flex h-11 w-11 items-center justify-center rounded-full"
+              className="relative flex h-12 w-12 items-center justify-center"
               style={{
-                background: 'radial-gradient(120% 120% at 30% 20%, #ffffff 0%, #f0f0f0 55%, #d9d9d9 100%)',
-                boxShadow: 'inset 1px 2px 3px rgba(255,255,255,1), inset -2px -2px 5px rgba(0,0,0,0.12), 0 2px 6px rgba(0,0,0,0.12)',
+                borderRadius: '24px 24px 8px 8px',
+                background: 'radial-gradient(120% 120% at 32% 20%, #ffffff 0%, #eee 55%, #d7d7d7 100%)',
+                boxShadow: 'inset 1px 2px 3px rgba(255,255,255,1), inset -2px -3px 6px rgba(0,0,0,0.14), 0 2px 6px rgba(0,0,0,0.14)',
               }}
             >
-              <span className="absolute right-0.5 top-1/2 h-5 w-[3px] -translate-y-1/2 rounded-full bg-[#EC0016] opacity-90" aria-hidden="true" />
+              {/* Liseré rouge Siemens */}
+              <span className="absolute right-1 top-2 bottom-2 w-[3px] rounded-full bg-[#EC0016] opacity-90 shadow-[0_0_6px_rgba(236,0,22,0.4)]" aria-hidden="true" />
+              {/* Bore = bouton menu */}
               <button
                 ref={menuButtonRef}
                 onClick={() => setIsOpen((v) => !v)}
@@ -215,8 +218,8 @@ export default function Header({ siteSettings, poles }: HeaderProps) {
                 aria-controls="mobile-menu"
                 className="flex h-8 w-8 cursor-pointer items-center justify-center rounded-full text-white transition-transform active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#EC0016]"
                 style={{
-                  background: 'radial-gradient(circle at center, #1a1a1a 0%, #333 100%)',
-                  boxShadow: 'inset 0 2px 5px rgba(0,0,0,0.9), 0 1px 2px rgba(255,255,255,0.8)',
+                  background: 'radial-gradient(circle at 50% 40%, #2a2a2a 0%, #111 100%)',
+                  boxShadow: 'inset 0 2px 5px rgba(0,0,0,0.9), 0 1px 2px rgba(255,255,255,0.85)',
                 }}
               >
                 {isOpen ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
@@ -315,9 +318,10 @@ export default function Header({ siteSettings, poles }: HeaderProps) {
               className="absolute right-[240px] left-0 bottom-[60px] h-[100px] z-30 flex flex-col justify-end"
               style={{
                 borderRadius: '50px 0 0 50px',
-                background: 'linear-gradient(180deg, #ffffff 0%, #fdfdfd 40%, #e8e8e8 100%)',
+                background: 'linear-gradient(180deg, #fbfbfb 0%, #f4f4f4 100%)',
                 boxShadow:
-                  '0 20px 40px -15px rgba(0,0,0,0.25), inset 0 6px 12px rgba(255,255,255,1), inset 0 -4px 15px rgba(0,0,0,0.06)',
+                  '0 4px 12px rgba(0,0,0,0.12), inset 0 2px 4px rgba(255,255,255,0.95), inset 0 -3px 10px rgba(0,0,0,0.05)',
+                border: '1px solid rgba(0,0,0,0.05)',
               }}
             >
               <div className="absolute bottom-2 left-[20px] right-0 h-[4px] bg-[#EC0016] rounded-l-full shadow-[0_2px_4px_rgba(236,0,22,0.3)]" />
@@ -357,8 +361,11 @@ export default function Header({ siteSettings, poles }: HeaderProps) {
             )}
           >
             <div
-              className="relative flex h-[72px] items-center gap-4 rounded-[36px] border border-gray-100 bg-white/95 pl-5 pr-2 backdrop-blur-md"
-              style={{ boxShadow: '0 14px 36px -14px rgba(0,0,0,0.28), inset 0 2px 6px rgba(255,255,255,1), inset 0 -3px 10px rgba(0,0,0,0.05)' }}
+              className="relative flex h-[72px] items-center gap-4 rounded-[36px] border border-black/[0.06] pl-5 pr-2 backdrop-blur-md"
+              style={{
+                background: 'linear-gradient(180deg, #fbfbfb 0%, #f4f4f4 100%)',
+                boxShadow: '0 4px 12px rgba(0,0,0,0.12), inset 0 2px 4px rgba(255,255,255,0.95)',
+              }}
             >
               {/* Liseré rouge plateau */}
               <div aria-hidden="true" className="absolute bottom-2 left-6 right-[88px] h-[3px] rounded-full bg-[#EC0016]/80" />
@@ -470,8 +477,8 @@ function NavIconLink({ icon: Icon, label, isActive, onClick, onHover }: any) {
       onMouseEnter={onHover}
       onFocus={onHover}
       className={cn(
-        'group relative flex flex-col items-center gap-2 rounded-xl p-2 transition-all duration-300 hover:-translate-y-1 focus-visible:outline-none',
-        isActive ? 'text-[#EC0016]' : 'text-gray-700 hover:text-[#EC0016]'
+        'group relative flex flex-col items-center gap-2 rounded-xl p-2 transition-all duration-300 hover:-translate-y-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#EC0016]',
+        isActive ? 'text-[#EC0016]' : 'text-[#2b2b2b] hover:text-[#EC0016]'
       )}
     >
       <Icon className="w-6 h-6 stroke-[1.5px]" />
@@ -498,8 +505,8 @@ function NavIconDropdown({ icon: Icon, label, isActive, onHover, poles }: any) {
         onClick={() => setOpen((v) => !v)}
         onFocus={onHover}
         className={cn(
-          'group relative flex flex-col items-center gap-2 rounded-xl p-2 transition-all duration-300 hover:-translate-y-1 focus-visible:outline-none',
-          isActive || open ? 'text-[#EC0016]' : 'text-gray-700 hover:text-[#EC0016]'
+          'group relative flex flex-col items-center gap-2 rounded-xl p-2 transition-all duration-300 hover:-translate-y-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#EC0016]',
+          isActive || open ? 'text-[#EC0016]' : 'text-[#2b2b2b] hover:text-[#EC0016]'
         )}
       >
         <Icon className="w-6 h-6 stroke-[1.5px]" />
@@ -535,7 +542,7 @@ function NavIconDropdown({ icon: Icon, label, isActive, onHover, poles }: any) {
                       >
                         <PoleIcon className="h-4 w-4" />
                       </span>
-                      <span className="font-bold text-gray-800">{pole.title}</span>
+                      <span className="font-bold text-[#2b2b2b]">{pole.title}</span>
                     </a>
                   )
                 })}

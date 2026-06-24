@@ -21,7 +21,8 @@
       "Bash(node -e \"const fr=require\\('./messages/fr.json'\\),ar=require\\('./messages/ar.json'\\); console.log\\('fr.doctors.bookShort=',fr.doctors&&fr.doctors.bookShort\\); console.log\\('ar.doctors.bookShort=',ar.doctors&&ar.doctors.bookShort\\);\")",
       "Bash(git -c core.quotepath=false status --short)",
       "Bash(git -c core.quotepath=false diff --stat)",
-      "PowerShell(Get-CimInstance *)"
+      "PowerShell(Get-CimInstance *)",
+      "PowerShell($c = Get-NetTCPConnection -LocalPort 3000 -State Listen -ErrorAction SilentlyContinue; if\\($c\\){ $c.OwningProcess | Select -Unique | %{ Stop-Process -Id $_ -Force -ErrorAction SilentlyContinue } }; \"stopped\")"
     ]
   }
 }
