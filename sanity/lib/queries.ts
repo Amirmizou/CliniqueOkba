@@ -535,6 +535,7 @@ export const sectionContentQuery = groq`
     ctaText,
     ctaText_ar,
     ctaLink,
+    accentColor,
     "videoUrl": videoFile.asset->url,
     videoPoster
   }
@@ -554,6 +555,7 @@ export const allSectionContentsQuery = groq`
     ctaText,
     ctaText_ar,
     ctaLink,
+    accentColor,
     "videoUrl": videoFile.asset->url,
     videoPoster
   }

@@ -3,7 +3,7 @@ import SiteFooter from '@/components/site-footer'
 import DoctorsShowcase from '@/components/doctors-showcase'
 import ScrollAnimation from '@/components/ui/scroll-animation'
 import { getTranslations } from 'next-intl/server'
-import { getSiteSettings, getDoctors } from '@/sanity/lib/fetch'
+import { getSiteSettings, getDoctors, getAllSectionContents } from '@/sanity/lib/fetch'
 import { localizeSanityData } from '@/sanity/lib/localize'
 import { urlFor } from '@/sanity/lib/image'
 import { generatePhysiciansStructuredData } from '@/lib/seo'
@@ -21,14 +21,18 @@ export default async function EquipePage({
 }) {
     const { locale } = await params
     const t = await getTranslations('equipe')
-    const [siteSettingsRaw, doctorsRaw] = await Promise.all([
+    const [siteSettingsRaw, doctorsRaw, sectionContentsRaw] = await Promise.all([
         getSiteSettings(),
         getDoctors(),
+        getAllSectionContents(),
     ])
 
     // Localisation FR/AR du contenu Sanity (repli sur le français)
     const siteSettings = localizeSanityData(siteSettingsRaw, locale)
     const doctors = localizeSanityData(doctorsRaw, locale)
+    const sectionContents = localizeSanityData(sectionContentsRaw, locale)
+
+    const doctorsSectionContent = (sectionContents || []).find((s: any) => s.sectionId === 'doctors')
 
     // Données structurées Physician (SEO) à partir des médecins Sanity
     const physiciansJsonLd = generatePhysiciansStructuredData(
@@ -60,7 +64,7 @@ export default async function EquipePage({
             )}
             <SiteHeader siteSettings={siteSettings} />
             <main className="min-h-screen pt-20">
-                <DoctorsShowcase data={doctors} />
+                <DoctorsShowcase data={doctors} sectionContent={doctorsSectionContent} />
 
                 {/* Contact CTA */}
                 <section className="pb-20">

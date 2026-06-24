@@ -134,7 +134,7 @@ export default async function Home(props: { params: Promise<{ locale: string }> 
         />
         <Poles data={localizedData.poles} />
         <SectionDivider variant="ecg" />
-        <DoctorsShowcase data={localizedData.doctors} />
+        <DoctorsShowcase data={localizedData.doctors} sectionContent={sectionContentMap['doctors']} />
         <SectionDivider variant="ecg" />
         <VideosGallery data={localizedData.videos} />
         <SectionDivider variant="ecg" />
