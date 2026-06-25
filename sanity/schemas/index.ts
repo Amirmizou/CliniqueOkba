@@ -18,6 +18,7 @@ import footerContent from './footerContent'
 import pageSeo from './pageSeo'
 import insuranceSection from './insurance'
 import video from './video'
+import labResults from './labResults'
 
 export const schemaTypes = [
     // Configuration Générale
@@ -35,6 +36,7 @@ export const schemaTypes = [
     specialty,
     equipment,
     homeCare,
+    labResults,
     insuranceSection,
 
     // Équipe & Avis

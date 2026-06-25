@@ -298,6 +298,7 @@ export const articlesQuery = groq`
     title_ar,
     slug,
     excerpt,
+    excerpt_ar,
     image,
     category,
     author,
@@ -625,5 +626,17 @@ export const allPageSeoQuery = groq`
     metaDescription,
     ogImage,
     keywords
+  }
+`
+
+export const labResultsQuery = groq`
+  *[_type == "labResults"][0] {
+    ...,
+    precisionFeatures[] {
+        title, title_ar, desc, desc_ar, icon
+    },
+    qrSteps[] {
+        step, title, title_ar, desc, desc_ar
+    }
   }
 `

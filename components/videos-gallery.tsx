@@ -121,7 +121,7 @@ export default function VideosGallery({ data }: { data?: VideoItem[] }) {
                     : 'bg-muted text-muted-foreground hover:bg-muted/80 hover:text-foreground'
                 }`}
               >
-                {t(`categories.${cat}`)}
+                {t.has(`categories.${cat}`) ? t(`categories.${cat}`) : cat}
               </button>
             ))}
           </div>

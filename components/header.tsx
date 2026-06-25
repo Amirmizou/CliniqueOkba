@@ -25,6 +25,11 @@ import {
   ClipboardList,
   Info,
   Mail,
+  Phone,
+  MapPin,
+  Clock,
+  Facebook,
+  Instagram,
   type LucideIcon,
 } from 'lucide-react'
 import { ThemeToggle } from '@/components/theme-toggle'
@@ -91,6 +96,9 @@ interface SiteSettings {
   clinicName?: string
   phone?: string
   logo?: any
+  address?: string
+  hours?: { emergency?: string; weekdays?: string; saturday?: string }
+  social?: { facebook?: string; instagram?: string }
 }
 
 interface HeaderProps {
@@ -190,17 +198,78 @@ export default function Header({ siteSettings, poles }: HeaderProps) {
     ? siteSettings.clinicName
     : (locale === 'ar' ? 'المصحة الطبية عقبة' : 'Clinique OKBA')
 
+  /* Barre utilitaire — infos essentielles (depuis Sanity siteSettings) */
+  const utilPhone = (siteSettings?.phone || '').split('/')[0].trim()
+  const utilPhoneHref = `tel:${utilPhone.replace(/[^+\d]/g, '')}`
+  const utilHours = siteSettings?.hours?.weekdays || ''
+  const utilAddress = siteSettings?.address || ''
+  const utilFacebook = siteSettings?.social?.facebook
+  const utilInstagram = siteSettings?.social?.instagram
+
   return (
     <>
-      <header className={cn(
-        "fixed inset-x-0 top-0 z-[100] flex justify-center px-4 pt-4 pointer-events-none transition-transform duration-500",
-        isHidden && !isOpen ? "-translate-y-[150%]" : "translate-y-0"
-      )}>
-        
+      <style dangerouslySetInnerHTML={{__html: `
+        @keyframes scanLaser {
+          0% { transform: translateY(2px); opacity: 0; }
+          15% { opacity: 1; }
+          85% { opacity: 1; }
+          100% { transform: translateY(56px); opacity: 0; }
+        }
+      `}} />
+      {/* ═══ BARRE UTILITAIRE (desktop) — infos essentielles (dans le flux) ═══ */}
+      <div className="relative z-[60] hidden xl:block">
+        <div className="bg-[#006633] text-white">
+          <div className="mx-auto flex h-9 max-w-7xl items-center justify-between gap-4 overflow-hidden px-5 text-[12px]">
+            {/* Gauche : Urgences + Infos (Phone, Hours, Address) */}
+            <div className="flex min-w-0 items-center gap-4">
+              <span className="flex shrink-0 items-center gap-2 whitespace-nowrap font-bold tracking-wide text-[#FDE68A]">
+                <Siren className="h-3.5 w-3.5 shrink-0 animate-pulse text-red-400" />
+                Urgences, Imagerie et Pédiatrie 24h/24
+              </span>
+
+              {utilPhone && (
+                <a href={utilPhoneHref} className="flex shrink-0 items-center gap-1.5 font-medium transition-colors hover:text-[#FDE68A]">
+                  <Phone className="h-3.5 w-3.5 shrink-0" />
+                  <span dir="ltr" className="whitespace-nowrap">{utilPhone}</span>
+                </a>
+              )}
+              {utilHours && (
+                <span className="hidden shrink-0 items-center gap-1.5 text-white/85 2xl:flex">
+                  <Clock className="h-3.5 w-3.5 shrink-0" />
+                  <span className="whitespace-nowrap">{utilHours}</span>
+                </span>
+              )}
+              {utilAddress && (
+                <span className="hidden min-w-0 items-center gap-1.5 text-white/85 2xl:flex">
+                  <MapPin className="h-3.5 w-3.5 shrink-0" />
+                  <span className="truncate">{utilAddress}</span>
+                </span>
+              )}
+            </div>
+
+            {/* Droite : Réseaux sociaux */}
+            <div className="flex shrink-0 items-center gap-3">
+              {utilFacebook && (
+                <a href={utilFacebook} target="_blank" rel="noopener noreferrer" aria-label="Facebook" className="transition-colors hover:text-[#FDE68A]">
+                  <Facebook className="h-4 w-4" />
+                </a>
+              )}
+              {utilInstagram && (
+                <a href={utilInstagram} target="_blank" rel="noopener noreferrer" aria-label="Instagram" className="transition-colors hover:text-[#FDE68A]">
+                  <Instagram className="h-4 w-4" />
+                </a>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <header className="relative z-[60] flex justify-center px-4 py-3 bg-white/95 backdrop-blur-md border-b border-black/[0.06] shadow-[0_2px_14px_rgba(0,0,0,0.06)] dark:bg-slate-950/90 dark:border-white/10">
+
         {/* MOBILE & TABLET FALLBACK */}
-        <div className="pointer-events-auto w-full max-w-7xl flex items-center justify-between rounded-2xl bg-white/95 backdrop-blur-md shadow-[0_8px_30px_rgb(0,0,0,0.12)] border border-gray-100 px-4 py-3 xl:hidden">
-          <a href="/" className="flex items-center gap-3">
-            <div className="relative h-10 w-10 rounded-full bg-white p-1 shadow-sm ring-1 ring-gray-100">
+        <div className="w-full max-w-7xl flex items-center justify-between rounded-2xl bg-white/95 backdrop-blur-md shadow-[0_8px_30px_rgb(0,0,0,0.12)] border border-gray-100 px-4 py-3 xl:hidden">
+          <a href="/" className="flex items-center gap-3 group">
+            <div className="relative h-12 w-12 rounded-full bg-white p-1 shadow-sm ring-1 ring-gray-100 transition-transform duration-300 group-hover:scale-105 active:scale-95">
               <Image src="/logo.png" alt="Logo" fill className="object-contain p-1" />
             </div>
             <span className="font-extrabold text-[#006633] text-sm uppercase leading-none flex flex-col">
@@ -209,6 +278,16 @@ export default function Header({ siteSettings, poles }: HeaderProps) {
             </span>
           </a>
           <div className="flex items-center gap-3">
+            {/* MINI SCANNER (Visible on mobile) */}
+            <div className="relative w-10 h-10 rounded-full flex items-center justify-center bg-gray-50 border border-gray-200 shadow-inner">
+              <div className="absolute inset-1 rounded-full bg-gradient-to-br from-gray-200 to-gray-400 shadow-inner" />
+              <div className="absolute inset-[6px] rounded-full bg-black shadow-[inset_0_2px_8px_rgba(0,0,0,0.8)] flex items-center justify-center">
+                <div className="bg-[#e87722] w-[8px] h-[3px] rounded-[1px] shadow-sm flex items-center justify-center">
+                </div>
+              </div>
+              <div className="absolute top-[20%] right-[20%] w-1 h-1 rounded-full bg-red-500 shadow-[0_0_4px_rgba(239,68,68,0.8)] animate-pulse" />
+            </div>
+
             <LanguageSwitcher />
             <button
               ref={menuButtonRef}
@@ -221,7 +300,7 @@ export default function Header({ siteSettings, poles }: HeaderProps) {
         </div>
 
         {/* 3D SCANNER DESKTOP — Siemens Symbia Pro.specta */}
-        <div className={cn("pointer-events-auto relative w-full max-w-5xl mx-auto h-[140px] hidden xl:block transition-all duration-700 origin-top mt-4", isScrolled ? "scale-95 -translate-y-2 opacity-95" : "scale-100 translate-y-0 opacity-100")}>
+        <div className={cn("pointer-events-auto relative w-full max-w-7xl mx-auto h-[140px] hidden xl:block transition-all duration-700 origin-top mt-4", isScrolled ? "scale-95 -translate-y-2 opacity-95" : "scale-100 translate-y-0 opacity-100")}>
           
           {/* ═══════════════ GANTRY BASE / FLOOR MOUNT ═══════════════ */}
           <div className="absolute right-[10px] bottom-[0px] w-[170px] h-[16px] z-0 pointer-events-none" style={{
@@ -237,124 +316,135 @@ export default function Header({ siteSettings, poles }: HeaderProps) {
             boxShadow: '4px 4px 12px rgba(0,0,0,0.12), inset -2px 0 6px rgba(0,0,0,0.06)'
           }} />
 
-          {/* ═══════════════ GANTRY ANNEAU PRINCIPAL ═══════════════ */}
-          {/* Outer ring bevel — épaisseur visible */}
-          <div className="absolute right-[15px] bottom-[-2px] w-[150px] h-[150px] rounded-full z-[35] pointer-events-none" style={{
-            background: 'conic-gradient(from 220deg, #e0e0e0, #f5f5f5 90deg, #ffffff 180deg, #d5d5d5 270deg, #e0e0e0)',
-            boxShadow: '0 8px 30px rgba(0,0,0,0.2), inset 0 2px 6px rgba(255,255,255,0.8), inset 0 -4px 8px rgba(0,0,0,0.1)'
-          }}>
-            {/* Inner bevel ring for 3D depth */}
-            <div className="absolute inset-[6px] rounded-full" style={{
-              background: 'conic-gradient(from 40deg, #f0f0f0, #e2e2e2 90deg, #d8d8d8 180deg, #ececec 270deg, #f0f0f0)',
-              boxShadow: 'inset 0 3px 6px rgba(0,0,0,0.08), inset 0 -2px 4px rgba(255,255,255,0.6)'
-            }} />
-          </div>
-
-          {/* Gantry masque — découpe le bore (trou central plus petit ~60px) */}
-          <div className="absolute right-[15px] bottom-[-2px] w-[150px] h-[150px] rounded-full z-[38] pointer-events-none" style={{
-            background: 'conic-gradient(from 220deg, #e0e0e0, #f5f5f5 90deg, #ffffff 180deg, #d5d5d5 270deg, #e0e0e0)',
-            WebkitMaskImage: 'radial-gradient(circle at center, transparent 29px, black 30px)',
-            maskImage: 'radial-gradient(circle at center, transparent 29px, black 30px)',
-            boxShadow: 'inset 0 2px 8px rgba(255,255,255,0.5)'
+          {/* ═══════════════ OMBRE DE CONTACT AU SOL (ancrage réaliste) ═══════════════ */}
+          <div aria-hidden="true" className="absolute z-[2] pointer-events-none" style={{
+            right: '24px', bottom: '-5px', width: '132px', height: '22px',
+            borderRadius: '50%',
+            background: 'radial-gradient(closest-side, rgba(0,0,0,0.30), rgba(0,0,0,0) 76%)',
+            filter: 'blur(2px)',
           }} />
 
-          {/* Bore intérieur sombre */}
-          <div className="absolute z-[20] rounded-full pointer-events-none" style={{
-            width: '60px', height: '60px',
-            right: '60px', bottom: '43px',
-            background: 'radial-gradient(circle at 40% 40%, #1a1a1a 0%, #0a0a0a 60%, #000000 100%)',
-            boxShadow: 'inset 0 4px 20px rgba(0,0,0,0.95), inset 0 -2px 8px rgba(30,30,30,0.5)'
+          {/* ═══════════════ GANTRY ANNEAU — face plastique mate ═══════════════ */}
+          {/* Disque de base : épaisseur + ombre portée douce */}
+          <div className="absolute right-[15px] bottom-[-2px] w-[150px] h-[150px] rounded-full z-[35] pointer-events-none" style={{
+            background: 'radial-gradient(125% 125% at 36% 20%, #ffffff 0%, #f3f3f3 46%, #e2e2e2 78%, #cdcdcd 100%)',
+            boxShadow: '0 16px 36px -10px rgba(0,0,0,0.30), 0 4px 10px rgba(0,0,0,0.12)',
+          }} />
+
+          {/* Face avant (donut) — trouée pour révéler le tunnel */}
+          <div className="absolute right-[15px] bottom-[-2px] w-[150px] h-[150px] rounded-full z-[38] pointer-events-none overflow-hidden" style={{
+            background: 'radial-gradient(130% 130% at 36% 18%, #ffffff 0%, #f4f4f4 44%, #e4e4e4 74%, #d2d2d2 100%)',
+            WebkitMaskImage: 'radial-gradient(circle at center, transparent 30px, black 31px)',
+            maskImage: 'radial-gradient(circle at center, transparent 30px, black 31px)',
+            boxShadow: 'inset 0 3px 7px rgba(255,255,255,0.9), inset 0 -10px 18px rgba(0,0,0,0.10)',
           }}>
-            {/* LED indicateur intérieur */}
-            <div className="absolute top-[25%] right-[15%] w-[3px] h-[3px] rounded-full bg-red-500 shadow-[0_0_8px_2px_rgba(239,68,68,0.8)] animate-pulse" />
-            {/* Reflet intérieur subtle du bore */}
-            <div className="absolute inset-[4px] rounded-full opacity-20" style={{
-              background: 'conic-gradient(from 180deg, transparent 0deg, rgba(255,255,255,0.15) 60deg, transparent 120deg)'
+            {/* Reflet large et doux (lumière de plafond, haut-gauche) */}
+            <div className="absolute inset-0" style={{ background: 'radial-gradient(55% 38% at 33% 12%, rgba(255,255,255,0.85), rgba(255,255,255,0) 62%)' }} />
+            {/* Chanfrein annulaire vers le bore (occlusion ambiante) */}
+            <div className="absolute left-1/2 top-1/2 h-[92px] w-[92px] -translate-x-1/2 -translate-y-1/2 rounded-full" style={{
+              boxShadow: 'inset 0 0 0 5px rgba(0,0,0,0.04), inset 0 7px 16px rgba(0,0,0,0.20), inset 0 -2px 5px rgba(255,255,255,0.5)',
             }} />
           </div>
 
-          {/* Liseré de bore — bord intérieur de l'ouverture */}
+          {/* Liseré signature vert — anneau fin près du bord externe (forme façon Siemens) */}
           <div className="absolute z-[39] rounded-full pointer-events-none" style={{
+            right: '22px', bottom: '5px', width: '136px', height: '136px',
+            boxShadow: 'inset 0 0 0 2px rgba(0,102,51,0.55)',
+          }} />
+
+          {/* ═══════════════ BORE — tunnel profond ═══════════════ */}
+          <div className="absolute z-[40] rounded-full overflow-hidden pointer-events-none" style={{
             width: '64px', height: '64px',
             right: '58px', bottom: '41px',
-            boxShadow: 'inset 0 0 0 2px rgba(180,180,180,0.6), inset 0 3px 8px rgba(0,0,0,0.4)'
-          }} />
+            background: 'radial-gradient(circle at 50% 38%, #242424 0%, #101010 46%, #000000 100%)',
+            boxShadow: 'inset 0 6px 22px rgba(0,0,0,0.95), inset 0 -3px 10px rgba(25,25,25,0.6)',
+          }}>
+            {/* Lèvre du tunnel éclairée en haut */}
+            <div className="absolute inset-0 rounded-full" style={{ background: 'radial-gradient(60% 28% at 50% 7%, rgba(255,255,255,0.20), rgba(255,255,255,0) 60%)' }} />
+            {/* Anneaux détecteurs internes (suggérés) */}
+            <div className="absolute inset-[8px] rounded-full border border-white/[0.06]" />
+            <div className="absolute inset-[16px] rounded-full border border-white/[0.05]" />
 
-          {/* ═══════════════ BADGE "SYMBIA Pro.specta" (style orange Siemens) ═══════════════ */}
-          <div className="absolute z-[42] pointer-events-none" style={{ right: '18px', bottom: '30px' }}>
-            <div className="bg-[#e87722] text-white px-2 py-[2px] rounded-[3px] shadow-md">
-              <span className="text-[5px] font-extrabold tracking-wider uppercase leading-none">{clinicNameText}</span>
-            </div>
+            {/* Effet Laser / Scanning Beam (balayage vertical comme un vrai scanner) */}
+            <div className="absolute left-[8%] right-[8%] top-0 h-[3px] rounded-full bg-[#00ff88] shadow-[0_0_16px_6px_rgba(0,255,136,0.85)]" style={{ animation: 'scanLaser 2.6s ease-in-out infinite alternate' }} />
+            {/* Lueur diffuse qui suit le faisceau */}
+            <div className="absolute left-0 right-0 top-0 h-[16px] -mt-[7px] opacity-60" style={{ background: 'radial-gradient(ellipse at center, rgba(0,255,136,0.35), transparent 70%)', animation: 'scanLaser 2.6s ease-in-out infinite alternate' }} />
+
+            {/* LED indicateur intérieur */}
+            <div className="absolute top-[25%] right-[15%] w-[3px] h-[3px] rounded-full bg-red-500 shadow-[0_0_8px_2px_rgba(239,68,68,0.8)] animate-pulse" />
           </div>
 
-          {/* ═══════════════ DETECTOR HEAD (tête supérieure + bras) ═══════════════ */}
-          {/* Bras de connexion courbé */}
-          <div className="absolute z-[36] pointer-events-none" style={{
-            right: '78px', top: '-8px', width: '24px', height: '35px',
-            background: 'linear-gradient(90deg, #e8e8e8 0%, #f2f2f2 50%, #e0e0e0 100%)',
-            borderRadius: '6px 6px 4px 4px',
-            boxShadow: '2px 2px 8px rgba(0,0,0,0.12), inset 1px 0 3px rgba(255,255,255,0.5), inset -1px 0 2px rgba(0,0,0,0.05)'
+          {/* Lèvre du bore — biseau 3D (haut clair, bas sombre) */}
+          <div className="absolute z-[41] rounded-full pointer-events-none" style={{
+            width: '64px', height: '64px',
+            right: '58px', bottom: '41px',
+            boxShadow: 'inset 0 2px 3px rgba(255,255,255,0.55), inset 0 -3px 9px rgba(0,0,0,0.55), 0 0 0 1px rgba(0,0,0,0.12)',
           }} />
-          {/* Tête de détection principale */}
-          <div className="absolute z-[37] pointer-events-none" style={{
-            right: '55px', top: '-22px', width: '70px', height: '26px',
-            borderRadius: '8px 8px 4px 4px',
-            background: 'linear-gradient(180deg, #ffffff 0%, #f5f5f5 30%, #e8e8e8 100%)',
-            boxShadow: '0 -4px 16px rgba(0,0,0,0.08), 0 6px 12px rgba(0,0,0,0.15), inset 0 2px 4px rgba(255,255,255,1), inset 0 -1px 3px rgba(0,0,0,0.06)'
-          }}>
-            {/* Ligne rouge accent supérieure */}
-            <div className="absolute bottom-0 left-[10%] right-[10%] h-[2px] bg-[#EC0016] rounded-full shadow-[0_1px_4px_rgba(236,0,22,0.4)]" />
-            {/* Texte Siemens (très discret) */}
-            <div className="absolute inset-0 flex items-center justify-center">
-              <span className="text-[5px] font-bold text-gray-400 tracking-[0.15em] uppercase">Healthineers</span>
-            </div>
+
+          {/* ═══════════════ REPÈRE « RDV » (signale que le gantry est cliquable) ═══════════════ */}
+          <div className="absolute z-[45] pointer-events-none" style={{ right: '22px', bottom: '66px' }}>
+            <div className="bg-[#006633] text-white px-1.5 py-[1px] rounded-[2px] shadow-sm text-[7px] font-extrabold tracking-[0.15em] uppercase">RDV</div>
           </div>
 
           {/* ═══════════════ TABLE / PLATEAU PATIENT ═══════════════ */}
-          {/* Support mécanique (base grise du lit) */}
-          <div className="absolute z-[5] pointer-events-none" style={{
-            left: '12%', right: '120px', bottom: '2px', height: '28px',
-            borderRadius: '6px 0 0 8px',
-            background: 'linear-gradient(180deg, #c0c0c0 0%, #a8a8a8 40%, #969696 100%)',
-            boxShadow: '0 6px 16px rgba(0,0,0,0.2), inset 0 1px 2px rgba(255,255,255,0.3)'
+          {/* Piédestal blanc à nervures verticales (inspiré du SOMATOM go.Top) */}
+          <div className={cn("absolute z-[5] pointer-events-none origin-right", isHidden ? "translate-x-[200px] opacity-0 transition-all duration-[2000ms] ease-in-out" : "translate-x-0 opacity-100 transition-all duration-[1500ms] delay-[400ms] ease-out")} style={{
+            left: '46%', right: '158px', bottom: '3px', height: '30px',
+            borderRadius: '10px 10px 3px 3px',
+            background: 'linear-gradient(180deg, #fdfdfd 0%, #f1f1f1 55%, #dcdcdc 100%)',
+            boxShadow: '0 9px 20px -5px rgba(0,0,0,0.22), inset 0 2px 4px rgba(255,255,255,0.95), inset 0 -3px 7px rgba(0,0,0,0.08)'
           }}>
-            {/* Grilles d'aération */}
-            <div className="absolute top-[6px] left-[30px] right-[20px] flex gap-[3px]" aria-hidden="true">
-              {[...Array(12)].map((_, i) => (
-                <div key={i} className="h-[12px] w-[2px] rounded-full bg-black/10" />
-              ))}
-            </div>
+            {/* Nervures verticales courbes (signature de la colonne SOMATOM) */}
+            <div className="absolute inset-x-3 top-[5px] bottom-[7px]" aria-hidden="true" style={{
+              background: 'repeating-linear-gradient(90deg, rgba(0,0,0,0.08) 0px, rgba(0,0,0,0.08) 1px, transparent 1px, transparent 9px)',
+              borderRadius: '4px',
+              WebkitMaskImage: 'linear-gradient(180deg, transparent, #000 28%, #000 78%, transparent)',
+              maskImage: 'linear-gradient(180deg, transparent, #000 28%, #000 78%, transparent)'
+            }} />
+            {/* Reflet vertical doux au centre de la colonne */}
+            <div className="absolute inset-y-2 left-1/2 w-1/3 -translate-x-1/2" aria-hidden="true" style={{
+              background: 'radial-gradient(60% 80% at 50% 30%, rgba(255,255,255,0.7), rgba(255,255,255,0) 70%)'
+            }} />
+            {/* Base évasée (pied au sol) */}
+            <div className="absolute -bottom-[3px] -left-[10px] -right-[10px] h-[6px] rounded-b-md" aria-hidden="true" style={{
+              background: 'linear-gradient(180deg, #e2e2e2, #c6c6c6)',
+              boxShadow: '0 5px 12px rgba(0,0,0,0.20)'
+            }} />
           </div>
 
           {/* Side rail gauche (rebord latéral) */}
-          <div className="absolute z-[32] pointer-events-none" style={{
-            left: '11%', right: '100px', bottom: '28px', height: '6px',
+          <div className={cn("absolute z-[32] pointer-events-none origin-right", isHidden ? "translate-x-[200px] opacity-0 transition-all duration-[2000ms] ease-in-out" : "translate-x-0 opacity-100 transition-all duration-[1500ms] delay-[400ms] ease-out")} style={{
+            left: '11%', right: '145px', bottom: '28px', height: '6px',
             borderRadius: '12px 0 0 0',
             background: 'linear-gradient(180deg, #f0f0f0 0%, #d8d8d8 100%)',
             boxShadow: '0 -2px 4px rgba(0,0,0,0.06), inset 0 1px 2px rgba(255,255,255,0.8)'
           }} />
 
           {/* Surface du plateau principal */}
-          <div className="absolute z-[30] flex flex-col justify-end transition-transform duration-700 hover:-translate-x-1" style={{
-            left: '13%', right: '82px', bottom: '32px', height: '50px',
+          <div className={cn("absolute z-[30] flex flex-col justify-end origin-right hover:-translate-x-1", isHidden ? "translate-x-[200px] opacity-0 transition-all duration-[2000ms] ease-in-out" : "translate-x-0 opacity-100 transition-all duration-[1500ms] delay-[400ms] ease-out")} style={{
+            left: '10%', right: '95px', bottom: '32px', height: '64px',
             borderRadius: '20px 0 0 6px',
             background: 'linear-gradient(180deg, #ffffff 0%, #fafafa 20%, #f0f0f0 60%, #e4e4e4 100%)',
             boxShadow: '0 8px 20px -4px rgba(0,0,0,0.18), inset 0 3px 10px rgba(255,255,255,1), inset 0 -2px 6px rgba(0,0,0,0.04)',
             WebkitMaskImage: 'linear-gradient(to right, black 70%, transparent 100%)',
             maskImage: 'linear-gradient(to right, black 70%, transparent 100%)'
           }}>
-            {/* Bande LED cyan le long du bord inférieur (comme sur le vrai scanner) */}
-            <div className="absolute bottom-[3px] left-[20px] right-0 h-[2px] rounded-l-full" style={{
-              background: 'linear-gradient(90deg, #00c8ff 0%, #00e5ff 40%, rgba(0,229,255,0) 100%)',
-              boxShadow: '0 0 8px rgba(0,200,255,0.5), 0 0 3px rgba(0,200,255,0.3)'
+            {/* Liseré latéral net (façon bande Siemens, en vert identité) */}
+            <div className="absolute bottom-[5px] left-[22px] right-0 h-[2px] rounded-l-full" style={{
+              background: 'linear-gradient(90deg, #006633 0%, #00a651 55%, rgba(0,166,81,0) 100%)',
+              boxShadow: '0 0 5px rgba(0,166,81,0.35)'
             }} />
 
             {/* Ligne de guidage subtile */}
             <div aria-hidden="true" className="pointer-events-none absolute top-[50%] left-[55%] right-0 h-[1px] bg-black/[0.04]" />
 
-            {/* Ombre d'entrée dans le bore */}
-            <div aria-hidden="true" className="pointer-events-none absolute right-0 top-0 bottom-0 w-[60px] z-10" style={{
-              background: 'linear-gradient(to left, rgba(0,0,0,0.5) 0%, transparent 100%)'
+            {/* Ombre d'entrée dans le bore — la table s'enfonce dans le tunnel */}
+            <div aria-hidden="true" className="pointer-events-none absolute right-0 top-0 bottom-0 w-[95px] z-10" style={{
+              background: 'linear-gradient(to left, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0.28) 48%, transparent 100%)'
+            }} />
+            {/* Liseré vert qui file du plateau vers le bore (continuité visuelle) */}
+            <div aria-hidden="true" className="pointer-events-none absolute bottom-[3px] right-0 h-[2px] w-[90px] z-[11]" style={{
+              background: 'linear-gradient(to right, rgba(0,255,136,0.6) 0%, rgba(0,102,51,0) 100%)'
             }} />
 
             {/* Blur de jonction */}
@@ -362,55 +452,83 @@ export default function Header({ siteSettings, poles }: HeaderProps) {
               backdropFilter: 'blur(1.5px)'
             }} />
 
-            {/* Contenu de la table (navigation) */}
-            <div className="absolute inset-0 flex items-center px-4 pb-1">
-              {/* Sélecteur de langue */}
-              <div className="shrink-0 mr-4">
-                <LanguageSwitcher />
-              </div>
+          </div>
 
-              {/* Logo Area */}
-              <a href="/" className="flex items-center gap-2.5 shrink-0 mr-6 group">
-                <div className="relative h-11 w-11 rounded-full bg-white p-1 shadow-sm ring-1 ring-gray-100 transition-transform group-hover:scale-105">
-                  <Image src="/logo.png" alt="Logo" fill className="object-contain p-1" />
-                </div>
-                <div className="flex flex-col">
-                  <span className="text-[10px] font-extrabold text-[#006633] leading-none uppercase">Centre</span>
-                  <span className="text-[10px] font-extrabold text-[#006633] leading-none uppercase mt-0.5">Diagnostic</span>
-                </div>
-              </a>
-
-              {/* Navigation */}
-              <nav className="flex-1 flex items-center justify-start gap-4 lg:gap-8 pr-[220px]" onMouseLeave={() => setHovered(null)}>
-                <NavIconLink icon={Home} label={t('center')} isActive={indicatorKey === 'about'} onClick={() => scrollToSection('#about')} onHover={() => setHovered('about')} />
-                <NavIconDropdown icon={Stethoscope} label={t('specialties')} isActive={indicatorKey === 'specialties'} onHover={() => setHovered('specialties')} onClick={() => scrollToSection('#specialties')} poles={navPoles} locale={locale} />
-                <NavIconLink icon={Activity} label={t('equipment')} isActive={indicatorKey === 'equipements'} onClick={() => scrollToSection('#equipements')} onHover={() => setHovered('equipements')} />
-                <NavIconLink icon={Users} label={t('doctors')} isActive={indicatorKey === 'medecins'} onClick={() => scrollToSection('#medecins')} onHover={() => setHovered('medecins')} />
-                <NavIconLink icon={Info} label={t('faq')} isActive={indicatorKey === 'faq'} onClick={() => scrollToSection('#faq')} onHover={() => setHovered('faq')} />
-                <NavIconLink icon={Mail} label={t('contact')} isActive={indicatorKey === 'contact'} onClick={() => scrollToSection('#contact')} onHover={() => setHovered('contact')} />
-              </nav>
+          {/* ═══════════════ NAVIGATION (calque net, hors du masque de fondu) ═══════════════ */}
+          {/* Placé à gauche de l'anneau (right-[195px]) → aucun item sous le gantry, aucun estompage */}
+          <div
+            className={cn(
+              "absolute z-[34] flex items-center pl-7 origin-right",
+              isHidden ? "translate-x-[200px] opacity-0 transition-all duration-[2000ms] ease-in-out" : "translate-x-0 opacity-100 transition-all duration-[1500ms] delay-[400ms] ease-out",
+            )}
+            style={{ left: '10%', right: '220px', bottom: '32px', height: '64px' }}
+          >
+            {/* Sélecteur de langue */}
+            <div className="shrink-0 mr-2 md:mr-4 pointer-events-auto">
+              <LanguageSwitcher />
             </div>
+
+            {/* Logo Area */}
+            <a href="/" className="flex items-center gap-3 shrink-0 mr-4 md:mr-6 group pointer-events-auto">
+              <div className="relative h-14 w-14 rounded-full bg-white p-1 shadow-sm ring-1 ring-gray-100 transition-transform group-hover:scale-105">
+                <Image src="/logo.png" alt="Logo" fill className="object-contain p-1" />
+              </div>
+              <div className="flex flex-col whitespace-nowrap">
+                <span className="text-[12px] md:text-[14px] font-extrabold text-[#006633] leading-none uppercase">Clinique</span>
+                <span className="text-[12px] md:text-[14px] font-extrabold text-[#006633] leading-none uppercase mt-0.5">Okba</span>
+              </div>
+            </a>
+
+            {/* Navigation */}
+            <nav className="flex flex-1 min-w-0 items-center justify-between gap-1 pointer-events-auto" onMouseLeave={() => setHovered(null)}>
+              <NavIconLink icon={Home} label={t('center')} isActive={indicatorKey === 'about'} onClick={() => scrollToSection('#about')} onHover={() => setHovered('about')} />
+              <NavIconDropdown icon={Stethoscope} label={t('specialties')} isActive={indicatorKey === 'specialties'} onHover={() => setHovered('specialties')} onClick={() => scrollToSection('#specialties')} poles={navPoles} locale={locale} />
+              <NavIconLink icon={Activity} label={t('equipment')} isActive={indicatorKey === 'equipements'} onClick={() => scrollToSection('#equipements')} onHover={() => setHovered('equipements')} />
+              <NavIconLink icon={Users} label={t('doctors')} isActive={indicatorKey === 'medecins'} onClick={() => scrollToSection('#medecins')} onHover={() => setHovered('medecins')} />
+              <NavIconLink icon={Info} label={t('faq')} isActive={indicatorKey === 'faq'} onClick={() => scrollToSection('#faq')} onHover={() => setHovered('faq')} />
+              <NavIconLink icon={Mail} label={t('contact')} isActive={indicatorKey === 'contact'} onClick={() => scrollToSection('#contact')} onHover={() => setHovered('contact')} />
+            </nav>
           </div>
 
           {/* ═══════════════ ROTATING SPECT HEADS ═══════════════ */}
-          <div className="absolute right-[15px] bottom-[-2px] w-[150px] h-[150px] z-[44] animate-[spin_20s_linear_infinite] pointer-events-none">
+          <div className="absolute right-[15px] bottom-[-2px] w-[150px] h-[150px] z-[44] animate-[spin_32s_linear_infinite] pointer-events-none">
             {/* Tête 1 */}
-            <div className="absolute top-[-6px] left-1/2 w-[55px] h-[22px] -translate-x-1/2 rounded-[6px]" style={{
+            <div className="absolute top-[-10px] left-1/2 w-[65px] h-[26px] -translate-x-1/2 rounded-[8px]" style={{
               background: 'linear-gradient(180deg, #ffffff 0%, #f0f0f0 40%, #e0e0e0 100%)',
               boxShadow: '0 4px 12px rgba(0,0,0,0.18), inset 0 2px 4px rgba(255,255,255,1), inset 0 -1px 2px rgba(0,0,0,0.06)',
               border: '1px solid #d0d0d0'
             }}>
-              <div className="absolute bottom-0 left-[15%] right-[15%] h-[2px] bg-[#EC0016] rounded-full" />
+              {/* Collimator fente */}
+              <div className="absolute top-[50%] left-[5%] right-[5%] h-[3px] -translate-y-1/2 bg-[#b0b0b0] rounded-full shadow-[inset_0_1px_2px_rgba(0,0,0,0.4)]" />
+              <div className="absolute bottom-[2px] left-[15%] right-[15%] h-[2px] bg-[#EC0016]/75 rounded-full" />
             </div>
             {/* Tête 2 */}
-            <div className="absolute bottom-[-6px] left-1/2 w-[55px] h-[22px] -translate-x-1/2 rounded-[6px]" style={{
+            <div className="absolute bottom-[-10px] left-1/2 w-[65px] h-[26px] -translate-x-1/2 rounded-[8px]" style={{
               background: 'linear-gradient(0deg, #ffffff 0%, #f0f0f0 40%, #e0e0e0 100%)',
               boxShadow: '0 -4px 12px rgba(0,0,0,0.18), inset 0 -2px 4px rgba(255,255,255,1), inset 0 1px 2px rgba(0,0,0,0.06)',
               border: '1px solid #d0d0d0'
             }}>
-              <div className="absolute top-0 left-[15%] right-[15%] h-[2px] bg-[#EC0016] rounded-full" />
+              {/* Collimator fente */}
+              <div className="absolute top-[50%] left-[5%] right-[5%] h-[3px] -translate-y-1/2 bg-[#b0b0b0] rounded-full shadow-[inset_0_1px_2px_rgba(0,0,0,0.4)]" />
+              <div className="absolute top-[2px] left-[15%] right-[15%] h-[2px] bg-[#EC0016]/75 rounded-full" />
             </div>
           </div>
+
+          {/* ═══════════════ GANTRY = BOUTON « PRENDRE RENDEZ-VOUS » (fonctionnel) ═══════════════ */}
+          <button
+            onClick={() => scrollToSection('#contact')}
+            aria-label={t('appointment')}
+            title={t('appointment')}
+            className="group absolute z-[46] rounded-full pointer-events-auto cursor-pointer transition-transform duration-300 hover:scale-[1.02] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#006633] focus-visible:ring-offset-2"
+            style={{ right: '15px', bottom: '-2px', width: '150px', height: '150px' }}
+          >
+            {/* Halo vert au survol/focus (le scanner « s'active ») */}
+            <span aria-hidden="true" className="absolute inset-[5px] rounded-full transition-all duration-300 group-hover:shadow-[0_0_0_3px_rgba(0,102,51,0.55),0_0_30px_rgba(0,255,136,0.45)] group-focus-visible:shadow-[0_0_0_3px_rgba(0,102,51,0.6)]" />
+            {/* Infobulle */}
+            <span className="pointer-events-none absolute right-full top-1/2 mr-1 -translate-y-1/2 whitespace-nowrap rounded-md bg-[#006633] px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-white opacity-0 shadow-lg transition-opacity duration-200 group-hover:opacity-100 group-focus-visible:opacity-100">
+              {t('appointment')}
+            </span>
+          </button>
 
         </div>
       </header>
@@ -474,14 +592,14 @@ function NavIconLink({ icon: Icon, label, isActive, onClick, onHover }: any) {
       onMouseEnter={onHover}
       onFocus={onHover}
       className={cn(
-        'group relative flex flex-col items-center gap-1 rounded-xl p-1.5 transition-all duration-300 hover:-translate-y-0.5 focus-visible:outline-none',
-        isActive ? 'text-[#EC0016]' : 'text-gray-600 hover:text-[#EC0016]'
+        'group relative flex flex-row items-center gap-1 rounded-xl px-2 py-1.5 transition-all duration-300 hover:-translate-y-0.5 focus-visible:outline-none whitespace-nowrap',
+        isActive ? 'text-[#006633]' : 'text-gray-600 hover:text-[#006633]'
       )}
     >
-      <Icon className="w-5 h-5 stroke-[1.5px]" />
-      <span className="text-[10px] font-extrabold tracking-wide uppercase">{label}</span>
+      <Icon className="w-3.5 h-3.5 stroke-[2px] shrink-0" />
+      <span className="text-[9px] md:text-[10px] xl:text-[11px] font-extrabold tracking-wide uppercase truncate">{label}</span>
       {isActive && (
-        <span className="absolute -bottom-1 h-[2px] w-5 bg-[#EC0016] rounded-full shadow-[0_0_4px_rgba(236,0,22,0.6)]" />
+        <span className="absolute -bottom-1 left-2 right-2 h-[2px] bg-[#006633] rounded-full shadow-[0_0_4px_rgba(0,102,51,0.6)]" />
       )}
     </button>
   )
@@ -505,16 +623,14 @@ function NavIconDropdown({ icon: Icon, label, isActive, onHover, onClick, poles,
         }}
         onFocus={onHover}
         className={cn(
-          'group relative flex flex-col items-center gap-1 rounded-xl p-1.5 transition-all duration-300 hover:-translate-y-0.5 focus-visible:outline-none',
-          isActive || open ? 'text-[#EC0016]' : 'text-gray-600 hover:text-[#EC0016]'
+          'group relative flex flex-row items-center gap-1 rounded-xl px-2 py-1.5 transition-all duration-300 hover:-translate-y-0.5 focus-visible:outline-none whitespace-nowrap',
+          isActive || open ? 'text-[#006633]' : 'text-gray-600 hover:text-[#006633]'
         )}
       >
-        <Icon className="w-5 h-5 stroke-[1.5px]" />
-        <span className="text-[10px] font-extrabold tracking-wide uppercase flex items-center gap-0.5">
-          {label}
-        </span>
+        <Icon className="w-3.5 h-3.5 stroke-[2px] shrink-0" />
+        <span className="text-[9px] md:text-[10px] xl:text-[11px] font-extrabold tracking-wide uppercase truncate">{label}</span>
         {(isActive || open) && (
-          <span className="absolute -bottom-1 h-[2px] w-5 bg-[#EC0016] rounded-full shadow-[0_0_4px_rgba(236,0,22,0.6)]" />
+          <span className="absolute -bottom-1 left-2 right-2 h-[2px] bg-[#006633] rounded-full shadow-[0_0_4px_rgba(0,102,51,0.6)]" />
         )}
       </button>
 

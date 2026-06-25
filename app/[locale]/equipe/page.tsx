@@ -64,7 +64,7 @@ export default async function EquipePage({
                 />
             )}
             <SiteHeader siteSettings={siteSettings} />
-            <main className="min-h-screen pt-20">
+            <main className="min-h-screen pt-8">
                 <DoctorsShowcase data={doctors} sectionContent={doctorsSectionContent} />
 
                 {/* Contact CTA */}

@@ -16,6 +16,8 @@ import {
   Activity,
   Layers,
   Clock,
+  Sparkles,
+  Cpu,
 } from 'lucide-react'
 import { UniversalPlayer } from '@/components/ui/universal-player'
 import { Link } from '@/navigation'
@@ -75,6 +77,7 @@ export interface PolePageData {
   accent: string
   badge?: string
   urgent?: boolean
+  aiBoosted?: boolean
   videos?: PoleVideo[]
 }
 
@@ -607,6 +610,30 @@ export default function PolePageContent({
       )}
 
       {/* ════════════════════════════════ ÉQUIPEMENTS ═════════════════════════════ */}
+      {/* Bandeau « imagerie augmentée par l'IA » */}
+      {pole.aiBoosted && (
+        <section className="relative overflow-hidden py-12 sm:py-16" style={{ background: `linear-gradient(135deg, ${pole.accent}0F, transparent 70%)` }}>
+          <div className="mx-auto max-w-6xl px-6 lg:px-8">
+            <div className="flex flex-col items-start gap-5 rounded-3xl border border-border/50 bg-card/60 p-6 shadow-sm backdrop-blur-sm sm:flex-row sm:items-center sm:p-8">
+              <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl text-white shadow-lg" style={{ backgroundColor: pole.accent }}>
+                <Sparkles className="h-7 w-7" />
+              </div>
+              <div className="flex-1">
+                <h3 className="flex items-center gap-2 text-xl font-bold text-foreground sm:text-2xl">
+                  <Cpu className="h-5 w-5 shrink-0" style={{ color: pole.accent }} />
+                  {isAr ? 'تصوير معزّز بالذكاء الاصطناعي' : "Une imagerie augmentée par l'IA"}
+                </h3>
+                <p className="mt-2 leading-relaxed text-muted-foreground">
+                  {isAr
+                    ? 'كل أجهزة Siemens Healthineers لدينا مدعومة بالذكاء الاصطناعي (وضع المريض، إعادة بناء الصور، والمساعدة في القراءة) لنتائج أدقّ وأسرع وقابلة للتكرار، وبجرعة إشعاع محكومة.'
+                    : "Tout notre plateau Siemens Healthineers s'appuie sur l'intelligence artificielle — positionnement du patient, reconstruction des images et aide à la lecture — pour des résultats plus précis, plus rapides et reproductibles, à dose maîtrisée."}
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+      )}
+
       {equipments && equipments.length > 0 && (
         <section className="relative overflow-hidden bg-background py-16 sm:py-24">
           <div className="mx-auto max-w-6xl px-6 lg:px-8">

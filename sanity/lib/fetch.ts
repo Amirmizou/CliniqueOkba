@@ -29,6 +29,7 @@ import {
     footerContentQuery,
     pageSeoQuery,
     allPageSeoQuery,
+    labResultsQuery,
 } from './queries'
 
 // En développement : revalidation quasi immédiate (1 s) → les changements publiés
@@ -281,4 +282,12 @@ export async function getHomePageData() {
         homeCare,
         sectionContents,
     }
+}
+
+// ==========================================
+// LABORATOIRE
+// ==========================================
+
+export async function getLabResults() {
+    return safeFetch(client.fetch(labResultsQuery, {}, cacheOptions), null)
 }

@@ -12,9 +12,16 @@ export default getRequestConfig(async ({ requestLocale }) => {
   const validLocale: string =
     typeof requested === 'string' && locales.includes(requested as Locale) ? requested : 'fr'
 
+  // Imports explicites (pas de template littéral) : webpack/Next émet des chunks
+  // nommés fiables. Évite l'erreur dev « Cannot find module ./_rsc_messages_*_json.js ».
+  const messages =
+    validLocale === 'ar'
+      ? (await import('./messages/ar.json')).default
+      : (await import('./messages/fr.json')).default
+
   return {
     locale: validLocale,
-    messages: (await import(`./messages/${validLocale}.json`)).default,
+    messages,
   }
 })
 

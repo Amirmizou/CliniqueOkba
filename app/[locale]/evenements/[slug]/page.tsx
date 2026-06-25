@@ -89,7 +89,7 @@ export default async function EventPage({ params }: { params: Promise<{ slug: st
     return (
         <>
             <SiteHeader siteSettings={siteSettings} />
-            <main className="min-h-screen pt-24">
+            <main className="min-h-screen pt-8">
                 <article className="py-16">
                     <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
                         <ScrollAnimation variant="fadeUp">

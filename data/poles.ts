@@ -33,6 +33,10 @@ export interface Pole {
   /** Introduction longue affichée sur la page dédiée */
   intro?: string
   intro_ar?: string
+  /** Met en avant un bandeau « augmenté par l'IA » sur la page dédiée */
+  aiBoosted?: boolean
+  /** Vidéos de présentation */
+  videos?: { title?: string; videoUrl?: string; poster?: any }[]
 }
 
 export const poles: Pole[] = [
@@ -45,25 +49,26 @@ export const poles: Pole[] = [
       'Un plateau d’imagerie complet pour des diagnostics rapides et précis.',
     description_ar: 'منصة تصوير طبي متكاملة لتشخيص سريع ودقيق.',
     items: [
-      'Scanner (TDM)',
-      'IRM',
-      'Mammographie',
-      'Radiologie numérique',
-      'Échographie',
+      'Scanner SOMATOM go.Top (TDM)',
+      'IRM MAGNETOM Altea 1.5T',
+      'Mammographie MAMMOMAT (tomosynthèse 3D)',
+      'Échographie ACUSON Juniper',
+      'Radiologie numérique MULTIX Impact',
     ],
     items_ar: [
-      'جهاز التصوير المقطعي (Scanner)',
-      'التصوير بالرنين المغناطيسي (IRM)',
-      'تصوير الثدي (Mammographie)',
-      'الأشعة الرقمية',
-      'الموجات فوق الصوتية (Échographie)',
+      'سكانير SOMATOM go.Top (التصوير المقطعي)',
+      'رنين مغناطيسي MAGNETOM Altea 1.5T',
+      'تصوير الثدي MAMMOMAT (ثلاثي الأبعاد)',
+      'الموجات فوق الصوتية ACUSON Juniper',
+      'الأشعة الرقمية MULTIX Impact',
     ],
     iconName: 'ScanLine',
     accent: '#3B82F6',
     galleryCategories: ['imagerie'],
+    aiBoosted: true,
     intro:
-      'Notre service d’imagerie réunit scanner, IRM, mammographie, radiologie numérique et échographie. Des équipements de dernière génération, au service d’un diagnostic fiable et rapide.',
-    intro_ar: 'يضم قسم التصوير لدينا أجهزة المسح المقطعي، الرنين المغناطيسي، الماموجرام، والأشعة الرقمية والموجات الصوتية. أجهزة من الجيل الأحدث لضمان تشخيص دقيق وسريع.',
+      'Notre service d’imagerie réunit un plateau technique complet de dernière génération Siemens Healthineers : scanner SOMATOM go.Top, IRM MAGNETOM Altea 1.5T, mammographe MAMMOMAT (tomosynthèse 3D), échographe ACUSON Juniper et radiologie numérique MULTIX Impact. L’ensemble du plateau est augmenté par l’intelligence artificielle — positionnement du patient, reconstruction des images et aide à la lecture — pour des résultats plus précis, plus rapides et reproductibles, à dose maîtrisée.',
+    intro_ar: 'يضم قسم التصوير لدينا منصة تقنية متكاملة من الجيل الأحدث من Siemens Healthineers: سكانير SOMATOM go.Top، رنين مغناطيسي MAGNETOM Altea 1.5T، جهاز تصوير ثدي MAMMOMAT (ثلاثي الأبعاد)، جهاز موجات فوق صوتية ACUSON Juniper، وأشعة رقمية MULTIX Impact. كامل المنصة معزّز بالذكاء الاصطناعي — وضع المريض، إعادة بناء الصور والمساعدة في القراءة — لنتائج أدقّ وأسرع وقابلة للتكرار، وبجرعة محكومة.',
   },
   {
     id: 'medecine-nucleaire',
@@ -92,6 +97,7 @@ export const poles: Pole[] = [
     badge: 'SPECT/CT · Nouveau',
     badge_ar: 'SPECT/CT · جديد',
     featured: true,
+    aiBoosted: true,
     galleryCategories: ['nucleaire'],
     intro:
       'Notre pôle de médecine nucléaire s’appuie sur le SPECT/CT Siemens Symbia Pro.specta, une caméra hybride de dernière génération qui associe la scintigraphie (SPECT) au scanner (CT). En un seul examen, elle conjugue imagerie fonctionnelle et anatomique pour localiser et caractériser les anomalies avec une précision exceptionnelle : os, cœur, thyroïde, reins et bien plus encore.',
@@ -180,18 +186,32 @@ export const poles: Pole[] = [
       'Analyses biologiques fiables grâce à des automates de dernière génération.',
     description_ar: 'تحاليل بيولوجية موثوقة بفضل أجهزة أوتوماتيكية حديثة.',
     items: [
-      'Hématologie',
-      'Biochimie',
-      'Immunologie',
-      'Microbiologie',
-      'Hormonologie',
+      'Hématologie (FNS, Groupage, TP, INR, HbA1c...)',
+      'Bilan Diabète (Glycémie, Hémoglobine glyquée, HGPO...)',
+      'Maladies Infectieuses (Hépatites, VIH, Sérologies...)',
+      'Maladies respiratoires (PCR, Cultures bactériennes...)',
+      'Pédiatrie (Dépistage néonatal, Hormone de croissance...)',
+      'Bilan de fertilité (AMH, FSH, Spermogramme, TMS...)',
+      'Gynécologie (Prélèvements, Maladies sexuellement transmissibles)',
+      'Maladies auto-immunes (Anticorps spécifiques, FAN, ANCA...)',
+      'Marqueurs tumoraux (PSA, AFP, CEA, Dépistage colorectal)',
+      'Exploration (Fonctions hépatiques, rénales, lipidiques)',
+      'Vitamines et minéraux (D, B12, Calcium)',
+      'Dépistage Helicobacter pylori (PCR, Sérologie, Test respiratoire)',
     ],
     items_ar: [
-      'أمراض الدم',
-      'الكيمياء الحيوية',
-      'علم المناعة',
-      'علم الأحياء الدقيقة',
-      'الهرمونات',
+      'أمراض الدم (FNS، فصيلة الدم، تخثر، HbA1c...)',
+      'فحص السكري (سكر الدم، HbA1c، HGPO...)',
+      'الأمراض المعدية (التهاب الكبد، فيروس نقص المناعة، الأمصال...)',
+      'أمراض الجهاز التنفسي (PCR، مزارع بكتيرية...)',
+      'طب الأطفال (فحص حديثي الولادة، هرمون النمو...)',
+      'فحص الخصوبة (AMH، الهرمونات، فحص الحيوانات المنوية...)',
+      'أمراض النساء (مسحات، أمراض منقولة جنسياً)',
+      'أمراض المناعة الذاتية (أجسام مضادة، FAN، ANCA...)',
+      'دلالات الأورام (PSA، AFP، CEA، فحص سرطان القولون)',
+      'فحوصات (وظائف الكبد، الكلى، الدهون)',
+      'الفيتامينات والمعادن (D، B12، الكالسيوم)',
+      'فحص جرثومة المعدة (PCR، الأمصال، فحص التنفس)',
     ],
     iconName: 'FlaskConical',
     accent: '#8B5CF6',
@@ -199,6 +219,12 @@ export const poles: Pole[] = [
     intro:
       'Notre laboratoire d’analyses médicales réalise vos bilans sanguins et prélèvements sur des automates de dernière génération, pour des résultats fiables et rapides.',
     intro_ar: 'يقوم مختبرنا الطبي بإجراء فحوصات الدم والعينات باستخدام أجهزة أوتوماتيكية من الجيل الأحدث للحصول على نتائج دقيقة وسريعة.',
+    videos: [
+      {
+        title: 'Présentation du Pôle Laboratoire',
+        videoUrl: '/videos/Présentation laboratoire OKBA.mp4',
+      }
+    ],
   },
   {
     id: 'chirurgie',

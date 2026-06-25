@@ -4,6 +4,7 @@ import About from '@/components/about'
 import VideosGallery from '@/components/videos-gallery'
 import LogoLoader from '@/components/logo-loader'
 import TrustBand from '@/components/trust-band'
+import LatestNews from '@/components/latest-news'
 import Poles from '@/components/poles'
 import DoctorsShowcase from '@/components/doctors-showcase'
 import FeaturedEvent from '@/components/featured-event'
@@ -40,6 +41,7 @@ import {
   getFaq,
   getVideos,
   getFooterContent,
+  getArticles,
 } from '@/sanity/lib/fetch'
 import { localizeSanityData } from '@/sanity/lib/localize'
 import type { ClinicEvent } from '@/lib/events'
@@ -69,6 +71,7 @@ export default async function Home(props: { params: Promise<{ locale: string }> 
     faqs,
     videos,
     footerContent,
+    articles,
   ] = await Promise.all([
     getSiteSettings(),
     getAboutSection(),
@@ -84,6 +87,7 @@ export default async function Home(props: { params: Promise<{ locale: string }> 
     getFaq(),
     getVideos(),
     getFooterContent(),
+    getArticles(),
   ])
 
   // Localize all fetched data
@@ -102,6 +106,7 @@ export default async function Home(props: { params: Promise<{ locale: string }> 
     faqs: localizeSanityData(faqs, locale),
     videos: localizeSanityData(videos, locale),
     footerContent: localizeSanityData(footerContent, locale),
+    articles: localizeSanityData(articles, locale),
   }
 
   // Create a map of section contents for easy access
@@ -127,6 +132,7 @@ export default async function Home(props: { params: Promise<{ locale: string }> 
       <SiteHeader siteSettings={localizedData.siteSettings} />
       <main id='main-content' className='min-h-screen'>
         <HeroCarousel slides={localizedData.heroSlides} siteSettings={localizedData.siteSettings} sectionContent={sectionContentMap['hero']} />
+        <LatestNews articles={localizedData.articles} />
         <TrustBand siteSettings={localizedData.siteSettings} />
         <About
           data={localizedData.aboutSection}
