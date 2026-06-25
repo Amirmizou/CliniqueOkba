@@ -63,7 +63,7 @@ export default function MobileActionBar({ siteSettings }: MobileActionBarProps) 
               className="group flex min-h-[56px] flex-col items-center justify-center gap-1 rounded-xl bg-[#006633] px-2 py-3 text-white shadow-md transition-all active:scale-95 hover:bg-[#004d26] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#006633] focus-visible:ring-offset-2 cursor-pointer"
             >
               <Phone className="h-5 w-5" aria-hidden="true" />
-              <span className="text-[11px] font-semibold leading-none">{t('call')}</span>
+              <span className="text-xs font-semibold leading-none">{t('call')}</span>
             </a>
 
             {/* WhatsApp / Appointment */}
@@ -75,7 +75,7 @@ export default function MobileActionBar({ siteSettings }: MobileActionBarProps) 
               className="group flex min-h-[56px] flex-col items-center justify-center gap-1 rounded-xl bg-[#25D366] px-2 py-3 text-white shadow-md transition-all active:scale-95 hover:bg-[#1da851] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#25D366] focus-visible:ring-offset-2 cursor-pointer"
             >
               <MessageCircle className="h-5 w-5" aria-hidden="true" />
-              <span className="text-[11px] font-semibold leading-none">{t('appointment')}</span>
+              <span className="text-xs font-semibold leading-none">{t('appointment')}</span>
             </a>
 
             {/* Directions */}
@@ -87,7 +87,7 @@ export default function MobileActionBar({ siteSettings }: MobileActionBarProps) 
               className="group flex min-h-[56px] flex-col items-center justify-center gap-1 rounded-xl border border-border/60 bg-card px-2 py-3 text-foreground transition-all active:scale-95 hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 cursor-pointer"
             >
               <MapPin className="h-5 w-5 text-primary" aria-hidden="true" />
-              <span className="text-[11px] font-semibold leading-none">{t('directions')}</span>
+              <span className="text-xs font-semibold leading-none">{t('directions')}</span>
             </a>
           </div>
         </motion.nav>

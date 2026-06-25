@@ -62,7 +62,7 @@ export function AnimatedLogo({ className, size = 96 }: { className?: string; siz
 
         {/* Impulsions sonar — démarrent à 2 s, se répètent */}
         {!reduced &&
-          [0, 0.55, 1.1].map((d) => (
+          [0, 1.2, 2.4].map((d) => (
             <motion.circle
               key={d}
               cx="50"
@@ -70,14 +70,14 @@ export function AnimatedLogo({ className, size = 96 }: { className?: string; siz
               r="46"
               fill="none"
               stroke="#4caf6e"
-              strokeWidth="0.7"
+              strokeWidth="0.6"
               initial={{ scale: 0.82, opacity: 0 }}
-              animate={{ scale: [0.82, 1.75], opacity: [0, 0.5, 0] }}
+              animate={{ scale: [0.82, 1.75], opacity: [0, 0.28, 0] }}
               transition={{
-                duration: 2.6,
-                delay: 2.0 + d,
+                duration: 2.8,
+                delay: 2.5 + d,
                 repeat: Infinity,
-                repeatDelay: 2.0,
+                repeatDelay: 5.0,
                 ease: 'easeOut',
               }}
               style={{ transformOrigin: '50px 50px' }}

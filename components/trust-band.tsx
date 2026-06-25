@@ -81,7 +81,7 @@ export default function TrustBand({ siteSettings }: TrustBandProps) {
                 <p className="stat-number bg-gradient-to-br from-[#006633] to-[#4caf6e] bg-clip-text text-2xl font-bold tracking-tight text-transparent sm:text-3xl md:text-4xl">
                   <StatValue raw={s.value || ''} />
                 </p>
-                <p className="mt-1 text-[11px] font-medium uppercase tracking-wider text-muted-foreground sm:text-xs">
+                <p className="mt-1 text-xs font-medium uppercase tracking-wider text-muted-foreground">
                   {s.label}
                 </p>
               </div>
@@ -112,7 +112,7 @@ export default function TrustBand({ siteSettings }: TrustBandProps) {
                 <Phone className="h-5 w-5" />
               </span>
               <span className="min-w-0">
-                <span className="block text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
+                <span className="block text-xs font-medium uppercase tracking-wider text-muted-foreground">
                   {t('phone')}
                 </span>
                 <span className="block truncate font-semibold text-foreground" dir="ltr">
@@ -147,7 +147,7 @@ function TrustItem({
         {icon}
       </span>
       <span className="min-w-0">
-        <span className="block text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
+        <span className="block text-xs font-medium uppercase tracking-wider text-muted-foreground">
           {label}
         </span>
         <span className="block font-semibold text-foreground">{value}</span>
