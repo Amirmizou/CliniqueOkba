@@ -89,6 +89,7 @@ function toArabic(doc: Doctor): Doctor {
     specialty: tr(AR_SPECIALTY, doc.specialty) || doc.specialty,
     subtitle: tr(AR_SUBTITLE, doc.subtitle),
     experience: tr(AR_EXPERIENCE, doc.experience),
+    customBadge: doc.customBadge_ar || doc.customBadge,
     days: tr(AR_DAYS, doc.days) || doc.days,
     hours: tr(AR_HOURS, doc.hours) || doc.hours,
     services: doc.services.map((s) => AR_SERVICE.get(normalizeKey(s)) || s),
@@ -107,6 +108,8 @@ function resolveDoctors(data: any[] | undefined, locale: string): Doctor[] {
           subtitle: d.subtitle || undefined,
           services: Array.isArray(d.services) ? d.services : [],
           experience: d.experience || undefined,
+          customBadge: d.customBadge || undefined,
+          customBadge_ar: d.customBadge_ar || undefined,
           days: d.consultationDays || '',
           hours: d.consultationHours || '',
           poster: d.image ? urlFor(d.image).width(620).height(827).url() : '',
@@ -212,12 +215,20 @@ function DoctorCard({
                 {doctor.subtitle}
               </p>
             )}
-            {doctor.experience && (
-              <span className="mt-2 inline-flex items-center gap-1.5 rounded-full bg-white/15 px-2.5 py-1 text-[11px] font-semibold text-white backdrop-blur-sm">
-                <Award className="h-3 w-3 text-amber-300" />
-                {doctor.experience}
-              </span>
-            )}
+            <div className="mt-2 flex flex-wrap items-center gap-2">
+              {doctor.experience && (
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-white/15 px-2.5 py-1 text-[11px] font-semibold text-white backdrop-blur-sm">
+                  <Award className="h-3 w-3 text-amber-300" />
+                  {doctor.experience}
+                </span>
+              )}
+              {doctor.customBadge && (
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-[#FDE68A] px-2.5 py-1 text-[11px] font-bold text-slate-900 shadow-md">
+                  <Sparkles className="h-3 w-3" />
+                  {doctor.customBadge}
+                </span>
+              )}
+            </div>
           </div>
         </button>
 

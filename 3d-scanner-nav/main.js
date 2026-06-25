@@ -117,7 +117,7 @@ const bodyWhite = new THREE.MeshPhysicalMaterial({
 });
 const softWhite   = new THREE.MeshStandardMaterial({ color: 0xe8e8e8, roughness: 0.5, metalness: 0.05 });
 const panelGray   = new THREE.MeshStandardMaterial({ color: 0xd0d0d0, roughness: 0.6, metalness: 0.1 });
-const darkTunnel  = new THREE.MeshStandardMaterial({ color: 0x1a1a1a, roughness: 0.35, metalness: 0.7, side: THREE.DoubleSide });
+const tunnelMat  = new THREE.MeshStandardMaterial({ color: 0xf0f2f5, roughness: 0.5, metalness: 0.2, side: THREE.DoubleSide });
 const footingGray = new THREE.MeshStandardMaterial({ color: 0x888888, roughness: 0.65, metalness: 0.15 });
 const darkFooting = new THREE.MeshStandardMaterial({ color: 0x555555, roughness: 0.7, metalness: 0.2 });
 const orangeLabel = new THREE.MeshStandardMaterial({ color: 0xff6611, roughness: 0.3, emissive: 0xff4400, emissiveIntensity: 0.15 });
@@ -181,7 +181,7 @@ root.add(backPanel);
 // Tunnel cylinder
 const tLen = gantryDepth + 0.4;
 const tunnelGeo = new THREE.CylinderGeometry(BR + 0.01, BR + 0.01, tLen, 64, 1, true);
-const tunnelMesh = new THREE.Mesh(tunnelGeo, darkTunnel);
+const tunnelMesh = new THREE.Mesh(tunnelGeo, tunnelMat);
 tunnelMesh.rotation.x = Math.PI / 2;
 tunnelMesh.position.set(gantryX, GR * 0.92 + GCY, 0);
 root.add(tunnelMesh);
@@ -239,7 +239,7 @@ detGroup.add(detLower);
 
 // ── Bottom face plate (dark detector window) ──
 const detFaceGeo = new RoundedBoxGeometry(detW - 0.4, 0.06, detD - 0.4, 3, 0.03);
-const detFace = new THREE.Mesh(detFaceGeo, darkTunnel);
+const detFace = new THREE.Mesh(detFaceGeo, tunnelMat);
 detFace.position.y = -detH * 0.35;
 detGroup.add(detFace);
 

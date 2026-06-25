@@ -27,6 +27,9 @@ export interface Doctor {
   /** Mention d'expérience facultative (ex : "+25 ans d'expérience") */
   experience?: string
   experience_ar?: string
+  /** Badge personnalisé (ex: Nouveau, Absente...) */
+  customBadge?: string
+  customBadge_ar?: string
   /** Jours de consultation */
   days: string
   days_ar?: string

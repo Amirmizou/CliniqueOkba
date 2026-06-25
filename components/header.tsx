@@ -266,6 +266,42 @@ export default function Header({ siteSettings, poles }: HeaderProps) {
 
       <header className="relative z-[60] flex justify-center px-4 py-3 bg-white/95 backdrop-blur-md border-b border-black/[0.06] shadow-[0_2px_14px_rgba(0,0,0,0.06)] dark:bg-slate-950/90 dark:border-white/10">
 
+        {/* ═══ Décor médical subtil (réduit le vide de la bande, desktop) ═══ */}
+        <div aria-hidden="true" className="pointer-events-none absolute inset-0 z-0 hidden overflow-hidden xl:block">
+          {/* Trame de points fine — dense sur les côtés, estompée derrière le menu */}
+          <div
+            className="absolute inset-0 text-[#006633]"
+            style={{
+              backgroundImage: 'radial-gradient(currentColor 1px, transparent 1px)',
+              backgroundSize: '22px 22px',
+              opacity: 0.05,
+              WebkitMaskImage: 'linear-gradient(90deg, #000, transparent 28%, transparent 72%, #000)',
+              maskImage: 'linear-gradient(90deg, #000, transparent 28%, transparent 72%, #000)',
+            }}
+          />
+          {/* Ligne ECG / pouls fine en bas (langage visuel médical, vert identité) */}
+          <svg
+            className="absolute bottom-1.5 left-0 h-6 w-full text-[#006633]/15"
+            viewBox="0 0 1200 40"
+            preserveAspectRatio="none"
+            fill="none"
+          >
+            <path
+              d="M0 20 H360 l10 -13 l9 26 l9 -20 l7 7 H545 l13 -9 l9 18 l7 -9 H760 l10 -12 l9 24 l9 -18 l7 6 H1200"
+              stroke="currentColor"
+              strokeWidth="1.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
+          {/* Petite croix médicale discrète (à gauche) */}
+          <div className="absolute left-[3%] top-1/2 -translate-y-1/2 text-[#006633]/10">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path d="M10 3h4v7h7v4h-7v7h-4v-7H3v-4h7z" />
+            </svg>
+          </div>
+        </div>
+
         {/* MOBILE & TABLET FALLBACK */}
         <div className="w-full max-w-7xl flex items-center justify-between rounded-2xl bg-white/95 backdrop-blur-md shadow-[0_8px_30px_rgb(0,0,0,0.12)] border border-gray-100 px-4 py-3 xl:hidden">
           <a href="/" className="flex items-center gap-3 group">
@@ -352,33 +388,33 @@ export default function Header({ siteSettings, poles }: HeaderProps) {
             boxShadow: 'inset 0 0 0 2px rgba(0,102,51,0.55)',
           }} />
 
-          {/* ═══════════════ BORE — tunnel profond ═══════════════ */}
+          {/* ═══════════════ BORE — tunnel clair (illuminé, façon SOMATOM) ═══════════════ */}
           <div className="absolute z-[40] rounded-full overflow-hidden pointer-events-none" style={{
             width: '64px', height: '64px',
             right: '58px', bottom: '41px',
-            background: 'radial-gradient(circle at 50% 38%, #242424 0%, #101010 46%, #000000 100%)',
-            boxShadow: 'inset 0 6px 22px rgba(0,0,0,0.95), inset 0 -3px 10px rgba(25,25,25,0.6)',
+            background: 'radial-gradient(circle at 50% 35%, #ffffff 0%, #eef1f4 55%, #d6dbe1 100%)',
+            boxShadow: 'inset 0 6px 16px rgba(0,0,0,0.12), inset 0 -3px 10px rgba(255,255,255,0.7)',
           }}>
-            {/* Lèvre du tunnel éclairée en haut */}
-            <div className="absolute inset-0 rounded-full" style={{ background: 'radial-gradient(60% 28% at 50% 7%, rgba(255,255,255,0.20), rgba(255,255,255,0) 60%)' }} />
+            {/* Ombrage doux du pourtour (profondeur du tunnel clair) */}
+            <div className="absolute inset-0 rounded-full" style={{ boxShadow: 'inset 0 0 14px rgba(0,0,0,0.10)' }} />
             {/* Anneaux détecteurs internes (suggérés) */}
-            <div className="absolute inset-[8px] rounded-full border border-white/[0.06]" />
-            <div className="absolute inset-[16px] rounded-full border border-white/[0.05]" />
+            <div className="absolute inset-[8px] rounded-full border border-black/[0.07]" />
+            <div className="absolute inset-[16px] rounded-full border border-black/[0.05]" />
 
-            {/* Effet Laser / Scanning Beam (balayage vertical comme un vrai scanner) */}
-            <div className="absolute left-[8%] right-[8%] top-0 h-[3px] rounded-full bg-[#00ff88] shadow-[0_0_16px_6px_rgba(0,255,136,0.85)]" style={{ animation: 'scanLaser 2.6s ease-in-out infinite alternate' }} />
+            {/* Effet Laser / Scanning Beam (vert visible sur fond clair) */}
+            <div className="absolute left-[8%] right-[8%] top-0 h-[3px] rounded-full bg-[#00a651] shadow-[0_0_12px_4px_rgba(0,166,81,0.6)]" style={{ animation: 'scanLaser 2.6s ease-in-out infinite alternate' }} />
             {/* Lueur diffuse qui suit le faisceau */}
-            <div className="absolute left-0 right-0 top-0 h-[16px] -mt-[7px] opacity-60" style={{ background: 'radial-gradient(ellipse at center, rgba(0,255,136,0.35), transparent 70%)', animation: 'scanLaser 2.6s ease-in-out infinite alternate' }} />
+            <div className="absolute left-0 right-0 top-0 h-[16px] -mt-[7px] opacity-55" style={{ background: 'radial-gradient(ellipse at center, rgba(0,166,81,0.30), transparent 70%)', animation: 'scanLaser 2.6s ease-in-out infinite alternate' }} />
 
             {/* LED indicateur intérieur */}
             <div className="absolute top-[25%] right-[15%] w-[3px] h-[3px] rounded-full bg-red-500 shadow-[0_0_8px_2px_rgba(239,68,68,0.8)] animate-pulse" />
           </div>
 
-          {/* Lèvre du bore — biseau 3D (haut clair, bas sombre) */}
+          {/* Lèvre du bore — biseau 3D doux (tunnel clair) */}
           <div className="absolute z-[41] rounded-full pointer-events-none" style={{
             width: '64px', height: '64px',
             right: '58px', bottom: '41px',
-            boxShadow: 'inset 0 2px 3px rgba(255,255,255,0.55), inset 0 -3px 9px rgba(0,0,0,0.55), 0 0 0 1px rgba(0,0,0,0.12)',
+            boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.10), inset 0 -2px 5px rgba(255,255,255,0.7), 0 0 0 1px rgba(0,0,0,0.10)',
           }} />
 
           {/* ═══════════════ REPÈRE « RDV » (signale que le gantry est cliquable) ═══════════════ */}

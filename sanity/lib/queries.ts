@@ -383,6 +383,8 @@ export const doctorsQuery = groq`
     bio_ar,
     experience,
     experience_ar,
+    customBadge,
+    customBadge_ar,
     services,
     services_ar,
     qualifications,
