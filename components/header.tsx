@@ -447,7 +447,7 @@ export default function Header({ siteSettings, poles }: HeaderProps) {
           </button>
 
           {/* ═══ CONTENU — logo + contrôles ═══ */}
-          <div className="absolute inset-0 z-50 flex items-center" style={{ paddingLeft: '14px', paddingRight: '96px' }}>
+          <div className="absolute inset-0 z-50 flex items-center" style={{ paddingLeft: '14px', paddingRight: '100px' }}>
             <a href="/" className="flex items-center gap-2 group min-w-0">
               <div className="relative h-9 w-9 shrink-0 rounded-full bg-white p-1 shadow-sm ring-1 ring-gray-100 transition-transform duration-300 group-hover:scale-105 active:scale-95 dark:ring-white/10">
                 <Image src="/logo.png" alt="Logo" fill className="object-contain p-1" />
@@ -458,7 +458,7 @@ export default function Header({ siteSettings, poles }: HeaderProps) {
               </span>
             </a>
 
-            <div className="ml-auto flex items-center gap-1 shrink-0">
+            <div className="ml-auto flex items-center gap-1.5 shrink-0">
               {utilPhone && (
                 <a
                   href={utilPhoneHref}
@@ -468,14 +468,13 @@ export default function Header({ siteSettings, poles }: HeaderProps) {
                   <Phone className="h-3.5 w-3.5" />
                 </a>
               )}
-              <ThemeToggle />
               <LanguageSwitcher />
               <button
                 ref={menuButtonRef}
                 aria-label={isOpen ? 'Fermer le menu' : 'Ouvrir le menu'}
                 aria-expanded={isOpen}
                 aria-controls="mobile-menu"
-                className="flex h-8 w-8 shrink-0 cursor-pointer items-center justify-center rounded-full bg-gray-100 text-gray-600 transition-colors hover:bg-gray-200 active:scale-95 dark:bg-slate-800 dark:text-gray-300"
+                className="flex h-8 w-8 shrink-0 cursor-pointer items-center justify-center rounded-full bg-[#006633] text-white shadow-sm transition-all active:scale-95 hover:bg-[#004d26]"
                 onClick={() => setIsOpen((v) => !v)}
               >
                 {isOpen ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
@@ -804,6 +803,12 @@ export default function Header({ siteSettings, poles }: HeaderProps) {
                   </div>
                 </div>
               )}
+
+              {/* Apparence */}
+              <div className="mt-1 flex items-center justify-between rounded-2xl border border-gray-100 bg-gray-50 px-4 py-3 dark:border-slate-700 dark:bg-slate-800/60">
+                <span className="text-sm font-bold text-gray-700 dark:text-gray-200">Apparence</span>
+                <ThemeToggle />
+              </div>
             </motion.nav>
           </motion.div>
         )}
