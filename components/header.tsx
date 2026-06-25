@@ -449,12 +449,24 @@ export default function Header({ siteSettings, poles }: HeaderProps) {
           {/* ═══ CONTENU — logo + contrôles ═══ */}
           <div className="absolute inset-0 z-50 flex items-center" style={{ paddingLeft: '14px', paddingRight: '96px' }}>
             <a href="/" className="flex min-w-0 items-center gap-2 group">
-              <div className="relative h-9 w-9 shrink-0 rounded-full bg-white p-1 shadow-sm ring-1 ring-gray-100 transition-transform duration-300 group-hover:scale-105 active:scale-95 dark:ring-white/10">
-                <Image src="/logo.png" alt="Logo" fill className="object-contain p-1" />
+              {/* Logo circle with rotating arc animation */}
+              <div className="relative h-9 w-9 shrink-0 transition-transform duration-300 group-hover:scale-105 active:scale-95">
+                {/* Rotating arc ring */}
+                <svg
+                  className="absolute inset-[-5px] animate-[spin_8s_linear_infinite] pointer-events-none"
+                  viewBox="0 0 46 46"
+                  fill="none"
+                  aria-hidden="true"
+                >
+                  <circle cx="23" cy="23" r="21" stroke="rgba(0,102,51,0.35)" strokeWidth="1.5" strokeDasharray="22 44" strokeLinecap="round" />
+                </svg>
+                <div className="relative h-9 w-9 rounded-full bg-white p-1 shadow-sm ring-1 ring-gray-100 dark:ring-white/10 overflow-hidden">
+                  <Image src="/logo.png" alt="Logo" fill className="object-contain p-1" />
+                </div>
               </div>
-              <span className="flex min-w-0 flex-col font-extrabold text-[#006633] text-[12px] uppercase leading-none">
-                <span className="truncate">{clinicNameText}</span>
-                <span className="truncate text-[8px] text-[#EC0016] mt-0.5 tracking-widest font-bold">{t('tagline')}</span>
+              <span className="flex min-w-0 flex-col gap-[2px]">
+                <span className="truncate text-[12px] font-extrabold text-[#006633] uppercase leading-none tracking-tight">{clinicNameText}</span>
+                <span className="truncate text-[9px] font-bold text-[#EC0016] leading-none tracking-wide uppercase">{t('tagline')}</span>
               </span>
             </a>
 
@@ -721,6 +733,15 @@ export default function Header({ siteSettings, poles }: HeaderProps) {
             exit={{ opacity: 0 }}
             className="fixed inset-0 z-[90] overflow-y-auto bg-white/95 px-6 pb-12 pt-24 backdrop-blur-xl xl:hidden"
           >
+            {/* Close button — fixed above the menu overlay so it's always clickable */}
+            <button
+              onClick={() => setIsOpen(false)}
+              aria-label="Fermer le menu"
+              className="fixed top-[22px] right-4 z-[95] flex h-9 w-9 cursor-pointer items-center justify-center rounded-full bg-[#006633] text-white shadow-lg transition-all active:scale-95 hover:bg-[#004d26]"
+            >
+              <X className="w-5 h-5" />
+            </button>
+
             <motion.nav
               initial={{ y: -16, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
