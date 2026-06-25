@@ -5,6 +5,7 @@ import {
   Menu,
   X,
   ChevronDown,
+  ChevronRight,
   Newspaper,
   CalendarDays,
   Users,
@@ -312,19 +313,23 @@ export default function Header({ siteSettings, poles }: HeaderProps) {
         <div className="relative w-full max-w-7xl h-[76px] xl:hidden" style={{ overflow: 'visible' }}>
 
           {/* Pill — fond visible, overflow:hidden pour que les décos restent dans la pilule */}
-          <div className="absolute inset-0 rounded-2xl overflow-hidden bg-white/95 backdrop-blur-md shadow-[0_8px_30px_rgb(0,0,0,0.12)] border border-gray-100 dark:bg-slate-900/95 dark:border-white/10">
+          <div className="absolute inset-0 rounded-2xl overflow-hidden bg-white/97 backdrop-blur-md shadow-[0_8px_30px_rgb(0,0,0,0.10)] border border-gray-100/80 dark:bg-slate-900/97 dark:border-white/8">
             {/* Trame de points (côté gauche seulement, le gantry occupe le côté droit) */}
             <div className="absolute inset-0 text-[#006633]" style={{
               backgroundImage: 'radial-gradient(currentColor 1px, transparent 1px)',
               backgroundSize: '14px 14px',
-              opacity: 0.05,
+              opacity: 0.04,
               WebkitMaskImage: 'linear-gradient(90deg, #000 0%, transparent 55%)',
               maskImage: 'linear-gradient(90deg, #000 0%, transparent 55%)',
             }} />
             {/* ECG fine */}
-            <svg className="absolute bottom-1 left-0 h-4 w-full text-[#006633]/12" viewBox="0 0 400 24" preserveAspectRatio="none" fill="none">
+            <svg className="absolute bottom-2 left-0 h-4 w-full text-[#006633]/10" viewBox="0 0 400 24" preserveAspectRatio="none" fill="none">
               <path d="M0 12 H100 l6 -8 l5 16 l5 -11 l4 3 H180 l7 -5 l5 10 l4 -5 H280 l6 -7 l5 14 l5 -10 l4 3 H400" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
+            {/* Gradient accent bar — signature marque */}
+            <div className="absolute bottom-0 left-6 right-6 h-[2px] rounded-full" style={{
+              background: 'linear-gradient(90deg, transparent, #006633 18%, #4caf6e 48%, #FDE68A 68%, #006633 88%, transparent)',
+            }} />
           </div>
 
           {/* ═══ BASE / SOCLE ═══ */}
@@ -448,39 +453,42 @@ export default function Header({ siteSettings, poles }: HeaderProps) {
 
           {/* ═══ CONTENU — logo + contrôles ═══ */}
           <div className="absolute inset-0 z-50 flex items-center" style={{ paddingLeft: '14px', paddingRight: '96px' }}>
-            <a href="/" className="flex min-w-0 items-center gap-2 group">
-              {/* Logo circle with rotating arc animation */}
-              <div className="relative h-9 w-9 shrink-0 transition-transform duration-300 group-hover:scale-105 active:scale-95">
-                {/* Rotating arc ring */}
-                <svg
-                  className="absolute inset-[-5px] animate-[spin_8s_linear_infinite] pointer-events-none"
-                  viewBox="0 0 46 46"
-                  fill="none"
-                  aria-hidden="true"
-                >
-                  <circle cx="23" cy="23" r="21" stroke="rgba(0,102,51,0.35)" strokeWidth="1.5" strokeDasharray="22 44" strokeLinecap="round" />
+            <a href="/" className="flex min-w-0 items-center gap-2.5 group">
+              {/* Logo animé */}
+              <div className="relative h-10 w-10 shrink-0 transition-transform duration-300 group-hover:scale-105 active:scale-95">
+                <svg className="absolute inset-[-6px] animate-[spin_8s_linear_infinite] pointer-events-none" viewBox="0 0 52 52" fill="none" aria-hidden="true">
+                  <circle cx="26" cy="26" r="24" stroke="rgba(0,102,51,0.30)" strokeWidth="1.5" strokeDasharray="24 52" strokeLinecap="round" />
                 </svg>
-                <div className="relative h-9 w-9 rounded-full bg-white p-1 shadow-sm ring-1 ring-gray-100 dark:ring-white/10 overflow-hidden">
-                  <Image src="/logo.png" alt="Logo" fill className="object-contain p-1" />
+                <div className="relative h-10 w-10 rounded-full bg-white shadow-md ring-1 ring-gray-100 dark:ring-white/10 overflow-hidden">
+                  <Image src="/logo.png" alt="Logo Clinique OKBA" fill className="object-contain p-1.5" />
                 </div>
               </div>
-              <span className="flex min-w-0 flex-col gap-[2px]">
-                <span className="truncate text-[12px] font-extrabold text-[#006633] uppercase leading-none tracking-tight">{clinicNameText}</span>
-                <span className="truncate text-[9px] font-bold text-[#EC0016] leading-none tracking-wide uppercase">{t('tagline')}</span>
+              {/* Texte */}
+              <span className="flex min-w-0 flex-col gap-[3px]">
+                <span className="truncate text-[13px] font-black text-[#006633] uppercase leading-none tracking-tight">{clinicNameText}</span>
+                <span className="truncate text-[9px] font-semibold text-[#EC0016] leading-none tracking-wide">{t('tagline')}</span>
               </span>
             </a>
 
-            <div className="ml-auto flex shrink-0 items-center gap-1.5">
-              <LanguageSwitcher />
+            <div className="ml-auto flex shrink-0 items-center gap-2">
+              {/* Badge locale actif */}
+              <span
+                className="text-[10px] font-black text-[#006633] border border-[#006633]/20 rounded-full px-2 py-[3px] leading-none tracking-wide"
+                style={{ background: 'rgba(0,102,51,0.06)' }}
+                aria-label={`Langue : ${locale === 'ar' ? 'Arabe' : 'Français'}`}
+              >
+                {locale === 'ar' ? 'ع' : 'FR'}
+              </span>
+              {/* Bouton menu */}
               <button
                 ref={menuButtonRef}
-                aria-label={isOpen ? 'Fermer le menu' : 'Ouvrir le menu'}
+                aria-label="Ouvrir le menu"
                 aria-expanded={isOpen}
                 aria-controls="mobile-menu"
                 className="flex h-8 w-8 shrink-0 cursor-pointer items-center justify-center rounded-full bg-[#006633] text-white shadow-sm transition-all active:scale-95 hover:bg-[#004d26]"
                 onClick={() => setIsOpen((v) => !v)}
               >
-                {isOpen ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
+                <Menu className="w-4 h-4" />
               </button>
             </div>
           </div>
@@ -728,100 +736,151 @@ export default function Header({ siteSettings, poles }: HeaderProps) {
             role="dialog"
             aria-modal="true"
             aria-label="Menu de navigation"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[90] overflow-y-auto bg-white/95 px-6 pb-12 pt-24 backdrop-blur-xl xl:hidden"
+            initial={{ clipPath: 'inset(0 0 100% 0)' }}
+            animate={{ clipPath: 'inset(0 0 0% 0)' }}
+            exit={{ clipPath: 'inset(0 0 100% 0)', opacity: 0 }}
+            transition={{ duration: 0.38, ease: [0.32, 0.72, 0, 1] }}
+            className="fixed inset-0 z-[90] flex flex-col bg-white xl:hidden dark:bg-slate-950"
           >
-            {/* Close button — fixed above the menu overlay so it's always clickable */}
-            <button
-              onClick={() => setIsOpen(false)}
-              aria-label="Fermer le menu"
-              className="fixed top-[22px] right-4 z-[95] flex h-9 w-9 cursor-pointer items-center justify-center rounded-full bg-[#006633] text-white shadow-lg transition-all active:scale-95 hover:bg-[#004d26]"
+            {/* ── Branding header vert foncé ── */}
+            <div
+              className="shrink-0 px-5 pb-5 pt-12"
+              style={{ background: 'linear-gradient(135deg, #006633 0%, #004422 100%)' }}
             >
-              <X className="w-5 h-5" />
-            </button>
-
-            <motion.nav
-              initial={{ y: -16, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              exit={{ y: -16, opacity: 0 }}
-              className="mx-auto flex max-w-md flex-col gap-2"
-            >
-              {/* Urgences CTA */}
-              {utilPhone && (
-                <a
-                  href={utilPhoneHref}
-                  className="mb-1 flex items-center justify-between rounded-2xl bg-[#006633] p-4 text-white shadow-md transition-all active:scale-[0.98]"
-                >
-                  <span className="flex items-center gap-3">
-                    <Siren className="h-5 w-5 shrink-0 animate-pulse text-[#FDE68A]" aria-hidden="true" />
-                    <span>
-                      <span className="block text-[10px] font-semibold uppercase tracking-widest text-[#FDE68A]/80">
-                        Urgences 24h/24
-                      </span>
-                      <span className="block text-base font-bold" dir="ltr">{utilPhone}</span>
-                    </span>
-                  </span>
-                  <Phone className="h-5 w-5 shrink-0" aria-hidden="true" />
-                </a>
-              )}
-
-              {/* Navigation principale */}
-              {[
-                { key: 'center', href: '#about', icon: Home },
-                { key: 'specialties', href: '#specialties', icon: Stethoscope },
-                { key: 'equipment', href: '#equipements', icon: Activity },
-                { key: 'doctors', href: '#medecins', icon: Users },
-                { key: 'faq', href: '#faq', icon: Info },
-                { key: 'contact', href: '#contact', icon: Mail },
-              ].map((item) => (
-                <motion.button
-                  key={item.key}
-                  onClick={() => scrollToSection(item.href)}
-                  className="group flex items-center gap-3 rounded-2xl border border-gray-100 bg-gray-50 p-4 text-start transition-all hover:border-[#006633]/20 hover:bg-[#006633]/5 dark:border-slate-700 dark:bg-slate-800/60"
-                >
-                  <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#006633]/10 text-[#006633]">
-                    <item.icon className="h-5 w-5" />
-                  </span>
-                  <span className="text-base font-bold text-gray-800 dark:text-gray-100">{t(item.key)}</span>
-                </motion.button>
-              ))}
-
-              {/* Pôles d'excellence */}
-              {navPoles.length > 0 && (
-                <div className="mt-1 rounded-2xl border border-gray-100 bg-gray-50 p-3 dark:border-slate-700 dark:bg-slate-800/60">
-                  <p className="mb-2 px-1 text-[10px] font-bold uppercase tracking-widest text-gray-400">{t('ourPoles')}</p>
-                  <div className="flex flex-col gap-0.5">
-                    {navPoles.map((pole) => {
-                      const PoleIcon = POLE_ICONS[pole.iconName] || Stethoscope
-                      return (
-                        <Link
-                          key={pole.slug}
-                          href={`/${locale}/poles/${pole.slug}`}
-                          onClick={() => setIsOpen(false)}
-                          className="flex items-center gap-3 rounded-xl px-3 py-2.5 transition-colors hover:bg-white dark:hover:bg-slate-700"
-                        >
-                          <span
-                            className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-white"
-                            style={{ backgroundColor: pole.accent }}
-                          >
-                            <PoleIcon className="h-4 w-4" />
-                          </span>
-                          <span className="text-sm font-semibold text-gray-800 dark:text-gray-100">{pole.title}</span>
-                        </Link>
-                      )
-                    })}
+              <div className="flex items-center justify-between">
+                <div className="flex min-w-0 items-center gap-3">
+                  <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-full bg-white/15 ring-1 ring-white/20">
+                    <Image src="/logo.png" alt="Clinique OKBA" fill className="object-contain p-1.5" />
+                  </div>
+                  <div className="min-w-0">
+                    <p className="truncate text-[13px] font-black uppercase leading-none tracking-tight text-white">
+                      {clinicNameText}
+                    </p>
+                    <p className="mt-1 text-[10px] font-medium leading-none text-[#FDE68A]/85">
+                      {t('tagline')}
+                    </p>
                   </div>
                 </div>
-              )}
-
-              {/* Apparence */}
-              <div className="mt-1 flex items-center justify-between rounded-2xl border border-gray-100 bg-gray-50 px-4 py-3 dark:border-slate-700 dark:bg-slate-800/60">
-                <span className="text-sm font-bold text-gray-700 dark:text-gray-200">Apparence</span>
-                <ThemeToggle />
+                <button
+                  onClick={() => setIsOpen(false)}
+                  aria-label="Fermer le menu"
+                  className="ml-3 flex h-9 w-9 shrink-0 cursor-pointer items-center justify-center rounded-full bg-white/15 text-white transition-all hover:bg-white/25 active:scale-95"
+                >
+                  <X className="h-5 w-5" />
+                </button>
               </div>
-            </motion.nav>
+            </div>
+
+            {/* ── Corps défilant ── */}
+            <div className="flex-1 overflow-y-auto overscroll-contain">
+              <div className="px-4 pt-3 pb-6">
+
+                {/* Urgences */}
+                {utilPhone && (
+                  <a
+                    href={utilPhoneHref}
+                    className="mb-3 flex items-center gap-3 rounded-2xl border border-red-100 bg-red-50 p-4 transition-all active:scale-[0.98] dark:border-red-900/30 dark:bg-red-950/30"
+                  >
+                    <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-red-500 text-white shadow-sm">
+                      <Siren className="h-5 w-5 animate-pulse" aria-hidden="true" />
+                    </span>
+                    <span className="min-w-0 flex-1">
+                      <span className="block text-[9px] font-bold uppercase tracking-[0.12em] text-red-400">
+                        Urgences 24h/24
+                      </span>
+                      <span className="block text-base font-bold text-gray-900 dark:text-white" dir="ltr">
+                        {utilPhone}
+                      </span>
+                    </span>
+                    <Phone className="h-4 w-4 shrink-0 text-red-400" aria-hidden="true" />
+                  </a>
+                )}
+
+                {/* Navigation principale */}
+                <nav className="flex flex-col">
+                  {[
+                    { key: 'center', href: '#about', icon: Home },
+                    { key: 'specialties', href: '#specialties', icon: Stethoscope },
+                    { key: 'equipment', href: '#equipements', icon: Activity },
+                    { key: 'doctors', href: '#medecins', icon: Users },
+                    { key: 'faq', href: '#faq', icon: Info },
+                    { key: 'contact', href: '#contact', icon: Mail },
+                  ].map((item, i) => (
+                    <motion.button
+                      key={item.key}
+                      initial={{ opacity: 0, x: -10 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: 0.06 + i * 0.04, duration: 0.2, ease: 'easeOut' }}
+                      onClick={() => scrollToSection(item.href)}
+                      className="group flex items-center gap-3.5 rounded-xl px-3 py-3.5 text-start transition-all hover:bg-gray-50 active:bg-gray-100 dark:hover:bg-slate-800"
+                    >
+                      <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl text-[#006633] dark:text-emerald-400" style={{ background: 'rgba(0,102,51,0.08)' }}>
+                        <item.icon className="h-[18px] w-[18px]" />
+                      </span>
+                      <span className="flex-1 text-[15px] font-semibold text-gray-800 dark:text-gray-100">
+                        {t(item.key)}
+                      </span>
+                      <ChevronRight className="h-4 w-4 text-gray-300 transition-transform group-hover:translate-x-0.5 dark:text-gray-600" />
+                    </motion.button>
+                  ))}
+                </nav>
+
+                {/* Pôles d'excellence */}
+                {navPoles.length > 0 && (
+                  <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: 0.34, duration: 0.2 }}
+                    className="mt-3 rounded-2xl border border-gray-100 bg-gray-50 p-3 dark:border-slate-700 dark:bg-slate-800/60"
+                  >
+                    <p className="mb-2 px-1 text-[10px] font-bold uppercase tracking-widest text-gray-400">
+                      {t('ourPoles')}
+                    </p>
+                    <div className="flex flex-col gap-0.5">
+                      {navPoles.map((pole) => {
+                        const PoleIcon = POLE_ICONS[pole.iconName] || Stethoscope
+                        return (
+                          <Link
+                            key={pole.slug}
+                            href={`/${locale}/poles/${pole.slug}`}
+                            onClick={() => setIsOpen(false)}
+                            className="flex items-center gap-3 rounded-xl px-3 py-2.5 transition-colors hover:bg-white dark:hover:bg-slate-700"
+                          >
+                            <span
+                              className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-white"
+                              style={{ backgroundColor: pole.accent }}
+                            >
+                              <PoleIcon className="h-4 w-4" />
+                            </span>
+                            <span className="flex-1 text-sm font-semibold text-gray-800 dark:text-gray-100">
+                              {pole.title}
+                            </span>
+                            <ChevronRight className="h-3.5 w-3.5 text-gray-300 dark:text-gray-600" />
+                          </Link>
+                        )
+                      })}
+                    </div>
+                  </motion.div>
+                )}
+
+                {/* Paramètres (langue + apparence) */}
+                <div className="mt-3 rounded-2xl border border-gray-100 bg-gray-50 p-3 dark:border-slate-700 dark:bg-slate-800/60">
+                  <p className="mb-1 px-1 text-[10px] font-bold uppercase tracking-widest text-gray-400">
+                    Paramètres
+                  </p>
+                  <div className="flex items-center justify-between px-1 py-2.5">
+                    <span className="text-sm font-medium text-gray-700 dark:text-gray-200">Langue</span>
+                    <LanguageSwitcher />
+                  </div>
+                  <div className="mx-1 h-px bg-gray-200 dark:bg-slate-700" />
+                  <div className="flex items-center justify-between px-1 py-2.5">
+                    <span className="text-sm font-medium text-gray-700 dark:text-gray-200">Apparence</span>
+                    <ThemeToggle />
+                  </div>
+                </div>
+
+              </div>
+            </div>
           </motion.div>
         )}
       </AnimatePresence>

@@ -327,16 +327,21 @@ export default function HeroCarousel({ slides: rawSlides = [], siteSettings, sec
                             initial={{ opacity: 0, y: 16 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: 0.5 }}
-                            className="mt-6 flex flex-wrap gap-2.5"
+                            className="mt-6 flex flex-wrap gap-2"
                         >
                             {trustChips.map((c, i) => (
-                                <li
+                                <motion.li
                                     key={i}
-                                    className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-3.5 py-2 backdrop-blur-md"
+                                    initial={{ opacity: 0, scale: 0.9 }}
+                                    animate={{ opacity: 1, scale: 1 }}
+                                    transition={{ delay: 0.5 + i * 0.07, duration: 0.28 }}
+                                    className="inline-flex items-center gap-2 rounded-full border border-white/25 px-3.5 py-2 backdrop-blur-md"
+                                    style={{ background: 'rgba(255,255,255,0.12)' }}
                                 >
-                                    <span className="text-sm font-bold text-[#FDE68A]">{c.value}</span>
-                                    <span className="text-xs font-medium text-white/85">{c.label}</span>
-                                </li>
+                                    <span className="text-sm font-extrabold tabular-nums text-[#FDE68A] leading-none">{c.value}</span>
+                                    <span className="h-3 w-px bg-white/25" aria-hidden="true" />
+                                    <span className="text-[11px] font-medium text-white/90 leading-none">{c.label}</span>
+                                </motion.li>
                             ))}
                         </motion.ul>
 
