@@ -302,32 +302,37 @@ export default function Header({ siteSettings, poles }: HeaderProps) {
           </div>
         </div>
 
-        {/* MOBILE & TABLET FALLBACK */}
-        <div className="w-full max-w-7xl flex items-center justify-between rounded-2xl bg-white/95 backdrop-blur-md shadow-[0_8px_30px_rgb(0,0,0,0.12)] border border-gray-100 px-4 py-3 xl:hidden">
-          <a href="/" className="flex items-center gap-3 group">
-            <div className="relative h-12 w-12 rounded-full bg-white p-1 shadow-sm ring-1 ring-gray-100 transition-transform duration-300 group-hover:scale-105 active:scale-95">
+        {/* MOBILE & TABLET NAVBAR */}
+        <div className="w-full max-w-7xl flex items-center justify-between rounded-2xl bg-white/95 backdrop-blur-md shadow-[0_8px_30px_rgb(0,0,0,0.12)] border border-gray-100 px-4 py-2.5 xl:hidden dark:bg-slate-900/95 dark:border-white/10">
+          <a href="/" className="flex items-center gap-2.5 group">
+            <div className="relative h-10 w-10 shrink-0 rounded-full bg-white p-1 shadow-sm ring-1 ring-gray-100 transition-transform duration-300 group-hover:scale-105 active:scale-95">
               <Image src="/logo.png" alt="Logo" fill className="object-contain p-1" />
             </div>
-            <span className="font-extrabold text-[#006633] text-sm uppercase leading-none flex flex-col">
+            <span className="font-extrabold text-[#006633] text-[13px] uppercase leading-none flex flex-col">
               <span>{clinicNameText}</span>
-              <span className="text-[9px] text-[#EC0016] mt-0.5 tracking-widest">{t('tagline')}</span>
+              <span className="text-[9px] text-[#EC0016] mt-0.5 tracking-widest font-bold">{t('tagline')}</span>
             </span>
           </a>
-          <div className="flex items-center gap-3">
-            {/* MINI SCANNER (Visible on mobile) */}
-            <div className="relative w-10 h-10 rounded-full flex items-center justify-center bg-gray-50 border border-gray-200 shadow-inner">
-              <div className="absolute inset-1 rounded-full bg-gradient-to-br from-gray-200 to-gray-400 shadow-inner" />
-              <div className="absolute inset-[6px] rounded-full bg-black shadow-[inset_0_2px_8px_rgba(0,0,0,0.8)] flex items-center justify-center">
-                <div className="bg-[#e87722] w-[8px] h-[3px] rounded-[1px] shadow-sm flex items-center justify-center">
-                </div>
-              </div>
-              <div className="absolute top-[20%] right-[20%] w-1 h-1 rounded-full bg-red-500 shadow-[0_0_4px_rgba(239,68,68,0.8)] animate-pulse" />
-            </div>
 
+          <div className="flex items-center gap-1.5">
+            {/* Urgences — bouton téléphone toujours visible */}
+            {utilPhone && (
+              <a
+                href={utilPhoneHref}
+                aria-label="Appeler la clinique — urgences"
+                className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#006633] text-white shadow-sm transition-all active:scale-95 hover:bg-[#004d26]"
+              >
+                <Phone className="h-4 w-4" />
+              </a>
+            )}
+            <ThemeToggle />
             <LanguageSwitcher />
             <button
               ref={menuButtonRef}
-              className="flex h-10 w-10 cursor-pointer items-center justify-center rounded-full bg-gray-100 text-gray-600 transition-colors hover:bg-gray-200"
+              aria-label={isOpen ? 'Fermer le menu' : 'Ouvrir le menu'}
+              aria-expanded={isOpen}
+              aria-controls="mobile-menu"
+              className="flex h-9 w-9 shrink-0 cursor-pointer items-center justify-center rounded-full bg-gray-100 text-gray-600 transition-colors hover:bg-gray-200 active:scale-95 dark:bg-slate-800 dark:text-gray-300"
               onClick={() => setIsOpen((v) => !v)}
             >
               {isOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
@@ -588,6 +593,26 @@ export default function Header({ siteSettings, poles }: HeaderProps) {
               exit={{ y: -16, opacity: 0 }}
               className="mx-auto flex max-w-md flex-col gap-2"
             >
+              {/* Urgences CTA */}
+              {utilPhone && (
+                <a
+                  href={utilPhoneHref}
+                  className="mb-1 flex items-center justify-between rounded-2xl bg-[#006633] p-4 text-white shadow-md transition-all active:scale-[0.98]"
+                >
+                  <span className="flex items-center gap-3">
+                    <Siren className="h-5 w-5 shrink-0 animate-pulse text-[#FDE68A]" aria-hidden="true" />
+                    <span>
+                      <span className="block text-[10px] font-semibold uppercase tracking-widest text-[#FDE68A]/80">
+                        Urgences 24h/24
+                      </span>
+                      <span className="block text-base font-bold" dir="ltr">{utilPhone}</span>
+                    </span>
+                  </span>
+                  <Phone className="h-5 w-5 shrink-0" aria-hidden="true" />
+                </a>
+              )}
+
+              {/* Navigation principale */}
               {[
                 { key: 'center', href: '#about', icon: Home },
                 { key: 'specialties', href: '#specialties', icon: Stethoscope },
@@ -599,20 +624,42 @@ export default function Header({ siteSettings, poles }: HeaderProps) {
                 <motion.button
                   key={item.key}
                   onClick={() => scrollToSection(item.href)}
-                  className="group flex items-center gap-4 rounded-2xl border border-gray-100 bg-gray-50 p-4 transition-all hover:border-[#EC0016]/30 hover:bg-[#EC0016]/5"
+                  className="group flex items-center gap-3 rounded-2xl border border-gray-100 bg-gray-50 p-4 text-start transition-all hover:border-[#006633]/20 hover:bg-[#006633]/5 dark:border-slate-700 dark:bg-slate-800/60"
                 >
-                  <item.icon className="h-6 w-6 text-[#006633]" />
-                  <span className="text-lg font-bold text-gray-800">{t(item.key)}</span>
+                  <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#006633]/10 text-[#006633]">
+                    <item.icon className="h-5 w-5" />
+                  </span>
+                  <span className="text-base font-bold text-gray-800 dark:text-gray-100">{t(item.key)}</span>
                 </motion.button>
               ))}
 
-              <div className="mt-4 border-t pt-4 border-gray-200">
-                <p className="mb-2 text-xs font-bold uppercase tracking-wider text-gray-400">{t('settings')}</p>
-                <div className="flex items-center justify-between rounded-xl bg-gray-50 p-4 border border-gray-100">
-                  <span className="font-bold text-gray-800">{t('appearance')}</span>
-                  <ThemeToggle />
+              {/* Pôles d'excellence */}
+              {navPoles.length > 0 && (
+                <div className="mt-1 rounded-2xl border border-gray-100 bg-gray-50 p-3 dark:border-slate-700 dark:bg-slate-800/60">
+                  <p className="mb-2 px-1 text-[10px] font-bold uppercase tracking-widest text-gray-400">{t('ourPoles')}</p>
+                  <div className="flex flex-col gap-0.5">
+                    {navPoles.map((pole) => {
+                      const PoleIcon = POLE_ICONS[pole.iconName] || Stethoscope
+                      return (
+                        <Link
+                          key={pole.slug}
+                          href={`/${locale}/poles/${pole.slug}`}
+                          onClick={() => setIsOpen(false)}
+                          className="flex items-center gap-3 rounded-xl px-3 py-2.5 transition-colors hover:bg-white dark:hover:bg-slate-700"
+                        >
+                          <span
+                            className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-white"
+                            style={{ backgroundColor: pole.accent }}
+                          >
+                            <PoleIcon className="h-4 w-4" />
+                          </span>
+                          <span className="text-sm font-semibold text-gray-800 dark:text-gray-100">{pole.title}</span>
+                        </Link>
+                      )
+                    })}
+                  </div>
                 </div>
-              </div>
+              )}
             </motion.nav>
           </motion.div>
         )}
