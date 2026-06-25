@@ -220,69 +220,158 @@ export default function Header({ siteSettings, poles }: HeaderProps) {
           </div>
         </div>
 
-        {/* 3D SCANNER DESKTOP */}
+        {/* 3D SCANNER DESKTOP — Siemens Symbia Pro.specta */}
         <div className={cn("pointer-events-auto relative w-full max-w-5xl mx-auto h-[140px] hidden xl:block transition-all duration-700 origin-top mt-4", isScrolled ? "scale-95 -translate-y-2 opacity-95" : "scale-100 translate-y-0 opacity-100")}>
           
-          {/* BASE / PEDESTAL */}
-          <div className="absolute left-[15%] right-[100px] bottom-[0px] h-[30px] z-0 flex flex-col justify-end items-center">
-            <div className="w-[100%] h-[20px] shadow-[inset_0_2px_4px_rgba(0,0,0,0.2)]"
-                 style={{ background: 'repeating-linear-gradient(180deg, #d4d4d4, #d4d4d4 3px, #e8e8e8 3px, #e8e8e8 6px)' }} />
-            <div className="w-[100%] h-[10px] bg-gradient-to-b from-[#e0e0e0] to-[#c5c5c5] rounded-b-lg shadow-[0_10px_20px_rgba(0,0,0,0.15)]" />
-          </div>
+          {/* ═══════════════ GANTRY BASE / FLOOR MOUNT ═══════════════ */}
+          <div className="absolute right-[10px] bottom-[0px] w-[170px] h-[16px] z-0 pointer-events-none" style={{
+            borderRadius: '0 0 8px 8px',
+            background: 'linear-gradient(180deg, #c8c8c8 0%, #a0a0a0 100%)',
+            boxShadow: '0 4px 12px rgba(0,0,0,0.25)'
+          }} />
 
-          {/* GANTRY COMPOSITE (Vue de Face) */}
-          {/* 1. Extension Droite (z-10) */}
-          <div className="absolute right-[5px] bottom-[10px] w-[60px] h-[120px] rounded-tr-[30px] rounded-br-[10px] bg-gradient-to-r from-[#ececec] to-[#dcdcdc] shadow-[5px_5px_15px_rgba(0,0,0,0.1)] z-10" />
-          
-          {/* Badge Clinique Okba */}
-          <div className="absolute right-[0px] bottom-[65px] bg-[#006633] text-white px-2 py-1 flex flex-col items-center justify-center rounded-sm shadow-sm z-50 pointer-events-none">
-            <span className="text-[6px] font-extrabold tracking-widest uppercase leading-none">{clinicNameText}</span>
-          </div>
+          {/* ═══════════════ GANTRY BODY — EXTENSION DROITE (profondeur) ═══════════════ */}
+          <div className="absolute right-[5px] bottom-[12px] w-[55px] h-[120px] z-[8] pointer-events-none" style={{
+            borderRadius: '0 24px 8px 0',
+            background: 'linear-gradient(90deg, #e8e8e8 0%, #d8d8d8 60%, #c5c5c5 100%)',
+            boxShadow: '4px 4px 12px rgba(0,0,0,0.12), inset -2px 0 6px rgba(0,0,0,0.06)'
+          }} />
 
-          {/* FOND DU TROU SOMBRE (Derrière la table) - z-20 */}
-          {/* Center X = right:15px + 70px = 85px. Radius = 50px. Center Y = bottom:0 + 70px = 70px. -> right-[35px] bottom-[20px] w-[100px] h-[100px] */}
-          <div className="absolute right-[35px] bottom-[20px] w-[100px] h-[100px] rounded-full shadow-[inset_0_5px_15px_rgba(0,0,0,0.9)] z-20" style={{
-            background: 'radial-gradient(circle at center, #0a0a0a 0%, #2a2a2a 100%)'
+          {/* ═══════════════ GANTRY ANNEAU PRINCIPAL ═══════════════ */}
+          {/* Outer ring bevel — épaisseur visible */}
+          <div className="absolute right-[15px] bottom-[-2px] w-[150px] h-[150px] rounded-full z-[35] pointer-events-none" style={{
+            background: 'conic-gradient(from 220deg, #e0e0e0, #f5f5f5 90deg, #ffffff 180deg, #d5d5d5 270deg, #e0e0e0)',
+            boxShadow: '0 8px 30px rgba(0,0,0,0.2), inset 0 2px 6px rgba(255,255,255,0.8), inset 0 -4px 8px rgba(0,0,0,0.1)'
           }}>
-             <div className="absolute top-[30%] right-3 w-1 h-1 rounded-full bg-red-500 shadow-[0_0_6px_rgba(239,68,68,1)] animate-pulse" />
+            {/* Inner bevel ring for 3D depth */}
+            <div className="absolute inset-[6px] rounded-full" style={{
+              background: 'conic-gradient(from 40deg, #f0f0f0, #e2e2e2 90deg, #d8d8d8 180deg, #ececec 270deg, #f0f0f0)',
+              boxShadow: 'inset 0 3px 6px rgba(0,0,0,0.08), inset 0 -2px 4px rgba(255,255,255,0.6)'
+            }} />
           </div>
 
-          {/* TABLE (Plateau à gauche) - z-30 */}
-          {/* La table s'enfonce dans le trou et se fond grâce au mask-image et au blur (chevauchement doux via right-[75px]) */}
-          <div className="absolute left-[20px] right-[75px] bottom-[40px] h-[60px] z-30 flex flex-col justify-end transition-transform duration-700 hover:-translate-x-1" style={{
-            borderRadius: '30px 0 0 30px',
-            background: 'linear-gradient(180deg, #ffffff 0%, #fcfcfc 40%, #e0e0e0 100%)',
-            boxShadow: '0 10px 20px -5px rgba(0,0,0,0.2), inset 0 3px 8px rgba(255,255,255,1), inset 0 -3px 8px rgba(0,0,0,0.05)',
-            WebkitMaskImage: 'linear-gradient(to right, black 75%, transparent 100%)',
-            maskImage: 'linear-gradient(to right, black 75%, transparent 100%)'
-          }}>
-            {/* Ligne d'accentuation Siemens (#EC0016) qui s'estompe naturellement avec le masque global */}
-            <div className="absolute bottom-[4px] left-[15px] right-0 h-[2px] bg-[#EC0016] rounded-l-full shadow-[0_1px_2px_rgba(236,0,22,0.3)]" />
+          {/* Gantry masque — découpe le bore (trou central plus petit ~60px) */}
+          <div className="absolute right-[15px] bottom-[-2px] w-[150px] h-[150px] rounded-full z-[38] pointer-events-none" style={{
+            background: 'conic-gradient(from 220deg, #e0e0e0, #f5f5f5 90deg, #ffffff 180deg, #d5d5d5 270deg, #e0e0e0)',
+            WebkitMaskImage: 'radial-gradient(circle at center, transparent 29px, black 30px)',
+            maskImage: 'radial-gradient(circle at center, transparent 29px, black 30px)',
+            boxShadow: 'inset 0 2px 8px rgba(255,255,255,0.5)'
+          }} />
 
-            {/* Rails de la table qui filent dans le tunnel */}
-            <div aria-hidden="true" className="pointer-events-none absolute top-[16px] left-[58%] right-0 h-[2px] rounded-full bg-black/[0.06]" />
-            <div aria-hidden="true" className="pointer-events-none absolute top-[24px] left-[58%] right-0 h-[2px] rounded-full bg-black/[0.06]" />
-            
-            {/* Ombre d'ouverture dans le gantry : simule le bore qui avale la table */}
-            <div aria-hidden="true" className="pointer-events-none absolute right-0 top-0 bottom-0 w-[50px] z-10" style={{
-               background: 'linear-gradient(to left, rgba(0,0,0,0.55) 0%, transparent 100%)'
+          {/* Bore intérieur sombre */}
+          <div className="absolute z-[20] rounded-full pointer-events-none" style={{
+            width: '60px', height: '60px',
+            right: '60px', bottom: '43px',
+            background: 'radial-gradient(circle at 40% 40%, #1a1a1a 0%, #0a0a0a 60%, #000000 100%)',
+            boxShadow: 'inset 0 4px 20px rgba(0,0,0,0.95), inset 0 -2px 8px rgba(30,30,30,0.5)'
+          }}>
+            {/* LED indicateur intérieur */}
+            <div className="absolute top-[25%] right-[15%] w-[3px] h-[3px] rounded-full bg-red-500 shadow-[0_0_8px_2px_rgba(239,68,68,0.8)] animate-pulse" />
+            {/* Reflet intérieur subtle du bore */}
+            <div className="absolute inset-[4px] rounded-full opacity-20" style={{
+              background: 'conic-gradient(from 180deg, transparent 0deg, rgba(255,255,255,0.15) 60deg, transparent 120deg)'
+            }} />
+          </div>
+
+          {/* Liseré de bore — bord intérieur de l'ouverture */}
+          <div className="absolute z-[39] rounded-full pointer-events-none" style={{
+            width: '64px', height: '64px',
+            right: '58px', bottom: '41px',
+            boxShadow: 'inset 0 0 0 2px rgba(180,180,180,0.6), inset 0 3px 8px rgba(0,0,0,0.4)'
+          }} />
+
+          {/* ═══════════════ BADGE "SYMBIA Pro.specta" (style orange Siemens) ═══════════════ */}
+          <div className="absolute z-[42] pointer-events-none" style={{ right: '18px', bottom: '30px' }}>
+            <div className="bg-[#e87722] text-white px-2 py-[2px] rounded-[3px] shadow-md">
+              <span className="text-[5px] font-extrabold tracking-wider uppercase leading-none">{clinicNameText}</span>
+            </div>
+          </div>
+
+          {/* ═══════════════ DETECTOR HEAD (tête supérieure + bras) ═══════════════ */}
+          {/* Bras de connexion courbé */}
+          <div className="absolute z-[36] pointer-events-none" style={{
+            right: '78px', top: '-8px', width: '24px', height: '35px',
+            background: 'linear-gradient(90deg, #e8e8e8 0%, #f2f2f2 50%, #e0e0e0 100%)',
+            borderRadius: '6px 6px 4px 4px',
+            boxShadow: '2px 2px 8px rgba(0,0,0,0.12), inset 1px 0 3px rgba(255,255,255,0.5), inset -1px 0 2px rgba(0,0,0,0.05)'
+          }} />
+          {/* Tête de détection principale */}
+          <div className="absolute z-[37] pointer-events-none" style={{
+            right: '55px', top: '-22px', width: '70px', height: '26px',
+            borderRadius: '8px 8px 4px 4px',
+            background: 'linear-gradient(180deg, #ffffff 0%, #f5f5f5 30%, #e8e8e8 100%)',
+            boxShadow: '0 -4px 16px rgba(0,0,0,0.08), 0 6px 12px rgba(0,0,0,0.15), inset 0 2px 4px rgba(255,255,255,1), inset 0 -1px 3px rgba(0,0,0,0.06)'
+          }}>
+            {/* Ligne rouge accent supérieure */}
+            <div className="absolute bottom-0 left-[10%] right-[10%] h-[2px] bg-[#EC0016] rounded-full shadow-[0_1px_4px_rgba(236,0,22,0.4)]" />
+            {/* Texte Siemens (très discret) */}
+            <div className="absolute inset-0 flex items-center justify-center">
+              <span className="text-[5px] font-bold text-gray-400 tracking-[0.15em] uppercase">Healthineers</span>
+            </div>
+          </div>
+
+          {/* ═══════════════ TABLE / PLATEAU PATIENT ═══════════════ */}
+          {/* Support mécanique (base grise du lit) */}
+          <div className="absolute z-[5] pointer-events-none" style={{
+            left: '12%', right: '120px', bottom: '2px', height: '28px',
+            borderRadius: '6px 0 0 8px',
+            background: 'linear-gradient(180deg, #c0c0c0 0%, #a8a8a8 40%, #969696 100%)',
+            boxShadow: '0 6px 16px rgba(0,0,0,0.2), inset 0 1px 2px rgba(255,255,255,0.3)'
+          }}>
+            {/* Grilles d'aération */}
+            <div className="absolute top-[6px] left-[30px] right-[20px] flex gap-[3px]" aria-hidden="true">
+              {[...Array(12)].map((_, i) => (
+                <div key={i} className="h-[12px] w-[2px] rounded-full bg-black/10" />
+              ))}
+            </div>
+          </div>
+
+          {/* Side rail gauche (rebord latéral) */}
+          <div className="absolute z-[32] pointer-events-none" style={{
+            left: '11%', right: '100px', bottom: '28px', height: '6px',
+            borderRadius: '12px 0 0 0',
+            background: 'linear-gradient(180deg, #f0f0f0 0%, #d8d8d8 100%)',
+            boxShadow: '0 -2px 4px rgba(0,0,0,0.06), inset 0 1px 2px rgba(255,255,255,0.8)'
+          }} />
+
+          {/* Surface du plateau principal */}
+          <div className="absolute z-[30] flex flex-col justify-end transition-transform duration-700 hover:-translate-x-1" style={{
+            left: '13%', right: '82px', bottom: '32px', height: '50px',
+            borderRadius: '20px 0 0 6px',
+            background: 'linear-gradient(180deg, #ffffff 0%, #fafafa 20%, #f0f0f0 60%, #e4e4e4 100%)',
+            boxShadow: '0 8px 20px -4px rgba(0,0,0,0.18), inset 0 3px 10px rgba(255,255,255,1), inset 0 -2px 6px rgba(0,0,0,0.04)',
+            WebkitMaskImage: 'linear-gradient(to right, black 70%, transparent 100%)',
+            maskImage: 'linear-gradient(to right, black 70%, transparent 100%)'
+          }}>
+            {/* Bande LED cyan le long du bord inférieur (comme sur le vrai scanner) */}
+            <div className="absolute bottom-[3px] left-[20px] right-0 h-[2px] rounded-l-full" style={{
+              background: 'linear-gradient(90deg, #00c8ff 0%, #00e5ff 40%, rgba(0,229,255,0) 100%)',
+              boxShadow: '0 0 8px rgba(0,200,255,0.5), 0 0 3px rgba(0,200,255,0.3)'
             }} />
 
-            {/* Chevauchement doux : Blur localisé sur la couture */}
-            <div aria-hidden="true" className="pointer-events-none absolute right-0 top-0 bottom-0 w-[30px] z-20" style={{
-               backdropFilter: 'blur(1px)'
+            {/* Ligne de guidage subtile */}
+            <div aria-hidden="true" className="pointer-events-none absolute top-[50%] left-[55%] right-0 h-[1px] bg-black/[0.04]" />
+
+            {/* Ombre d'entrée dans le bore */}
+            <div aria-hidden="true" className="pointer-events-none absolute right-0 top-0 bottom-0 w-[60px] z-10" style={{
+              background: 'linear-gradient(to left, rgba(0,0,0,0.5) 0%, transparent 100%)'
             }} />
 
-            {/* Contenu de la table */}
+            {/* Blur de jonction */}
+            <div aria-hidden="true" className="pointer-events-none absolute right-0 top-0 bottom-0 w-[25px] z-20" style={{
+              backdropFilter: 'blur(1.5px)'
+            }} />
+
+            {/* Contenu de la table (navigation) */}
             <div className="absolute inset-0 flex items-center px-4 pb-1">
-              {/* Sélecteur de langue (Premier élément) */}
+              {/* Sélecteur de langue */}
               <div className="shrink-0 mr-4">
                 <LanguageSwitcher />
               </div>
 
               {/* Logo Area */}
               <a href="/" className="flex items-center gap-2.5 shrink-0 mr-6 group">
-                <div className="relative h-12 w-12 rounded-full bg-white p-1 shadow-sm ring-1 ring-gray-100 transition-transform group-hover:scale-105">
+                <div className="relative h-11 w-11 rounded-full bg-white p-1 shadow-sm ring-1 ring-gray-100 transition-transform group-hover:scale-105">
                   <Image src="/logo.png" alt="Logo" fill className="object-contain p-1" />
                 </div>
                 <div className="flex flex-col">
@@ -292,7 +381,7 @@ export default function Header({ siteSettings, poles }: HeaderProps) {
               </a>
 
               {/* Navigation */}
-              <nav className="flex-1 flex items-center justify-start gap-4 lg:gap-8 pr-[210px]" onMouseLeave={() => setHovered(null)}>
+              <nav className="flex-1 flex items-center justify-start gap-4 lg:gap-8 pr-[220px]" onMouseLeave={() => setHovered(null)}>
                 <NavIconLink icon={Home} label={t('center')} isActive={indicatorKey === 'about'} onClick={() => scrollToSection('#about')} onHover={() => setHovered('about')} />
                 <NavIconDropdown icon={Stethoscope} label={t('specialties')} isActive={indicatorKey === 'specialties'} onHover={() => setHovered('specialties')} onClick={() => scrollToSection('#specialties')} poles={navPoles} locale={locale} />
                 <NavIconLink icon={Activity} label={t('equipment')} isActive={indicatorKey === 'equipements'} onClick={() => scrollToSection('#equipements')} onHover={() => setHovered('equipements')} />
@@ -303,34 +392,23 @@ export default function Header({ siteSettings, poles }: HeaderProps) {
             </div>
           </div>
 
-          {/* CERCLE PRINCIPAL AVEC MASQUE (Devant la table) - z-40 */}
-          {/* Centré à right:15px, w:140px. Le trou fait 100px (50px rayon) */}
-          <div className="absolute right-[15px] bottom-[0px] w-[140px] h-[140px] rounded-full bg-gradient-to-br from-[#ffffff] via-[#f0f0f0] to-[#cccccc] shadow-[0_10px_20px_rgba(0,0,0,0.15)] z-40 pointer-events-none" 
-               style={{
-                 WebkitMaskImage: 'radial-gradient(circle at center, transparent 49.5px, black 50px)',
-                 maskImage: 'radial-gradient(circle at center, transparent 49.5px, black 50px)'
-               }}>
-            {/* Liseré Rouge Optionnel sur l'arête intérieure */}
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[100px] h-[100px] rounded-full shadow-[inset_0_0_0_1px_rgba(236,0,22,0.3)] opacity-50" />
-          </div>
-
-          {/* Ombre portée du bord du trou sur la table pour le réalisme (z-40) */}
-          <div className="absolute right-[35px] bottom-[20px] w-[100px] h-[100px] rounded-full z-40 pointer-events-none shadow-[inset_6px_6px_10px_rgba(0,0,0,0.2)]" />
-
-          {/* Liseré vert continu autour de l'anneau (fil conducteur table ↔ gantry) */}
-          <div className="absolute right-[15px] bottom-[0px] w-[140px] h-[140px] rounded-full z-40 pointer-events-none" style={{ boxShadow: 'inset 0 0 0 2px rgba(0,102,51,0.6)' }} />
-          {/* Liseré du bord interne du bore */}
-          <div className="absolute right-[37px] bottom-[22px] w-[96px] h-[96px] rounded-full z-40 pointer-events-none" style={{ boxShadow: 'inset 0 0 0 1.5px rgba(0,102,51,0.45)' }} />
-
-          {/* ROTATING SPECT HEADS - z-[45] (Orbite autour de l'anneau, passe devant la table) */}
-          <div className="absolute right-[15px] bottom-[0px] w-[140px] h-[140px] z-[45] animate-[spin_20s_linear_infinite] pointer-events-none">
-            {/* Tête de Détection 1 */}
-            <div className="absolute top-[-10px] left-1/2 w-[70px] h-[30px] -translate-x-1/2 rounded-[8px] bg-gradient-to-b from-[#ffffff] to-[#e6e6e6] shadow-[0_5px_15px_rgba(0,0,0,0.2),inset_0_2px_4px_rgba(255,255,255,1)] border border-[#cccccc] flex flex-col items-center justify-start pt-1">
-              <div className="w-full h-[2px] bg-[#EC0016] mt-auto" />
+          {/* ═══════════════ ROTATING SPECT HEADS ═══════════════ */}
+          <div className="absolute right-[15px] bottom-[-2px] w-[150px] h-[150px] z-[44] animate-[spin_20s_linear_infinite] pointer-events-none">
+            {/* Tête 1 */}
+            <div className="absolute top-[-6px] left-1/2 w-[55px] h-[22px] -translate-x-1/2 rounded-[6px]" style={{
+              background: 'linear-gradient(180deg, #ffffff 0%, #f0f0f0 40%, #e0e0e0 100%)',
+              boxShadow: '0 4px 12px rgba(0,0,0,0.18), inset 0 2px 4px rgba(255,255,255,1), inset 0 -1px 2px rgba(0,0,0,0.06)',
+              border: '1px solid #d0d0d0'
+            }}>
+              <div className="absolute bottom-0 left-[15%] right-[15%] h-[2px] bg-[#EC0016] rounded-full" />
             </div>
-            {/* Tête de Détection 2 */}
-            <div className="absolute bottom-[-10px] left-1/2 w-[70px] h-[30px] -translate-x-1/2 rounded-[8px] bg-gradient-to-t from-[#ffffff] to-[#e6e6e6] shadow-[0_-5px_15px_rgba(0,0,0,0.2),inset_0_-2px_4px_rgba(255,255,255,1)] border border-[#cccccc] flex flex-col items-center justify-end pb-1">
-              <div className="w-full h-[2px] bg-[#EC0016] mb-auto" />
+            {/* Tête 2 */}
+            <div className="absolute bottom-[-6px] left-1/2 w-[55px] h-[22px] -translate-x-1/2 rounded-[6px]" style={{
+              background: 'linear-gradient(0deg, #ffffff 0%, #f0f0f0 40%, #e0e0e0 100%)',
+              boxShadow: '0 -4px 12px rgba(0,0,0,0.18), inset 0 -2px 4px rgba(255,255,255,1), inset 0 1px 2px rgba(0,0,0,0.06)',
+              border: '1px solid #d0d0d0'
+            }}>
+              <div className="absolute top-0 left-[15%] right-[15%] h-[2px] bg-[#EC0016] rounded-full" />
             </div>
           </div>
 
