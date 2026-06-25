@@ -108,6 +108,8 @@ export default function HeroCarousel({ slides: rawSlides = [], siteSettings, sec
         setIsAutoPlaying(false)
     }
 
+    const toggleAutoPlay = () => setIsAutoPlaying((prev) => !prev)
+
     const scrollToId = (id: string) =>
         document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' })
 
@@ -406,24 +408,50 @@ export default function HeroCarousel({ slides: rawSlides = [], siteSettings, sec
                     >
                         <ChevronRight className="h-5 w-5 rotate-90" />
                     </button>
+
+                    {/* Bouton pause/play — WCAG 2.2.2 */}
+                    <button
+                        onClick={toggleAutoPlay}
+                        aria-label={isAutoPlaying ? 'Mettre en pause' : 'Reprendre'}
+                        className="flex h-9 w-9 cursor-pointer items-center justify-center rounded-full border border-white/20 bg-white/10 text-white backdrop-blur-md transition-colors hover:bg-white/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/50"
+                    >
+                        {isAutoPlaying
+                            ? <Pause className="h-4 w-4" />
+                            : <Play className="h-4 w-4 ms-0.5" />
+                        }
+                    </button>
                 </div>
             )}
 
             {/* Indicateurs mobiles (en bas) */}
             {slides.length > 1 && (
                 <div className="absolute bottom-28 left-1/2 z-30 -translate-x-1/2 md:hidden">
-                    <div className="flex gap-2 rounded-full border border-white/10 bg-black/30 px-3 py-2 backdrop-blur-md">
+                    <div className="flex items-center gap-1 rounded-full border border-white/10 bg-black/30 px-3 py-2 backdrop-blur-md">
+                        {/* Bouton pause/play (WCAG 2.2.2) */}
+                        <button
+                            onClick={toggleAutoPlay}
+                            aria-label={isAutoPlaying ? 'Mettre en pause le diaporama' : 'Reprendre le diaporama'}
+                            className="me-1 flex h-8 w-8 items-center justify-center rounded-full text-white/70 transition-colors hover:bg-white/10 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/50"
+                        >
+                            {isAutoPlaying
+                                ? <Pause className="h-3 w-3" />
+                                : <Play className="h-3 w-3 ms-0.5" />
+                            }
+                        </button>
                         {slides.map((_, index) => (
                             <button
                                 key={index}
                                 onClick={() => goTo(index)}
                                 aria-label={`Aller à la slide ${index + 1}`}
-                                className={`h-1.5 rounded-full transition-all ${
+                                aria-current={index === currentIndex ? 'true' : undefined}
+                                className="flex h-8 min-w-[20px] items-center justify-center px-1"
+                            >
+                                <span className={`block h-1.5 rounded-full transition-all duration-300 ${
                                     index === currentIndex
                                         ? 'w-8 bg-gradient-to-r from-[#006633] to-[#FDE68A]'
                                         : 'w-3 bg-white/30'
-                                }`}
-                            />
+                                }`} />
+                            </button>
                         ))}
                     </div>
                 </div>

@@ -97,7 +97,7 @@ export default function About({ data, sectionContent }: AboutProps) {
             opacity: 1,
             x: 0,
             duration: 0.6,
-            stagger: 0.6, // Heartbeat rhythm timing
+            stagger: 0.15,
             ease: 'power2.out',
             scrollTrigger: {
               trigger: featuresRef.current,
@@ -119,7 +119,7 @@ export default function About({ data, sectionContent }: AboutProps) {
             scale: 1,
             rotation: 0,
             duration: 0.5,
-            stagger: 0.6,
+            stagger: 0.15,
             ease: 'back.out(1.7)',
             scrollTrigger: {
               trigger: featuresRef.current,

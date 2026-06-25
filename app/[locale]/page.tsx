@@ -134,14 +134,23 @@ export default async function Home(props: { params: Promise<{ locale: string }> 
         <HeroCarousel slides={localizedData.heroSlides} siteSettings={localizedData.siteSettings} sectionContent={sectionContentMap['hero']} />
         <LatestNews articles={localizedData.articles} />
         <TrustBand siteSettings={localizedData.siteSettings} />
+        {/* Services first — visitors want to know WHAT we treat before WHO we are */}
+        <Poles data={localizedData.poles} />
+        <SectionDivider variant="ecg" />
+        {/* Social proof right after services */}
+        <LazyTestimonials
+          data={localizedData.testimonials}
+          sectionContent={sectionContentMap['testimonials']}
+        />
+        <SectionDivider variant="ecg" />
+        {/* Team credibility after social proof */}
+        <DoctorsShowcase data={localizedData.doctors} sectionContent={sectionContentMap['doctors']} />
+        <SectionDivider variant="ecg" />
+        {/* About / story after trust is established */}
         <About
           data={localizedData.aboutSection}
           sectionContent={sectionContentMap['about']}
         />
-        <Poles data={localizedData.poles} />
-        <SectionDivider variant="ecg" />
-        <DoctorsShowcase data={localizedData.doctors} sectionContent={sectionContentMap['doctors']} />
-        <SectionDivider variant="ecg" />
         <VideosGallery data={localizedData.videos} />
         <SectionDivider variant="ecg" />
         {featuredEvent && (
@@ -156,11 +165,6 @@ export default async function Home(props: { params: Promise<{ locale: string }> 
           sectionContent={sectionContentMap['homecare']}
         />
         <SectionDivider variant="gradient" />
-        <LazyTestimonials
-          data={localizedData.testimonials}
-          sectionContent={sectionContentMap['testimonials']}
-        />
-        <SectionDivider variant="ecg" />
         <Insurance data={localizedData.insurance} />
         <SectionDivider variant="ecg" />
         <FaqTeaser data={localizedData.faqs} sectionContent={sectionContentMap['faq']} />

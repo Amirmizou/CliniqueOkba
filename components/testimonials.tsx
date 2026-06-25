@@ -127,7 +127,7 @@ export default function Testimonials({ data = [], sectionContent }: Testimonials
                         const role = testimonial.role || testimonial.service || t('patient')
 
                         return (
-                            <ScrollAnimation key={id} variant="scaleUp" as="div">
+                            <ScrollAnimation key={id} variant="fadeUp" as="div">
                                 <div className="relative flex h-full flex-col rounded-2xl border border-border/50 bg-card p-6 shadow-sm transition-shadow duration-300 hover:shadow-md">
                                     {/* Decorative quote — background only */}
                                     <Quote
