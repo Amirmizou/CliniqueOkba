@@ -2,7 +2,6 @@
 
 import { useTranslations } from 'next-intl'
 import ScrollAnimation from '@/components/ui/scroll-animation'
-import StaggerContainer from '@/components/ui/stagger-container'
 import { Star, Quote, BadgeCheck } from 'lucide-react'
 import Image from 'next/image'
 import { urlFor } from '@/sanity/lib/image'
@@ -106,71 +105,74 @@ export default function Testimonials({ data = [], sectionContent }: Testimonials
     return (
         <section id="testimonials" className="bg-muted/30 py-20">
             <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-                <ScrollAnimation variant="fadeUp" className="mb-16 text-center">
+                <ScrollAnimation variant="fadeUp" className="mb-12 text-center">
                     {badge && (
                         <span className="mb-3 inline-block rounded-full bg-primary/10 px-4 py-1.5 text-xs font-semibold uppercase tracking-widest text-primary">
                             {badge}
                         </span>
                     )}
-                    <h2 className="text-foreground text-3xl font-bold sm:text-4xl">
+                    <h2 className="text-3xl font-bold text-foreground sm:text-4xl">
                         {title}
                     </h2>
-                    <p className="mx-auto mt-4 max-w-2xl text-lg text-muted-foreground leading-relaxed">
+                    <p className="mx-auto mt-4 max-w-2xl text-lg leading-relaxed text-muted-foreground">
                         {subtitle}
                     </p>
                 </ScrollAnimation>
 
-                <StaggerContainer className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-                    {testimonials.map((testimonial) => {
-                        const id = testimonial._id || testimonial.id || testimonial.name
-                        const content = testimonial.content || testimonial.comment || ''
-                        const role = testimonial.role || testimonial.service || t('patient')
+                {/* Mobile: horizontal snap scroll; md+: CSS grid */}
+                <div className="-mx-4 sm:-mx-6 md:mx-0">
+                    <div className="flex snap-x snap-mandatory gap-4 overflow-x-auto px-4 pb-3 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:px-6 md:grid md:grid-cols-2 md:gap-6 md:overflow-visible md:px-0 lg:grid-cols-3">
+                        {testimonials.map((testimonial) => {
+                            const id = testimonial._id || testimonial.id || testimonial.name
+                            const content = testimonial.content || testimonial.comment || ''
+                            const role = testimonial.role || testimonial.service || t('patient')
 
-                        return (
-                            <ScrollAnimation key={id} variant="fadeUp" as="div">
-                                <div className="relative flex h-full flex-col rounded-2xl border border-border/50 bg-card p-6 shadow-sm transition-shadow duration-300 hover:shadow-md">
-                                    {/* Decorative quote — background only */}
-                                    <Quote
-                                        className="absolute right-5 top-5 h-12 w-12 text-primary/6"
-                                        aria-hidden="true"
-                                    />
+                            return (
+                                <div key={id} className="w-[85vw] shrink-0 snap-start sm:w-[70vw] md:w-auto md:shrink">
+                                    <div className="relative flex h-full flex-col rounded-2xl border border-border/50 bg-card p-6 shadow-sm transition-shadow duration-300 hover:shadow-md">
+                                        <Quote
+                                            className="absolute right-5 top-5 h-12 w-12 text-primary/6"
+                                            aria-hidden="true"
+                                        />
 
-                                    {/* Top row: stars + verified */}
-                                    <div className="mb-4 flex items-center justify-between">
-                                        <StarRating rating={testimonial.rating} />
-                                        {testimonial.verified && (
-                                            <span className="flex items-center gap-1 text-[11px] font-medium text-emerald-600">
-                                                <BadgeCheck className="h-3.5 w-3.5" aria-hidden="true" />
-                                                {t('verified')}
-                                            </span>
-                                        )}
-                                    </div>
+                                        <div className="mb-4 flex items-center justify-between">
+                                            <StarRating rating={testimonial.rating} />
+                                            {testimonial.verified && (
+                                                <span className="flex items-center gap-1 text-xs font-medium text-emerald-600">
+                                                    <BadgeCheck className="h-3.5 w-3.5" aria-hidden="true" />
+                                                    {t('verified')}
+                                                </span>
+                                            )}
+                                        </div>
 
-                                    {/* Testimonial text */}
-                                    <p className="flex-1 text-sm leading-relaxed text-foreground/80 italic">
-                                        &ldquo;{content}&rdquo;
-                                    </p>
+                                        <p className="flex-1 italic text-sm leading-relaxed text-foreground/80">
+                                            &ldquo;{content}&rdquo;
+                                        </p>
 
-                                    {/* Divider */}
-                                    <div className="my-5 h-px bg-border/50" />
+                                        <div className="my-5 h-px bg-border/50" />
 
-                                    {/* Author */}
-                                    <div className="flex items-center gap-3">
-                                        <Avatar testimonial={testimonial} />
-                                        <div className="min-w-0">
-                                            <p className="truncate text-sm font-semibold text-foreground">
-                                                {testimonial.name}
-                                            </p>
-                                            <p className="truncate text-xs text-primary font-medium">
-                                                {role}
-                                            </p>
+                                        <div className="flex items-center gap-3">
+                                            <Avatar testimonial={testimonial} />
+                                            <div className="min-w-0">
+                                                <p className="truncate text-sm font-semibold text-foreground">
+                                                    {testimonial.name}
+                                                </p>
+                                                <p className="truncate text-xs font-medium text-primary">
+                                                    {role}
+                                                </p>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                            </ScrollAnimation>
-                        )
-                    })}
-                </StaggerContainer>
+                            )
+                        })}
+                    </div>
+
+                    {/* Swipe hint — mobile only */}
+                    <p className="mt-2 px-4 text-center text-xs text-muted-foreground/60 md:hidden" aria-hidden="true">
+                        {t('swipeHint')}
+                    </p>
+                </div>
             </div>
         </section>
     )

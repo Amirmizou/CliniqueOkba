@@ -15,6 +15,7 @@ import SiteFooter from '@/components/site-footer'
 import SkipLink from '@/components/skip-link'
 import BackToTop from '@/components/back-to-top'
 import MobileActionBar from '@/components/mobile-action-bar'
+import AccreditationsBand from '@/components/accreditations-band'
 import ScrollProgress from '@/components/ui/scroll-progress'
 import SectionDivider from '@/components/ui/section-divider'
 import { setRequestLocale } from 'next-intl/server'
@@ -134,6 +135,7 @@ export default async function Home(props: { params: Promise<{ locale: string }> 
         <HeroCarousel slides={localizedData.heroSlides} siteSettings={localizedData.siteSettings} sectionContent={sectionContentMap['hero']} />
         <LatestNews articles={localizedData.articles} />
         <TrustBand siteSettings={localizedData.siteSettings} />
+        <AccreditationsBand />
         {/* Services first — visitors want to know WHAT we treat before WHO we are */}
         <Poles data={localizedData.poles} />
         <SectionDivider variant="ecg" />

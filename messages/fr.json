@@ -178,7 +178,9 @@
     "badge": "Témoignages",
     "title": "Ce que disent nos patients",
     "subtitle": "Votre satisfaction est notre priorité",
-    "verified": "Vérifié"
+    "verified": "Vérifié",
+    "patient": "Patient(e)",
+    "swipeHint": "Glissez pour voir plus"
   },
   "faqTeaser": {
     "badge": "Vos questions",
