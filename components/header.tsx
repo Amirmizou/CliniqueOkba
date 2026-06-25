@@ -215,6 +215,12 @@ export default function Header({ siteSettings, poles }: HeaderProps) {
           85% { opacity: 1; }
           100% { transform: translateY(56px); opacity: 0; }
         }
+        @keyframes scanLaserMobile {
+          0% { transform: translateY(2px); opacity: 0; }
+          15% { opacity: 1; }
+          85% { opacity: 1; }
+          100% { transform: translateY(28px); opacity: 0; }
+        }
       `}} />
       {/* ═══ BARRE UTILITAIRE (desktop) — infos essentielles (dans le flux) ═══ */}
       <div className="relative z-[60] hidden xl:block">
@@ -302,41 +308,179 @@ export default function Header({ siteSettings, poles }: HeaderProps) {
           </div>
         </div>
 
-        {/* MOBILE & TABLET NAVBAR */}
-        <div className="w-full max-w-7xl flex items-center justify-between rounded-2xl bg-white/95 backdrop-blur-md shadow-[0_8px_30px_rgb(0,0,0,0.12)] border border-gray-100 px-4 py-2.5 xl:hidden dark:bg-slate-900/95 dark:border-white/10">
-          <a href="/" className="flex items-center gap-2.5 group">
-            <div className="relative h-10 w-10 shrink-0 rounded-full bg-white p-1 shadow-sm ring-1 ring-gray-100 transition-transform duration-300 group-hover:scale-105 active:scale-95">
-              <Image src="/logo.png" alt="Logo" fill className="object-contain p-1" />
-            </div>
-            <span className="font-extrabold text-[#006633] text-[13px] uppercase leading-none flex flex-col">
-              <span>{clinicNameText}</span>
-              <span className="text-[9px] text-[#EC0016] mt-0.5 tracking-widest font-bold">{t('tagline')}</span>
-            </span>
-          </a>
+        {/* ─── MOBILE GANTRY SCANNER (xl:hidden) — Siemens Symbia ~0.55× ─── */}
+        <div className="relative w-full max-w-7xl h-[76px] xl:hidden" style={{ overflow: 'visible' }}>
 
-          <div className="flex items-center gap-1.5">
-            {/* Urgences — bouton téléphone toujours visible */}
-            {utilPhone && (
-              <a
-                href={utilPhoneHref}
-                aria-label="Appeler la clinique — urgences"
-                className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#006633] text-white shadow-sm transition-all active:scale-95 hover:bg-[#004d26]"
+          {/* Pill — fond visible, overflow:hidden pour que les décos restent dans la pilule */}
+          <div className="absolute inset-0 rounded-2xl overflow-hidden bg-white/95 backdrop-blur-md shadow-[0_8px_30px_rgb(0,0,0,0.12)] border border-gray-100 dark:bg-slate-900/95 dark:border-white/10">
+            {/* Trame de points (côté gauche seulement, le gantry occupe le côté droit) */}
+            <div className="absolute inset-0 text-[#006633]" style={{
+              backgroundImage: 'radial-gradient(currentColor 1px, transparent 1px)',
+              backgroundSize: '14px 14px',
+              opacity: 0.05,
+              WebkitMaskImage: 'linear-gradient(90deg, #000 0%, transparent 55%)',
+              maskImage: 'linear-gradient(90deg, #000 0%, transparent 55%)',
+            }} />
+            {/* ECG fine */}
+            <svg className="absolute bottom-1 left-0 h-4 w-full text-[#006633]/12" viewBox="0 0 400 24" preserveAspectRatio="none" fill="none">
+              <path d="M0 12 H100 l6 -8 l5 16 l5 -11 l4 3 H180 l7 -5 l5 10 l4 -5 H280 l6 -7 l5 14 l5 -10 l4 3 H400" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          </div>
+
+          {/* ═══ BASE / SOCLE ═══ */}
+          <div className="absolute z-0 pointer-events-none" style={{
+            right: '4px', bottom: '0px', width: '94px', height: '9px',
+            borderRadius: '0 0 5px 5px',
+            background: 'linear-gradient(180deg, #c8c8c8 0%, #a0a0a0 100%)',
+            boxShadow: '0 3px 8px rgba(0,0,0,0.25)',
+          }} />
+
+          {/* ═══ EXTENSION DROITE (profondeur) ═══ */}
+          <div className="absolute z-[8] pointer-events-none" style={{
+            right: '2px', bottom: '7px', width: '30px', height: '64px',
+            borderRadius: '0 14px 5px 0',
+            background: 'linear-gradient(90deg, #e8e8e8 0%, #d8d8d8 60%, #c5c5c5 100%)',
+            boxShadow: '3px 3px 8px rgba(0,0,0,0.12), inset -1px 0 4px rgba(0,0,0,0.06)',
+          }} />
+
+          {/* ═══ OMBRE DE CONTACT ═══ */}
+          <div aria-hidden="true" className="absolute z-[2] pointer-events-none" style={{
+            right: '13px', bottom: '-3px', width: '73px', height: '12px',
+            borderRadius: '50%',
+            background: 'radial-gradient(closest-side, rgba(0,0,0,0.30), rgba(0,0,0,0) 76%)',
+            filter: 'blur(2px)',
+          }} />
+
+          {/* ═══ ANNEAU GANTRY — disque base ═══ */}
+          <div className="absolute rounded-full z-[35] pointer-events-none" style={{
+            right: '8px', bottom: '-2px', width: '82px', height: '82px',
+            background: 'radial-gradient(125% 125% at 36% 20%, #ffffff 0%, #f3f3f3 46%, #e2e2e2 78%, #cdcdcd 100%)',
+            boxShadow: '0 10px 24px -6px rgba(0,0,0,0.30), 0 3px 7px rgba(0,0,0,0.12)',
+          }} />
+
+          {/* Face avant (donut) — trouée pour le tunnel */}
+          <div className="absolute rounded-full z-[38] pointer-events-none overflow-hidden" style={{
+            right: '8px', bottom: '-2px', width: '82px', height: '82px',
+            background: 'radial-gradient(130% 130% at 36% 18%, #ffffff 0%, #f4f4f4 44%, #e4e4e4 74%, #d2d2d2 100%)',
+            WebkitMaskImage: 'radial-gradient(circle at center, transparent 16px, black 17px)',
+            maskImage: 'radial-gradient(circle at center, transparent 16px, black 17px)',
+            boxShadow: 'inset 0 2px 5px rgba(255,255,255,0.9), inset 0 -6px 12px rgba(0,0,0,0.10)',
+          }}>
+            <div className="absolute inset-0" style={{ background: 'radial-gradient(55% 38% at 33% 12%, rgba(255,255,255,0.85), rgba(255,255,255,0) 62%)' }} />
+            <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full" style={{
+              width: '50px', height: '50px',
+              boxShadow: 'inset 0 0 0 3px rgba(0,0,0,0.04), inset 0 4px 10px rgba(0,0,0,0.20), inset 0 -1px 3px rgba(255,255,255,0.5)',
+            }} />
+          </div>
+
+          {/* Liseré signature vert */}
+          <div className="absolute z-[39] rounded-full pointer-events-none" style={{
+            right: '12px', bottom: '3px', width: '74px', height: '74px',
+            boxShadow: 'inset 0 0 0 1.5px rgba(0,102,51,0.55)',
+          }} />
+
+          {/* ═══ BORE — tunnel illuminé ═══ */}
+          <div className="absolute z-[40] rounded-full overflow-hidden pointer-events-none" style={{
+            width: '34px', height: '34px', right: '32px', bottom: '22px',
+            background: 'radial-gradient(circle at 50% 35%, #ffffff 0%, #eef1f4 55%, #d6dbe1 100%)',
+            boxShadow: 'inset 0 4px 10px rgba(0,0,0,0.12), inset 0 -2px 6px rgba(255,255,255,0.7)',
+          }}>
+            <div className="absolute inset-0 rounded-full" style={{ boxShadow: 'inset 0 0 8px rgba(0,0,0,0.10)' }} />
+            <div className="absolute inset-[4px] rounded-full border border-black/[0.07]" />
+            <div className="absolute inset-[8px] rounded-full border border-black/[0.05]" />
+            {/* Laser */}
+            <div className="absolute left-[8%] right-[8%] top-0 h-[2px] rounded-full bg-[#00a651] shadow-[0_0_8px_3px_rgba(0,166,81,0.6)]" style={{ animation: 'scanLaserMobile 2.6s ease-in-out infinite alternate' }} />
+            <div className="absolute left-0 right-0 top-0 h-[10px] -mt-[4px] opacity-55" style={{ background: 'radial-gradient(ellipse at center, rgba(0,166,81,0.30), transparent 70%)', animation: 'scanLaserMobile 2.6s ease-in-out infinite alternate' }} />
+            {/* LED rouge */}
+            <div className="absolute top-[25%] right-[15%] w-[2px] h-[2px] rounded-full bg-red-500 shadow-[0_0_5px_1px_rgba(239,68,68,0.8)] animate-pulse" />
+          </div>
+
+          {/* Lèvre bore — biseau 3D */}
+          <div className="absolute z-[41] rounded-full pointer-events-none" style={{
+            width: '34px', height: '34px', right: '32px', bottom: '22px',
+            boxShadow: 'inset 0 1px 3px rgba(0,0,0,0.10), inset 0 -1px 3px rgba(255,255,255,0.7), 0 0 0 1px rgba(0,0,0,0.10)',
+          }} />
+
+          {/* Badge RDV */}
+          <div className="absolute z-[45] pointer-events-none" style={{ right: '12px', bottom: '36px' }}>
+            <div className="bg-[#006633] text-white px-1 py-[1px] rounded-[2px] shadow-sm text-[6px] font-extrabold tracking-[0.15em] uppercase">RDV</div>
+          </div>
+
+          {/* ═══ SPECT HEADS ROTATIFS ═══ */}
+          <div className="absolute z-[44] animate-[spin_32s_linear_infinite] pointer-events-none" style={{
+            right: '8px', bottom: '-2px', width: '82px', height: '82px',
+          }}>
+            {/* Tête 1 */}
+            <div className="absolute top-[-6px] left-1/2 -translate-x-1/2 rounded-[5px]" style={{
+              width: '36px', height: '14px',
+              background: 'linear-gradient(180deg, #ffffff 0%, #f0f0f0 40%, #e0e0e0 100%)',
+              boxShadow: '0 3px 8px rgba(0,0,0,0.18), inset 0 1px 3px rgba(255,255,255,1)',
+              border: '1px solid #d0d0d0',
+            }}>
+              <div className="absolute top-[50%] left-[5%] right-[5%] h-[2px] -translate-y-1/2 bg-[#b0b0b0] rounded-full shadow-[inset_0_1px_1px_rgba(0,0,0,0.4)]" />
+              <div className="absolute bottom-[1px] left-[15%] right-[15%] h-[1px] bg-[#EC0016]/75 rounded-full" />
+            </div>
+            {/* Tête 2 */}
+            <div className="absolute bottom-[-6px] left-1/2 -translate-x-1/2 rounded-[5px]" style={{
+              width: '36px', height: '14px',
+              background: 'linear-gradient(0deg, #ffffff 0%, #f0f0f0 40%, #e0e0e0 100%)',
+              boxShadow: '0 -3px 8px rgba(0,0,0,0.18), inset 0 -1px 3px rgba(255,255,255,1)',
+              border: '1px solid #d0d0d0',
+            }}>
+              <div className="absolute top-[50%] left-[5%] right-[5%] h-[2px] -translate-y-1/2 bg-[#b0b0b0] rounded-full shadow-[inset_0_1px_1px_rgba(0,0,0,0.4)]" />
+              <div className="absolute top-[1px] left-[15%] right-[15%] h-[1px] bg-[#EC0016]/75 rounded-full" />
+            </div>
+          </div>
+
+          {/* ═══ BOUTON GANTRY → Prendre RDV ═══ */}
+          <button
+            onClick={() => scrollToSection('#contact')}
+            aria-label={t('appointment')}
+            title={t('appointment')}
+            className="group absolute z-[46] rounded-full pointer-events-auto cursor-pointer transition-transform duration-300 hover:scale-[1.02] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#006633] focus-visible:ring-offset-2"
+            style={{ right: '8px', bottom: '-2px', width: '82px', height: '82px' }}
+          >
+            <span aria-hidden="true" className="absolute inset-[3px] rounded-full transition-all duration-300 group-hover:shadow-[0_0_0_2px_rgba(0,102,51,0.55),0_0_20px_rgba(0,255,136,0.45)] group-focus-visible:shadow-[0_0_0_2px_rgba(0,102,51,0.6)]" />
+            <span className="pointer-events-none absolute right-full top-1/2 mr-1 -translate-y-1/2 whitespace-nowrap rounded-md bg-[#006633] px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider text-white opacity-0 shadow-lg transition-opacity duration-200 group-hover:opacity-100 group-focus-visible:opacity-100">
+              {t('appointment')}
+            </span>
+          </button>
+
+          {/* ═══ CONTENU — logo + contrôles ═══ */}
+          <div className="absolute inset-0 z-50 flex items-center" style={{ paddingLeft: '14px', paddingRight: '96px' }}>
+            <a href="/" className="flex items-center gap-2 group min-w-0">
+              <div className="relative h-9 w-9 shrink-0 rounded-full bg-white p-1 shadow-sm ring-1 ring-gray-100 transition-transform duration-300 group-hover:scale-105 active:scale-95 dark:ring-white/10">
+                <Image src="/logo.png" alt="Logo" fill className="object-contain p-1" />
+              </div>
+              <span className="font-extrabold text-[#006633] text-[12px] uppercase leading-none flex flex-col min-w-0">
+                <span className="truncate">{clinicNameText}</span>
+                <span className="text-[8px] text-[#EC0016] mt-0.5 tracking-widest font-bold">{t('tagline')}</span>
+              </span>
+            </a>
+
+            <div className="ml-auto flex items-center gap-1 shrink-0">
+              {utilPhone && (
+                <a
+                  href={utilPhoneHref}
+                  aria-label="Appeler la clinique — urgences"
+                  className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#006633] text-white shadow-sm transition-all active:scale-95 hover:bg-[#004d26]"
+                >
+                  <Phone className="h-3.5 w-3.5" />
+                </a>
+              )}
+              <ThemeToggle />
+              <LanguageSwitcher />
+              <button
+                ref={menuButtonRef}
+                aria-label={isOpen ? 'Fermer le menu' : 'Ouvrir le menu'}
+                aria-expanded={isOpen}
+                aria-controls="mobile-menu"
+                className="flex h-8 w-8 shrink-0 cursor-pointer items-center justify-center rounded-full bg-gray-100 text-gray-600 transition-colors hover:bg-gray-200 active:scale-95 dark:bg-slate-800 dark:text-gray-300"
+                onClick={() => setIsOpen((v) => !v)}
               >
-                <Phone className="h-4 w-4" />
-              </a>
-            )}
-            <ThemeToggle />
-            <LanguageSwitcher />
-            <button
-              ref={menuButtonRef}
-              aria-label={isOpen ? 'Fermer le menu' : 'Ouvrir le menu'}
-              aria-expanded={isOpen}
-              aria-controls="mobile-menu"
-              className="flex h-9 w-9 shrink-0 cursor-pointer items-center justify-center rounded-full bg-gray-100 text-gray-600 transition-colors hover:bg-gray-200 active:scale-95 dark:bg-slate-800 dark:text-gray-300"
-              onClick={() => setIsOpen((v) => !v)}
-            >
-              {isOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-            </button>
+                {isOpen ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
+              </button>
+            </div>
           </div>
         </div>
 
