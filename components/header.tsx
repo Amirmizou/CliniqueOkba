@@ -1,14 +1,12 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import {
   Menu,
   X,
-  Phone,
-  Calendar,
-  CalendarDays,
   ChevronDown,
   Newspaper,
+  CalendarDays,
   Users,
   HelpCircle,
   ScanLine,
@@ -22,17 +20,26 @@ import {
   Baby,
   Pill,
   Activity,
+  Home,
+  User,
+  ClipboardList,
+  Info,
+  Mail,
+  Phone,
+  MapPin,
+  Clock,
+  Facebook,
+  Instagram,
   type LucideIcon,
 } from 'lucide-react'
-import { Button } from '@/components/ui/button'
 import { ThemeToggle } from '@/components/theme-toggle'
 import { LanguageSwitcher } from '@/components/language-switcher'
-import { Link, useRouter } from '@/navigation'
 import { useTranslations, useLocale } from 'next-intl'
 import Image from 'next/image'
 import { motion, AnimatePresence, useScroll, useMotionValueEvent } from 'framer-motion'
 import { cn } from '@/lib/utils'
 import { poles as localPoles } from '@/data/poles'
+import Link from 'next/link'
 
 const POLE_ICONS: Record<string, LucideIcon> = {
   ScanLine,
@@ -56,8 +63,6 @@ interface NavPole {
   badge?: string
 }
 
-/** Pôles du menu : Sanity prioritaire (brut, avec title_ar), repli sur les
- *  données locales. La langue est choisie ici via la locale client (fiable). */
 function resolveNavPoles(data: any[] | undefined, locale: string): NavPole[] {
   const source = data && data.length > 0 ? data : localPoles
   return source.map((p: any, i: number) => {
@@ -65,16 +70,14 @@ function resolveNavPoles(data: any[] | undefined, locale: string): NavPole[] {
     const local = localPoles.find((lp) => lp.slug === slug)
 
     let title = (locale === 'ar' && p.title_ar) ? p.title_ar : (p.title || '')
-    const hasArabicChars = /[\u0600-\u06FF]/.test(title)
-    
-    // Si on est en arabe mais que le texte n'a pas de caractères arabes, 
-    // on va chercher dans les données locales.
+    const hasArabicChars = /[؀-ۿ]/.test(title)
+
     if (locale === 'ar' && !hasArabicChars && local?.title_ar) {
       title = local.title_ar
     }
 
     let badge = (locale === 'ar' && p.badge_ar) ? p.badge_ar : (p.badge || undefined)
-    const badgeHasArabic = badge ? /[\u0600-\u06FF]/.test(badge) : false
+    const badgeHasArabic = badge ? /[؀-ۿ]/.test(badge) : false
     if (locale === 'ar' && badge && !badgeHasArabic && local?.badge_ar) {
       badge = local.badge_ar
     }
@@ -93,6 +96,9 @@ interface SiteSettings {
   clinicName?: string
   phone?: string
   logo?: any
+  address?: string
+  hours?: { emergency?: string; weekdays?: string; saturday?: string }
+  social?: { facebook?: string; instagram?: string }
 }
 
 interface HeaderProps {
@@ -105,461 +111,599 @@ export default function Header({ siteSettings, poles }: HeaderProps) {
   const locale = useLocale()
   const navPoles = resolveNavPoles(poles, locale)
   const [isOpen, setIsOpen] = useState(false)
-  const [hidden, setHidden] = useState(false)
-  const [activeTab, setActiveTab] = useState('home')
-  const { scrollY } = useScroll()
   const [isScrolled, setIsScrolled] = useState(false)
+  const [isHidden, setIsHidden] = useState(false)
+  const [activeTab, setActiveTab] = useState('home')
+  const [hovered, setHovered] = useState<string | null>(null)
+  const { scrollY } = useScroll()
+  const menuButtonRef = useRef<HTMLButtonElement>(null)
 
-  // Prevent body scroll when mobile menu is open
   useEffect(() => {
-    if (isOpen) {
-      document.body.style.overflow = 'hidden'
-    } else {
-      document.body.style.overflow = 'unset'
-    }
+    document.body.style.overflow = isOpen ? 'hidden' : 'unset'
     return () => {
       document.body.style.overflow = 'unset'
     }
   }, [isOpen])
 
-  // Intersection Observer for active section detection
   useEffect(() => {
-    const sections = ['home', 'about', 'specialties', 'equipements', 'contact']
+    if (!isOpen) return
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setIsOpen(false)
+        menuButtonRef.current?.focus()
+      }
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [isOpen])
 
+  useEffect(() => {
+    const sections = ['home', 'about', 'specialties', 'equipements', 'medecins', 'contact']
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            setActiveTab(entry.target.id)
-          }
+          if (entry.isIntersecting) setActiveTab(entry.target.id)
         })
       },
-      { threshold: 0.3, rootMargin: '-100px 0px -50% 0px' }
+      { threshold: 0.3, rootMargin: '-100px 0px -50% 0px' },
     )
-
     sections.forEach((id) => {
-      const element = document.getElementById(id)
-      if (element) observer.observe(element)
+      const el = document.getElementById(id)
+      if (el) observer.observe(el)
     })
-
     return () => observer.disconnect()
   }, [])
 
-  // Handle hash on page load
   useEffect(() => {
     const hash = window.location.hash
     if (hash) {
-      // Wait a bit for the page to render
       setTimeout(() => {
-        const element = document.querySelector(hash)
-        if (element) {
-          element.scrollIntoView({ behavior: 'smooth' })
+        const el = document.querySelector(hash)
+        if (el) {
+          el.scrollIntoView({ behavior: 'smooth' })
           setActiveTab(hash.replace('#', ''))
         }
       }, 100)
     }
   }, [])
 
-  useMotionValueEvent(scrollY, "change", (latest) => {
-    const previous = scrollY.getPrevious() ?? 0
+  useMotionValueEvent(scrollY, 'change', (latest) => {
+    setIsScrolled(latest > 24)
+    
+    const previous = scrollY.getPrevious() || 0
     if (latest > previous && latest > 150) {
-      setHidden(true)
-    } else {
-      setHidden(false)
+      setIsHidden(true)
+    } else if (latest < previous) {
+      setIsHidden(false)
     }
-    setIsScrolled(latest > 20)
   })
-
-  const navItems = [
-    { label: t('home'), href: '#home', id: 'home' },
-    { label: t('about'), href: '#about', id: 'about' },
-    { label: t('gallery'), href: '#equipements', id: 'equipements' },
-    { label: t('contact'), href: '#contact', id: 'contact' },
-  ]
 
   const scrollToSection = (href: string) => {
     setIsOpen(false)
-
-    // Check if we're on the homepage
     const isHomepage = window.location.pathname === '/' || window.location.pathname === '/ar'
-
     if (isHomepage) {
-      // On homepage, just scroll
-      const element = document.querySelector(href)
-      if (element) {
-        element.scrollIntoView({ behavior: 'smooth' })
+      const el = document.querySelector(href)
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth' })
         setActiveTab(href.replace('#', ''))
       }
     } else {
-      // On another page, navigate to homepage with hash
       window.location.href = `/${href}`
     }
   }
 
+  const indicatorKey = hovered ?? activeTab
+
+  const clinicNameText = siteSettings?.clinicName && (locale !== 'ar' || /[؀-ۿ]/.test(siteSettings.clinicName))
+    ? siteSettings.clinicName
+    : (locale === 'ar' ? 'المصحة الطبية عقبة' : 'Clinique OKBA')
+
+  /* Barre utilitaire — infos essentielles (depuis Sanity siteSettings) */
+  const utilPhone = (siteSettings?.phone || '').split('/')[0].trim()
+  const utilPhoneHref = `tel:${utilPhone.replace(/[^+\d]/g, '')}`
+  const utilHours = siteSettings?.hours?.weekdays || ''
+  const utilAddress = siteSettings?.address || ''
+  const utilFacebook = siteSettings?.social?.facebook
+  const utilInstagram = siteSettings?.social?.instagram
+
   return (
     <>
-      <motion.header
-        variants={{
-          visible: { y: 0, opacity: 1 },
-          hidden: { y: -100, opacity: 0 }
-        }}
-        animate={hidden ? "hidden" : "visible"}
-        transition={{ duration: 0.35, ease: "easeInOut" }}
-        className="fixed top-0 left-0 right-0 z-[100] flex justify-center pt-4 px-4 pointer-events-none"
-      >
-        <div className={cn(
-          "pointer-events-auto flex items-center justify-between gap-2 sm:gap-4 px-3 py-2 rounded-full transition-all duration-500 ease-out border w-full max-w-6xl",
-          isScrolled
-            ? "bg-white/70 dark:bg-black/70 backdrop-blur-[24px] border-border/40 shadow-[0_8px_30px_rgb(0,0,0,0.12)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.3)]"
-            : "bg-white/40 dark:bg-black/40 backdrop-blur-lg border-white/40 dark:border-white/10 shadow-[0_8px_30px_rgb(0,0,0,0.05)]"
-        )}>
-          {/* Logo Section */}
-          <a
-            href='/'
-            className='group flex cursor-pointer items-center gap-3'
-          >
-            <motion.div
-              className='relative h-10 w-10 sm:h-11 sm:w-11 overflow-hidden rounded-full bg-white p-1 shadow-md ring-1 ring-black/10 flex-shrink-0'
-              whileHover={{ scale: 1.05, rotate: 5 }}
-              whileTap={{ scale: 0.95 }}
-            >
-              <Image
-                src='/logo.png'
-                alt='Clinique OKBA'
-                fill
-                sizes="44px"
-                className='object-contain p-0.5'
-                priority
-              />
-            </motion.div>
-            <div className="hidden sm:flex flex-col leading-none transition-all duration-300 opacity-100">
-              <span className='font-display text-sm font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-foreground to-foreground/70 tracking-tight'>
-                {siteSettings?.clinicName && (!locale || locale !== 'ar' || /[\u0600-\u06FF]/.test(siteSettings.clinicName)) 
-                  ? siteSettings.clinicName 
-                  : (locale === 'ar' ? 'المصحة الطبية عقبة' : 'Clinique OKBA')}
+      <style dangerouslySetInnerHTML={{__html: `
+        @keyframes scanLaser {
+          0% { transform: translateY(2px); opacity: 0; }
+          15% { opacity: 1; }
+          85% { opacity: 1; }
+          100% { transform: translateY(56px); opacity: 0; }
+        }
+      `}} />
+      {/* ═══ BARRE UTILITAIRE (desktop) — infos essentielles (dans le flux) ═══ */}
+      <div className="relative z-[60] hidden xl:block">
+        <div className="bg-[#006633] text-white">
+          <div className="mx-auto flex h-9 max-w-7xl items-center justify-between gap-4 overflow-hidden px-5 text-[12px]">
+            {/* Gauche : Urgences + Infos (Phone, Hours, Address) */}
+            <div className="flex min-w-0 items-center gap-4">
+              <span className="flex shrink-0 items-center gap-2 whitespace-nowrap font-bold tracking-wide text-[#FDE68A]">
+                <Siren className="h-3.5 w-3.5 shrink-0 animate-pulse text-red-400" />
+                Urgences, Imagerie et Pédiatrie 24h/24
               </span>
-              <span className='text-[9px] text-primary font-bold tracking-widest uppercase mt-0.5'>{t('tagline')}</span>
+
+              {utilPhone && (
+                <a href={utilPhoneHref} className="flex shrink-0 items-center gap-1.5 font-medium transition-colors hover:text-[#FDE68A]">
+                  <Phone className="h-3.5 w-3.5 shrink-0" />
+                  <span dir="ltr" className="whitespace-nowrap">{utilPhone}</span>
+                </a>
+              )}
+              {utilHours && (
+                <span className="hidden shrink-0 items-center gap-1.5 text-white/85 2xl:flex">
+                  <Clock className="h-3.5 w-3.5 shrink-0" />
+                  <span className="whitespace-nowrap">{utilHours}</span>
+                </span>
+              )}
+              {utilAddress && (
+                <span className="hidden min-w-0 items-center gap-1.5 text-white/85 2xl:flex">
+                  <MapPin className="h-3.5 w-3.5 shrink-0" />
+                  <span className="truncate">{utilAddress}</span>
+                </span>
+              )}
             </div>
+
+            {/* Droite : Réseaux sociaux */}
+            <div className="flex shrink-0 items-center gap-3">
+              {utilFacebook && (
+                <a href={utilFacebook} target="_blank" rel="noopener noreferrer" aria-label="Facebook" className="transition-colors hover:text-[#FDE68A]">
+                  <Facebook className="h-4 w-4" />
+                </a>
+              )}
+              {utilInstagram && (
+                <a href={utilInstagram} target="_blank" rel="noopener noreferrer" aria-label="Instagram" className="transition-colors hover:text-[#FDE68A]">
+                  <Instagram className="h-4 w-4" />
+                </a>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <header className="relative z-[60] flex justify-center px-4 py-3 bg-white/95 backdrop-blur-md border-b border-black/[0.06] shadow-[0_2px_14px_rgba(0,0,0,0.06)] dark:bg-slate-950/90 dark:border-white/10">
+
+        {/* ═══ Décor médical subtil (réduit le vide de la bande, desktop) ═══ */}
+        <div aria-hidden="true" className="pointer-events-none absolute inset-0 z-0 hidden overflow-hidden xl:block">
+          {/* Trame de points fine — dense sur les côtés, estompée derrière le menu */}
+          <div
+            className="absolute inset-0 text-[#006633]"
+            style={{
+              backgroundImage: 'radial-gradient(currentColor 1px, transparent 1px)',
+              backgroundSize: '22px 22px',
+              opacity: 0.05,
+              WebkitMaskImage: 'linear-gradient(90deg, #000, transparent 28%, transparent 72%, #000)',
+              maskImage: 'linear-gradient(90deg, #000, transparent 28%, transparent 72%, #000)',
+            }}
+          />
+          {/* Ligne ECG / pouls fine en bas (langage visuel médical, vert identité) */}
+          <svg
+            className="absolute bottom-1.5 left-0 h-6 w-full text-[#006633]/15"
+            viewBox="0 0 1200 40"
+            preserveAspectRatio="none"
+            fill="none"
+          >
+            <path
+              d="M0 20 H360 l10 -13 l9 26 l9 -20 l7 7 H545 l13 -9 l9 18 l7 -9 H760 l10 -12 l9 24 l9 -18 l7 6 H1200"
+              stroke="currentColor"
+              strokeWidth="1.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
+          {/* Petite croix médicale discrète (à gauche) */}
+          <div className="absolute left-[3%] top-1/2 -translate-y-1/2 text-[#006633]/10">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path d="M10 3h4v7h7v4h-7v7h-4v-7H3v-4h7z" />
+            </svg>
+          </div>
+        </div>
+
+        {/* MOBILE & TABLET FALLBACK */}
+        <div className="w-full max-w-7xl flex items-center justify-between rounded-2xl bg-white/95 backdrop-blur-md shadow-[0_8px_30px_rgb(0,0,0,0.12)] border border-gray-100 px-4 py-3 xl:hidden">
+          <a href="/" className="flex items-center gap-3 group">
+            <div className="relative h-12 w-12 rounded-full bg-white p-1 shadow-sm ring-1 ring-gray-100 transition-transform duration-300 group-hover:scale-105 active:scale-95">
+              <Image src="/logo.png" alt="Logo" fill className="object-contain p-1" />
+            </div>
+            <span className="font-extrabold text-[#006633] text-sm uppercase leading-none flex flex-col">
+              <span>{clinicNameText}</span>
+              <span className="text-[9px] text-[#EC0016] mt-0.5 tracking-widest">{t('tagline')}</span>
+            </span>
           </a>
-
-          {/* Desktop Navigation - The "Island" */}
-          <nav className='hidden md:flex items-center gap-2 bg-white/50 dark:bg-black/20 p-1.5 rounded-full border border-white/40 dark:border-white/10 shadow-sm'>
-            {navItems.map((item) => {
-              const isActive = activeTab === item.id || activeTab === item.id.replace('#', '')
-
-              return (
-                <button
-                  key={item.label} // Changed key to label to be safe
-                  onClick={() => scrollToSection(item.href || '#')}
-                  onMouseEnter={() => {
-                    // Optional: Pre-select on hover for snappier feel
-                    // setActiveTab(item.id) 
-                  }}
-                  className={cn(
-                    'relative px-5 py-2.5 text-sm font-semibold transition-colors duration-300 rounded-full flex items-center gap-2 group z-10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2',
-                    isActive ? "text-primary drop-shadow-sm" : "text-foreground/90 hover:text-primary"
-                  )}
-                >
-                  {/* Active Indicator (The "Liquid Pill") - Premium */}
-                  {isActive && (
-                    <motion.div
-                      layoutId="activeSection"
-                      className="absolute inset-0 bg-primary/10 shadow-[inset_0_1px_1px_rgba(255,255,255,0.2)] rounded-full z-[-1] border border-primary/20"
-                      transition={{ type: "spring", stiffness: 400, damping: 30 }}
-                    />
-                  )}
-
-                  {/* Text Content */}
-                  <span className="relative z-10 font-medium tracking-wide">{item.label}</span>
-
-                  {/* Hover Glow Effect */}
-                  {!isActive && (
-                    <div className="absolute inset-0 rounded-full bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
-                  )}
-                </button>
-              )
-            })}
-
-            <div className="hidden md:block w-px h-6 bg-border/50 mx-1" /> {/* Divider */}
-
-            {/* Dropdown : Pôles */}
-            <motion.div initial="initial" whileHover="hover" className="relative z-30">
-              <button
-                className="relative px-5 py-2.5 text-sm font-semibold transition-colors duration-300 rounded-full text-foreground/90 hover:text-primary flex items-center gap-1 hover:bg-white/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
-              >
-                {t('poles')}
-                <motion.div variants={{ initial: { rotate: 0 }, hover: { rotate: -180 } }} transition={{ duration: 0.3 }}>
-                  <ChevronDown className="h-3 w-3" />
-                </motion.div>
-              </button>
-
-              <motion.div 
-                className="absolute top-full start-1/2 -translate-x-1/2 pt-6 w-[22rem]"
-                variants={{
-                  initial: { opacity: 0, y: 15, scale: 0.95, pointerEvents: "none" },
-                  hover: { opacity: 1, y: 0, scale: 1, pointerEvents: "auto" }
-                }}
-                transition={{ type: "spring", stiffness: 400, damping: 25 }}
-              >
-                <div className="glass-card p-2 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.12)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.3)] border border-white/40 dark:border-white/10 overflow-hidden bg-white/95 dark:bg-black/95 backdrop-blur-[24px]">
-                  <div className="grid grid-cols-1 gap-1">
-                    {navPoles.map((pole) => {
-                      const Icon = POLE_ICONS[pole.iconName] || Stethoscope
-                      return (
-                        <Link
-                          key={pole.slug}
-                          href={`/poles/${pole.slug}`}
-                          className="flex items-center gap-3 px-3 py-2.5 text-sm rounded-xl hover:bg-primary/5 transition-all duration-200 group/item"
-                        >
-                          <div
-                            className="flex h-9 w-9 items-center justify-center rounded-lg text-white shadow-sm transition-transform group-hover/item:scale-110"
-                            style={{ backgroundColor: pole.accent }}
-                          >
-                            <Icon className="h-4 w-4" />
-                          </div>
-                          <div className="flex flex-col">
-                            <span className="font-semibold text-foreground leading-tight">
-                              {pole.title}
-                            </span>
-                            {pole.badge && (
-                              <span className="text-[10px] font-medium opacity-70">
-                                {pole.badge}
-                              </span>
-                            )}
-                          </div>
-                        </Link>
-                      )
-                    })}
-                  </div>
+          <div className="flex items-center gap-3">
+            {/* MINI SCANNER (Visible on mobile) */}
+            <div className="relative w-10 h-10 rounded-full flex items-center justify-center bg-gray-50 border border-gray-200 shadow-inner">
+              <div className="absolute inset-1 rounded-full bg-gradient-to-br from-gray-200 to-gray-400 shadow-inner" />
+              <div className="absolute inset-[6px] rounded-full bg-black shadow-[inset_0_2px_8px_rgba(0,0,0,0.8)] flex items-center justify-center">
+                <div className="bg-[#e87722] w-[8px] h-[3px] rounded-[1px] shadow-sm flex items-center justify-center">
                 </div>
-              </motion.div>
-            </motion.div>
-
-            {/* Dropdown for additional pages */}
-            <motion.div initial="initial" whileHover="hover" className="relative z-20">
-              <button
-                className="relative px-5 py-2.5 text-sm font-semibold transition-colors duration-300 rounded-full text-foreground/90 hover:text-primary flex items-center gap-1 hover:bg-white/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
-              >
-                {t('more')}
-                <motion.div variants={{ initial: { rotate: 0 }, hover: { rotate: -180 } }} transition={{ duration: 0.3 }}>
-                  <ChevronDown className="h-3 w-3" />
-                </motion.div>
-              </button>
-
-              {/* Dropdown Menu */}
-              <motion.div 
-                className="absolute top-full end-0 pt-6 w-64"
-                variants={{
-                  initial: { opacity: 0, y: 15, scale: 0.95, pointerEvents: "none" },
-                  hover: { opacity: 1, y: 0, scale: 1, pointerEvents: "auto" }
-                }}
-                transition={{ type: "spring", stiffness: 400, damping: 25 }}
-              >
-                <div className="glass-card p-2 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.12)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.3)] border border-white/40 dark:border-white/10 overflow-hidden bg-white/95 dark:bg-black/95 backdrop-blur-[24px]">
-                  <div className="space-y-1">
-                    <a href="/actualites" className="flex items-center gap-4 px-4 py-3 text-sm rounded-xl hover:bg-primary/5 text-muted-foreground hover:text-primary transition-all duration-200 group/item">
-                      <div className="p-2 rounded-lg bg-primary/10 text-primary group-hover/item:bg-primary group-hover/item:text-white transition-colors shadow-sm">
-                        <Newspaper className="h-4 w-4" />
-                      </div>
-                      <div className="flex flex-col">
-                        <span className="font-semibold text-foreground group-hover/item:text-primary">{t('news')}</span>
-                        <span className="text-[10px] opacity-70">{t('newsDesc')}</span>
-                      </div>
-                    </a>
-                    <a href="/evenements" className="flex items-center gap-4 px-4 py-3 text-sm rounded-xl hover:bg-primary/5 text-muted-foreground hover:text-primary transition-all duration-200 group/item">
-                      <div className="p-2 rounded-lg bg-primary/10 text-primary group-hover/item:bg-primary group-hover/item:text-white transition-colors shadow-sm">
-                        <CalendarDays className="h-4 w-4" />
-                      </div>
-                      <div className="flex flex-col">
-                        <span className="font-semibold text-foreground group-hover/item:text-primary">{t('events')}</span>
-                        <span className="text-[10px] opacity-70">{t('eventsDesc')}</span>
-                      </div>
-                    </a>
-                    <a href="/equipe" className="flex items-center gap-4 px-4 py-3 text-sm rounded-xl hover:bg-primary/5 text-muted-foreground hover:text-primary transition-all duration-200 group/item">
-                      <div className="p-2 rounded-lg bg-primary/10 text-primary group-hover/item:bg-primary group-hover/item:text-white transition-colors shadow-sm">
-                        <Users className="h-4 w-4" />
-                      </div>
-                      <div className="flex flex-col">
-                        <span className="font-semibold text-foreground group-hover/item:text-primary">{t('team')}</span>
-                        <span className="text-[10px] opacity-70">{t('teamDesc')}</span>
-                      </div>
-                    </a>
-                    <a href="/faq" className="flex items-center gap-4 px-4 py-3 text-sm rounded-xl hover:bg-primary/5 text-muted-foreground hover:text-primary transition-all duration-200 group/item">
-                      <div className="p-2 rounded-lg bg-primary/10 text-primary group-hover/item:bg-primary group-hover/item:text-white transition-colors shadow-sm">
-                        <HelpCircle className="h-4 w-4" />
-                      </div>
-                      <div className="flex flex-col">
-                        <span className="font-semibold text-foreground group-hover/item:text-primary">{t('faq')}</span>
-                        <span className="text-[10px] opacity-70">{t('faqDesc')}</span>
-                      </div>
-                    </a>
-                  </div>
-                </div>
-              </motion.div>
-            </motion.div>
-          </nav>
-
-          {/* Actions */}
-          <div className='flex items-center gap-1 sm:gap-2'>
-            {/* Language toggle */}
-            <div className="flex items-center gap-1 pe-1 sm:pe-2 border-e border-border/50 me-1 sm:me-2">
-              <div className="flex items-center justify-center">
-                <LanguageSwitcher />
               </div>
+              <div className="absolute top-[20%] right-[20%] w-1 h-1 rounded-full bg-red-500 shadow-[0_0_4px_rgba(239,68,68,0.8)] animate-pulse" />
             </div>
 
-            {/* Elegant Call to Action Button */}
-            <motion.div
-              className="relative overflow-hidden rounded-full"
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-            >
-              <Button
-                size='sm'
-                className={cn(
-                  "relative rounded-full font-semibold shadow-lg transition-all duration-300 overflow-hidden group border-0 z-10",
-                  "bg-[#006633] text-white hover:bg-[#004d26]",
-                  "hover:shadow-[#006633]/30 hover:shadow-xl h-11 px-5 sm:px-6 touch-target"
-                )}
-                onClick={() => scrollToSection('#contact')}
-              >
-                {/* Shine effect on hover */}
-                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent translate-x-[-200%] group-hover:translate-x-[200%] transition-transform duration-1000" />
-
-                {/* Icône statique */}
-                <span className="relative z-10">
-                  <Phone className="w-4 h-4 mr-2 drop-shadow-lg" />
-                </span>
-
-                <span className="relative z-10 hidden sm:inline drop-shadow-lg tracking-wide">
-                  {t('emergency')}
-                </span>
-              </Button>
-            </motion.div>
-
-            {/* Mobile Menu Toggle */}
+            <LanguageSwitcher />
             <button
-              className='md:hidden flex h-11 w-11 items-center justify-center rounded-full hover:bg-secondary transition-colors touch-target cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2'
-              onClick={() => setIsOpen(!isOpen)}
-              aria-label="Toggle menu"
+              ref={menuButtonRef}
+              className="flex h-10 w-10 cursor-pointer items-center justify-center rounded-full bg-gray-100 text-gray-600 transition-colors hover:bg-gray-200"
+              onClick={() => setIsOpen((v) => !v)}
             >
-              <div className='relative w-6 h-6'>
-                <Menu className={cn("absolute inset-0 transition-all duration-300", isOpen ? "opacity-0 rotate-90" : "opacity-100 rotate-0")} />
-                <X className={cn("absolute inset-0 transition-all duration-300", isOpen ? "opacity-100 rotate-0" : "opacity-0 -rotate-90")} />
-              </div>
+              {isOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
             </button>
           </div>
         </div>
-      </motion.header>
 
-      {/* Mobile Menu Overlay */}
+        {/* 3D SCANNER DESKTOP — Siemens Symbia Pro.specta */}
+        <div className={cn("pointer-events-auto relative w-full max-w-7xl mx-auto h-[140px] hidden xl:block transition-all duration-700 origin-top mt-4", isScrolled ? "scale-95 -translate-y-2 opacity-95" : "scale-100 translate-y-0 opacity-100")}>
+          
+          {/* ═══════════════ GANTRY BASE / FLOOR MOUNT ═══════════════ */}
+          <div className="absolute right-[10px] bottom-[0px] w-[170px] h-[16px] z-0 pointer-events-none" style={{
+            borderRadius: '0 0 8px 8px',
+            background: 'linear-gradient(180deg, #c8c8c8 0%, #a0a0a0 100%)',
+            boxShadow: '0 4px 12px rgba(0,0,0,0.25)'
+          }} />
+
+          {/* ═══════════════ GANTRY BODY — EXTENSION DROITE (profondeur) ═══════════════ */}
+          <div className="absolute right-[5px] bottom-[12px] w-[55px] h-[120px] z-[8] pointer-events-none" style={{
+            borderRadius: '0 24px 8px 0',
+            background: 'linear-gradient(90deg, #e8e8e8 0%, #d8d8d8 60%, #c5c5c5 100%)',
+            boxShadow: '4px 4px 12px rgba(0,0,0,0.12), inset -2px 0 6px rgba(0,0,0,0.06)'
+          }} />
+
+          {/* ═══════════════ OMBRE DE CONTACT AU SOL (ancrage réaliste) ═══════════════ */}
+          <div aria-hidden="true" className="absolute z-[2] pointer-events-none" style={{
+            right: '24px', bottom: '-5px', width: '132px', height: '22px',
+            borderRadius: '50%',
+            background: 'radial-gradient(closest-side, rgba(0,0,0,0.30), rgba(0,0,0,0) 76%)',
+            filter: 'blur(2px)',
+          }} />
+
+          {/* ═══════════════ GANTRY ANNEAU — face plastique mate ═══════════════ */}
+          {/* Disque de base : épaisseur + ombre portée douce */}
+          <div className="absolute right-[15px] bottom-[-2px] w-[150px] h-[150px] rounded-full z-[35] pointer-events-none" style={{
+            background: 'radial-gradient(125% 125% at 36% 20%, #ffffff 0%, #f3f3f3 46%, #e2e2e2 78%, #cdcdcd 100%)',
+            boxShadow: '0 16px 36px -10px rgba(0,0,0,0.30), 0 4px 10px rgba(0,0,0,0.12)',
+          }} />
+
+          {/* Face avant (donut) — trouée pour révéler le tunnel */}
+          <div className="absolute right-[15px] bottom-[-2px] w-[150px] h-[150px] rounded-full z-[38] pointer-events-none overflow-hidden" style={{
+            background: 'radial-gradient(130% 130% at 36% 18%, #ffffff 0%, #f4f4f4 44%, #e4e4e4 74%, #d2d2d2 100%)',
+            WebkitMaskImage: 'radial-gradient(circle at center, transparent 30px, black 31px)',
+            maskImage: 'radial-gradient(circle at center, transparent 30px, black 31px)',
+            boxShadow: 'inset 0 3px 7px rgba(255,255,255,0.9), inset 0 -10px 18px rgba(0,0,0,0.10)',
+          }}>
+            {/* Reflet large et doux (lumière de plafond, haut-gauche) */}
+            <div className="absolute inset-0" style={{ background: 'radial-gradient(55% 38% at 33% 12%, rgba(255,255,255,0.85), rgba(255,255,255,0) 62%)' }} />
+            {/* Chanfrein annulaire vers le bore (occlusion ambiante) */}
+            <div className="absolute left-1/2 top-1/2 h-[92px] w-[92px] -translate-x-1/2 -translate-y-1/2 rounded-full" style={{
+              boxShadow: 'inset 0 0 0 5px rgba(0,0,0,0.04), inset 0 7px 16px rgba(0,0,0,0.20), inset 0 -2px 5px rgba(255,255,255,0.5)',
+            }} />
+          </div>
+
+          {/* Liseré signature vert — anneau fin près du bord externe (forme façon Siemens) */}
+          <div className="absolute z-[39] rounded-full pointer-events-none" style={{
+            right: '22px', bottom: '5px', width: '136px', height: '136px',
+            boxShadow: 'inset 0 0 0 2px rgba(0,102,51,0.55)',
+          }} />
+
+          {/* ═══════════════ BORE — tunnel clair (illuminé, façon SOMATOM) ═══════════════ */}
+          <div className="absolute z-[40] rounded-full overflow-hidden pointer-events-none" style={{
+            width: '64px', height: '64px',
+            right: '58px', bottom: '41px',
+            background: 'radial-gradient(circle at 50% 35%, #ffffff 0%, #eef1f4 55%, #d6dbe1 100%)',
+            boxShadow: 'inset 0 6px 16px rgba(0,0,0,0.12), inset 0 -3px 10px rgba(255,255,255,0.7)',
+          }}>
+            {/* Ombrage doux du pourtour (profondeur du tunnel clair) */}
+            <div className="absolute inset-0 rounded-full" style={{ boxShadow: 'inset 0 0 14px rgba(0,0,0,0.10)' }} />
+            {/* Anneaux détecteurs internes (suggérés) */}
+            <div className="absolute inset-[8px] rounded-full border border-black/[0.07]" />
+            <div className="absolute inset-[16px] rounded-full border border-black/[0.05]" />
+
+            {/* Effet Laser / Scanning Beam (vert visible sur fond clair) */}
+            <div className="absolute left-[8%] right-[8%] top-0 h-[3px] rounded-full bg-[#00a651] shadow-[0_0_12px_4px_rgba(0,166,81,0.6)]" style={{ animation: 'scanLaser 2.6s ease-in-out infinite alternate' }} />
+            {/* Lueur diffuse qui suit le faisceau */}
+            <div className="absolute left-0 right-0 top-0 h-[16px] -mt-[7px] opacity-55" style={{ background: 'radial-gradient(ellipse at center, rgba(0,166,81,0.30), transparent 70%)', animation: 'scanLaser 2.6s ease-in-out infinite alternate' }} />
+
+            {/* LED indicateur intérieur */}
+            <div className="absolute top-[25%] right-[15%] w-[3px] h-[3px] rounded-full bg-red-500 shadow-[0_0_8px_2px_rgba(239,68,68,0.8)] animate-pulse" />
+          </div>
+
+          {/* Lèvre du bore — biseau 3D doux (tunnel clair) */}
+          <div className="absolute z-[41] rounded-full pointer-events-none" style={{
+            width: '64px', height: '64px',
+            right: '58px', bottom: '41px',
+            boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.10), inset 0 -2px 5px rgba(255,255,255,0.7), 0 0 0 1px rgba(0,0,0,0.10)',
+          }} />
+
+          {/* ═══════════════ REPÈRE « RDV » (signale que le gantry est cliquable) ═══════════════ */}
+          <div className="absolute z-[45] pointer-events-none" style={{ right: '22px', bottom: '66px' }}>
+            <div className="bg-[#006633] text-white px-1.5 py-[1px] rounded-[2px] shadow-sm text-[7px] font-extrabold tracking-[0.15em] uppercase">RDV</div>
+          </div>
+
+          {/* ═══════════════ TABLE / PLATEAU PATIENT ═══════════════ */}
+          {/* Piédestal blanc à nervures verticales (inspiré du SOMATOM go.Top) */}
+          <div className={cn("absolute z-[5] pointer-events-none origin-right", isHidden ? "translate-x-[200px] opacity-0 transition-all duration-[2000ms] ease-in-out" : "translate-x-0 opacity-100 transition-all duration-[1500ms] delay-[400ms] ease-out")} style={{
+            left: '46%', right: '158px', bottom: '3px', height: '30px',
+            borderRadius: '10px 10px 3px 3px',
+            background: 'linear-gradient(180deg, #fdfdfd 0%, #f1f1f1 55%, #dcdcdc 100%)',
+            boxShadow: '0 9px 20px -5px rgba(0,0,0,0.22), inset 0 2px 4px rgba(255,255,255,0.95), inset 0 -3px 7px rgba(0,0,0,0.08)'
+          }}>
+            {/* Nervures verticales courbes (signature de la colonne SOMATOM) */}
+            <div className="absolute inset-x-3 top-[5px] bottom-[7px]" aria-hidden="true" style={{
+              background: 'repeating-linear-gradient(90deg, rgba(0,0,0,0.08) 0px, rgba(0,0,0,0.08) 1px, transparent 1px, transparent 9px)',
+              borderRadius: '4px',
+              WebkitMaskImage: 'linear-gradient(180deg, transparent, #000 28%, #000 78%, transparent)',
+              maskImage: 'linear-gradient(180deg, transparent, #000 28%, #000 78%, transparent)'
+            }} />
+            {/* Reflet vertical doux au centre de la colonne */}
+            <div className="absolute inset-y-2 left-1/2 w-1/3 -translate-x-1/2" aria-hidden="true" style={{
+              background: 'radial-gradient(60% 80% at 50% 30%, rgba(255,255,255,0.7), rgba(255,255,255,0) 70%)'
+            }} />
+            {/* Base évasée (pied au sol) */}
+            <div className="absolute -bottom-[3px] -left-[10px] -right-[10px] h-[6px] rounded-b-md" aria-hidden="true" style={{
+              background: 'linear-gradient(180deg, #e2e2e2, #c6c6c6)',
+              boxShadow: '0 5px 12px rgba(0,0,0,0.20)'
+            }} />
+          </div>
+
+          {/* Side rail gauche (rebord latéral) */}
+          <div className={cn("absolute z-[32] pointer-events-none origin-right", isHidden ? "translate-x-[200px] opacity-0 transition-all duration-[2000ms] ease-in-out" : "translate-x-0 opacity-100 transition-all duration-[1500ms] delay-[400ms] ease-out")} style={{
+            left: '11%', right: '145px', bottom: '28px', height: '6px',
+            borderRadius: '12px 0 0 0',
+            background: 'linear-gradient(180deg, #f0f0f0 0%, #d8d8d8 100%)',
+            boxShadow: '0 -2px 4px rgba(0,0,0,0.06), inset 0 1px 2px rgba(255,255,255,0.8)'
+          }} />
+
+          {/* Surface du plateau principal */}
+          <div className={cn("absolute z-[30] flex flex-col justify-end origin-right hover:-translate-x-1", isHidden ? "translate-x-[200px] opacity-0 transition-all duration-[2000ms] ease-in-out" : "translate-x-0 opacity-100 transition-all duration-[1500ms] delay-[400ms] ease-out")} style={{
+            left: '10%', right: '95px', bottom: '32px', height: '64px',
+            borderRadius: '20px 0 0 6px',
+            background: 'linear-gradient(180deg, #ffffff 0%, #fafafa 20%, #f0f0f0 60%, #e4e4e4 100%)',
+            boxShadow: '0 8px 20px -4px rgba(0,0,0,0.18), inset 0 3px 10px rgba(255,255,255,1), inset 0 -2px 6px rgba(0,0,0,0.04)',
+            WebkitMaskImage: 'linear-gradient(to right, black 70%, transparent 100%)',
+            maskImage: 'linear-gradient(to right, black 70%, transparent 100%)'
+          }}>
+            {/* Liseré latéral net (façon bande Siemens, en vert identité) */}
+            <div className="absolute bottom-[5px] left-[22px] right-0 h-[2px] rounded-l-full" style={{
+              background: 'linear-gradient(90deg, #006633 0%, #00a651 55%, rgba(0,166,81,0) 100%)',
+              boxShadow: '0 0 5px rgba(0,166,81,0.35)'
+            }} />
+
+            {/* Ligne de guidage subtile */}
+            <div aria-hidden="true" className="pointer-events-none absolute top-[50%] left-[55%] right-0 h-[1px] bg-black/[0.04]" />
+
+            {/* Ombre d'entrée dans le bore — la table s'enfonce dans le tunnel */}
+            <div aria-hidden="true" className="pointer-events-none absolute right-0 top-0 bottom-0 w-[95px] z-10" style={{
+              background: 'linear-gradient(to left, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0.28) 48%, transparent 100%)'
+            }} />
+            {/* Liseré vert qui file du plateau vers le bore (continuité visuelle) */}
+            <div aria-hidden="true" className="pointer-events-none absolute bottom-[3px] right-0 h-[2px] w-[90px] z-[11]" style={{
+              background: 'linear-gradient(to right, rgba(0,255,136,0.6) 0%, rgba(0,102,51,0) 100%)'
+            }} />
+
+            {/* Blur de jonction */}
+            <div aria-hidden="true" className="pointer-events-none absolute right-0 top-0 bottom-0 w-[25px] z-20" style={{
+              backdropFilter: 'blur(1.5px)'
+            }} />
+
+          </div>
+
+          {/* ═══════════════ NAVIGATION (calque net, hors du masque de fondu) ═══════════════ */}
+          {/* Placé à gauche de l'anneau (right-[195px]) → aucun item sous le gantry, aucun estompage */}
+          <div
+            className={cn(
+              "absolute z-[34] flex items-center pl-7 origin-right",
+              isHidden ? "translate-x-[200px] opacity-0 transition-all duration-[2000ms] ease-in-out" : "translate-x-0 opacity-100 transition-all duration-[1500ms] delay-[400ms] ease-out",
+            )}
+            style={{ left: '10%', right: '220px', bottom: '32px', height: '64px' }}
+          >
+            {/* Sélecteur de langue */}
+            <div className="shrink-0 mr-2 md:mr-4 pointer-events-auto">
+              <LanguageSwitcher />
+            </div>
+
+            {/* Logo Area */}
+            <a href="/" className="flex items-center gap-3 shrink-0 mr-4 md:mr-6 group pointer-events-auto">
+              <div className="relative h-14 w-14 rounded-full bg-white p-1 shadow-sm ring-1 ring-gray-100 transition-transform group-hover:scale-105">
+                <Image src="/logo.png" alt="Logo" fill className="object-contain p-1" />
+              </div>
+              <div className="flex flex-col whitespace-nowrap">
+                <span className="text-[12px] md:text-[14px] font-extrabold text-[#006633] leading-none uppercase">Clinique</span>
+                <span className="text-[12px] md:text-[14px] font-extrabold text-[#006633] leading-none uppercase mt-0.5">Okba</span>
+              </div>
+            </a>
+
+            {/* Navigation */}
+            <nav className="flex flex-1 min-w-0 items-center justify-between gap-1 pointer-events-auto" onMouseLeave={() => setHovered(null)}>
+              <NavIconLink icon={Home} label={t('center')} isActive={indicatorKey === 'about'} onClick={() => scrollToSection('#about')} onHover={() => setHovered('about')} />
+              <NavIconDropdown icon={Stethoscope} label={t('specialties')} isActive={indicatorKey === 'specialties'} onHover={() => setHovered('specialties')} onClick={() => scrollToSection('#specialties')} poles={navPoles} locale={locale} />
+              <NavIconLink icon={Activity} label={t('equipment')} isActive={indicatorKey === 'equipements'} onClick={() => scrollToSection('#equipements')} onHover={() => setHovered('equipements')} />
+              <NavIconLink icon={Users} label={t('doctors')} isActive={indicatorKey === 'medecins'} onClick={() => scrollToSection('#medecins')} onHover={() => setHovered('medecins')} />
+              <NavIconLink icon={Info} label={t('faq')} isActive={indicatorKey === 'faq'} onClick={() => scrollToSection('#faq')} onHover={() => setHovered('faq')} />
+              <NavIconLink icon={Mail} label={t('contact')} isActive={indicatorKey === 'contact'} onClick={() => scrollToSection('#contact')} onHover={() => setHovered('contact')} />
+            </nav>
+          </div>
+
+          {/* ═══════════════ ROTATING SPECT HEADS ═══════════════ */}
+          <div className="absolute right-[15px] bottom-[-2px] w-[150px] h-[150px] z-[44] animate-[spin_32s_linear_infinite] pointer-events-none">
+            {/* Tête 1 */}
+            <div className="absolute top-[-10px] left-1/2 w-[65px] h-[26px] -translate-x-1/2 rounded-[8px]" style={{
+              background: 'linear-gradient(180deg, #ffffff 0%, #f0f0f0 40%, #e0e0e0 100%)',
+              boxShadow: '0 4px 12px rgba(0,0,0,0.18), inset 0 2px 4px rgba(255,255,255,1), inset 0 -1px 2px rgba(0,0,0,0.06)',
+              border: '1px solid #d0d0d0'
+            }}>
+              {/* Collimator fente */}
+              <div className="absolute top-[50%] left-[5%] right-[5%] h-[3px] -translate-y-1/2 bg-[#b0b0b0] rounded-full shadow-[inset_0_1px_2px_rgba(0,0,0,0.4)]" />
+              <div className="absolute bottom-[2px] left-[15%] right-[15%] h-[2px] bg-[#EC0016]/75 rounded-full" />
+            </div>
+            {/* Tête 2 */}
+            <div className="absolute bottom-[-10px] left-1/2 w-[65px] h-[26px] -translate-x-1/2 rounded-[8px]" style={{
+              background: 'linear-gradient(0deg, #ffffff 0%, #f0f0f0 40%, #e0e0e0 100%)',
+              boxShadow: '0 -4px 12px rgba(0,0,0,0.18), inset 0 -2px 4px rgba(255,255,255,1), inset 0 1px 2px rgba(0,0,0,0.06)',
+              border: '1px solid #d0d0d0'
+            }}>
+              {/* Collimator fente */}
+              <div className="absolute top-[50%] left-[5%] right-[5%] h-[3px] -translate-y-1/2 bg-[#b0b0b0] rounded-full shadow-[inset_0_1px_2px_rgba(0,0,0,0.4)]" />
+              <div className="absolute top-[2px] left-[15%] right-[15%] h-[2px] bg-[#EC0016]/75 rounded-full" />
+            </div>
+          </div>
+
+          {/* ═══════════════ GANTRY = BOUTON « PRENDRE RENDEZ-VOUS » (fonctionnel) ═══════════════ */}
+          <button
+            onClick={() => scrollToSection('#contact')}
+            aria-label={t('appointment')}
+            title={t('appointment')}
+            className="group absolute z-[46] rounded-full pointer-events-auto cursor-pointer transition-transform duration-300 hover:scale-[1.02] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#006633] focus-visible:ring-offset-2"
+            style={{ right: '15px', bottom: '-2px', width: '150px', height: '150px' }}
+          >
+            {/* Halo vert au survol/focus (le scanner « s'active ») */}
+            <span aria-hidden="true" className="absolute inset-[5px] rounded-full transition-all duration-300 group-hover:shadow-[0_0_0_3px_rgba(0,102,51,0.55),0_0_30px_rgba(0,255,136,0.45)] group-focus-visible:shadow-[0_0_0_3px_rgba(0,102,51,0.6)]" />
+            {/* Infobulle */}
+            <span className="pointer-events-none absolute right-full top-1/2 mr-1 -translate-y-1/2 whitespace-nowrap rounded-md bg-[#006633] px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-white opacity-0 shadow-lg transition-opacity duration-200 group-hover:opacity-100 group-focus-visible:opacity-100">
+              {t('appointment')}
+            </span>
+          </button>
+
+        </div>
+      </header>
+
+      {/* MOBILE FULL SCREEN MENU */}
       <AnimatePresence>
         {isOpen && (
           <motion.div
-            initial={{ opacity: 0, backdropFilter: "blur(0px)" }}
-            animate={{ opacity: 1, backdropFilter: "blur(12px)" }}
-            exit={{ opacity: 0, backdropFilter: "blur(0px)" }}
-            className="fixed inset-0 z-40 bg-background/60 md:hidden pt-24 px-6 overflow-y-auto"
+            id="mobile-menu"
+            role="dialog"
+            aria-modal="true"
+            aria-label="Menu de navigation"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[90] overflow-y-auto bg-white/95 px-6 pb-12 pt-24 backdrop-blur-xl xl:hidden"
           >
             <motion.nav
-              initial={{ y: -20, opacity: 0 }}
+              initial={{ y: -16, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
-              exit={{ y: -20, opacity: 0 }}
-              transition={{ delay: 0.1 }}
-              className="flex flex-col gap-2 pb-8"
+              exit={{ y: -16, opacity: 0 }}
+              className="mx-auto flex max-w-md flex-col gap-2"
             >
-              {navItems.map((item, i) => (
+              {[
+                { key: 'center', href: '#about', icon: Home },
+                { key: 'specialties', href: '#specialties', icon: Stethoscope },
+                { key: 'equipment', href: '#equipements', icon: Activity },
+                { key: 'doctors', href: '#medecins', icon: Users },
+                { key: 'faq', href: '#faq', icon: Info },
+                { key: 'contact', href: '#contact', icon: Mail },
+              ].map((item) => (
                 <motion.button
-                  key={item.id}
-                  initial={{ x: -20, opacity: 0 }}
-                  animate={{ x: 0, opacity: 1 }}
-                  transition={{ delay: 0.1 + (i * 0.05) }}
+                  key={item.key}
                   onClick={() => scrollToSection(item.href)}
-                  className="flex items-center justify-between p-4 rounded-2xl bg-card/50 border border-border/50 hover:bg-primary/5 hover:border-primary/20 transition-all group touch-friendly"
+                  className="group flex items-center gap-4 rounded-2xl border border-gray-100 bg-gray-50 p-4 transition-all hover:border-[#EC0016]/30 hover:bg-[#EC0016]/5"
                 >
-                  <span className="text-xl font-medium group-hover:text-primary transition-colors">{item.label}</span>
-                  <div className="w-8 h-8 rounded-full bg-background flex items-center justify-center group-hover:scale-110 transition-transform">
-                    <div className="w-2 h-2 rounded-full bg-primary/20 group-hover:bg-primary transition-colors" />
-                  </div>
+                  <item.icon className="h-6 w-6 text-[#006633]" />
+                  <span className="text-lg font-bold text-gray-800">{t(item.key)}</span>
                 </motion.button>
               ))}
 
-              {/* Pôles */}
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.35 }}
-                className="pt-4 border-t border-border/30"
-              >
-                <p className="text-xs text-muted-foreground uppercase tracking-wider mb-2 px-2">{t('ourPoles')}</p>
-                <div className="grid grid-cols-1 gap-2">
-                  {navPoles.map((pole) => {
-                    const Icon = POLE_ICONS[pole.iconName] || Stethoscope
-                    return (
-                      <a
-                        key={pole.slug}
-                        href={`/poles/${pole.slug}`}
-                        onClick={() => setIsOpen(false)}
-                        className="flex items-center gap-4 p-3 rounded-xl bg-card/50 border border-border/50 hover:bg-primary/5 hover:border-primary/20 transition-all touch-friendly"
-                      >
-                        <div
-                          className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg text-white shadow-sm"
-                          style={{ backgroundColor: pole.accent }}
-                        >
-                          <Icon className="h-5 w-5" />
-                        </div>
-                        <span className="font-medium text-lg">{pole.title}</span>
-                      </a>
-                    )
-                  })}
-                </div>
-              </motion.div>
-
-              {/* Additional Pages */}
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.4 }}
-                className="pt-4 border-t border-border/30"
-              >
-                <p className="text-xs text-muted-foreground uppercase tracking-wider mb-2 px-2">{t('more')}</p>
-                <div className="space-y-2">
-                  <a href="/actualites" onClick={() => setIsOpen(false)} className="flex items-center gap-3 p-3 rounded-xl bg-card/50 border border-border/50 hover:bg-primary/5 hover:border-primary/20 transition-all">
-                    <Newspaper className="h-5 w-5 text-primary" />
-                    <span className="font-medium">{t('news')}</span>
-                  </a>
-                  <a href="/evenements" onClick={() => setIsOpen(false)} className="flex items-center gap-3 p-3 rounded-xl bg-card/50 border border-border/50 hover:bg-primary/5 hover:border-primary/20 transition-all">
-                    <CalendarDays className="h-5 w-5 text-primary" />
-                    <span className="font-medium">{t('events')}</span>
-                  </a>
-                  <a href="/equipe" onClick={() => setIsOpen(false)} className="flex items-center gap-3 p-3 rounded-xl bg-card/50 border border-border/50 hover:bg-primary/5 hover:border-primary/20 transition-all">
-                    <Users className="h-5 w-5 text-primary" />
-                    <span className="font-medium">{t('team')}</span>
-                  </a>
-                  <a href="/faq" onClick={() => setIsOpen(false)} className="flex items-center gap-3 p-3 rounded-xl bg-card/50 border border-border/50 hover:bg-primary/5 hover:border-primary/20 transition-all">
-                    <HelpCircle className="h-5 w-5 text-primary" />
-                    <span className="font-medium">{t('faq')}</span>
-                  </a>
-                </div>
-              </motion.div>
-
-              {/* Apparence et Langue (Mobile) */}
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.45 }}
-                className="pt-4 border-t border-border/30 pb-10 safe-area-inset-bottom"
-              >
-                <p className="text-xs text-muted-foreground uppercase tracking-wider mb-2 px-2">{t('settings')}</p>
-                <div className="flex items-center justify-between p-4 rounded-xl bg-card/50 border border-border/50">
-                  <span className="font-medium">{t('appearance')}</span>
+              <div className="mt-4 border-t pt-4 border-gray-200">
+                <p className="mb-2 text-xs font-bold uppercase tracking-wider text-gray-400">{t('settings')}</p>
+                <div className="flex items-center justify-between rounded-xl bg-gray-50 p-4 border border-gray-100">
+                  <span className="font-bold text-gray-800">{t('appearance')}</span>
                   <ThemeToggle />
                 </div>
-              </motion.div>
+              </div>
             </motion.nav>
           </motion.div>
         )}
       </AnimatePresence>
     </>
+  )
+}
+
+function NavIconLink({ icon: Icon, label, isActive, onClick, onHover }: any) {
+  return (
+    <button
+      onClick={onClick}
+      onMouseEnter={onHover}
+      onFocus={onHover}
+      className={cn(
+        'group relative flex flex-row items-center gap-1 rounded-xl px-2 py-1.5 transition-all duration-300 hover:-translate-y-0.5 focus-visible:outline-none whitespace-nowrap',
+        isActive ? 'text-[#006633]' : 'text-gray-600 hover:text-[#006633]'
+      )}
+    >
+      <Icon className="w-3.5 h-3.5 stroke-[2px] shrink-0" />
+      <span className="text-[9px] md:text-[10px] xl:text-[11px] font-extrabold tracking-wide uppercase truncate">{label}</span>
+      {isActive && (
+        <span className="absolute -bottom-1 left-2 right-2 h-[2px] bg-[#006633] rounded-full shadow-[0_0_4px_rgba(0,102,51,0.6)]" />
+      )}
+    </button>
+  )
+}
+
+function NavIconDropdown({ icon: Icon, label, isActive, onHover, onClick, poles, locale }: any) {
+  const [open, setOpen] = useState(false)
+  return (
+    <div
+      className="relative flex justify-center"
+      onMouseEnter={() => {
+        setOpen(true)
+        if (onHover) onHover()
+      }}
+      onMouseLeave={() => setOpen(false)}
+    >
+      <button
+        onClick={(e) => {
+          setOpen((v) => !v)
+          if (onClick) onClick(e)
+        }}
+        onFocus={onHover}
+        className={cn(
+          'group relative flex flex-row items-center gap-1 rounded-xl px-2 py-1.5 transition-all duration-300 hover:-translate-y-0.5 focus-visible:outline-none whitespace-nowrap',
+          isActive || open ? 'text-[#006633]' : 'text-gray-600 hover:text-[#006633]'
+        )}
+      >
+        <Icon className="w-3.5 h-3.5 stroke-[2px] shrink-0" />
+        <span className="text-[9px] md:text-[10px] xl:text-[11px] font-extrabold tracking-wide uppercase truncate">{label}</span>
+        {(isActive || open) && (
+          <span className="absolute -bottom-1 left-2 right-2 h-[2px] bg-[#006633] rounded-full shadow-[0_0_4px_rgba(0,102,51,0.6)]" />
+        )}
+      </button>
+
+      <AnimatePresence>
+        {open && (
+          <motion.div
+            initial={{ opacity: 0, y: 10, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 10, scale: 0.95 }}
+            className="absolute top-full left-1/2 -translate-x-1/2 pt-4 w-[280px] z-50"
+          >
+            <div className="overflow-hidden rounded-xl bg-white shadow-xl ring-1 ring-black/5 p-2">
+              <div className="grid grid-cols-1 gap-1">
+                {poles.map((pole: any) => {
+                  const PoleIcon = POLE_ICONS[pole.iconName] || Stethoscope
+                  return (
+                    <Link
+                      key={pole.slug}
+                      href={`/${locale}/poles/${pole.slug}`}
+                      className="group/item flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors duration-200 hover:bg-gray-50"
+                      onClick={() => setOpen(false)}
+                    >
+                      <span
+                        className="flex h-8 w-8 items-center justify-center rounded-md text-white shadow-sm"
+                        style={{ backgroundColor: pole.accent }}
+                      >
+                        <PoleIcon className="h-4 w-4" />
+                      </span>
+                      <span className="font-bold text-gray-800">{pole.title}</span>
+                    </Link>
+                  )
+                })}
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
   )
 }

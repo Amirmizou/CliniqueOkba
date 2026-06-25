@@ -10,11 +10,13 @@ import {
 import {
     ChevronLeft,
     ChevronRight,
+    ChevronDown,
     Phone,
     CalendarHeart,
-    Pause,
     Play,
+    Pause,
 } from 'lucide-react'
+import { UniversalPlayer } from '@/components/ui/universal-player'
 import Image from 'next/image'
 import { useTranslations, useLocale } from 'next-intl'
 import { useReducedMotion } from '@/hooks/use-reduced-motion'
@@ -150,11 +152,35 @@ export default function HeroCarousel({ slides: rawSlides = [], siteSettings, sec
 
     const currentSlide = slides[currentIndex]
 
+    /* H1 FIXE (SEO + marque stable) — ne change pas à chaque slide */
+    const heroTitle = isAr
+        ? (sectionContent?.title_ar || sectionContent?.title || siteSettings?.clinicName_ar || siteSettings?.clinicName || 'المصحة الطبية عقبة')
+        : (sectionContent?.title || siteSettings?.clinicName || 'Clinique OKBA')
+
+    /* Ligne animée par slide (le titre/sous-titre de la slide devient le message tournant) */
+    const slideLine = currentSlide.subtitle || currentSlide.title || ''
+
+    /* Chips de réassurance : Sanity (heroStats) sinon valeurs par défaut bilingues */
+    const trustChips =
+        siteSettings?.heroStats && siteSettings.heroStats.length > 0
+            ? siteSettings.heroStats.slice(0, 3).filter((s) => s?.value)
+            : isAr
+                ? [
+                      { value: '24/7', label: 'الإسعافات' },
+                      { value: '+6', label: 'أقطاب تميز' },
+                      { value: 'SPECT/CT', label: 'تصوير متطور' },
+                  ]
+                : [
+                      { value: '24/7', label: 'Urgences' },
+                      { value: '+6', label: "Pôles d'excellence" },
+                      { value: 'SPECT/CT', label: 'Imagerie de pointe' },
+                  ]
+
     return (
         <section
             ref={heroRef}
             id="home"
-            className="relative flex min-h-[85dvh] lg:min-h-[80dvh] flex-col overflow-hidden"
+            className="relative flex min-h-[58dvh] lg:min-h-[62dvh] flex-col overflow-hidden"
             onMouseEnter={() => setIsAutoPlaying(false)}
             onMouseLeave={() => setIsAutoPlaying(true)}
             // Accessibilité clavier : suspendre le défilement auto quand un
@@ -189,13 +215,13 @@ export default function HeroCarousel({ slides: rawSlides = [], siteSettings, sec
                             className="relative h-full w-full"
                         >
                             {currentSlide.videoUrl ? (
-                                <video
-                                    src={currentSlide.videoUrl}
-                                    autoPlay
-                                    loop
-                                    muted
-                                    playsInline
-                                    className="absolute inset-0 h-full w-full object-cover object-center"
+                                <UniversalPlayer
+                                    url={currentSlide.videoUrl}
+                                    playing={isAutoPlaying}
+                                    muted={true}
+                                    loop={true}
+                                    controls={false}
+                                    className="absolute left-0 top-0 h-full w-full object-cover"
                                 />
                             ) : (
                                 <Image
@@ -205,7 +231,7 @@ export default function HeroCarousel({ slides: rawSlides = [], siteSettings, sec
                                     fill
                                     className="object-cover object-center"
                                     priority
-                                    quality={100}
+                                    quality={82}
                                     sizes="100vw"
                                     unoptimized={false}
                                 />
@@ -243,94 +269,103 @@ export default function HeroCarousel({ slides: rawSlides = [], siteSettings, sec
             {/* ---------------------------------------------------------- */}
             <motion.div
                 style={prefersReducedMotion ? undefined : { y: yContent, opacity: contentOpacity }}
-                className="relative z-20 mx-auto flex w-full max-w-7xl flex-1 items-center px-4 pt-28 pb-16 sm:px-6 lg:px-8"
+                className="relative z-20 mx-auto flex w-full max-w-7xl flex-1 items-center px-4 pt-10 pb-16 sm:px-6 lg:px-8"
             >
                 <div className="grid w-full items-center gap-10 lg:grid-cols-12">
                     {/* Colonne texte */}
                     <div className="lg:col-span-7">
                         {/* Logo animé (motion graphic) */}
                         <AnimatedLogo className="mb-6" size={96} />
-                        <AnimatePresence mode="wait">
+
+                        {/* Badge (fixe) */}
                         <motion.div
-                            key={currentIndex}
-                            initial={{ opacity: 0, y: 24 }}
+                            initial={{ opacity: 0, y: 12 }}
                             animate={{ opacity: 1, y: 0 }}
-                            exit={{ opacity: 0, y: -16 }}
-                            transition={{ duration: 0.6, ease: EASE_OUT }}
+                            transition={{ delay: 0.15 }}
+                            className="mb-5 inline-flex items-center gap-2 rounded-full border border-white/30 bg-white/10 px-4 py-2 text-xs font-medium text-white backdrop-blur-md sm:text-sm"
                         >
-                            {/* Badge */}
-                            <motion.div
-                                initial={{ opacity: 0, y: 12 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{ delay: 0.15 }}
-                                className="mb-5 inline-flex items-center gap-2 rounded-full border border-white/30 bg-white/10 px-4 py-2 text-xs font-medium text-white backdrop-blur-md sm:text-sm"
-                            >
-                                {isAr ? (sectionContent?.badge_ar || sectionContent?.badge || t('badge')) : (sectionContent?.badge || t('badge'))}
-                            </motion.div>
-
-                            {/* Titre — révélation mot à mot (masque + montée) */}
-                            <h1
-                                style={{ textShadow: '0 2px 28px rgba(0,0,0,0.45), 0 1px 3px rgba(0,0,0,0.7)' }}
-                                className="text-3xl font-bold leading-[1.12] tracking-tight text-white sm:text-5xl lg:text-6xl xl:text-7xl"
-                            >
-                                <WordReveal
-                                    key={currentIndex}
-                                    text={currentSlide.title || ''}
-                                    mode="mount"
-                                    delay={0.25}
-                                />
-                            </h1>
-
-                            {/* Filet dégradé signature (épuré) */}
-                            <motion.div
-                                initial={{ scaleX: 0 }}
-                                animate={{ scaleX: 1 }}
-                                transition={{ delay: 0.5, duration: 0.7, ease: EASE_OUT }}
-                                className="mt-5 h-1 w-32 origin-left rounded-full bg-gradient-to-r from-[#006633] to-[#FDE68A]"
-                            />
-
-                            {/* Sous-titre */}
-                            {currentSlide.subtitle && (
-                                <motion.p
-                                    initial={{ opacity: 0, y: 16 }}
-                                    animate={{ opacity: 1, y: 0 }}
-                                    transition={{ delay: 0.4 }}
-                                    style={{ textShadow: '0 1px 14px rgba(0,0,0,0.55)' }}
-                                    className="mt-5 max-w-xl text-base font-light leading-relaxed text-white/90 sm:text-lg"
-                                >
-                                    {currentSlide.subtitle}
-                                </motion.p>
-                            )}
-
-                            {/* CTAs */}
-                            <motion.div
-                                initial={{ opacity: 0, y: 16 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{ delay: 0.55 }}
-                                className="mt-8 flex w-full flex-col gap-4 sm:w-auto sm:flex-row sm:items-center"
-                            >
-                                <Magnetic className="w-full sm:w-fit">
-                                    <button
-                                        onClick={handleBooking}
-                                        className="group relative inline-flex w-full cursor-pointer items-center justify-center gap-2 overflow-hidden rounded-full bg-white px-7 py-4 text-sm font-semibold text-[#006633] shadow-lg transition duration-300 hover:bg-gray-50 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-white/60 active:scale-[0.98] sm:w-auto sm:text-base touch-target"
-                                    >
-                                        <CalendarHeart className="h-5 w-5" />
-                                        {t('cta.appointment')}
-                                        <ChevronRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
-                                    </button>
-                                </Magnetic>
-
-                                <a
-                                    href={phoneHref}
-                                    className="group inline-flex w-full cursor-pointer items-center justify-center gap-2 rounded-full border border-white/25 bg-white/10 px-7 py-4 text-sm font-semibold text-white backdrop-blur-md transition duration-300 hover:border-white/50 hover:bg-white/20 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-white/30 active:scale-[0.97] sm:w-auto sm:text-base touch-target"
-                                >
-                                    <Phone className="h-5 w-5 text-emerald-300" />
-                                    {t('cta.call')}
-                                </a>
-                            </motion.div>
-
+                            {isAr ? (sectionContent?.badge_ar || sectionContent?.badge || t('badge')) : (sectionContent?.badge || t('badge'))}
                         </motion.div>
-                        </AnimatePresence>
+
+                        {/* Titre H1 FIXE (SEO + marque) — révélation mot à mot au montage */}
+                        <h1
+                            style={{ textShadow: '0 2px 28px rgba(0,0,0,0.45), 0 1px 3px rgba(0,0,0,0.7)' }}
+                            className="text-3xl font-bold leading-[1.12] tracking-tight text-white sm:text-5xl lg:text-6xl xl:text-7xl"
+                        >
+                            <WordReveal text={heroTitle} mode="mount" delay={0.2} />
+                        </h1>
+
+                        {/* Filet dégradé signature (épuré) */}
+                        <motion.div
+                            initial={{ scaleX: 0 }}
+                            animate={{ scaleX: 1 }}
+                            transition={{ delay: 0.5, duration: 0.7, ease: EASE_OUT }}
+                            className="mt-5 h-1 w-32 origin-left rounded-full bg-gradient-to-r from-[#006633] to-[#FDE68A]"
+                        />
+
+                        {/* Message animé par slide (réserve de hauteur → pas de saut de mise en page) */}
+                        <div className="mt-5 min-h-[3.5rem] max-w-xl sm:min-h-[4rem]">
+                            <AnimatePresence mode="wait">
+                                {slideLine && (
+                                    <motion.p
+                                        key={currentIndex}
+                                        initial={{ opacity: 0, y: 14 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        exit={{ opacity: 0, y: -10 }}
+                                        transition={{ duration: 0.5, ease: EASE_OUT }}
+                                        style={{ textShadow: '0 1px 14px rgba(0,0,0,0.55)' }}
+                                        className="text-base font-light leading-relaxed text-white/90 sm:text-lg"
+                                    >
+                                        {slideLine}
+                                    </motion.p>
+                                )}
+                            </AnimatePresence>
+                        </div>
+
+                        {/* Chips de réassurance (confiance above-the-fold) */}
+                        <motion.ul
+                            initial={{ opacity: 0, y: 16 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: 0.5 }}
+                            className="mt-6 flex flex-wrap gap-2.5"
+                        >
+                            {trustChips.map((c, i) => (
+                                <li
+                                    key={i}
+                                    className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-3.5 py-2 backdrop-blur-md"
+                                >
+                                    <span className="text-sm font-bold text-[#FDE68A]">{c.value}</span>
+                                    <span className="text-xs font-medium text-white/85">{c.label}</span>
+                                </li>
+                            ))}
+                        </motion.ul>
+
+                        {/* CTAs (fixe) */}
+                        <motion.div
+                            initial={{ opacity: 0, y: 16 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: 0.6 }}
+                            className="mt-8 flex w-full flex-col gap-4 sm:w-auto sm:flex-row sm:items-center"
+                        >
+                            <Magnetic className="w-full sm:w-fit">
+                                <button
+                                    onClick={handleBooking}
+                                    className="group relative inline-flex w-full cursor-pointer items-center justify-center gap-2 overflow-hidden rounded-full bg-white px-7 py-4 text-sm font-semibold text-[#006633] shadow-lg transition duration-300 hover:bg-gray-50 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-white/60 active:scale-[0.98] sm:w-auto sm:text-base touch-target"
+                                >
+                                    <CalendarHeart className="h-5 w-5" />
+                                    {t('cta.appointment')}
+                                    <ChevronRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+                                </button>
+                            </Magnetic>
+
+                            <a
+                                href={phoneHref}
+                                className="group inline-flex w-full cursor-pointer items-center justify-center gap-2 rounded-full border border-white/25 bg-white/10 px-7 py-4 text-sm font-semibold text-white backdrop-blur-md transition duration-300 hover:border-white/50 hover:bg-white/20 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-white/30 active:scale-[0.97] sm:w-auto sm:text-base touch-target"
+                            >
+                                <Phone className="h-5 w-5 text-emerald-300" />
+                                {t('cta.call')}
+                            </a>
+                        </motion.div>
                     </div>
                 </div>
             </motion.div>
@@ -421,6 +456,23 @@ export default function HeroCarousel({ slides: rawSlides = [], siteSettings, sec
                     </div>
                 </div>
             )}
+
+            {/* ---------------------------------------------------------- */}
+            {/*  Indice de scroll (invite à explorer)                      */}
+            {/* ---------------------------------------------------------- */}
+            <button
+                onClick={() => scrollToId('about')}
+                aria-label={isAr ? 'انتقل للأسفل' : 'Défiler vers le bas'}
+                className="group absolute bottom-12 left-1/2 z-30 hidden -translate-x-1/2 cursor-pointer flex-col items-center gap-1 text-white/70 transition-colors hover:text-white md:flex"
+            >
+                <span className="text-[10px] font-medium uppercase tracking-[0.2em]">{isAr ? 'اكتشف' : 'Découvrir'}</span>
+                <motion.span
+                    animate={prefersReducedMotion ? undefined : { y: [0, 6, 0] }}
+                    transition={{ duration: 1.6, repeat: Infinity, ease: 'easeInOut' }}
+                >
+                    <ChevronDown className="h-5 w-5" />
+                </motion.span>
+            </button>
 
             {/* ---------------------------------------------------------- */}
             {/*  Signature ECG (ligne de vie) au bas du hero               */}

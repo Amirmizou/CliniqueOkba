@@ -15,6 +15,7 @@ import {
   X,
   Sparkles,
   Maximize2,
+  Play,
   Award,
   Baby,
   Activity,
@@ -29,6 +30,7 @@ import { doctors, CLINIC_WHATSAPP, CLINIC_PHONE, type Doctor } from '@/data/doct
 import { urlFor, sanityImageLoader, hiResImage } from '@/sanity/lib/image'
 import { AnimatedSection } from '@/components/ui/animated-section'
 import { LineReveal } from '@/components/ui/reveal-text'
+import { UniversalPlayer } from '@/components/ui/universal-player'
 
 // Résolution des icônes Sanity (chaîne -> composant Lucide)
 const ICONS: Record<string, LucideIcon> = {
@@ -87,6 +89,7 @@ function toArabic(doc: Doctor): Doctor {
     specialty: tr(AR_SPECIALTY, doc.specialty) || doc.specialty,
     subtitle: tr(AR_SUBTITLE, doc.subtitle),
     experience: tr(AR_EXPERIENCE, doc.experience),
+    customBadge: doc.customBadge_ar || doc.customBadge,
     days: tr(AR_DAYS, doc.days) || doc.days,
     hours: tr(AR_HOURS, doc.hours) || doc.hours,
     services: doc.services.map((s) => AR_SERVICE.get(normalizeKey(s)) || s),
@@ -105,34 +108,43 @@ function resolveDoctors(data: any[] | undefined, locale: string): Doctor[] {
           subtitle: d.subtitle || undefined,
           services: Array.isArray(d.services) ? d.services : [],
           experience: d.experience || undefined,
+          customBadge: d.customBadge || undefined,
+          customBadge_ar: d.customBadge_ar || undefined,
           days: d.consultationDays || '',
           hours: d.consultationHours || '',
           poster: d.image ? urlFor(d.image).width(620).height(827).url() : '',
           icon: ICONS[d.iconName] || Stethoscope,
           accent: d.accentColor || '#006633',
           gradient: '',
+          videos: Array.isArray(d.videos) ? d.videos.filter(Boolean) : [],
         }))
 
   return locale === 'ar' ? base.map(toArabic) : base
 }
 
 /* -------------------------------------------------------------------------- */
-/*  Carte médecin 3D                                                          */
-/* -------------------------------------------------------------------------- */
 
 function DoctorCard({
   doctor,
   index,
   onOpen,
+  onPlay,
+  sectionAccent,
 }: {
   doctor: Doctor
   index: number
   onOpen: (d: Doctor) => void
+  onPlay: (d: Doctor) => void
+  sectionAccent?: string
 }) {
   const t = useTranslations('doctors')
   const locale = useLocale()
 
   const Icon = doctor.icon
+  // Si une couleur de section est définie, elle s'applique à tous les médecins,
+  // sinon on utilise la couleur propre au médecin, ou le vert par défaut.
+  const accent = sectionAccent || doctor.accent || '#006633'
+  const hasVideos = Array.isArray(doctor.videos) && doctor.videos.length > 0
   const waMessage = encodeURIComponent(
     locale === 'ar'
       ? `مرحباً، أرغب في حجز موعد مع ${doctor.name} (${doctor.specialty}) في عيادة OKBA.`
@@ -148,7 +160,8 @@ function DoctorCard({
       className="group relative h-full"
     >
       <div
-        className="relative flex h-full flex-col overflow-hidden rounded-[1.75rem] border border-border/40 bg-white shadow-soft ring-1 ring-[#006633]/5 transition-all duration-300 hover:-translate-y-1 hover:shadow-elevated dark:border-white/10 dark:bg-slate-900"
+        className="relative flex h-full flex-col overflow-hidden rounded-[1.75rem] border border-border/40 bg-white shadow-soft ring-1 ring-black/5 transition-all duration-300 hover:-translate-y-1 hover:shadow-elevated dark:border-white/10 dark:bg-slate-900"
+        style={{ '--tw-ring-color': `${accent}1A` } as React.CSSProperties}
       >
         {/* ----- Affiche ----- */}
         <button
@@ -167,8 +180,11 @@ function DoctorCard({
             className="object-cover transition-transform duration-700 group-hover:scale-[1.06] select-none"
           />
 
-          {/* Liseré doré supérieur (identité visuelle) */}
-          <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-[#006633] via-[#FDE68A] to-[#006633]" />
+          {/* Liseré supérieur (identité visuelle) */}
+          <div 
+            className="absolute inset-x-0 top-0 h-1" 
+            style={{ backgroundImage: `linear-gradient(to right, ${accent}, #FDE68A, ${accent})` }}
+          />
 
           {/* Voile sombre bas (lisibilité du nom) */}
           <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
@@ -185,7 +201,7 @@ function DoctorCard({
             {/* Badge spécialité déplacé en bas pour ne pas cacher le visage */}
             <div
               className="mb-2.5 inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold text-white shadow-lg backdrop-blur-sm"
-              style={{ backgroundColor: `${doctor.accent}E6` }}
+              style={{ backgroundColor: `${accent}E6` }}
             >
               <Icon className="h-3.5 w-3.5" />
               {doctor.specialty}
@@ -199,14 +215,36 @@ function DoctorCard({
                 {doctor.subtitle}
               </p>
             )}
-            {doctor.experience && (
-              <span className="mt-2 inline-flex items-center gap-1.5 rounded-full bg-white/15 px-2.5 py-1 text-[11px] font-semibold text-white backdrop-blur-sm">
-                <Award className="h-3 w-3 text-amber-300" />
-                {doctor.experience}
-              </span>
-            )}
+            <div className="mt-2 flex flex-wrap items-center gap-2">
+              {doctor.experience && (
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-white/15 px-2.5 py-1 text-[11px] font-semibold text-white backdrop-blur-sm">
+                  <Award className="h-3 w-3 text-amber-300" />
+                  {doctor.experience}
+                </span>
+              )}
+              {doctor.customBadge && (
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-[#FDE68A] px-2.5 py-1 text-[11px] font-bold text-slate-900 shadow-md">
+                  <Sparkles className="h-3 w-3" />
+                  {doctor.customBadge}
+                </span>
+              )}
+            </div>
           </div>
         </button>
+
+        {/* Bouton lecture vidéo (si le médecin a des vidéos) */}
+        {hasVideos && (
+          <button
+            type="button"
+            onClick={() => onPlay(doctor)}
+            aria-label={locale === 'ar' ? `مشاهدة فيديو ${doctor.name}` : `Voir la vidéo de ${doctor.name}`}
+            className="group/play absolute left-4 top-4 z-20 inline-flex items-center gap-2 rounded-full px-3 py-2 text-xs font-semibold text-white shadow-lg backdrop-blur-sm transition-transform duration-200 hover:scale-105 active:scale-95"
+            style={{ backgroundColor: `${accent}E6` }}
+          >
+            <Play className="h-3.5 w-3.5 fill-current" />
+            {locale === 'ar' ? 'فيديو' : 'Vidéo'}
+          </button>
+        )}
 
         {/* ----- Panneau d'informations ----- */}
         <div className="flex flex-1 flex-col gap-4 p-5">
@@ -217,8 +255,8 @@ function DoctorCard({
                 key={s}
                 className="rounded-lg border px-2.5 py-1 text-[11px] font-medium text-foreground/80"
                 style={{
-                  borderColor: `${doctor.accent}40`,
-                  backgroundColor: `${doctor.accent}10`,
+                  borderColor: `${accent}40`,
+                  backgroundColor: `${accent}10`,
                 }}
               >
                 {s}
@@ -227,7 +265,7 @@ function DoctorCard({
             {doctor.services.length > 7 && (
               <span
                 className="rounded-lg border px-2.5 py-1 text-[11px] font-semibold"
-                style={{ borderColor: `${doctor.accent}30`, color: doctor.accent }}
+                style={{ borderColor: `${accent}30`, color: accent }}
               >
                 +{doctor.services.length - 7}
               </span>
@@ -237,11 +275,11 @@ function DoctorCard({
           {/* Horaires */}
           <div className="space-y-1.5 text-sm text-muted-foreground">
             <div className="flex items-center gap-2">
-              <Calendar className="h-4 w-4 shrink-0" style={{ color: doctor.accent }} />
+              <Calendar className="h-4 w-4 shrink-0" style={{ color: accent }} />
               <span>{doctor.days}</span>
             </div>
             <div className="flex items-center gap-2">
-              <Clock className="h-4 w-4 shrink-0" style={{ color: doctor.accent }} />
+              <Clock className="h-4 w-4 shrink-0" style={{ color: accent }} />
               <span>{doctor.hours}</span>
             </div>
           </div>
@@ -253,7 +291,7 @@ function DoctorCard({
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex flex-1 items-center justify-center gap-1.5 rounded-xl px-3 py-2.5 text-sm font-semibold text-white shadow-md transition-transform duration-200 hover:scale-[1.03] active:scale-95 touch-target"
-              style={{ backgroundColor: doctor.accent }}
+              style={{ backgroundColor: accent }}
             >
               <MessageCircle className="h-4 w-4" />
               {t('bookShort')}
@@ -262,7 +300,7 @@ function DoctorCard({
               href={`tel:${CLINIC_PHONE}`}
               aria-label={t('callFor', { name: doctor.name })}
               className="inline-flex items-center justify-center rounded-xl border px-3 py-2.5 text-foreground/80 transition-colors hover:bg-foreground/5 touch-target min-w-[48px]"
-              style={{ borderColor: `${doctor.accent}55` }}
+              style={{ borderColor: `${accent}55` }}
             >
               <Phone className="h-4 w-4" />
             </a>
@@ -325,48 +363,166 @@ function PosterLightbox({
 }
 
 /* -------------------------------------------------------------------------- */
+/*  Lightbox vidéo                                                            */
+/* -------------------------------------------------------------------------- */
+
+function VideoLightbox({
+  doctor,
+  onClose,
+}: {
+  doctor: Doctor
+  onClose: () => void
+}) {
+  const tc = useTranslations('common')
+  const videos = doctor.videos || []
+  const [index, setIndex] = useState(0)
+  const current = videos[index]
+
+  return (
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      onClick={onClose}
+      className="fixed inset-0 z-[100] flex items-center justify-center bg-black/85 p-4 backdrop-blur-sm"
+    >
+      <button
+        type="button"
+        onClick={onClose}
+        aria-label={tc('close')}
+        className="absolute right-5 top-5 flex h-11 w-11 items-center justify-center rounded-full bg-white/15 text-white backdrop-blur-md transition-colors hover:bg-white/30"
+      >
+        <X className="h-5 w-5" />
+      </button>
+
+      <motion.div
+        initial={{ scale: 0.92, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        exit={{ scale: 0.92, opacity: 0 }}
+        transition={{ type: 'spring', stiffness: 220, damping: 24 }}
+        onClick={(e) => e.stopPropagation()}
+        className="w-full max-w-4xl"
+      >
+        <div className="mb-3 text-center">
+          <h3 className="text-lg font-bold text-white">{doctor.name}</h3>
+          <p className="text-sm text-white/70">{doctor.specialty}</p>
+        </div>
+
+        <div className="relative aspect-video w-full overflow-hidden rounded-2xl bg-black shadow-2xl ring-2 ring-[#FDE68A]/40">
+          {current && (
+            <UniversalPlayer
+              key={current}
+              url={current}
+              playing
+              controls
+              className="absolute inset-0 h-full w-full"
+            />
+          )}
+        </div>
+
+        {videos.length > 1 && (
+          <div className="mt-4 flex flex-wrap justify-center gap-2">
+            {videos.map((_, i) => (
+              <button
+                key={i}
+                type="button"
+                onClick={() => setIndex(i)}
+                aria-label={`Vidéo ${i + 1}`}
+                className={`h-9 min-w-[2.25rem] rounded-full px-3 text-sm font-semibold transition-colors ${
+                  i === index
+                    ? 'bg-white text-slate-900'
+                    : 'bg-white/15 text-white hover:bg-white/25'
+                }`}
+              >
+                {i + 1}
+              </button>
+            ))}
+          </div>
+        )}
+      </motion.div>
+    </motion.div>
+  )
+}
+
+/* -------------------------------------------------------------------------- */
 /*  Section principale                                                         */
 /* -------------------------------------------------------------------------- */
 
-export default function DoctorsShowcase({ data }: { data?: any[] }) {
+interface SectionContent {
+  badge?: string
+  badge_ar?: string
+  title?: string
+  title_ar?: string
+  subtitle?: string
+  subtitle_ar?: string
+  accentColor?: string
+}
+
+export default function DoctorsShowcase({ data, sectionContent }: { data?: any[], sectionContent?: SectionContent }) {
   const t = useTranslations('doctors')
   const locale = useLocale()
   const isAr = locale === 'ar'
   const [active, setActive] = useState<Doctor | null>(null)
+  const [videoDoctor, setVideoDoctor] = useState<Doctor | null>(null)
   const list = resolveDoctors(data, locale)
+  
+  const sectionAccent = sectionContent?.accentColor || '#006633'
 
   return (
     <section
       id="medecins"
       className="relative overflow-hidden bg-background py-16 sm:py-20 md:py-24"
     >
-      {/* Décor d'ambiance */}
-      <div className="pointer-events-none absolute -top-32 right-0 h-96 w-96 rounded-full bg-brand-green/15 blur-[130px]" />
-      <div className="pointer-events-none absolute -bottom-32 left-0 h-96 w-96 rounded-full bg-brand-gold/20 blur-[130px]" />
+      {/* Décor d'ambiance dynamique */}
+      <div 
+        className="pointer-events-none absolute -top-32 right-0 h-96 w-96 rounded-full blur-[130px]" 
+        style={{ backgroundColor: `${sectionAccent}26` }}
+      />
+      <div 
+        className="pointer-events-none absolute -bottom-32 left-0 h-96 w-96 rounded-full blur-[130px]" 
+        style={{ backgroundColor: `${sectionAccent}1A` }}
+      />
 
       <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* En-tête */}
         <AnimatedSection animation="fade" className="mb-14 text-center">
           <div className="animate-item">
-            <span className="mb-4 inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-4 py-2 text-sm font-semibold leading-normal text-primary">
+            <span 
+              className="mb-4 inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-semibold leading-normal"
+              style={{ 
+                color: sectionAccent, 
+                backgroundColor: `${sectionAccent}0D`, 
+                borderColor: `${sectionAccent}33` 
+              }}
+            >
               <Sparkles className="h-4 w-4" />
-              {t('badge')}
+              {isAr ? (sectionContent?.badge_ar || sectionContent?.badge || t('badge')) : (sectionContent?.badge || t('badge'))}
             </span>
             <h2 className="mb-4 text-3xl font-bold sm:text-4xl md:text-5xl">
               {locale === 'ar' ? (
                 <LineReveal className="text-gradient">
-                  {t('titleLine1')} <span className="text-foreground">{t('titleLine2')}</span>
+                  {sectionContent?.title_ar || sectionContent?.title ? (
+                    (sectionContent?.title_ar || sectionContent?.title) as string
+                  ) : (
+                    <>{t('titleLine1')} <span className="text-foreground">{t('titleLine2')}</span></>
+                  )}
                 </LineReveal>
               ) : (
                 <>
-                  <LineReveal className="text-gradient">{t('titleLine1')}</LineReveal>
-                  <br />
-                  <LineReveal className="text-foreground" delay={0.12}>{t('titleLine2')}</LineReveal>
+                  {sectionContent?.title ? (
+                    <LineReveal className="text-gradient">{sectionContent.title}</LineReveal>
+                  ) : (
+                    <>
+                      <LineReveal className="text-gradient">{t('titleLine1')}</LineReveal>
+                      <br />
+                      <LineReveal className="text-foreground" delay={0.12}>{t('titleLine2')}</LineReveal>
+                    </>
+                  )}
                 </>
               )}
             </h2>
             <p className="mx-auto max-w-2xl text-base text-muted-foreground sm:text-lg">
-              {t('subtitle')}
+              {isAr ? (sectionContent?.subtitle_ar || sectionContent?.subtitle || t('subtitle')) : (sectionContent?.subtitle || t('subtitle'))}
             </p>
           </div>
         </AnimatedSection>
@@ -382,7 +538,7 @@ export default function DoctorsShowcase({ data }: { data?: any[] }) {
                 key={doctor.id}
                 className="w-[85vw] shrink-0 snap-center sm:w-[calc(50%-0.75rem)] sm:shrink lg:w-[calc(33.333%-1rem)] xl:w-[calc(25%-1.125rem)]"
               >
-                <DoctorCard doctor={doctor} index={i} onOpen={setActive} />
+                <DoctorCard doctor={doctor} index={i} onOpen={setActive} onPlay={setVideoDoctor} sectionAccent={sectionAccent} />
               </div>
             ))}
           </div>
@@ -394,9 +550,14 @@ export default function DoctorsShowcase({ data }: { data?: any[] }) {
         </div>
       </div>
 
-      {/* Lightbox */}
+      {/* Lightbox affiche */}
       <AnimatePresence>
         {active && <PosterLightbox doctor={active} onClose={() => setActive(null)} />}
+      </AnimatePresence>
+
+      {/* Lightbox vidéo */}
+      <AnimatePresence>
+        {videoDoctor && <VideoLightbox doctor={videoDoctor} onClose={() => setVideoDoctor(null)} />}
       </AnimatePresence>
     </section>
   )

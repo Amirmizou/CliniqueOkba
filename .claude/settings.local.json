@@ -12,7 +12,19 @@
       "Bash(grep -nA10 \"CATEGORY_LABELS\" lib/news.ts)",
       "WebFetch(domain:github.com)",
       "Bash(node -e \"const a=require\\('./messages/fr.json'\\); console.log\\(JSON.stringify\\(a.hero,null,1\\)\\)\")",
-      "Bash(node -e \"const a=require\\('./messages/ar.json'\\); console.log\\(JSON.stringify\\(a.hero,null,1\\)\\)\")"
+      "Bash(node -e \"const a=require\\('./messages/ar.json'\\); console.log\\(JSON.stringify\\(a.hero,null,1\\)\\)\")",
+      "Bash(node _shoot.mjs \"C:/Users/CLINIQ~1/AppData/Local/Temp/claude/D--SiteWebOkba/61bfcbb9-f093-45f5-86b4-06aacab1dc4b/scratchpad/shots\")",
+      "Bash(rm -f \"C:/Users/CLINIQ~1/AppData/Local/Temp/claude/D--SiteWebOkba/61bfcbb9-f093-45f5-86b4-06aacab1dc4b/scratchpad/verify\"/home-*.png)",
+      "Bash(node _slice.mjs \"C:/Users/CLINIQ~1/AppData/Local/Temp/claude/D--SiteWebOkba/61bfcbb9-f093-45f5-86b4-06aacab1dc4b/scratchpad/verify\" \"home\")",
+      "Bash(curl -s http://localhost:3000/)",
+      "Bash(curl -s http://localhost:3000/ar)",
+      "Bash(node -e \"const fr=require\\('./messages/fr.json'\\),ar=require\\('./messages/ar.json'\\); console.log\\('fr.doctors.bookShort=',fr.doctors&&fr.doctors.bookShort\\); console.log\\('ar.doctors.bookShort=',ar.doctors&&ar.doctors.bookShort\\);\")",
+      "Bash(git -c core.quotepath=false status --short)",
+      "Bash(git -c core.quotepath=false diff --stat)",
+      "PowerShell(Get-CimInstance *)",
+      "PowerShell($c = Get-NetTCPConnection -LocalPort 3000 -State Listen -ErrorAction SilentlyContinue; if\\($c\\){ $c.OwningProcess | Select -Unique | %{ Stop-Process -Id $_ -Force -ErrorAction SilentlyContinue } }; \"stopped\")",
+      "Bash(git rev-list *)",
+      "PowerShell($c = Get-NetTCPConnection -LocalPort 3000 -State Listen -ErrorAction SilentlyContinue; if\\($c\\){ $c.OwningProcess | Select -Unique | %{ Stop-Process -Id $_ -Force -ErrorAction SilentlyContinue } }; Start-Sleep 2; \"free\")"
     ]
   }
 }

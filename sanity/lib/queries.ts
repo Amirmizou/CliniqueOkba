@@ -13,6 +13,7 @@ export const heroSlidesQuery = groq`
     subtitle,
     subtitle_ar,
     image,
+    "videoUrl": videoFile.asset->url,
     order
   }
 `
@@ -147,6 +148,7 @@ export const polesQuery = groq`
     items_ar,
     iconName,
     accentColor,
+    "imageUrl": image.asset->url,
     galleryCategories,
     "videos": videos[]{
       title,
@@ -296,6 +298,7 @@ export const articlesQuery = groq`
     title_ar,
     slug,
     excerpt,
+    excerpt_ar,
     image,
     category,
     author,
@@ -380,6 +383,8 @@ export const doctorsQuery = groq`
     bio_ar,
     experience,
     experience_ar,
+    customBadge,
+    customBadge_ar,
     services,
     services_ar,
     qualifications,
@@ -391,7 +396,8 @@ export const doctorsQuery = groq`
     consultationHours,
     consultationHours_ar,
     accentColor,
-    iconName
+    iconName,
+    videos
   }
 `
 
@@ -534,6 +540,7 @@ export const sectionContentQuery = groq`
     ctaText,
     ctaText_ar,
     ctaLink,
+    accentColor,
     "videoUrl": videoFile.asset->url,
     videoPoster
   }
@@ -553,6 +560,7 @@ export const allSectionContentsQuery = groq`
     ctaText,
     ctaText_ar,
     ctaLink,
+    accentColor,
     "videoUrl": videoFile.asset->url,
     videoPoster
   }
@@ -620,5 +628,17 @@ export const allPageSeoQuery = groq`
     metaDescription,
     ogImage,
     keywords
+  }
+`
+
+export const labResultsQuery = groq`
+  *[_type == "labResults"][0] {
+    ...,
+    precisionFeatures[] {
+        title, title_ar, desc, desc_ar, icon
+    },
+    qrSteps[] {
+        step, title, title_ar, desc, desc_ar
+    }
   }
 `

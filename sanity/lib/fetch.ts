@@ -29,6 +29,7 @@ import {
     footerContentQuery,
     pageSeoQuery,
     allPageSeoQuery,
+    labResultsQuery,
 } from './queries'
 
 // En développement : revalidation quasi immédiate (1 s) → les changements publiés
@@ -44,16 +45,31 @@ const shortCacheOptions = isDev
     ? { cache: 'no-store' as const }
     : { next: { revalidate: 60 } }
 
+/**
+ * Garde-fou réseau : si Sanity est injoignable (timeout, coupure, quota),
+ * on retourne un repli (`[]` ou `null`) au lieu de laisser l'exception
+ * remonter et faire planter toute la page. Les composants disposent déjà
+ * de données locales de secours — la dégradation reste gracieuse.
+ */
+async function safeFetch<T>(promise: Promise<T>, fallback: T): Promise<T> {
+    try {
+        return await promise
+    } catch (error) {
+        console.error('[sanity] fetch failed, using fallback:', (error as Error)?.message)
+        return fallback
+    }
+}
+
 // ==========================================
 // HERO & HOME
 // ==========================================
 
 export async function getHeroSlides() {
-    return client.fetch(heroSlidesQuery, {}, cacheOptions)
+    return safeFetch(client.fetch(heroSlidesQuery, {}, cacheOptions), [])
 }
 
 export async function getVideos() {
-    return client.fetch(videosQuery, {}, cacheOptions)
+    return safeFetch(client.fetch(videosQuery, {}, cacheOptions), [])
 }
 
 // ==========================================
@@ -61,7 +77,7 @@ export async function getVideos() {
 // ==========================================
 
 export async function getAboutSection() {
-    return client.fetch(aboutSectionQuery, {}, cacheOptions)
+    return safeFetch(client.fetch(aboutSectionQuery, {}, cacheOptions), null)
 }
 
 // ==========================================
@@ -69,15 +85,15 @@ export async function getAboutSection() {
 // ==========================================
 
 export async function getServices() {
-    return client.fetch(servicesQuery, {}, cacheOptions)
+    return safeFetch(client.fetch(servicesQuery, {}, cacheOptions), [])
 }
 
 export async function getFeaturedServices() {
-    return client.fetch(featuredServicesQuery, {}, cacheOptions)
+    return safeFetch(client.fetch(featuredServicesQuery, {}, cacheOptions), [])
 }
 
 export async function getServiceBySlug(slug: string) {
-    return client.fetch(serviceBySlugQuery, { slug }, cacheOptions)
+    return safeFetch(client.fetch(serviceBySlugQuery, { slug }, cacheOptions), null)
 }
 
 // ==========================================
@@ -85,7 +101,7 @@ export async function getServiceBySlug(slug: string) {
 // ==========================================
 
 export async function getEquipment() {
-    return client.fetch(equipmentQuery, {}, cacheOptions)
+    return safeFetch(client.fetch(equipmentQuery, {}, cacheOptions), [])
 }
 
 // ==========================================
@@ -93,11 +109,11 @@ export async function getEquipment() {
 // ==========================================
 
 export async function getSpecialties() {
-    return client.fetch(specialtiesQuery, {}, cacheOptions)
+    return safeFetch(client.fetch(specialtiesQuery, {}, cacheOptions), [])
 }
 
 export async function getPoles() {
-    return client.fetch(polesQuery, {}, cacheOptions)
+    return safeFetch(client.fetch(polesQuery, {}, cacheOptions), [])
 }
 
 // ==========================================
@@ -105,11 +121,11 @@ export async function getPoles() {
 // ==========================================
 
 export async function getTestimonials() {
-    return client.fetch(testimonialsQuery, {}, shortCacheOptions)
+    return safeFetch(client.fetch(testimonialsQuery, {}, shortCacheOptions), [])
 }
 
 export async function getFeaturedTestimonials() {
-    return client.fetch(featuredTestimonialsQuery, {}, shortCacheOptions)
+    return safeFetch(client.fetch(featuredTestimonialsQuery, {}, shortCacheOptions), [])
 }
 
 // ==========================================
@@ -117,7 +133,7 @@ export async function getFeaturedTestimonials() {
 // ==========================================
 
 export async function getHomeCare() {
-    return client.fetch(homeCareQuery, {}, cacheOptions)
+    return safeFetch(client.fetch(homeCareQuery, {}, cacheOptions), null)
 }
 
 // ==========================================
@@ -125,11 +141,11 @@ export async function getHomeCare() {
 // ==========================================
 
 export async function getGallery() {
-    return client.fetch(galleryQuery, {}, cacheOptions)
+    return safeFetch(client.fetch(galleryQuery, {}, cacheOptions), [])
 }
 
 export async function getFacilityPhotos() {
-    return client.fetch(facilityPhotosQuery, {}, cacheOptions)
+    return safeFetch(client.fetch(facilityPhotosQuery, {}, cacheOptions), [])
 }
 
 // ==========================================
@@ -137,11 +153,11 @@ export async function getFacilityPhotos() {
 // ==========================================
 
 export async function getArticles() {
-    return client.fetch(articlesQuery, {}, shortCacheOptions)
+    return safeFetch(client.fetch(articlesQuery, {}, shortCacheOptions), [])
 }
 
 export async function getArticleBySlug(slug: string) {
-    return client.fetch(articleBySlugQuery, { slug }, cacheOptions)
+    return safeFetch(client.fetch(articleBySlugQuery, { slug }, cacheOptions), null)
 }
 
 // ==========================================
@@ -149,11 +165,11 @@ export async function getArticleBySlug(slug: string) {
 // ==========================================
 
 export async function getEvents() {
-    return client.fetch(eventsQuery, {}, shortCacheOptions)
+    return safeFetch(client.fetch(eventsQuery, {}, shortCacheOptions), [])
 }
 
 export async function getEventBySlug(slug: string) {
-    return client.fetch(eventBySlugQuery, { slug }, cacheOptions)
+    return safeFetch(client.fetch(eventBySlugQuery, { slug }, cacheOptions), null)
 }
 
 // ==========================================
@@ -161,11 +177,11 @@ export async function getEventBySlug(slug: string) {
 // ==========================================
 
 export async function getDoctors() {
-    return client.fetch(doctorsQuery, {}, cacheOptions)
+    return safeFetch(client.fetch(doctorsQuery, {}, cacheOptions), [])
 }
 
 export async function getDoctorBySlug(slug: string) {
-    return client.fetch(doctorBySlugQuery, { slug }, cacheOptions)
+    return safeFetch(client.fetch(doctorBySlugQuery, { slug }, cacheOptions), null)
 }
 
 // ==========================================
@@ -173,7 +189,7 @@ export async function getDoctorBySlug(slug: string) {
 // ==========================================
 
 export async function getFaq() {
-    return client.fetch(faqQuery, {}, cacheOptions)
+    return safeFetch(client.fetch(faqQuery, {}, cacheOptions), [])
 }
 
 // ==========================================
@@ -181,7 +197,7 @@ export async function getFaq() {
 // ==========================================
 
 export async function getInsuranceSection() {
-    return client.fetch(insuranceSectionQuery, {}, cacheOptions)
+    return safeFetch(client.fetch(insuranceSectionQuery, {}, cacheOptions), null)
 }
 
 // ==========================================
@@ -190,7 +206,7 @@ export async function getInsuranceSection() {
 
 export async function getSiteSettings() {
     // Config du site (numéros, WhatsApp…) : cache court pour refléter vite les changements
-    return client.fetch(siteSettingsQuery, {}, shortCacheOptions)
+    return safeFetch(client.fetch(siteSettingsQuery, {}, shortCacheOptions), null)
 }
 
 // ==========================================
@@ -198,11 +214,11 @@ export async function getSiteSettings() {
 // ==========================================
 
 export async function getSectionContent(sectionId: string) {
-    return client.fetch(sectionContentQuery, { sectionId }, cacheOptions)
+    return safeFetch(client.fetch(sectionContentQuery, { sectionId }, cacheOptions), null)
 }
 
 export async function getAllSectionContents() {
-    return client.fetch(allSectionContentsQuery, {}, cacheOptions)
+    return safeFetch(client.fetch(allSectionContentsQuery, {}, cacheOptions), [])
 }
 
 // ==========================================
@@ -210,7 +226,7 @@ export async function getAllSectionContents() {
 // ==========================================
 
 export async function getFooterContent() {
-    return client.fetch(footerContentQuery, {}, cacheOptions)
+    return safeFetch(client.fetch(footerContentQuery, {}, cacheOptions), null)
 }
 
 // ==========================================
@@ -218,11 +234,11 @@ export async function getFooterContent() {
 // ==========================================
 
 export async function getPageSeo(page: string) {
-    return client.fetch(pageSeoQuery, { page }, cacheOptions)
+    return safeFetch(client.fetch(pageSeoQuery, { page }, cacheOptions), null)
 }
 
 export async function getAllPageSeo() {
-    return client.fetch(allPageSeoQuery, {}, cacheOptions)
+    return safeFetch(client.fetch(allPageSeoQuery, {}, cacheOptions), [])
 }
 
 // ==========================================
@@ -266,4 +282,12 @@ export async function getHomePageData() {
         homeCare,
         sectionContents,
     }
+}
+
+// ==========================================
+// LABORATOIRE
+// ==========================================
+
+export async function getLabResults() {
+    return safeFetch(client.fetch(labResultsQuery, {}, cacheOptions), null)
 }

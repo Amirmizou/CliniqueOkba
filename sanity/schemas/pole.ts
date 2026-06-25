@@ -92,6 +92,13 @@ export default defineType({
             initialValue: '#006633',
         }),
         defineField({
+            name: 'image',
+            title: 'Photo de la carte (optionnel)',
+            type: 'image',
+            description: 'Photo affichée en fond sur la carte du pôle. Si vide, une image par défaut est utilisée.',
+            options: { hotspot: true },
+        }),
+        defineField({
             name: 'galleryCategories',
             title: 'Catégories de photos (page dédiée)',
             type: 'array',

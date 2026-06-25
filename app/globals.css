@@ -213,6 +213,16 @@
   [dir="rtl"] .font-display {
     font-family: var(--font-montserrat-arabic), system-ui, sans-serif;
   }
+
+  /* --- Surcharge pour l'interface d'administration --- */
+  /* Supprimer la police Lemon Milk (affichage) dans le back-office */
+  .admin-panel {
+    --font-heading: var(--font-base);
+  }
+  .admin-panel h1, .admin-panel h2, .admin-panel h3, .admin-panel h4, .admin-panel h5, .admin-panel h6, .admin-panel .font-display {
+    font-family: var(--font-base);
+    letter-spacing: normal;
+  }
 }
 
 /* ==========================================================================
@@ -387,6 +397,53 @@ html {
 .focus-ring:focus-visible {
   outline: 3px solid oklch(0.48 0.16 145);
   outline-offset: 3px;
+}
+
+/* ============================================================
+   Navbar signature « IRM / Onde médicale »
+   Effets GPU-friendly (transform / opacity / stroke-dashoffset)
+   ============================================================ */
+
+/* Balayage scanner : un halo fin traverse la barre de gauche à droite */
+@keyframes irm-scan {
+  0%   { transform: translateX(-130%); }
+  100% { transform: translateX(130%); }
+}
+
+/* Tracé ECG/onde qui défile en pointillé (très subtil) */
+@keyframes irm-trace {
+  to { stroke-dashoffset: -340; }
+}
+
+/* Impulsion lumineuse au survol d'un lien */
+@keyframes irm-pulse {
+  0%   { opacity: 0.5; transform: scale(0.5); }
+  70%  { opacity: 0;   transform: scale(2.1); }
+  100% { opacity: 0;   transform: scale(2.1); }
+}
+
+.irm-scan {
+  animation: irm-scan 6.5s cubic-bezier(0.45, 0, 0.55, 1) infinite;
+  will-change: transform;
+}
+
+.irm-trace {
+  stroke-dasharray: 4 9;
+  animation: irm-trace 11s linear infinite;
+  will-change: stroke-dashoffset;
+}
+
+.irm-pulse {
+  animation: irm-pulse 1.05s ease-out forwards;
+  will-change: transform, opacity;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .irm-scan,
+  .irm-trace,
+  .irm-pulse {
+    animation: none !important;
+  }
 }
 
 /* Loading animations */

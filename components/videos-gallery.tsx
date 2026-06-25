@@ -16,10 +16,7 @@ import { urlFor } from '@/sanity/lib/image'
 import { useReducedMotion } from '@/hooks/use-reduced-motion'
 import { AnimatedSection } from '@/components/ui/animated-section'
 import { LineReveal } from '@/components/ui/reveal-text'
-import dynamic from 'next/dynamic'
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const ReactPlayer = dynamic(() => import('react-player') as any, { ssr: false }) as any
+import { UniversalPlayer } from '@/components/ui/universal-player'
 
 const EASE = [0.22, 1, 0.36, 1] as const
 
@@ -124,7 +121,7 @@ export default function VideosGallery({ data }: { data?: VideoItem[] }) {
                     : 'bg-muted text-muted-foreground hover:bg-muted/80 hover:text-foreground'
                 }`}
               >
-                {t(`categories.${cat}`)}
+                {t.has(`categories.${cat}`) ? t(`categories.${cat}`) : cat}
               </button>
             ))}
           </div>
@@ -156,16 +153,13 @@ export default function VideosGallery({ data }: { data?: VideoItem[] }) {
                 className="relative aspect-video w-full"
               >
                 {isPlaying ? (
-                  <div className="h-full w-full bg-black">
-                    <ReactPlayer
-                      url={active.videoUrl}
-                      playing
-                      controls
-                      width="100%"
-                      height="100%"
-                      onEnded={() => setIsPlaying(false)}
-                    />
-                  </div>
+                  <UniversalPlayer
+                    url={active.videoUrl!}
+                    playing={true}
+                    controls={true}
+                    className="h-full w-full object-contain bg-black"
+                    onEnded={() => setIsPlaying(false)}
+                  />
                 ) : (
                   <button
                     type="button"

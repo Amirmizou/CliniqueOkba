@@ -11,7 +11,7 @@ import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { PortableText } from '@portabletext/react'
 import ScrollAnimation from '@/components/ui/scroll-animation'
-import { getTranslations } from 'next-intl/server'
+import { getTranslations, setRequestLocale } from 'next-intl/server'
 
 interface Article {
     _id: string
@@ -80,6 +80,7 @@ const portableTextComponents = {
 
 export default async function ArticlePage({ params }: { params: Promise<{ slug: string; locale: string }> }) {
     const { slug, locale } = await params
+    setRequestLocale(locale)
     const article: Article = localizeSanityData(await getArticleBySlug(slug), locale)
 
     if (!article) {
@@ -93,7 +94,7 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
     return (
         <>
             <SiteHeader siteSettings={siteSettings} />
-            <main className="min-h-screen pt-24">
+            <main className="min-h-screen pt-8">
                 <article className="py-16">
                     <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
                         <ScrollAnimation variant="fadeUp">

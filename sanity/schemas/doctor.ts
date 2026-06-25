@@ -28,7 +28,7 @@ export default defineType({
         }),
         defineField({
             name: 'specialty',
-            title: 'Spécialité (FR)',
+            title: 'Spécialité / Badge Principal (FR)',
             type: 'string',
             validation: (Rule) => Rule.required(),
         }),
@@ -70,9 +70,9 @@ export default defineType({
         }),
         defineField({
             name: 'experience',
-            title: 'Expérience (FR)',
+            title: 'Expérience / Badge Ancienneté (FR)',
             type: 'string',
-            description: 'Ex : « Plus de 25 ans d’expérience » (optionnel)',
+            description: 'Badge affiché sur la photo. Ex : « Plus de 25 ans d’expérience » (optionnel)',
         }),
         defineField({
             name: 'experience_ar',
@@ -81,16 +81,35 @@ export default defineType({
         }),
         defineField({
             name: 'services',
-            title: 'Prestations / actes (FR)',
+            title: 'Prestations / Actes (Petits badges sous la photo) (FR)',
             type: 'array',
             of: [{ type: 'string' }],
-            description: 'Liste des prestations affichées sur la carte',
+            description: 'Liste des prestations, affichées comme des petits badges (tags) sur la carte',
         }),
         defineField({
             name: 'services_ar',
-            title: 'Prestations / actes (AR)',
+            title: 'Prestations / Actes (AR)',
             type: 'array',
             of: [{ type: 'string' }],
+        }),
+        defineField({
+            name: 'customBadge',
+            title: 'Badge personnalisé (Nouveau, En congé...) (FR)',
+            type: 'string',
+            description: 'Un badge supplémentaire libre qui s’affichera sur la photo (optionnel).',
+        }),
+        defineField({
+            name: 'customBadge_ar',
+            title: 'Badge personnalisé (AR)',
+            type: 'string',
+        }),
+        defineField({
+            name: 'videos',
+            title: 'Vidéos (liens)',
+            type: 'array',
+            of: [{ type: 'url' }],
+            description:
+                'Liens de présentation du médecin (YouTube, Facebook ou MP4). Affichés dans une fenêtre vidéo sur la carte.',
         }),
         defineField({
             name: 'consultationHours',

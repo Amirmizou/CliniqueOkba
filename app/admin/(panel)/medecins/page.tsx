@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { ArrowLeft, Loader2, Plus, Save, Trash2, Eye, EyeOff } from 'lucide-react'
-import { Text, Lines, ImagePicker, useToast } from '@/components/admin/ui'
+import { Text, Lines, ImagePicker, Field, useToast } from '@/components/admin/ui'
 import { LogoBadgeSpinner } from '@/components/ui/logo-badge'
 
 interface Doctor {
@@ -17,6 +17,8 @@ interface Doctor {
   subtitle_ar?: string
   services?: string[]
   services_ar?: string[]
+  videos?: string[]
+  accentColor?: string
   consultationDays?: string
   consultationDays_ar?: string
   consultationHours?: string
@@ -142,6 +144,33 @@ export default function MedecinsEditor() {
                     <Lines label="Prestations (FR)" value={d.services || []} onChange={(v) => upd(i, { services: v })} />
                     <Lines label="الخدمات (AR)" rtl value={d.services_ar || []} onChange={(v) => upd(i, { services_ar: v })} />
                   </div>
+
+                  {/* Couleur d'accent + vidéos */}
+                  <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                    <Field label="Couleur d'accent (carte, badges, boutons)">
+                      <div className="flex items-center gap-2">
+                        <input
+                          type="color"
+                          value={d.accentColor || '#006633'}
+                          onChange={(e) => upd(i, { accentColor: e.target.value })}
+                          className="h-9 w-12 shrink-0 cursor-pointer rounded-lg border border-slate-300 bg-white p-0.5 dark:border-slate-700 dark:bg-slate-800"
+                          aria-label="Sélecteur de couleur"
+                        />
+                        <Text
+                          value={d.accentColor || ''}
+                          onChange={(v) => upd(i, { accentColor: v })}
+                          placeholder="#006633"
+                          className="flex-1"
+                        />
+                      </div>
+                    </Field>
+                    <Lines
+                      label="Vidéos (un lien par ligne — YouTube, Facebook, MP4)"
+                      value={d.videos || []}
+                      onChange={(v) => upd(i, { videos: v })}
+                    />
+                  </div>
+
                   <div className="flex justify-end">
                     <button onClick={() => save(i)} disabled={d._saving || !d._dirty} className="inline-flex items-center gap-2 rounded-lg bg-emerald-600 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-700 disabled:opacity-40">
                       {d._saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}

@@ -10,7 +10,7 @@ import { Calendar, ArrowRight, Newspaper, User } from 'lucide-react'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import ScrollAnimation from '@/components/ui/scroll-animation'
-import { getTranslations } from 'next-intl/server'
+import { getTranslations, setRequestLocale } from 'next-intl/server'
 
 interface Article {
     _id: string
@@ -132,12 +132,13 @@ export default async function ActualitesPage({
     params: Promise<{ locale: string }>
 }) {
     const { locale } = await params
+    setRequestLocale(locale)
     const t = await getTranslations('news')
     const siteSettings = localizeSanityData(await getSiteSettings(), locale)
     return (
         <>
             <SiteHeader siteSettings={siteSettings} />
-            <main className="min-h-screen pt-24">
+            <main className="min-h-screen pt-8">
                 <section className="py-16 md:py-24">
                     <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                         <ScrollAnimation variant="fadeUp" className="text-center mb-16">

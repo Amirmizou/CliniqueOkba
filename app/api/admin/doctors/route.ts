@@ -19,7 +19,7 @@ export async function GET() {
   if (!(await isAuthenticated())) return NextResponse.json({ error: 'Non autorisé' }, { status: 401 })
   const doctors = await writeClient.fetch(
     `*[_type == "doctor"] | order(order asc) {
-      _id, ${STR.join(', ')}, services, services_ar, order, active,
+      _id, ${STR.join(', ')}, services, services_ar, videos, order, active,
       "imageUrl": image.asset->url, "imageAssetId": image.asset->_id
     }`,
   )
@@ -34,6 +34,7 @@ export async function POST(request: Request) {
       _type: 'doctor',
       services: Array.isArray(b.services) ? b.services.filter(Boolean) : [],
       services_ar: Array.isArray(b.services_ar) ? b.services_ar.filter(Boolean) : [],
+      videos: Array.isArray(b.videos) ? b.videos.filter(Boolean) : [],
       order: typeof b.order === 'number' ? b.order : 0,
       active: b.active !== false,
     }
@@ -53,9 +54,9 @@ export async function POST(request: Request) {
     }
     revalidateSite()
     return NextResponse.json({ ok: true, doctor: result })
-  } catch (e) {
+  } catch (e: any) {
     console.error('Erreur sauvegarde médecin:', e)
-    return NextResponse.json({ error: 'Échec de la sauvegarde' }, { status: 500 })
+    return NextResponse.json({ error: e.message || 'Échec de la sauvegarde' }, { status: 500 })
   }
 }
 

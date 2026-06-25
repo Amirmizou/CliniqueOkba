@@ -5,12 +5,14 @@ import PolePageContent, {
     type PolePhoto,
     type PolePageData,
 } from '@/components/pole-page-content'
-import { getSiteSettings, getPoles, getFacilityPhotos, getEquipment } from '@/sanity/lib/fetch'
+import LabResults from '@/components/lab-results'
+import { getSiteSettings, getPoles, getFacilityPhotos, getEquipment, getLabResults } from '@/sanity/lib/fetch'
 import { setRequestLocale } from 'next-intl/server'
 import { localizeSanityData } from '@/sanity/lib/localize'
 import { urlFor } from '@/sanity/lib/image'
 import { poles as localPoles, getPoleBySlug, CLINIC_PHONE } from '@/data/poles'
 import { equipements } from '@/data/equipements'
+import { imagingEquipment } from '@/data/imaging-equipment'
 
 export const revalidate = 3600
 
@@ -97,9 +99,10 @@ function resolvePole(slug: string, locale: string, sanityPoles?: any[]) {
         accent: sanity?.accentColor || local?.accent || '#006633',
         badge,
         urgent: sanity?.urgent ?? local?.urgent ?? false,
-        videos: Array.isArray(sanity?.videos)
+        aiBoosted: sanity?.aiBoosted ?? local?.aiBoosted ?? false,
+        videos: Array.isArray(sanity?.videos) && sanity.videos.length > 0
             ? sanity.videos.filter((v: any) => v?.videoUrl)
-            : undefined,
+            : local?.videos,
     }
     const categories: string[] =
         sanity?.galleryCategories && sanity.galleryCategories.length > 0
@@ -135,11 +138,12 @@ export default async function PolePage({
     const { slug, locale } = await params
     setRequestLocale(locale)
 
-    const [siteSettingsRaw, sanityPolesRaw, facilityPhotosRaw, equipmentsRaw] = await Promise.all([
+    const [siteSettingsRaw, sanityPolesRaw, facilityPhotosRaw, equipmentsRaw, labResultsRaw] = await Promise.all([
         getSiteSettings(),
         getPoles(),
         getFacilityPhotos(),
         getEquipment(),
+        slug === 'laboratoire' ? getLabResults() : Promise.resolve(null),
     ])
 
     // Localisation FR/AR du contenu Sanity (repli sur le français)
@@ -147,6 +151,7 @@ export default async function PolePage({
     const sanityPoles = localizeSanityData(sanityPolesRaw, locale)
     const facilityPhotos = localizeSanityData(facilityPhotosRaw, locale)
     const equipments = localizeSanityData(equipmentsRaw, locale)
+    const labResults = localizeSanityData(labResultsRaw, locale)
 
     const resolved = resolvePole(slug, locale, sanityPoles)
     if (!resolved) notFound()
@@ -165,19 +170,26 @@ export default async function PolePage({
             'urgences': 'facility'
         }
         const mappedCat = catMap[slug]
-        poleEquipments = equipments?.filter((eq: any) => eq.category === mappedCat) || []
+        poleEquipments = equipments?.filter((eq: any) => eq.category === mappedCat || (slug === 'laboratoire' && eq.category === 'laboratoire')) || []
+    }
+
+    // Repli local documenté (plateforme Siemens Healthineers) si aucun équipement
+    // n'est encore renseigné dans Sanity pour ce pôle (imagerie & médecine nucléaire).
+    if (poleEquipments.length === 0 && imagingEquipment[slug]) {
+        poleEquipments = localizeSanityData(imagingEquipment[slug], locale)
     }
 
     return (
         <>
             <SiteHeader siteSettings={siteSettings} />
-            <main className="min-h-screen pt-20">
+            <main className="min-h-screen pt-8">
                 <PolePageContent 
                     pole={resolved.pole} 
                     photos={photos} 
                     phone={phone} 
                     equipments={poleEquipments}
                 />
+                {slug === 'laboratoire' && <LabResults locale={locale} data={labResults} />}
             </main>
             <SiteFooter siteSettings={siteSettings} />
         </>

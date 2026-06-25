@@ -18,11 +18,28 @@ function Icon({ name, className }: { name: string; className?: string }) {
 export default function AdminShell({ children }: { children: ReactNode }) {
   const pathname = usePathname()
   const [open, setOpen] = useState(false)
+  const [q, setQ] = useState('')
+
+  const query = q.trim().toLowerCase()
+  const matches = (s: (typeof adminSections)[number]) =>
+    !query || s.label.toLowerCase().includes(query) || s.description.toLowerCase().includes(query)
 
   const NavLinks = () => (
     <nav className="flex flex-col gap-6">
+      {/* Recherche rapide */}
+      <div className="relative">
+        <Icons.Search className="pointer-events-none absolute start-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+        <input
+          type="search"
+          value={q}
+          onChange={(e) => setQ(e.target.value)}
+          placeholder="Rechercher…"
+          aria-label="Rechercher une section"
+          className="w-full rounded-lg border border-slate-200 bg-slate-50 py-2 ps-8 pe-3 text-sm text-slate-700 outline-none transition focus:border-emerald-500 focus:bg-white focus:ring-2 focus:ring-emerald-500/20 dark:border-slate-700 dark:bg-slate-800 dark:text-white"
+        />
+      </div>
       {GROUPS.map((group) => {
-        const items = adminSections.filter((s) => s.group === group)
+        const items = adminSections.filter((s) => s.group === group && matches(s))
         if (items.length === 0) return null
         return (
           <div key={group}>

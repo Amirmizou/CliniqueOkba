@@ -99,6 +99,12 @@ export default defineType({
             type: 'image',
             options: { hotspot: true },
         }),
+        defineField({
+            name: 'accentColor',
+            title: 'Couleur Principale / Bouton',
+            type: 'string',
+            description: 'Code couleur HEX (ex: #006633). Permet d\'unifier la couleur des boutons de la section.',
+        }),
     ],
     preview: {
         select: { title: 'sectionId', subtitle: 'title' },
