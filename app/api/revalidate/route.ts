@@ -12,12 +12,14 @@ import { revalidatePath } from 'next/cache'
  *   1. Définir SANITY_REVALIDATE_SECRET dans .env ET dans les variables
  *      d'environnement Hostinger (une chaîne secrète au choix).
  *   2. Sanity → manage.sanity.io → API → Webhooks → Create webhook :
- *        - URL    : https://cliniqueokba.com/api/revalidate?secret=LE_SECRET
- *        - Dataset: production
- *        - Trigger: Create, Update, Delete
- *        - HTTP method: POST
+ *        - URL         : https://cliniqueokba.com/api/revalidate
+ *        - Dataset     : production
+ *        - Trigger     : Create, Update, Delete
+ *        - HTTP method : POST
+ *        - Headers     : x-revalidate-secret: LE_SECRET   ← préféré (n'apparaît pas dans les logs)
+ *          (Alternative dépréciée : ?secret=LE_SECRET dans l'URL)
  *
- * Test manuel : POST https://cliniqueokba.com/api/revalidate?secret=LE_SECRET
+ * Test manuel : POST https://cliniqueokba.com/api/revalidate -H "x-revalidate-secret: LE_SECRET"
  */
 
 export const dynamic = 'force-dynamic'

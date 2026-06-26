@@ -2,10 +2,14 @@ import { NextResponse } from 'next/server'
 import fs from 'fs/promises'
 import path from 'path'
 import { revalidateAllPages } from '@/lib/revalidate'
+import { isAuthenticated } from '@/lib/admin/api'
 
 const dataPath = path.join(process.cwd(), 'data', 'clinic.json')
 
 export async function GET() {
+    if (!(await isAuthenticated())) {
+        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
     try {
         const fileContent = await fs.readFile(dataPath, 'utf-8')
         const data = JSON.parse(fileContent)
@@ -16,6 +20,9 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
+    if (!(await isAuthenticated())) {
+        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
     try {
         const fileContent = await fs.readFile(dataPath, 'utf-8')
         const data = JSON.parse(fileContent)
@@ -43,6 +50,9 @@ export async function POST(request: Request) {
 }
 
 export async function PUT(request: Request) {
+    if (!(await isAuthenticated())) {
+        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
     try {
         const fileContent = await fs.readFile(dataPath, 'utf-8')
         const data = JSON.parse(fileContent)
@@ -63,6 +73,9 @@ export async function PUT(request: Request) {
 }
 
 export async function DELETE(request: Request) {
+    if (!(await isAuthenticated())) {
+        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
     try {
         const { searchParams } = new URL(request.url)
         const id = searchParams.get('id')

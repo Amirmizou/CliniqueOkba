@@ -2,10 +2,14 @@ import { NextResponse } from 'next/server'
 import { client } from '@/sanity/lib/client'
 import { equipmentQuery, siteSettingsQuery, galleryQuery } from '@/sanity/lib/queries'
 import { urlFor } from '@/sanity/lib/image'
+import { isAuthenticated } from '@/lib/admin/api'
 
 export const revalidate = 60 // Revalidate every 60 seconds
 
 export async function GET() {
+    if (!(await isAuthenticated())) {
+        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
     try {
         // Fetch all data from Sanity
         const [equipment, siteSettings, gallery] = await Promise.all([

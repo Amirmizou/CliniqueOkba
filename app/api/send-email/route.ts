@@ -68,12 +68,12 @@ export async function POST(request: Request) {
 
     if (error) {
       console.error('Resend email error:', error);
-      return NextResponse.json({ error }, { status: 400 });
+      return NextResponse.json({ error: 'Failed to send email' }, { status: 500 });
     }
 
-    return NextResponse.json(data);
+    return NextResponse.json({ success: true });
   } catch (error) {
     console.error('API route error:', error);
-    return NextResponse.json({ message: 'Internal Server Error', error }, { status: 500 });
+    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
   }
 }
