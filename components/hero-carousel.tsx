@@ -180,7 +180,7 @@ export default function HeroCarousel({ slides: rawSlides = [], siteSettings, sec
         <section
             ref={heroRef}
             id="home"
-            className="relative flex min-h-[58dvh] lg:min-h-[62dvh] flex-col overflow-hidden"
+            className="relative flex min-h-[78dvh] sm:min-h-[58dvh] lg:min-h-[62dvh] flex-col overflow-hidden"
             onMouseEnter={() => setIsAutoPlaying(false)}
             onMouseLeave={() => setIsAutoPlaying(true)}
             // Accessibilité clavier : suspendre le défilement auto quand un
@@ -240,9 +240,10 @@ export default function HeroCarousel({ slides: rawSlides = [], siteSettings, sec
                     </motion.div>
                 </AnimatePresence>
 
-                {/* Scrim de lisibilité — gradient latéral doux côté contenu, vignette basse légère */}
-                <div className="absolute inset-0 bg-gradient-to-r from-slate-900/55 via-slate-900/20 to-transparent" />
-                <div className="absolute inset-0 bg-gradient-to-t from-slate-900/35 via-transparent to-transparent" />
+                {/* Scrim de lisibilité — gradient latéral côté contenu, vignette basse.
+                    Plus marqué sur mobile (contenu pleine largeur sur ciel clair). */}
+                <div className="absolute inset-0 bg-gradient-to-r from-slate-900/70 via-slate-900/35 to-slate-900/10 sm:from-slate-900/55 sm:via-slate-900/20 sm:to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-t from-slate-900/45 via-transparent to-slate-900/20 sm:from-slate-900/35 sm:to-transparent" />
                 {/* Fondu bas vers le fond (transition vers la vague) */}
                 <div className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-background to-transparent" />
 
@@ -269,13 +270,13 @@ export default function HeroCarousel({ slides: rawSlides = [], siteSettings, sec
             {/* ---------------------------------------------------------- */}
             <motion.div
                 style={prefersReducedMotion ? undefined : { y: yContent, opacity: contentOpacity }}
-                className="relative z-20 mx-auto flex w-full max-w-7xl flex-1 items-center px-4 pt-10 pb-16 sm:px-6 lg:px-8"
+                className="relative z-20 mx-auto flex w-full max-w-7xl flex-1 items-center px-4 pt-10 pb-28 sm:px-6 sm:pb-16 lg:px-8"
             >
                 <div className="grid w-full items-center gap-10 lg:grid-cols-12">
                     {/* Colonne texte */}
                     <div className="lg:col-span-7">
-                        {/* Logo animé (motion graphic) */}
-                        <AnimatedLogo className="mb-6" size={96} />
+                        {/* Logo animé (motion graphic) — masqué sur mobile (déjà présent dans le header) */}
+                        <AnimatedLogo className="mb-6 hidden sm:block" size={96} />
 
                         {/* Badge (fixe) */}
                         <motion.div
@@ -313,8 +314,8 @@ export default function HeroCarousel({ slides: rawSlides = [], siteSettings, sec
                                         animate={{ opacity: 1, y: 0 }}
                                         exit={{ opacity: 0, y: -10 }}
                                         transition={{ duration: 0.5, ease: EASE_OUT }}
-                                        style={{ textShadow: '0 1px 14px rgba(0,0,0,0.55)' }}
-                                        className="text-base font-light leading-relaxed text-white/90 sm:text-lg"
+                                        style={{ textShadow: '0 2px 16px rgba(0,0,0,0.75), 0 1px 3px rgba(0,0,0,0.6)' }}
+                                        className="text-base font-normal leading-relaxed text-white sm:text-lg"
                                     >
                                         {slideLine}
                                     </motion.p>
@@ -430,7 +431,7 @@ export default function HeroCarousel({ slides: rawSlides = [], siteSettings, sec
 
             {/* Indicateurs mobiles (en bas) */}
             {slides.length > 1 && (
-                <div className="absolute bottom-28 left-1/2 z-30 -translate-x-1/2 md:hidden">
+                <div className="absolute bottom-10 left-1/2 z-30 -translate-x-1/2 md:hidden">
                     <div className="flex items-center gap-1 rounded-full border border-white/10 bg-black/30 px-3 py-2 backdrop-blur-md">
                         {/* Bouton pause/play (WCAG 2.2.2) */}
                         <button

@@ -312,189 +312,56 @@ export default function Header({ siteSettings, poles }: HeaderProps) {
           </div>
         </div>
 
-        {/* ─── MOBILE GANTRY SCANNER (xl:hidden) — Siemens Symbia ~0.55× ─── */}
-        <div className="relative w-full max-w-7xl h-[76px] xl:hidden" style={{ overflow: 'visible' }}>
-
-          {/* Pill — fond visible, overflow:hidden pour que les décos restent dans la pilule */}
-          <div className="absolute inset-0 rounded-2xl overflow-hidden bg-white/97 backdrop-blur-md shadow-[0_8px_30px_rgb(0,0,0,0.10)] border border-gray-100/80 dark:bg-slate-900/97 dark:border-white/8">
-            {/* Trame de points (côté gauche seulement, le gantry occupe le côté droit) */}
-            <div className="absolute inset-0 text-[#006633]" style={{
+        {/* ─── EN-TÊTE MOBILE (xl:hidden) — clair, lisible, identité médicale ─── */}
+        <div className="relative w-full max-w-7xl xl:hidden">
+          <div className="relative flex items-center gap-2.5 overflow-hidden rounded-2xl border border-gray-100/80 bg-white/97 px-3 py-2.5 shadow-[0_8px_30px_rgb(0,0,0,0.10)] backdrop-blur-md dark:border-white/10 dark:bg-slate-900/97">
+            {/* Trame de points subtile (gauche) */}
+            <div aria-hidden="true" className="pointer-events-none absolute inset-0 text-[#006633]" style={{
               backgroundImage: 'radial-gradient(currentColor 1px, transparent 1px)',
               backgroundSize: '14px 14px',
               opacity: 0.04,
-              WebkitMaskImage: 'linear-gradient(90deg, #000 0%, transparent 55%)',
-              maskImage: 'linear-gradient(90deg, #000 0%, transparent 55%)',
+              WebkitMaskImage: 'linear-gradient(90deg, #000 0%, transparent 62%)',
+              maskImage: 'linear-gradient(90deg, #000 0%, transparent 62%)',
             }} />
-            {/* ECG fine */}
-            <svg className="absolute bottom-2 left-0 h-4 w-full text-[#006633]/10" viewBox="0 0 400 24" preserveAspectRatio="none" fill="none">
-              <path d="M0 12 H100 l6 -8 l5 16 l5 -11 l4 3 H180 l7 -5 l5 10 l4 -5 H280 l6 -7 l5 14 l5 -10 l4 3 H400" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
-            {/* Gradient accent bar — signature marque */}
-            <div className="absolute bottom-0 left-6 right-6 h-[2px] rounded-full" style={{
+            {/* Barre signature en bas */}
+            <div aria-hidden="true" className="pointer-events-none absolute bottom-0 left-4 right-4 h-[2px] rounded-full" style={{
               background: 'linear-gradient(90deg, transparent, #006633 18%, #4caf6e 48%, #FDE68A 68%, #006633 88%, transparent)',
             }} />
-          </div>
 
-          {/* ═══ BASE / SOCLE ═══ */}
-          <div className="absolute z-0 pointer-events-none" style={{
-            right: '4px', bottom: '0px', width: '94px', height: '9px',
-            borderRadius: '0 0 5px 5px',
-            background: 'linear-gradient(180deg, #c8c8c8 0%, #a0a0a0 100%)',
-            boxShadow: '0 3px 8px rgba(0,0,0,0.25)',
-          }} />
-
-          {/* ═══ EXTENSION DROITE (profondeur) ═══ */}
-          <div className="absolute z-[8] pointer-events-none" style={{
-            right: '2px', bottom: '7px', width: '30px', height: '64px',
-            borderRadius: '0 14px 5px 0',
-            background: 'linear-gradient(90deg, #e8e8e8 0%, #d8d8d8 60%, #c5c5c5 100%)',
-            boxShadow: '3px 3px 8px rgba(0,0,0,0.12), inset -1px 0 4px rgba(0,0,0,0.06)',
-          }} />
-
-          {/* ═══ OMBRE DE CONTACT ═══ */}
-          <div aria-hidden="true" className="absolute z-[2] pointer-events-none" style={{
-            right: '13px', bottom: '-3px', width: '73px', height: '12px',
-            borderRadius: '50%',
-            background: 'radial-gradient(closest-side, rgba(0,0,0,0.30), rgba(0,0,0,0) 76%)',
-            filter: 'blur(2px)',
-          }} />
-
-          {/* ═══ ANNEAU GANTRY — disque base ═══ */}
-          <div className="absolute rounded-full z-[35] pointer-events-none" style={{
-            right: '8px', bottom: '-2px', width: '82px', height: '82px',
-            background: 'radial-gradient(125% 125% at 36% 20%, #ffffff 0%, #f3f3f3 46%, #e2e2e2 78%, #cdcdcd 100%)',
-            boxShadow: '0 10px 24px -6px rgba(0,0,0,0.30), 0 3px 7px rgba(0,0,0,0.12)',
-          }} />
-
-          {/* Face avant (donut) — trouée pour le tunnel */}
-          <div className="absolute rounded-full z-[38] pointer-events-none overflow-hidden" style={{
-            right: '8px', bottom: '-2px', width: '82px', height: '82px',
-            background: 'radial-gradient(130% 130% at 36% 18%, #ffffff 0%, #f4f4f4 44%, #e4e4e4 74%, #d2d2d2 100%)',
-            WebkitMaskImage: 'radial-gradient(circle at center, transparent 16px, black 17px)',
-            maskImage: 'radial-gradient(circle at center, transparent 16px, black 17px)',
-            boxShadow: 'inset 0 2px 5px rgba(255,255,255,0.9), inset 0 -6px 12px rgba(0,0,0,0.10)',
-          }}>
-            <div className="absolute inset-0" style={{ background: 'radial-gradient(55% 38% at 33% 12%, rgba(255,255,255,0.85), rgba(255,255,255,0) 62%)' }} />
-            <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full" style={{
-              width: '50px', height: '50px',
-              boxShadow: 'inset 0 0 0 3px rgba(0,0,0,0.04), inset 0 4px 10px rgba(0,0,0,0.20), inset 0 -1px 3px rgba(255,255,255,0.5)',
-            }} />
-          </div>
-
-          {/* Liseré signature vert */}
-          <div className="absolute z-[39] rounded-full pointer-events-none" style={{
-            right: '12px', bottom: '3px', width: '74px', height: '74px',
-            boxShadow: 'inset 0 0 0 1.5px rgba(0,102,51,0.55)',
-          }} />
-
-          {/* ═══ BORE — tunnel illuminé ═══ */}
-          <div className="absolute z-[40] rounded-full overflow-hidden pointer-events-none" style={{
-            width: '34px', height: '34px', right: '32px', bottom: '22px',
-            background: 'radial-gradient(circle at 50% 35%, #ffffff 0%, #eef1f4 55%, #d6dbe1 100%)',
-            boxShadow: 'inset 0 4px 10px rgba(0,0,0,0.12), inset 0 -2px 6px rgba(255,255,255,0.7)',
-          }}>
-            <div className="absolute inset-0 rounded-full" style={{ boxShadow: 'inset 0 0 8px rgba(0,0,0,0.10)' }} />
-            <div className="absolute inset-[4px] rounded-full border border-black/[0.07]" />
-            <div className="absolute inset-[8px] rounded-full border border-black/[0.05]" />
-            {/* Laser */}
-            <div className="absolute left-[8%] right-[8%] top-0 h-[2px] rounded-full bg-[#00a651] shadow-[0_0_8px_3px_rgba(0,166,81,0.6)]" style={{ animation: 'scanLaserMobile 2.6s ease-in-out infinite alternate' }} />
-            <div className="absolute left-0 right-0 top-0 h-[10px] -mt-[4px] opacity-55" style={{ background: 'radial-gradient(ellipse at center, rgba(0,166,81,0.30), transparent 70%)', animation: 'scanLaserMobile 2.6s ease-in-out infinite alternate' }} />
-            {/* LED rouge */}
-            <div className="absolute top-[25%] right-[15%] w-[2px] h-[2px] rounded-full bg-red-500 shadow-[0_0_5px_1px_rgba(239,68,68,0.8)] animate-pulse" />
-          </div>
-
-          {/* Lèvre bore — biseau 3D */}
-          <div className="absolute z-[41] rounded-full pointer-events-none" style={{
-            width: '34px', height: '34px', right: '32px', bottom: '22px',
-            boxShadow: 'inset 0 1px 3px rgba(0,0,0,0.10), inset 0 -1px 3px rgba(255,255,255,0.7), 0 0 0 1px rgba(0,0,0,0.10)',
-          }} />
-
-          {/* Badge RDV */}
-          <div className="absolute z-[45] pointer-events-none" style={{ right: '12px', bottom: '36px' }}>
-            <div className="bg-[#006633] text-white px-1 py-[1px] rounded-[2px] shadow-sm text-[6px] font-extrabold tracking-[0.15em] uppercase">RDV</div>
-          </div>
-
-          {/* ═══ SPECT HEADS ROTATIFS ═══ */}
-          <div className="absolute z-[44] animate-[spin_32s_linear_infinite] pointer-events-none" style={{
-            right: '8px', bottom: '-2px', width: '82px', height: '82px',
-          }}>
-            {/* Tête 1 */}
-            <div className="absolute top-[-6px] left-1/2 -translate-x-1/2 rounded-[5px]" style={{
-              width: '36px', height: '14px',
-              background: 'linear-gradient(180deg, #ffffff 0%, #f0f0f0 40%, #e0e0e0 100%)',
-              boxShadow: '0 3px 8px rgba(0,0,0,0.18), inset 0 1px 3px rgba(255,255,255,1)',
-              border: '1px solid #d0d0d0',
-            }}>
-              <div className="absolute top-[50%] left-[5%] right-[5%] h-[2px] -translate-y-1/2 bg-[#b0b0b0] rounded-full shadow-[inset_0_1px_1px_rgba(0,0,0,0.4)]" />
-              <div className="absolute bottom-[1px] left-[15%] right-[15%] h-[1px] bg-[#EC0016]/75 rounded-full" />
-            </div>
-            {/* Tête 2 */}
-            <div className="absolute bottom-[-6px] left-1/2 -translate-x-1/2 rounded-[5px]" style={{
-              width: '36px', height: '14px',
-              background: 'linear-gradient(0deg, #ffffff 0%, #f0f0f0 40%, #e0e0e0 100%)',
-              boxShadow: '0 -3px 8px rgba(0,0,0,0.18), inset 0 -1px 3px rgba(255,255,255,1)',
-              border: '1px solid #d0d0d0',
-            }}>
-              <div className="absolute top-[50%] left-[5%] right-[5%] h-[2px] -translate-y-1/2 bg-[#b0b0b0] rounded-full shadow-[inset_0_1px_1px_rgba(0,0,0,0.4)]" />
-              <div className="absolute top-[1px] left-[15%] right-[15%] h-[1px] bg-[#EC0016]/75 rounded-full" />
-            </div>
-          </div>
-
-          {/* ═══ BOUTON GANTRY → Prendre RDV ═══ */}
-          <button
-            onClick={() => scrollToSection('#contact')}
-            aria-label={t('appointment')}
-            title={t('appointment')}
-            className="group absolute z-[46] rounded-full pointer-events-auto cursor-pointer transition-transform duration-300 hover:scale-[1.02] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#006633] focus-visible:ring-offset-2"
-            style={{ right: '8px', bottom: '-2px', width: '82px', height: '82px' }}
-          >
-            <span aria-hidden="true" className="absolute inset-[3px] rounded-full transition-all duration-300 group-hover:shadow-[0_0_0_2px_rgba(0,102,51,0.55),0_0_20px_rgba(0,255,136,0.45)] group-focus-visible:shadow-[0_0_0_2px_rgba(0,102,51,0.6)]" />
-            <span className="pointer-events-none absolute right-full top-1/2 mr-1 -translate-y-1/2 whitespace-nowrap rounded-md bg-[#006633] px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider text-white opacity-0 shadow-lg transition-opacity duration-200 group-hover:opacity-100 group-focus-visible:opacity-100">
-              {t('appointment')}
-            </span>
-          </button>
-
-          {/* ═══ CONTENU — logo + contrôles ═══
-              pointer-events-none sur le conteneur : la zone de padding vide (à droite)
-              ne doit PAS bloquer le bouton « RDV » du scanner (z-46) situé en dessous.
-              Les enfants interactifs réactivent pointer-events-auto. */}
-          <div className="pointer-events-none absolute inset-0 z-50 flex items-center" style={{ paddingLeft: '14px', paddingRight: '96px' }}>
-            <a href={homeHref} className="pointer-events-auto flex min-w-0 items-center gap-2.5 group">
-              {/* Logo animé */}
-              <div className="relative h-10 w-10 shrink-0 transition-transform duration-300 group-hover:scale-105 active:scale-95">
-                <svg className="absolute inset-[-6px] animate-[spin_8s_linear_infinite] pointer-events-none" viewBox="0 0 52 52" fill="none" aria-hidden="true">
+            {/* Logo + marque — prend tout l'espace disponible (plus de troncature) */}
+            <a href={homeHref} className="group relative z-10 flex min-w-0 flex-1 items-center gap-2.5">
+              <div className="relative h-10 w-10 shrink-0 transition-transform duration-300 group-active:scale-95">
+                <svg className="pointer-events-none absolute inset-[-6px] animate-[spin_8s_linear_infinite]" viewBox="0 0 52 52" fill="none" aria-hidden="true">
                   <circle cx="26" cy="26" r="24" stroke="rgba(0,102,51,0.30)" strokeWidth="1.5" strokeDasharray="24 52" strokeLinecap="round" />
                 </svg>
-                <div className="relative h-10 w-10 rounded-full bg-white shadow-md ring-1 ring-gray-100 dark:ring-white/10 overflow-hidden">
+                <div className="relative h-10 w-10 overflow-hidden rounded-full bg-white shadow-md ring-1 ring-gray-100 dark:ring-white/10">
                   <Image src="/logo.png" alt="Logo Clinique OKBA" fill className="object-contain p-1.5" />
                 </div>
               </div>
-              {/* Texte */}
               <span className="flex min-w-0 flex-col gap-[3px]">
-                <span className="truncate text-[13px] font-black text-[#006633] uppercase leading-none tracking-tight">{clinicNameText}</span>
-                <span className="truncate text-[9px] font-semibold text-[#EC0016] leading-none tracking-wide">{t('tagline')}</span>
+                <span className="truncate text-[15px] font-black uppercase leading-none tracking-tight text-[#006633]">{clinicNameText}</span>
+                <span className="truncate text-[9px] font-semibold uppercase leading-none tracking-wide text-[#EC0016]">{t('tagline')}</span>
               </span>
             </a>
 
-            <div className="pointer-events-auto ml-auto flex shrink-0 items-center gap-2">
-              {/* Badge locale actif */}
+            {/* Contrôles — langue + menu (compacts, garantissent la place au nom) */}
+            <div className="relative z-10 flex shrink-0 items-center gap-1.5">
               <span
-                className="text-[10px] font-black text-[#006633] border border-[#006633]/20 rounded-full px-2 py-[3px] leading-none tracking-wide"
+                className="rounded-full border border-[#006633]/20 px-2 py-[5px] text-[10px] font-black leading-none tracking-wide text-[#006633]"
                 style={{ background: 'rgba(0,102,51,0.06)' }}
                 aria-label={`Langue : ${locale === 'ar' ? 'Arabe' : 'Français'}`}
               >
                 {locale === 'ar' ? 'ع' : 'FR'}
               </span>
-              {/* Bouton menu */}
               <button
                 ref={menuButtonRef}
                 aria-label="Ouvrir le menu"
                 aria-expanded={isOpen}
                 aria-controls="mobile-menu"
-                className="flex h-8 w-8 shrink-0 cursor-pointer items-center justify-center rounded-full bg-[#006633] text-white shadow-sm transition-all active:scale-95 hover:bg-[#004d26]"
+                className="flex h-9 w-9 shrink-0 cursor-pointer items-center justify-center rounded-full bg-[#006633] text-white shadow-sm transition-all hover:bg-[#004d26] active:scale-95"
                 onClick={() => setIsOpen((v) => !v)}
               >
-                <Menu className="w-4 h-4" />
+                <Menu className="h-[18px] w-[18px]" />
               </button>
             </div>
           </div>
