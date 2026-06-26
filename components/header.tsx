@@ -179,6 +179,8 @@ export default function Header({ siteSettings, poles }: HeaderProps) {
     }
   })
 
+  const homeHref = locale === 'ar' ? '/ar' : '/'
+
   const scrollToSection = (href: string) => {
     setIsOpen(false)
     const isHomepage = window.location.pathname === '/' || window.location.pathname === '/ar'
@@ -189,7 +191,8 @@ export default function Header({ siteSettings, poles }: HeaderProps) {
         setActiveTab(href.replace('#', ''))
       }
     } else {
-      window.location.href = `/${href}`
+      // Retour à l'accueil de la bonne langue, avec l'ancre de section.
+      window.location.href = `${homeHref}${href}`
     }
   }
 
@@ -451,9 +454,12 @@ export default function Header({ siteSettings, poles }: HeaderProps) {
             </span>
           </button>
 
-          {/* ═══ CONTENU — logo + contrôles ═══ */}
-          <div className="absolute inset-0 z-50 flex items-center" style={{ paddingLeft: '14px', paddingRight: '96px' }}>
-            <a href="/" className="flex min-w-0 items-center gap-2.5 group">
+          {/* ═══ CONTENU — logo + contrôles ═══
+              pointer-events-none sur le conteneur : la zone de padding vide (à droite)
+              ne doit PAS bloquer le bouton « RDV » du scanner (z-46) situé en dessous.
+              Les enfants interactifs réactivent pointer-events-auto. */}
+          <div className="pointer-events-none absolute inset-0 z-50 flex items-center" style={{ paddingLeft: '14px', paddingRight: '96px' }}>
+            <a href={homeHref} className="pointer-events-auto flex min-w-0 items-center gap-2.5 group">
               {/* Logo animé */}
               <div className="relative h-10 w-10 shrink-0 transition-transform duration-300 group-hover:scale-105 active:scale-95">
                 <svg className="absolute inset-[-6px] animate-[spin_8s_linear_infinite] pointer-events-none" viewBox="0 0 52 52" fill="none" aria-hidden="true">
@@ -470,7 +476,7 @@ export default function Header({ siteSettings, poles }: HeaderProps) {
               </span>
             </a>
 
-            <div className="ml-auto flex shrink-0 items-center gap-2">
+            <div className="pointer-events-auto ml-auto flex shrink-0 items-center gap-2">
               {/* Badge locale actif */}
               <span
                 className="text-[10px] font-black text-[#006633] border border-[#006633]/20 rounded-full px-2 py-[3px] leading-none tracking-wide"
@@ -664,7 +670,7 @@ export default function Header({ siteSettings, poles }: HeaderProps) {
             </div>
 
             {/* Logo Area */}
-            <a href="/" className="flex items-center gap-3 shrink-0 mr-4 md:mr-6 group pointer-events-auto">
+            <a href={homeHref} className="flex items-center gap-3 shrink-0 mr-4 md:mr-6 group pointer-events-auto">
               <div className="relative h-14 w-14 rounded-full bg-white p-1 shadow-sm ring-1 ring-gray-100 transition-transform group-hover:scale-105">
                 <Image src="/logo.png" alt="Logo" fill className="object-contain p-1" />
               </div>

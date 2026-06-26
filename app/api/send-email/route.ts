@@ -3,8 +3,6 @@ import { Resend } from 'resend';
 import { emailRateLimiter } from '@/lib/rate-limit';
 import { z } from 'zod';
 
-const resend = new Resend(process.env.RESEND_API_KEY);
-
 const contactSchema = z.object({
   firstName: z.string().min(2).max(50),
   lastName: z.string().min(2).max(50),
@@ -51,6 +49,13 @@ export async function POST(request: Request) {
     }
     
     const { firstName, lastName, email, phone, message } = validationResult.data;
+
+    const apiKey = process.env.RESEND_API_KEY;
+    if (!apiKey) {
+      console.error('RESEND_API_KEY is not configured');
+      return NextResponse.json({ error: 'Email service unavailable' }, { status: 503 });
+    }
+    const resend = new Resend(apiKey);
 
     const fromEmail = 'onboarding@resend.dev';
     const toEmail = process.env.CLINIC_EMAIL || 'contact@cliniqueokba.com';

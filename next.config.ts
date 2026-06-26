@@ -1,9 +1,9 @@
 import type { NextConfig } from 'next'
 import createNextIntlPlugin from 'next-intl/plugin'
 
-import path from 'path'
-
-const withNextIntl = createNextIntlPlugin(path.join(process.cwd(), 'i18n.ts'))
+// Chemin RELATIF requis : Next 16 build avec Turbopack, qui (via next-intl)
+// n'accepte pas les chemins absolus pour le fichier de config i18n.
+const withNextIntl = createNextIntlPlugin('./i18n.ts')
 
 const nextConfig: NextConfig = {
   images: {
@@ -23,7 +23,6 @@ const nextConfig: NextConfig = {
       },
     ],
   },
-  eslint: { ignoreDuringBuilds: true },
   compress: true,
   poweredByHeader: false,
   generateEtags: false,
