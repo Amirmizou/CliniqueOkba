@@ -16,7 +16,6 @@ import {
   Sparkles,
   Maximize2,
   Play,
-  GraduationCap,
   Award,
   Baby,
   Activity,
@@ -233,14 +232,14 @@ function DoctorCard({
           </div>
         </button>
 
-        {/* ─── Vidéo éducative — affordances créatives (si le médecin a des vidéos) ─── */}
+        {/* ─── Vidéo — affordances créatives (si le médecin a des vidéos) ─── */}
         {hasVideos && (
           <>
             {/* Badge animé toujours visible (mobile + desktop) — pastille play + pulse sonar */}
             <button
               type="button"
               onClick={() => onPlay(doctor)}
-              aria-label={locale === 'ar' ? `مشاهدة الفيديو التعليمي لـ ${doctor.name}` : `Voir la vidéo éducative de ${doctor.name}`}
+              aria-label={locale === 'ar' ? `مشاهدة فيديو ${doctor.name}` : `Voir la vidéo de ${doctor.name}`}
               className="group/play absolute left-3 top-3 z-20 inline-flex items-center gap-2 rounded-full bg-white/92 py-1.5 pl-1.5 pr-3 shadow-lg ring-1 ring-black/5 backdrop-blur-md transition-transform duration-200 hover:scale-[1.04] active:scale-95 dark:bg-slate-900/90"
             >
               <span
@@ -255,10 +254,8 @@ function DoctorCard({
                 />
                 <Play className="relative ml-0.5 h-3.5 w-3.5 fill-current" />
               </span>
-              <span className="flex flex-col items-start leading-none">
-                <span className="text-[11px] font-bold" style={{ color: accent }}>
-                  {locale === 'ar' ? 'فيديو تعليمي' : 'Vidéo éducative'}
-                </span>
+              <span className="text-[11px] font-bold leading-none" style={{ color: accent }}>
+                {locale === 'ar' ? 'فيديو' : 'Vidéo'}
               </span>
             </button>
 
@@ -281,8 +278,8 @@ function DoctorCard({
                 <Play className="ml-1 h-7 w-7 fill-white text-white" />
               </span>
               <span className="inline-flex items-center gap-1.5 rounded-full bg-black/55 px-3 py-1.5 text-xs font-semibold text-white backdrop-blur-sm">
-                <GraduationCap className="h-3.5 w-3.5 text-[#FDE68A]" />
-                {locale === 'ar' ? 'شاهد الفيديو التعليمي' : 'Voir la vidéo éducative'}
+                <Play className="h-3.5 w-3.5 fill-[#FDE68A] text-[#FDE68A]" />
+                {locale === 'ar' ? 'شاهد الفيديو' : 'Voir la vidéo'}
               </span>
             </button>
           </>
@@ -419,8 +416,16 @@ function VideoLightbox({
   const locale = useLocale()
   const videos = doctor.videos || []
   const [index, setIndex] = useState(0)
+  const [isPlaying, setIsPlaying] = useState(false)
   const current = videos[index]
   const accent = doctor.accent || '#006633'
+
+  // Changer de vidéo réinitialise la lecture (évite l'autoplay bloqué : on
+  // remonte le lecteur sur un geste explicite, comme la section Vidéothèque).
+  const selectVideo = (i: number) => {
+    setIsPlaying(false)
+    setIndex(i)
+  }
 
   return (
     <motion.div
@@ -452,22 +457,42 @@ function VideoLightbox({
             className="mb-2 inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-[11px] font-bold uppercase tracking-wide text-white shadow-lg backdrop-blur-sm"
             style={{ backgroundColor: `${accent}E6` }}
           >
-            <GraduationCap className="h-3.5 w-3.5 text-[#FDE68A]" />
-            {locale === 'ar' ? 'فيديو تعليمي' : 'Vidéo éducative'}
+            <Play className="h-3 w-3 fill-current" />
+            {locale === 'ar' ? 'فيديو' : 'Vidéo'}
           </span>
           <h3 className="text-lg font-bold text-white">{doctor.name}</h3>
           <p className="text-sm text-white/70">{doctor.specialty}</p>
         </div>
 
         <div className="relative aspect-video w-full overflow-hidden rounded-2xl bg-black shadow-2xl ring-2 ring-[#FDE68A]/40">
-          {current && (
+          {current && isPlaying ? (
             <UniversalPlayer
               key={current}
               url={current}
               playing
               controls
-              className="absolute inset-0 h-full w-full"
+              className="h-full w-full object-contain bg-black"
+              onEnded={() => setIsPlaying(false)}
             />
+          ) : (
+            /* Affiche cliquable — le lecteur démarre sur ce geste (fiable mobile/desktop) */
+            <button
+              type="button"
+              onClick={() => setIsPlaying(true)}
+              aria-label={locale === 'ar' ? 'تشغيل الفيديو' : 'Lire la vidéo'}
+              className="group/play relative block h-full w-full cursor-pointer focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#FDE68A]/60"
+            >
+              <span className="absolute inset-0" style={{ background: `radial-gradient(circle at 50% 38%, ${accent}, #001b10 78%)` }} />
+              <span className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+              <span className="absolute inset-0 flex items-center justify-center">
+                <span className="relative flex h-20 w-20 items-center justify-center sm:h-24 sm:w-24">
+                  <span aria-hidden="true" className="absolute inset-0 animate-ping rounded-full bg-white/20" style={{ animationDuration: '2.2s' }} />
+                  <span className="relative flex h-full w-full items-center justify-center rounded-full border border-white/30 bg-white/15 backdrop-blur-md transition-all duration-300 group-hover/play:scale-110 group-hover/play:bg-[#006633]/80">
+                    <Play className="ms-1 h-8 w-8 fill-white text-white sm:h-10 sm:w-10" />
+                  </span>
+                </span>
+              </span>
+            </button>
           )}
         </div>
 
@@ -477,7 +502,7 @@ function VideoLightbox({
               <button
                 key={i}
                 type="button"
-                onClick={() => setIndex(i)}
+                onClick={() => selectVideo(i)}
                 aria-label={`Vidéo ${i + 1}`}
                 className={`h-9 min-w-[2.25rem] rounded-full px-3 text-sm font-semibold transition-colors ${
                   i === index
