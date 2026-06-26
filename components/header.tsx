@@ -339,20 +339,13 @@ export default function Header({ siteSettings, poles }: HeaderProps) {
                 </div>
               </div>
               <span className="flex min-w-0 flex-col gap-[3px]">
-                <span className="truncate text-[15px] font-black uppercase leading-none tracking-tight text-[#006633]">{clinicNameText}</span>
+                <span className="truncate text-[14px] font-black uppercase leading-none tracking-tight text-[#006633]">{clinicNameText}</span>
                 <span className="truncate text-[9px] font-semibold uppercase leading-none tracking-wide text-[#EC0016]">{t('tagline')}</span>
               </span>
             </a>
 
-            {/* Contrôles — langue + menu (compacts, garantissent la place au nom) */}
+            {/* Contrôles — menu + mini-scanner RDV (langue dispo dans le menu) */}
             <div className="relative z-10 flex shrink-0 items-center gap-1.5">
-              <span
-                className="rounded-full border border-[#006633]/20 px-2 py-[5px] text-[10px] font-black leading-none tracking-wide text-[#006633]"
-                style={{ background: 'rgba(0,102,51,0.06)' }}
-                aria-label={`Langue : ${locale === 'ar' ? 'Arabe' : 'Français'}`}
-              >
-                {locale === 'ar' ? 'ع' : 'FR'}
-              </span>
               <button
                 ref={menuButtonRef}
                 aria-label="Ouvrir le menu"
@@ -362,6 +355,54 @@ export default function Header({ siteSettings, poles }: HeaderProps) {
                 onClick={() => setIsOpen((v) => !v)}
               >
                 <Menu className="h-[18px] w-[18px]" />
+              </button>
+
+              {/* ═══ MINI GANTRY SCANNER — bouton « Prendre RDV » (identité imagerie) ═══ */}
+              <button
+                onClick={() => scrollToSection('#contact')}
+                aria-label={t('appointment')}
+                title={t('appointment')}
+                className="group relative h-[58px] w-[58px] shrink-0 cursor-pointer focus-visible:outline-none"
+              >
+                {/* Ombre de contact au sol */}
+                <span aria-hidden="true" className="absolute bottom-[2px] left-1/2 h-[8px] w-[44px] -translate-x-1/2 rounded-full" style={{ background: 'radial-gradient(closest-side, rgba(0,0,0,0.28), transparent 75%)', filter: 'blur(2px)' }} />
+
+                {/* Plateau patient — entre dans le bore depuis la gauche */}
+                <span aria-hidden="true" className="absolute left-[1px] top-1/2 h-[7px] w-[20px] -translate-y-1/2 rounded-l-[3px]" style={{ background: 'linear-gradient(180deg,#ffffff,#e6e6e6)', boxShadow: '0 2px 4px rgba(0,0,0,0.15), inset 0 1px 1px rgba(255,255,255,0.9)' }}>
+                  <span className="absolute bottom-[1px] left-0 right-[3px] h-[1.5px] rounded-full" style={{ background: 'linear-gradient(90deg,#006633,rgba(0,166,81,0))' }} />
+                </span>
+
+                {/* Disque gantry (base) */}
+                <span aria-hidden="true" className="absolute right-0 top-1/2 h-[54px] w-[54px] -translate-y-1/2 rounded-full" style={{ background: 'radial-gradient(125% 125% at 36% 20%, #fff 0%, #f3f3f3 46%, #e2e2e2 78%, #cdcdcd 100%)', boxShadow: '0 6px 16px -4px rgba(0,0,0,0.30), 0 2px 5px rgba(0,0,0,0.12)' }} />
+
+                {/* Face donut trouée (tunnel) */}
+                <span aria-hidden="true" className="absolute right-0 top-1/2 h-[54px] w-[54px] -translate-y-1/2 overflow-hidden rounded-full" style={{ background: 'radial-gradient(130% 130% at 36% 18%, #fff 0%, #f4f4f4 44%, #e4e4e4 74%, #d2d2d2 100%)', WebkitMaskImage: 'radial-gradient(circle at center, transparent 11px, black 12px)', maskImage: 'radial-gradient(circle at center, transparent 11px, black 12px)', boxShadow: 'inset 0 1px 4px rgba(255,255,255,0.9), inset 0 -4px 9px rgba(0,0,0,0.10)' }} />
+
+                {/* Liseré signature vert */}
+                <span aria-hidden="true" className="absolute right-[2px] top-1/2 h-[50px] w-[50px] -translate-y-1/2 rounded-full" style={{ boxShadow: 'inset 0 0 0 1.5px rgba(0,102,51,0.55)' }} />
+
+                {/* Bore illuminé + laser + LED */}
+                <span aria-hidden="true" className="absolute right-[15px] top-1/2 h-[24px] w-[24px] -translate-y-1/2 overflow-hidden rounded-full" style={{ background: 'radial-gradient(circle at 50% 35%, #fff 0%, #eef1f4 55%, #d6dbe1 100%)', boxShadow: 'inset 0 3px 7px rgba(0,0,0,0.12), inset 0 -1px 4px rgba(255,255,255,0.7)' }}>
+                  <span className="absolute inset-[3px] rounded-full border border-black/[0.06]" />
+                  <span className="absolute left-[10%] right-[10%] top-0 h-[2px] rounded-full bg-[#00a651] shadow-[0_0_6px_2px_rgba(0,166,81,0.6)]" style={{ animation: 'scanLaserMobile 2.6s ease-in-out infinite alternate' }} />
+                  <span className="absolute right-[16%] top-[24%] h-[2px] w-[2px] rounded-full bg-red-500 shadow-[0_0_4px_1px_rgba(239,68,68,0.8)] animate-pulse" />
+                </span>
+
+                {/* Têtes SPECT rotatives */}
+                <span aria-hidden="true" className="absolute right-0 top-1/2 h-[54px] w-[54px] -translate-y-1/2 animate-[spin_32s_linear_infinite]">
+                  <span className="absolute left-1/2 top-[-3px] h-[10px] w-[24px] -translate-x-1/2 rounded-[4px]" style={{ background: 'linear-gradient(180deg,#fff,#e6e6e6)', border: '1px solid #d0d0d0', boxShadow: '0 2px 5px rgba(0,0,0,0.18)' }}>
+                    <span className="absolute left-[6%] right-[6%] top-1/2 h-[1.5px] -translate-y-1/2 rounded-full bg-[#b0b0b0]" />
+                    <span className="absolute bottom-[1px] left-[15%] right-[15%] h-[1px] rounded-full bg-[#EC0016]/70" />
+                  </span>
+                  <span className="absolute bottom-[-3px] left-1/2 h-[10px] w-[24px] -translate-x-1/2 rounded-[4px]" style={{ background: 'linear-gradient(0deg,#fff,#e6e6e6)', border: '1px solid #d0d0d0', boxShadow: '0 -2px 5px rgba(0,0,0,0.18)' }}>
+                    <span className="absolute left-[6%] right-[6%] top-1/2 h-[1.5px] -translate-y-1/2 rounded-full bg-[#b0b0b0]" />
+                    <span className="absolute top-[1px] left-[15%] right-[15%] h-[1px] rounded-full bg-[#EC0016]/70" />
+                  </span>
+                </span>
+
+                {/* Halo vert au tap/focus + micro-badge RDV */}
+                <span aria-hidden="true" className="absolute right-0 top-1/2 h-[54px] w-[54px] -translate-y-1/2 rounded-full transition-all duration-300 group-active:shadow-[0_0_0_2px_rgba(0,102,51,0.55),0_0_16px_rgba(0,255,136,0.45)] group-focus-visible:shadow-[0_0_0_2px_rgba(0,102,51,0.6)]" />
+                <span aria-hidden="true" className="absolute right-[3px] top-[3px] z-10 rounded-[2px] bg-[#006633] px-[3px] py-[1px] text-[6px] font-extrabold uppercase leading-none tracking-[0.12em] text-white shadow-sm">RDV</span>
               </button>
             </div>
           </div>
