@@ -16,6 +16,7 @@ import {
   Sparkles,
   Maximize2,
   Play,
+  GraduationCap,
   Award,
   Baby,
   Activity,
@@ -232,18 +233,59 @@ function DoctorCard({
           </div>
         </button>
 
-        {/* Bouton lecture vidéo (si le médecin a des vidéos) */}
+        {/* ─── Vidéo éducative — affordances créatives (si le médecin a des vidéos) ─── */}
         {hasVideos && (
-          <button
-            type="button"
-            onClick={() => onPlay(doctor)}
-            aria-label={locale === 'ar' ? `مشاهدة فيديو ${doctor.name}` : `Voir la vidéo de ${doctor.name}`}
-            className="group/play absolute left-4 top-4 z-20 inline-flex items-center gap-2 rounded-full px-3 py-2 text-xs font-semibold text-white shadow-lg backdrop-blur-sm transition-transform duration-200 hover:scale-105 active:scale-95"
-            style={{ backgroundColor: `${accent}E6` }}
-          >
-            <Play className="h-3.5 w-3.5 fill-current" />
-            {locale === 'ar' ? 'فيديو' : 'Vidéo'}
-          </button>
+          <>
+            {/* Badge animé toujours visible (mobile + desktop) — pastille play + pulse sonar */}
+            <button
+              type="button"
+              onClick={() => onPlay(doctor)}
+              aria-label={locale === 'ar' ? `مشاهدة الفيديو التعليمي لـ ${doctor.name}` : `Voir la vidéo éducative de ${doctor.name}`}
+              className="group/play absolute left-3 top-3 z-20 inline-flex items-center gap-2 rounded-full bg-white/92 py-1.5 pl-1.5 pr-3 shadow-lg ring-1 ring-black/5 backdrop-blur-md transition-transform duration-200 hover:scale-[1.04] active:scale-95 dark:bg-slate-900/90"
+            >
+              <span
+                className="relative flex h-7 w-7 items-center justify-center rounded-full text-white"
+                style={{ backgroundColor: accent }}
+              >
+                {/* Onde sonar (invite à lire) */}
+                <span
+                  aria-hidden="true"
+                  className="absolute inset-0 rounded-full animate-ping"
+                  style={{ backgroundColor: accent, opacity: 0.35 }}
+                />
+                <Play className="relative ml-0.5 h-3.5 w-3.5 fill-current" />
+              </span>
+              <span className="flex flex-col items-start leading-none">
+                <span className="text-[11px] font-bold" style={{ color: accent }}>
+                  {locale === 'ar' ? 'فيديو تعليمي' : 'Vidéo éducative'}
+                </span>
+              </span>
+            </button>
+
+            {/* Voile doux au survol (desktop) — décoratif, laisse passer le clic vers le zoom */}
+            <span
+              aria-hidden="true"
+              className="pointer-events-none absolute inset-0 z-[9] hidden opacity-0 transition-opacity duration-300 group-hover:opacity-100 sm:block"
+              style={{ background: 'radial-gradient(circle at 50% 42%, rgba(0,0,0,0.45), rgba(0,0,0,0.12) 60%, transparent 82%)' }}
+            />
+            {/* Gros bouton play centré (desktop) — apparaît au survol, lance la vidéo */}
+            <button
+              type="button"
+              onClick={() => onPlay(doctor)}
+              tabIndex={-1}
+              aria-hidden="true"
+              className="pointer-events-none absolute left-1/2 top-[42%] z-10 hidden -translate-x-1/2 -translate-y-1/2 flex-col items-center gap-3 opacity-0 transition-opacity duration-300 group-hover:pointer-events-auto group-hover:opacity-100 sm:flex"
+            >
+              <span className="relative flex h-[68px] w-[68px] items-center justify-center rounded-full bg-white/25 ring-1 ring-white/50 backdrop-blur-md transition-transform duration-300 group-hover:scale-105">
+                <span aria-hidden="true" className="absolute inset-0 rounded-full border-2 border-white/70 animate-ping" />
+                <Play className="ml-1 h-7 w-7 fill-white text-white" />
+              </span>
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-black/55 px-3 py-1.5 text-xs font-semibold text-white backdrop-blur-sm">
+                <GraduationCap className="h-3.5 w-3.5 text-[#FDE68A]" />
+                {locale === 'ar' ? 'شاهد الفيديو التعليمي' : 'Voir la vidéo éducative'}
+              </span>
+            </button>
+          </>
         )}
 
         {/* ----- Panneau d'informations ----- */}
@@ -374,9 +416,11 @@ function VideoLightbox({
   onClose: () => void
 }) {
   const tc = useTranslations('common')
+  const locale = useLocale()
   const videos = doctor.videos || []
   const [index, setIndex] = useState(0)
   const current = videos[index]
+  const accent = doctor.accent || '#006633'
 
   return (
     <motion.div
@@ -403,7 +447,14 @@ function VideoLightbox({
         onClick={(e) => e.stopPropagation()}
         className="w-full max-w-4xl"
       >
-        <div className="mb-3 text-center">
+        <div className="mb-3 flex flex-col items-center text-center">
+          <span
+            className="mb-2 inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-[11px] font-bold uppercase tracking-wide text-white shadow-lg backdrop-blur-sm"
+            style={{ backgroundColor: `${accent}E6` }}
+          >
+            <GraduationCap className="h-3.5 w-3.5 text-[#FDE68A]" />
+            {locale === 'ar' ? 'فيديو تعليمي' : 'Vidéo éducative'}
+          </span>
           <h3 className="text-lg font-bold text-white">{doctor.name}</h3>
           <p className="text-sm text-white/70">{doctor.specialty}</p>
         </div>
