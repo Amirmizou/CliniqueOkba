@@ -36,7 +36,13 @@ export function UniversalPlayer({
     const v = videoRef.current
     if (!v) return
     if (playing) {
-      v.play().catch((e) => console.log('[UniversalPlayer] play failed:', e))
+      v.play().catch((e) => {
+        // Ignore NotSupportedError for placeholder/unsupported videos
+        if (e.name !== 'NotSupportedError' && e.name !== 'NotAllowedError') {
+          console.warn('[UniversalPlayer] play failed:', e.message)
+        }
+        onPause?.()
+      })
     } else {
       v.pause()
     }
@@ -110,6 +116,7 @@ export function UniversalPlayer({
       loop={loop}
       controls={controls}
       playsInline
+      autoPlay={playing}
       className={className}
       onPlay={onPlay}
       onPause={onPause}

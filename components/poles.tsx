@@ -54,18 +54,18 @@ const ICONS: Record<string, any> = {
 
 /** Images de fond par défaut (photos réelles de la clinique & spécialités) */
 const DEFAULT_IMAGES: Record<string, string> = {
-  ScanLine: '/imageries/scannerCT.png',
-  Radiation: '/images/Equipements/eq-26.jpg',
-  Smile: '/images/specialties/dentistry.png',
-  Stethoscope: '/images/specialties/internal-medicine.png',
-  Siren: '/images/Equipements/eq-23.jpg',
-  FlaskConical: '/images/Equipements/eq-30.jpg',
-  Eye: '/images/specialties/ophthalmology.png',
-  Heart: '/images/specialties/cardiology.png',
-  Baby: '/images/specialties/pediatrics.png',
-  ScanEye: '/images/specialties/ophthalmology.png',
-  Pill: '/images/Equipements/eq-19.jpg',
-  Activity: '/images/specialties/rheumatology.png',
+  ScanLine: 'https://cdn.sanity.io/images/ox121huo/production/2131088c8ef7bbe9fbea5fbb8138e0141afeb108-960x720.webp',
+  Radiation: 'https://cdn.sanity.io/images/ox121huo/production/88b2db71d90062f73179411ac73c94020ddbeab1-472x476.png',
+  Smile: 'https://cdn.sanity.io/images/ox121huo/production/e090e3347d9554481b0c27c9c7c5d13b44038c0a-2752x1536.png',
+  Stethoscope: 'https://cdn.sanity.io/images/ox121huo/production/f2462ecffc66194467fa60cb31da515094f6a834-1264x848.jpg',
+  Siren: 'https://cdn.sanity.io/images/ox121huo/production/92e468456b67480ffcf824c16d77c5d064a5ad3b-1201x1600.jpg',
+  FlaskConical: 'https://cdn.sanity.io/images/ox121huo/production/757b4e28bcfaa11d23804e928e749064562fc631-1600x744.jpg',
+  Eye: 'https://cdn.sanity.io/images/ox121huo/production/3ff593e8d95b85af2f1658c2e405523f45162149-1600x809.jpg',
+  Heart: 'https://cdn.sanity.io/images/ox121huo/production/790004232ac8c08fc220ade3534c6e0b5d7a8a2b-1234x823.jpg',
+  Baby: 'https://cdn.sanity.io/images/ox121huo/production/f2462ecffc66194467fa60cb31da515094f6a834-1264x848.jpg',
+  ScanEye: 'https://cdn.sanity.io/images/ox121huo/production/3ff593e8d95b85af2f1658c2e405523f45162149-1600x809.jpg',
+  Pill: 'https://cdn.sanity.io/images/ox121huo/production/cbb7cd26b49f2157bf8bc9738f1527fad86539ca-1280x720.jpg',
+  Activity: 'https://cdn.sanity.io/images/ox121huo/production/cbb7cd26b49f2157bf8bc9738f1527fad86539ca-1280x720.jpg',
 }
 
 /** Convertit les pôles Sanity en Pole[] (repli sur les données locales) */

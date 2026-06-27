@@ -79,6 +79,7 @@ export interface PolePageData {
   urgent?: boolean
   aiBoosted?: boolean
   videos?: PoleVideo[]
+  imageUrl?: string
 }
 
 export default function PolePageContent({
@@ -140,7 +141,7 @@ export default function PolePageContent({
       : `Bonjour, je souhaite prendre rendez-vous au ${pole.title} à la Clinique OKBA.`,
   )
 
-  const hasMedia = photos.length > 0 || videos.length > 0
+  const hasMedia = !!pole.imageUrl || photos.length > 0 || videos.length > 0
 
   return (
     <>
@@ -283,27 +284,15 @@ export default function PolePageContent({
               >
                 <div className="relative aspect-[4/3] w-full overflow-hidden rounded-3xl shadow-2xl ring-1 ring-border/50">
                   <div className="absolute inset-0 z-10 bg-gradient-to-tr from-black/20 via-transparent to-transparent" />
-                  {photos.length > 0 ? (
-                    <Image
-                      loader={sanityImageLoader}
-                      src={photos[0].src}
-                      alt={pole.title}
-                      fill
-                      sizes="(max-width: 1024px) 100vw, 50vw"
-                      className="bg-muted/30 object-cover"
-                      priority
-                    />
-                  ) : (
-                    <Image
-                      loader={sanityImageLoader}
-                      src={posterUrlOf(videos[0]) || ''}
-                      alt={pole.title}
-                      fill
-                      sizes="(max-width: 1024px) 100vw, 50vw"
-                      className="bg-muted/30 object-cover"
-                      priority
-                    />
-                  )}
+                  <Image
+                    loader={sanityImageLoader}
+                    src={pole.imageUrl || (photos.length > 0 ? photos[0].src : '') || posterUrlOf(videos[0]) || ''}
+                    alt={pole.title}
+                    fill
+                    sizes="(max-width: 1024px) 100vw, 50vw"
+                    className="bg-muted/30 object-cover"
+                    priority
+                  />
                   {/* Scan beam — one-shot on page load, evoking medical imaging */}
                   {!prefersReducedMotion && (
                     <motion.div

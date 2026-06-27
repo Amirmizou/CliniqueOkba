@@ -1,5 +1,6 @@
 import type React from 'react'
 import type { Metadata } from 'next'
+import dynamic from 'next/dynamic'
 import { Analytics } from '@vercel/analytics/next'
 import { SpeedInsights } from '@vercel/speed-insights/next'
 import { ThemeProvider } from '@/components/theme-provider'
@@ -10,6 +11,8 @@ import { getMessages, setRequestLocale } from 'next-intl/server'
 import PageTransition from '@/components/page-transition'
 import { ServiceWorkerRegistration as SWRegistrationComponent } from '@/components/service-worker-registration'
 import { AuraBackground } from '@/components/ui/aura-background'
+
+import { LogoIntroWrapper } from '@/components/ui/logo-intro-wrapper'
 
 export const metadata: Metadata = {
   ...defaultMetadata,
@@ -51,6 +54,8 @@ export default async function LocaleLayout({
         enableSystem={false}
         disableTransitionOnChange
       >
+        {/* Splash logo — première visite uniquement (sessionStorage guard) */}
+        <LogoIntroWrapper />
         <AuraBackground>
           <PageTransition>
             {children}

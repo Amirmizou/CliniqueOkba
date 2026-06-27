@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { ArrowLeft, Loader2, Plus, Save, Trash2, Eye, EyeOff } from 'lucide-react'
-import { Text, Lines, inputCls, Field, useToast } from '@/components/admin/ui'
+import { Text, Lines, inputCls, Field, ImagePicker, useToast } from '@/components/admin/ui'
 import { LogoBadgeSpinner } from '@/components/ui/logo-badge'
 
 interface Pole {
@@ -25,6 +25,8 @@ interface Pole {
   active?: boolean
   urgent?: boolean
   featured?: boolean
+  imageAssetId?: string | null
+  imageUrl?: string
   _dirty?: boolean
   _saving?: boolean
 }
@@ -140,6 +142,21 @@ export default function PolesEditor() {
                   <Lines label="Prestations (FR)" value={d.items || []} onChange={(v) => upd(i, { items: v })} />
                   <Lines label="الخدمات (AR)" rtl value={d.items_ar || []} onChange={(v) => upd(i, { items_ar: v })} />
                 </div>
+                {/* Photo de couverture */}
+                <div className="rounded-xl border border-slate-200 bg-slate-50 p-4 dark:border-slate-700 dark:bg-slate-800/50">
+                  <p className="mb-3 text-xs font-medium text-slate-500 dark:text-slate-400">
+                    Photo de couverture de la carte
+                  </p>
+                  <div className="sm:max-w-[200px]">
+                    <ImagePicker
+                      ratio="aspect-[4/3]"
+                      val={d.imageAssetId ?? undefined}
+                      url={!d.imageAssetId && d.imageUrl ? d.imageUrl : undefined}
+                      onChange={(assetId) => upd(i, { imageAssetId: assetId })}
+                    />
+                  </div>
+                </div>
+
                 <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
                   <Text label="Badge (FR)" value={d.badge || ''} onChange={(v) => upd(i, { badge: v })} />
                   <Text label="الشارة (AR)" rtl value={d.badge_ar || ''} onChange={(v) => upd(i, { badge_ar: v })} />

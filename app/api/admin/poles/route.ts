@@ -20,7 +20,9 @@ export async function GET() {
   const poles = await writeClient.fetch(
     `*[_type == "pole"] | order(order asc) {
       _id, ${STR.join(', ')}, "slug": slug.current, items, items_ar,
-      order, active, urgent, featured
+      order, active, urgent, featured,
+      "imageAssetId": image.asset._ref,
+      "imageUrl": image.asset->url
     }`,
   )
   return NextResponse.json({ poles })
@@ -43,11 +45,18 @@ export async function POST(request: Request) {
     if (!doc.iconName) doc.iconName = 'Stethoscope'
     if (!doc.accentColor) doc.accentColor = '#006633'
 
+    // Image de couverture : assetId fourni → référence, null explicite → suppression
+    if (b.imageAssetId) {
+      doc.image = { _type: 'image', asset: { _type: 'reference', _ref: b.imageAssetId } }
+    }
+
     let result
     if (b._id) {
       const patch: Record<string, any> = { ...doc }
       delete patch._type
-      result = await writeClient.patch(b._id).set(patch).commit()
+      let p = writeClient.patch(b._id).set(patch)
+      if (b.imageAssetId === null) p = p.unset(['image'])
+      result = await p.commit()
     } else {
       // Slug obligatoire : fourni ou dérivé du titre
       const current = (b.slug && String(b.slug).trim()) || slugify(b.title || '')

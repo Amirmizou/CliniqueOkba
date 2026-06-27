@@ -4,176 +4,226 @@ import {
   Img,
   staticFile,
   interpolate,
-  spring,
   useCurrentFrame,
   useVideoConfig,
   Easing,
 } from 'remotion'
 
-/* Couleurs de marque Clinique OKBA */
-const GREEN = '#006633'
-const GREEN_LIGHT = '#4caf6e'
-const AMBER = '#FDE68A'
+// ─── Brand ────────────────────────────────────────────────────────────────────
+const GREEN  = '#006633'
+const GREEN2 = '#3d8b4e'
 
-/* Tracé ECG (battement cardiaque) — signature médicale sous le logo */
-const ECG_PATH =
-  'M0,40 H120 l8,0 6,-26 8,52 6,-26 H300 l8,0 6,-26 8,52 6,-26 H520 l8,0 6,-26 8,52 6,-26 H720'
-
-/* Particules ambre (positions déterministes, pas de Math.random au rendu) */
-const PARTICLES = Array.from({ length: 14 }, (_, i) => ({
-  x: (i * 73) % 100,
-  delay: (i * 7) % 60,
-  size: 3 + (i % 4),
-  drift: ((i % 5) - 2) * 14,
-  dur: 70 + (i % 5) * 14,
-}))
+// ─── Easing ───────────────────────────────────────────────────────────────────
+const EXPO_OUT   = Easing.bezier(0.16, 1,    0.3,  1)
+const CIRC_OUT   = Easing.bezier(0,    0.55, 0.45, 1)
+const SMOOTH     = Easing.bezier(0.4,  0,    0.2,  1)
 
 export const OkbaLogo: React.FC = () => {
   const frame = useCurrentFrame()
-  const { fps, width, height, durationInFrames } = useVideoConfig()
+  const { width, height, durationInFrames } = useVideoConfig()
 
-  /* --- Apparition du logo (ressort) --- */
-  const enter = spring({ frame, fps, config: { damping: 16, mass: 0.8, stiffness: 110 } })
-  const logoScale = interpolate(enter, [0, 1], [0.72, 1])
-  const logoOpacity = interpolate(frame, [0, 14], [0, 1], {
-    extrapolateRight: 'clamp',
-  })
-  /* Flottement doux continu */
-  const floatY = Math.sin(frame / 18) * 6
+  // ── Logo dimensions ──────────────────────────────────────────────────────────
+  const logoW = width  * 0.62
+  const logoH = height * 0.62
 
-  /* --- Lueur radiale pulsée (vert -> ambre) --- */
-  const glowPulse = 0.55 + Math.sin(frame / 12) * 0.18
-  const glowScale = 0.9 + Math.sin(frame / 16) * 0.08
-
-  /* --- Reflet (shine) qui balaie le logo une fois --- */
-  const shineX = interpolate(frame, [18, 55], [-60, 160], {
+  // ─────────────────────────────────────────────────────────────────────────────
+  // PHASE 1 — Tige SVG qui monte (0→22f)
+  // ─────────────────────────────────────────────────────────────────────────────
+  const stemProgress = interpolate(frame, [0, 22], [0, 1], {
     extrapolateLeft: 'clamp',
     extrapolateRight: 'clamp',
-    easing: Easing.bezier(0.22, 1, 0.36, 1),
+    easing: CIRC_OUT,
   })
-
-  /* --- Tracé ECG : se dessine puis tête lumineuse qui file --- */
-  const ecgDraw = interpolate(frame, [26, 70], [0, 1], {
+  const stemOpacity = interpolate(frame, [16, 32], [1, 0], {
     extrapolateLeft: 'clamp',
     extrapolateRight: 'clamp',
-    easing: Easing.bezier(0.4, 0, 0.2, 1),
   })
-  const ecgOpacity = interpolate(frame, [24, 34], [0, 1], { extrapolateRight: 'clamp' })
 
-  /* --- Halo d'anneau qui s'étend (onde) --- */
-  const ringScale = interpolate(frame, [10, 60], [0.6, 1.6], {
+  // ─────────────────────────────────────────────────────────────────────────────
+  // PHASE 2 — Plante + OKBA : wipe du bas vers le haut (12→52f)
+  //   clip-path inset(top right bottom left)
+  //   "bottom" inset : 100% → 40%  révèle le haut du logo
+  // ─────────────────────────────────────────────────────────────────────────────
+  const plantBottom = interpolate(frame, [12, 52], [100, 40], {
+    extrapolateLeft: 'clamp',
     extrapolateRight: 'clamp',
-    easing: Easing.out(Easing.cubic),
+    easing: EXPO_OUT,
   })
-  const ringOpacity = interpolate(frame, [10, 60], [0.5, 0], { extrapolateRight: 'clamp' })
+  const plantOpacity = interpolate(frame, [10, 22], [0, 1], {
+    extrapolateRight: 'clamp',
+  })
+  // Légère montée initiale (sensation de pousse)
+  const plantY = interpolate(frame, [12, 52], [14, 0], {
+    extrapolateLeft: 'clamp',
+    extrapolateRight: 'clamp',
+    easing: EXPO_OUT,
+  })
 
-  /* --- Fondu de sortie (pour boucle/transition propre) --- */
+  // ─────────────────────────────────────────────────────────────────────────────
+  // PHASE 3 — CLINIQUE : wipe de gauche à droite (40→74f)
+  //   "right" inset : 100% → 0%  révèle de gauche à droite
+  // ─────────────────────────────────────────────────────────────────────────────
+  const cliniqueRight = interpolate(frame, [40, 74], [100, 0], {
+    extrapolateLeft: 'clamp',
+    extrapolateRight: 'clamp',
+    easing: EXPO_OUT,
+  })
+  const cliniqueOpacity = interpolate(frame, [38, 50], [0, 1], {
+    extrapolateRight: 'clamp',
+  })
+
+  // ─────────────────────────────────────────────────────────────────────────────
+  // PHASE 4 — Reflet diagonal (72→92f)
+  // ─────────────────────────────────────────────────────────────────────────────
+  const shineX = interpolate(frame, [72, 92], [-30, 130], {
+    extrapolateLeft: 'clamp',
+    extrapolateRight: 'clamp',
+    easing: SMOOTH,
+  })
+  const shineOpacity = interpolate(frame, [70, 75, 88, 92], [0, 0.85, 0.85, 0], {
+    extrapolateLeft: 'clamp',
+    extrapolateRight: 'clamp',
+  })
+
+  // ─────────────────────────────────────────────────────────────────────────────
+  // PHASE 5 — Respiration douce (après 88f)
+  // ─────────────────────────────────────────────────────────────────────────────
+  const breathPhase = Math.max(0, frame - 88)
+  const breathY     = Math.sin(breathPhase / 30) * 4
+  const breathScale = 1 + Math.sin(breathPhase / 38) * 0.006
+
+  // ─────────────────────────────────────────────────────────────────────────────
+  // EXIT — fondu sortant (propre pour boucle / transition)
+  // ─────────────────────────────────────────────────────────────────────────────
   const exitOpacity = interpolate(
     frame,
-    [durationInFrames - 14, durationInFrames - 1],
+    [durationInFrames - 16, durationInFrames - 2],
     [1, 0],
     { extrapolateLeft: 'clamp' },
   )
 
-  const logoSize = Math.min(width, height) * 0.46
+  // Tige SVG — position centrée sur la branche (≈ 46% x, de 38% à 54% y du logo)
+  const stemX   = logoW * 0.46
+  const stemY1  = logoH * 0.535
+  const stemY0  = logoH * 0.535 - logoH * 0.165 * stemProgress // monte
 
   return (
     <AbsoluteFill
       style={{
-        background: `radial-gradient(circle at 50% 42%, #00351f 0%, #00231595 45%, #000d08 100%)`,
-        opacity: exitOpacity,
+        background: 'transparent',
         alignItems: 'center',
         justifyContent: 'center',
-        fontFamily: 'sans-serif',
+        opacity: exitOpacity,
       }}
     >
-      {/* Texture de points subtile */}
-      <AbsoluteFill
-        style={{
-          backgroundImage: 'radial-gradient(rgba(255,255,255,0.05) 1px, transparent 1px)',
-          backgroundSize: '26px 26px',
-          opacity: 0.5,
-        }}
-      />
-
-      {/* Lueur radiale pulsée derrière le logo */}
+      {/* ── Halo vert très discret derrière le logo ─────────────────────── */}
       <div
         style={{
           position: 'absolute',
-          width: logoSize * 2.1,
-          height: logoSize * 2.1,
+          width:  logoW * 1.4,
+          height: logoH * 1.4,
           borderRadius: '50%',
-          background: `radial-gradient(circle, ${GREEN_LIGHT}55 0%, ${GREEN}22 40%, transparent 70%)`,
-          transform: `scale(${glowScale})`,
-          opacity: glowPulse,
-          filter: 'blur(8px)',
+          background: `radial-gradient(circle, ${GREEN2}28 0%, ${GREEN}0b 48%, transparent 72%)`,
+          opacity: Math.min(1, (frame - 50) / 30),
+          filter: 'blur(2px)',
         }}
       />
 
-      {/* Anneau d'onde qui s'étend */}
-      <div
-        style={{
-          position: 'absolute',
-          width: logoSize * 1.5,
-          height: logoSize * 1.5,
-          borderRadius: '50%',
-          border: `2px solid ${AMBER}`,
-          transform: `scale(${ringScale})`,
-          opacity: ringOpacity,
-        }}
-      />
-
-      {/* Particules ambre montantes */}
-      {PARTICLES.map((p, i) => {
-        const local = (frame - p.delay + p.dur) % p.dur
-        const prog = local / p.dur
-        const y = interpolate(prog, [0, 1], [height * 0.62, height * 0.28])
-        const o = Math.sin(prog * Math.PI) * 0.7
-        return (
-          <div
-            key={i}
-            style={{
-              position: 'absolute',
-              left: `${p.x}%`,
-              top: y,
-              width: p.size,
-              height: p.size,
-              borderRadius: '50%',
-              background: AMBER,
-              opacity: o,
-              transform: `translateX(${p.drift * prog}px)`,
-              boxShadow: `0 0 8px ${AMBER}`,
-            }}
-          />
-        )
-      })}
-
-      {/* Logo (branche d'olivier + wordmark) dans un médaillon blanc */}
+      {/* ── Conteneur logo ──────────────────────────────────────────────── */}
       <div
         style={{
           position: 'relative',
-          width: logoSize,
-          height: logoSize,
-          transform: `translateY(${floatY}px) scale(${logoScale})`,
-          opacity: logoOpacity,
-          background: '#ffffff',
-          borderRadius: '26%',
-          boxShadow: `0 30px 80px -20px rgba(0,0,0,0.55), 0 0 0 1px ${AMBER}55, inset 0 0 0 6px #ffffff`,
-          padding: logoSize * 0.06,
-          boxSizing: 'border-box',
+          width: logoW,
+          height: logoH,
+          transform: `translateY(${breathY}px) scale(${breathScale})`,
         }}
       >
-        <Img
-          src={staticFile('logo.png')}
-          style={{ width: '100%', height: '100%', objectFit: 'contain' }}
-        />
-        {/* Reflet qui balaie le médaillon */}
+
+        {/* ─ Tige SVG (disparaît quand le logo arrive) ──────────────────── */}
+        <svg
+          viewBox={`0 0 ${logoW} ${logoH}`}
+          width={logoW}
+          height={logoH}
+          style={{
+            position: 'absolute',
+            inset: 0,
+            opacity: stemOpacity,
+            overflow: 'visible',
+          }}
+        >
+          {/* Ombre portée de la tige */}
+          <line
+            x1={stemX + 1.5}  y1={stemY1}
+            x2={stemX + 1.5}  y2={stemY0}
+            stroke="rgba(0,0,0,0.12)"
+            strokeWidth={3}
+            strokeLinecap="round"
+          />
+          {/* Tige principale — se dessine avec strokeDashoffset */}
+          <line
+            x1={stemX}  y1={stemY1}
+            x2={stemX}  y2={stemY0}
+            stroke={GREEN}
+            strokeWidth={2.2}
+            strokeLinecap="round"
+            pathLength={1}
+            strokeDasharray={1}
+            strokeDashoffset={1 - stemProgress}
+            style={{ filter: `drop-shadow(0 0 3px ${GREEN2}88)` }}
+          />
+          {/* Petite lueur à l'apex de la tige */}
+          {stemProgress > 0.5 && (
+            <circle
+              cx={stemX}
+              cy={stemY0}
+              r={3}
+              fill={GREEN2}
+              opacity={Math.min(1, (stemProgress - 0.5) * 2)}
+              style={{ filter: `blur(2px)` }}
+            />
+          )}
+        </svg>
+
+        {/* ─ Couche 1 : Illustration botanique + OKBA ─────────────────────
+            clip-path révèle de bas en haut (bottom inset 100% → 40%)        */}
+        <div
+          style={{
+            position: 'absolute',
+            inset: 0,
+            clipPath: `inset(0 0 ${plantBottom}% 0 round 4px)`,
+            opacity: plantOpacity,
+            transform: `translateY(${plantY}px)`,
+          }}
+        >
+          <Img
+            src={staticFile('logo.png')}
+            style={{ width: '100%', height: '100%', objectFit: 'contain' }}
+          />
+        </div>
+
+        {/* ─ Couche 2 : CLINIQUE ───────────────────────────────────────────
+            clip-path révèle de gauche à droite (right inset 100% → 0%)      */}
+        <div
+          style={{
+            position: 'absolute',
+            inset: 0,
+            clipPath: `inset(58% ${cliniqueRight}% 0 0 round 2px)`,
+            opacity: cliniqueOpacity,
+          }}
+        >
+          <Img
+            src={staticFile('logo.png')}
+            style={{ width: '100%', height: '100%', objectFit: 'contain' }}
+          />
+        </div>
+
+        {/* ─ Reflet diagonal ───────────────────────────────────────────── */}
         <div
           style={{
             position: 'absolute',
             inset: 0,
             overflow: 'hidden',
-            borderRadius: '26%',
+            opacity: shineOpacity,
             pointerEvents: 'none',
           }}
         >
@@ -183,37 +233,26 @@ export const OkbaLogo: React.FC = () => {
               top: 0,
               bottom: 0,
               left: `${shineX}%`,
-              width: '30%',
-              background: 'linear-gradient(100deg, transparent, rgba(255,255,255,0.65), transparent)',
-              transform: 'skewX(-18deg)',
+              width: '22%',
+              background:
+                'linear-gradient(108deg, transparent 0%, rgba(255,255,255,0.72) 50%, transparent 100%)',
+              transform: 'skewX(-14deg)',
             }}
           />
         </div>
-      </div>
 
-      {/* Signature ECG sous le logo */}
-      <svg
-        width={logoSize * 1.25}
-        height={80}
-        viewBox="0 0 720 80"
-        style={{ position: 'absolute', top: `calc(50% + ${logoSize * 0.62}px)`, opacity: ecgOpacity }}
-        fill="none"
-      >
-        {/* trace de fond discret */}
-        <path d={ECG_PATH} stroke={`${AMBER}33`} strokeWidth={2} />
-        {/* tracé lumineux qui se dessine */}
-        <path
-          d={ECG_PATH}
-          stroke={AMBER}
-          strokeWidth={3}
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          pathLength={1}
-          strokeDasharray={1}
-          strokeDashoffset={1 - ecgDraw}
-          style={{ filter: `drop-shadow(0 0 5px ${AMBER})` }}
+        {/* ─ Liseré vert très subtil après révélation ────────────────────── */}
+        <div
+          style={{
+            position: 'absolute',
+            inset: 0,
+            borderRadius: 4,
+            boxShadow: `0 0 0 1px ${GREEN}18`,
+            opacity: Math.min(1, Math.max(0, (frame - 74) / 14)),
+            pointerEvents: 'none',
+          }}
         />
-      </svg>
+      </div>
     </AbsoluteFill>
   )
 }

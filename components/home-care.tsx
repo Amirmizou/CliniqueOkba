@@ -4,7 +4,7 @@ import { Stethoscope, Home, PhoneCall, Clock, CheckCircle2, Syringe, HeartPulse,
 import { motion } from 'framer-motion'
 import Image from 'next/image'
 import { useLocale, useTranslations } from 'next-intl'
-import { ECGLine } from '@/components/ui/ecg-line'
+import { cn } from '@/lib/utils'
 
 interface SectionContent {
   badge?: string
@@ -37,7 +37,6 @@ interface HomeCareProps {
   sectionContent?: SectionContent
 }
 
-/** Icônes pour les prestations par défaut */
 const SERVICE_ICONS = [Syringe, HeartPulse, Thermometer, Shield, Stethoscope, CheckCircle2]
 
 export default function HomeCare({ data, sectionContent }: HomeCareProps) {
@@ -63,7 +62,6 @@ export default function HomeCare({ data, sectionContent }: HomeCareProps) {
   const contactPrompt = data?.contactPrompt && (!isAr || hasArabicLetters(data.contactPrompt)) ? data.contactPrompt : t('contactPrompt')
   const ctaText = data?.callToAction?.text && (!isAr || hasArabicLetters(data.callToAction.text)) ? data.callToAction.text : t('ctaText')
 
-  // Prestations par défaut si rien de Sanity
   const defaultPrestations = isAr
     ? ['حقن وإعطاء الأدوية', 'تغيير الضمادات', 'مراقبة العلامات الحيوية']
     : ['Injections et administration de médicaments', 'Changement de pansements', 'Surveillance des constantes vitales']
@@ -71,171 +69,151 @@ export default function HomeCare({ data, sectionContent }: HomeCareProps) {
   const displayPrestations = prestations.length > 0 ? prestations : defaultPrestations
 
   return (
-    <section id='home-care' className='relative overflow-hidden bg-gradient-to-br from-[#006633] via-[#004d26] to-[#002211] py-20 sm:py-24 md:py-28'>
-      {/* ── Décor de fond ── */}
+    <section id='home-care' className='relative overflow-hidden bg-gradient-to-br from-[#006633] via-[#004d26] to-[#002211] py-24 sm:py-32'>
+      
+      {/* ── Décor de fond Premium ── */}
       <div className="pointer-events-none absolute inset-0">
-        {/* Glow top-left */}
-        <div className="absolute -top-40 -left-40 h-[500px] w-[500px] rounded-full bg-[#4caf6e]/20 blur-[120px]" />
-        {/* Glow bottom-right */}
-        <div className="absolute -bottom-40 -right-40 h-[500px] w-[500px] rounded-full bg-[#FDE68A]/10 blur-[120px]" />
-        {/* Grid pattern */}
-        <div
-          className="absolute inset-0 opacity-[0.04]"
-          style={{
-            backgroundImage: 'radial-gradient(circle, rgba(255,255,255,0.3) 1px, transparent 1px)',
-            backgroundSize: '32px 32px',
-          }}
+        <div className="absolute top-0 right-0 h-[800px] w-[800px] -translate-y-1/3 translate-x-1/3 rounded-full bg-[#4caf6e]/20 blur-[150px]" />
+        <div className="absolute bottom-0 left-0 h-[600px] w-[600px] translate-y-1/3 -translate-x-1/3 rounded-full bg-[#FDE68A]/10 blur-[120px]" />
+        {/* Bruit de fond subtil pour la texture */}
+        <div 
+          className="absolute inset-0 opacity-[0.05] mix-blend-overlay"
+          style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg viewBox=%220 0 200 200%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cfilter id=%22noiseFilter%22%3E%3CfeTurbulence type=%22fractalNoise%22 baseFrequency=%220.65%22 numOctaves=%223%22 stitchTiles=%22stitch%22/%3E%3C/filter%3E%3Crect width=%22100%25%22 height=%22100%25%22 filter=%22url(%23noiseFilter)%22/%3E%3C/svg%3E")' }}
         />
       </div>
 
       <div className='relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8'>
+        <div className="grid gap-16 lg:grid-cols-12 lg:items-start lg:gap-8">
+          
+          {/* ── Colonne Gauche : Texte et Services ── */}
+          <div className="flex flex-col pt-4 lg:col-span-6 xl:col-span-5">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: '-40px' }}
+              transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+            >
+              <span className="inline-flex items-center gap-2 rounded-full border border-[#FDE68A]/30 bg-[#FDE68A]/10 px-3 py-1.5 text-[11px] font-bold uppercase tracking-widest text-[#FDE68A]">
+                <Home className="h-3.5 w-3.5" />
+                {badge}
+              </span>
+              
+              <h2 className="mt-8 text-4xl font-light tracking-tight text-white sm:text-5xl lg:text-5xl xl:text-6xl">
+                {title}
+              </h2>
+              
+              <p className="mt-6 text-lg leading-relaxed text-white/70">
+                {subtitle}
+              </p>
+            </motion.div>
 
-        {/* ── En-tête de section ── */}
-        <motion.div
-          className="mb-14 text-center"
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: '-60px' }}
-          transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-        >
-          <span className="mb-4 inline-flex items-center gap-2 rounded-full border border-[#FDE68A]/30 bg-[#FDE68A]/10 px-4 py-2 text-sm font-semibold text-[#FDE68A]">
-            <Home className="h-4 w-4" />
-            {badge}
-          </span>
-          <h2 className="mt-4 text-3xl font-bold text-white sm:text-4xl md:text-5xl">
-            {title}
-          </h2>
-          <p className="mx-auto mt-4 max-w-2xl text-base text-white/70 sm:text-lg">
-            {subtitle}
-          </p>
-          {/* ECG accent */}
-          <div className="mx-auto mt-6 h-8 max-w-xs">
-            <ECGLine color="#FDE68A" height={32} />
+            {/* Grille de Prestations (Bento) */}
+            <motion.div 
+              className="mt-12 grid grid-cols-1 gap-4 sm:grid-cols-2"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: '-40px' }}
+              transition={{ duration: 0.6, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
+            >
+              {displayPrestations.map((item, i) => {
+                const IconComp = SERVICE_ICONS[i % SERVICE_ICONS.length]
+                return (
+                  <div 
+                    key={item} 
+                    className="group relative overflow-hidden rounded-2xl border border-white/5 bg-white/[0.02] p-5 transition-all hover:border-[#FDE68A]/30 hover:bg-white/[0.04]"
+                  >
+                    <IconComp className="mb-4 h-6 w-6 text-[#FDE68A]" />
+                    <h4 className="text-sm font-semibold leading-snug text-white/90">{item}</h4>
+                  </div>
+                )
+              })}
+            </motion.div>
           </div>
-        </motion.div>
 
-        {/* ── Layout principal : image + contenu ── */}
-        <div className='grid gap-10 lg:grid-cols-2 lg:items-center lg:gap-16'>
-
-          {/* Colonne image — ambulance avec overlay */}
-          <motion.div
-            className='group relative order-2 lg:order-1'
-            initial={{ opacity: 0, x: -40 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true, margin: '-60px' }}
-            transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-          >
-            <div className="relative h-[400px] w-full overflow-hidden rounded-3xl lg:h-[540px]">
+          {/* ── Colonne Droite : Image & CTA ── */}
+          <div className="relative mt-8 lg:col-span-6 lg:mt-0 xl:col-span-7 xl:pl-12">
+            
+            {/* Image Container */}
+            <motion.div 
+              className="relative aspect-[4/5] w-full overflow-hidden rounded-3xl lg:aspect-auto lg:h-[720px]"
+              initial={{ opacity: 0, scale: 0.95 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              viewport={{ once: true, margin: '-40px' }}
+              transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+            >
               <Image
                 src="/images/spec/home-care-generated.png"
                 alt={title || 'Soins à domicile'}
                 fill
-                className="object-cover transition-transform duration-700 group-hover:scale-[1.03]"
-                sizes="(max-width: 1024px) 100vw, 50vw"
+                className="object-cover transition-transform duration-1000 hover:scale-105"
+                sizes="(max-width: 1024px) 100vw, 60vw"
               />
-              {/* Overlay gradient */}
-              <div className="absolute inset-0 bg-gradient-to-t from-[#002211]/90 via-[#002211]/20 to-transparent" />
-              {/* Inner ring */}
+              <div className="absolute inset-0 bg-gradient-to-t from-[#002211]/90 via-[#002211]/20 to-transparent lg:bg-none" />
               <div className="absolute inset-0 rounded-3xl ring-1 ring-inset ring-[#FDE68A]/20" />
+            </motion.div>
 
-              {/* Badge flottant "24/7" */}
-              <div className="absolute bottom-6 left-6 flex items-center gap-3 rounded-2xl border border-[#FDE68A]/20 bg-[#006633]/80 px-5 py-3.5 backdrop-blur-xl">
-                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-[#006633] to-[#FDE68A] shadow-lg shadow-[#006633]/50">
-                  <Clock className="h-5 w-5 text-white" />
-                </div>
-                <div>
-                  <p className="text-sm font-bold text-white">7j/7</p>
-                  <p className="text-xs text-white/60">{availabilityText}</p>
-                </div>
-              </div>
-            </div>
-          </motion.div>
-
-          {/* Colonne contenu */}
-          <div className='order-1 space-y-6 lg:order-2'>
-
-            {/* ── Prestations ── */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: '-40px' }}
-              transition={{ duration: 0.5, delay: 0.1 }}
+            {/* Badge 24/7 flottant */}
+            <motion.div 
+              className={cn(
+                "absolute flex items-center gap-3 rounded-2xl border border-white/10 bg-white/10 px-4 py-3 shadow-xl backdrop-blur-md",
+                isAr ? "top-8 -right-4 sm:-right-8" : "top-8 -left-4 sm:-left-8"
+              )}
+              initial={{ opacity: 0, x: isAr ? -20 : 20 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, delay: 0.4 }}
             >
-              <div className="mb-4 flex items-center gap-3">
-                <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#FDE68A]/10">
-                  <Stethoscope className="h-5 w-5 text-[#FDE68A]" />
-                </div>
-                <h3 className="text-lg font-bold text-white">{t('prestations')}</h3>
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#FDE68A]/20 text-[#FDE68A]">
+                <Clock className="h-5 w-5" />
               </div>
-              <div className="space-y-3">
-                {displayPrestations.map((item, i) => {
-                  const IconComp = SERVICE_ICONS[i % SERVICE_ICONS.length]
-                  return (
-                    <motion.div
-                      key={item}
-                      initial={{ opacity: 0, x: 20 }}
-                      whileInView={{ opacity: 1, x: 0 }}
-                      viewport={{ once: true }}
-                      transition={{ duration: 0.4, delay: 0.15 + i * 0.06 }}
-                      className="group/item flex items-center gap-4 rounded-2xl border border-white/5 bg-white/[0.04] p-4 backdrop-blur-sm transition-all duration-300 hover:border-[#FDE68A]/30 hover:bg-white/[0.08]"
-                    >
-                      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#FDE68A]/10 text-[#FDE68A] transition-colors duration-300 group-hover/item:bg-[#FDE68A]/20">
-                        <IconComp className="h-5 w-5" />
-                      </div>
-                      <span className="text-sm font-medium text-white/90">{item}</span>
-                    </motion.div>
-                  )
-                })}
+              <div>
+                <p className="text-sm font-bold leading-none text-white">7j/7</p>
+                <p className="mt-1 text-[10px] uppercase tracking-wider text-white/70">{availabilityText}</p>
               </div>
             </motion.div>
 
-            {/* ── Contact & CTA ── */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
+            {/* Carte de Contact (Glassmorphism, Overlapping) */}
+            <motion.div 
+              className={cn(
+                "relative mx-4 -mt-24 rounded-3xl border border-[#FDE68A]/20 bg-[#002211]/80 p-6 shadow-[0_8px_30px_rgba(0,102,51,0.3)] backdrop-blur-2xl sm:mx-12 sm:p-8 lg:absolute lg:bottom-12 lg:m-0 lg:w-[420px]",
+                isAr ? "lg:-right-16" : "lg:-left-16"
+              )}
+              initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: '-40px' }}
-              transition={{ duration: 0.5, delay: 0.3 }}
-              className="rounded-2xl border border-[#FDE68A]/20 bg-gradient-to-br from-[#006633]/40 via-[#004d26]/20 to-transparent p-6 backdrop-blur-sm shadow-[0_8px_30px_rgba(0,102,51,0.15)]"
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, delay: 0.3 }}
             >
-              <div className="mb-4 flex items-center gap-3">
-                <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#FDE68A]/10">
+              <div className="mb-6 flex items-center gap-4">
+                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-[#FDE68A]/10">
                   <PhoneCall className="h-5 w-5 text-[#FDE68A]" />
                 </div>
                 <div>
                   <h3 className="text-lg font-bold text-white">{availabilityTitle}</h3>
-                  <p className="text-xs text-white/60">{contactPrompt}</p>
+                  <p className="text-sm text-white/60">{contactPrompt}</p>
                 </div>
               </div>
-
-              {/* Numéros de téléphone */}
-              <div className="mb-5 flex flex-col gap-2 sm:flex-row" dir="ltr">
-                <a
-                  href="tel:0563015916"
-                  className="inline-flex flex-1 items-center justify-center gap-2 rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-base font-bold text-white transition-all duration-200 hover:border-[#FDE68A]/40 hover:bg-white/10"
-                >
-                  <PhoneCall className="h-4 w-4 text-[#FDE68A]" />
-                  0563 01 59 16
+              
+              <div className="mb-6 space-y-3" dir="ltr">
+                <a href="tel:0563015916" className="group flex items-center justify-between rounded-xl border border-white/5 bg-white/5 px-4 py-3 text-white transition hover:border-[#FDE68A]/30 hover:bg-white/10">
+                  <span className="font-bold tracking-wider">0563 01 59 16</span>
+                  <ArrowRight className="h-4 w-4 text-[#FDE68A] transition-transform group-hover:translate-x-1" />
                 </a>
-                <a
-                  href="tel:0563015917"
-                  className="inline-flex flex-1 items-center justify-center gap-2 rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-base font-bold text-white transition-all duration-200 hover:border-[#FDE68A]/40 hover:bg-white/10"
-                >
-                  <PhoneCall className="h-4 w-4 text-[#FDE68A]" />
-                  0563 01 59 17
+                <a href="tel:0563015917" className="group flex items-center justify-between rounded-xl border border-white/5 bg-white/5 px-4 py-3 text-white transition hover:border-[#FDE68A]/30 hover:bg-white/10">
+                  <span className="font-bold tracking-wider">0563 01 59 17</span>
+                  <ArrowRight className="h-4 w-4 text-[#FDE68A] transition-transform group-hover:translate-x-1" />
                 </a>
               </div>
 
-              {/* CTA button avec dégradé vert -> jaune comme demandé */}
-              <button
-                onClick={scrollToContact}
-                className="group/btn inline-flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#006633] via-[#4caf6e] to-[#FDE68A] px-6 py-3.5 text-sm font-bold text-white shadow-lg shadow-[#006633]/30 transition-all duration-300 hover:opacity-90 active:scale-[0.98]"
+              <button 
+                onClick={scrollToContact} 
+                className="w-full rounded-xl bg-[#FDE68A] py-4 text-sm font-bold text-[#002211] shadow-lg shadow-[#FDE68A]/20 transition hover:bg-[#fcd34d] active:scale-[0.98]"
               >
                 {ctaText}
-                <ArrowRight className="h-4 w-4 transition-transform duration-200 group-hover/btn:translate-x-1" />
               </button>
             </motion.div>
 
           </div>
+
         </div>
       </div>
     </section>

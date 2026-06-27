@@ -18,7 +18,7 @@ import {
   Facebook,
   Instagram,
 } from 'lucide-react'
-import Map from '@/components/map'
+import LocationBento from '@/components/location-bento'
 import WhatsAppBooking from '@/components/whatsapp-booking'
 
 
@@ -360,17 +360,8 @@ export default function Contact({ siteSettings, sectionContent }: ContactProps) 
               </div>
             </div>
 
-            {/* Map */}
-            <div className='border-border border-t pt-8'>
-              <h3 className='text-foreground mb-4 font-semibold'>{ti('ourLocation')}</h3>
-              <Map
-                address={contactData.address}
-                coordinates={contactData.coordinates}
-              />
-            </div>
-
             {/* Social Links */}
-            <div className='border-border border-t pt-8'>
+            <div className='border-border border-t pt-8 mt-8'>
               <p className='text-foreground mb-4 font-semibold'>{ti('followUs')}</p>
               <div className='flex gap-3'>
                 <a
@@ -672,6 +663,14 @@ export default function Contact({ siteSettings, sectionContent }: ContactProps) 
             </Card>
           </ScrollAnimation>
         </div>
+
+        {/* Out-of-the-box Location Bento Dashboard */}
+        <ScrollAnimation variant="fadeUp" className='mt-20 pt-16 border-t border-border'>
+          <LocationBento
+            address={contactData.address}
+            coordinates={contactData.coordinates}
+          />
+        </ScrollAnimation>
       </div>
     </section>
   )

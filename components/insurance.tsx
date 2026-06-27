@@ -37,6 +37,21 @@ export default function Insurance({ data }: InsuranceProps) {
   const locale = useLocale()
   const isAr = locale === 'ar'
 
+  // Préparation des cartes pour le cylindre 3D
+  // Si le nombre de partenaires est trop petit, on duplique pour fermer le cercle.
+  let carouselItems = [...data.providers]
+  if (carouselItems.length > 0) {
+    while (carouselItems.length < 8) {
+      carouselItems = [...carouselItems, ...data.providers]
+    }
+  }
+
+  const total = carouselItems.length
+  const angle = 360 / total
+  const cardWidth = 260
+  // Calcul précis du rayon (translateZ) pour que les cartes ne se chevauchent pas
+  const tz = Math.round((cardWidth / 2) / Math.tan(Math.PI / total)) + 30
+
   return (
     <section
       id="prise-en-charge"
@@ -62,47 +77,64 @@ export default function Insurance({ data }: InsuranceProps) {
           </div>
         </AnimatedSection>
 
-        {/* Grille des organismes */}
-        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
-          {data.providers.map((provider, i) => {
-            const logoUrl = typeof provider.logo === 'string'
-              ? provider.logo
-              : provider.logo
-                ? urlFor(provider.logo).width(160).height(160).fit('max').url()
-                : ''
-            return (
-              <motion.div
-                key={provider.name}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: '-60px' }}
-                transition={{ duration: 0.5, delay: i * 0.08, ease: [0.22, 1, 0.36, 1] }}
-                className="group relative flex flex-col items-start rounded-2xl border border-border/60 bg-card/80 p-6 shadow-sm backdrop-blur-sm transition-all duration-300 hover:-translate-y-1 hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5"
-              >
-                <div className="mb-4 flex h-14 w-14 items-center justify-center overflow-hidden rounded-xl bg-primary/10 text-primary">
-                  {logoUrl ? (
-                    <Image
-                      src={logoUrl}
-                      alt={provider.name}
-                      width={56}
-                      height={56}
-                      className="h-full w-full object-contain p-1.5"
-                    />
-                  ) : (
-                    <BadgeCheck className="h-7 w-7" />
+        {/* Carrousel 3D Cylindrique */}
+        <div className="relative mx-auto mt-20 h-[280px] w-full max-w-[260px] [perspective:1400px]">
+          {/* Style injecté pour l'animation native CSS (plus performant pour la 3D continue) */}
+          <style dangerouslySetInnerHTML={{__html: `
+            @keyframes spin-cylinder {
+              0% { transform: translateZ(-${tz}px) rotateY(0deg); }
+              100% { transform: translateZ(-${tz}px) rotateY(-360deg); }
+            }
+            .animate-spin-cylinder {
+              animation: spin-cylinder ${total * 3.5}s linear infinite;
+            }
+            .animate-spin-cylinder:hover {
+              animation-play-state: paused;
+            }
+          `}} />
+          
+          <div className="animate-spin-cylinder absolute inset-0 [transform-style:preserve-3d]">
+            {carouselItems.map((provider, i) => {
+              const logoUrl = typeof provider.logo === 'string'
+                ? provider.logo
+                : provider.logo
+                  ? urlFor(provider.logo).width(320).url()
+                  : ''
+              
+              return (
+                <div
+                  key={`${provider.name}-${i}`}
+                  className="absolute inset-0 flex flex-col items-center justify-center rounded-2xl border border-border/80 bg-card/95 p-6 text-center shadow-lg backdrop-blur-md transition-colors hover:border-primary/40 hover:bg-card"
+                  style={{
+                    transform: `rotateY(${i * angle}deg) translateZ(${tz}px)`,
+                    backfaceVisibility: 'hidden',
+                  }}
+                >
+                  <div className="mb-4 flex h-16 w-full max-w-[160px] items-center justify-center rounded-xl bg-primary/5 p-2 text-primary shadow-inner">
+                    {logoUrl ? (
+                      <Image
+                        src={logoUrl}
+                        alt={provider.name}
+                        width={160}
+                        height={64}
+                        className="h-full w-full object-contain"
+                      />
+                    ) : (
+                      <BadgeCheck className="h-8 w-8" />
+                    )}
+                  </div>
+                  <h3 className="text-base font-bold text-foreground">
+                    {isAr ? (provider.name_ar || provider.name) : provider.name}
+                  </h3>
+                  {(provider.description || provider.description_ar) && (
+                    <p className="mt-2 text-[13px] leading-relaxed text-muted-foreground line-clamp-3">
+                      {isAr ? (provider.description_ar || provider.description) : provider.description}
+                    </p>
                   )}
                 </div>
-                <h3 className="text-base font-bold text-foreground">
-                  {isAr ? (provider.name_ar || provider.name) : provider.name}
-                </h3>
-                {(provider.description || provider.description_ar) && (
-                  <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-                    {isAr ? (provider.description_ar || provider.description) : provider.description}
-                  </p>
-                )}
-              </motion.div>
-            )
-          })}
+              )
+            })}
+          </div>
         </div>
 
         {/* Note + CTA */}
@@ -111,7 +143,7 @@ export default function Insurance({ data }: InsuranceProps) {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: '-60px' }}
           transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-          className="mt-10 flex flex-col items-center gap-5 rounded-2xl border border-primary/15 bg-primary/[0.04] p-6 text-center sm:flex-row sm:justify-between sm:text-left"
+          className="mt-20 flex flex-col items-center gap-5 rounded-2xl border border-primary/15 bg-primary/[0.04] p-6 text-center sm:flex-row sm:justify-between sm:text-left"
         >
           {(data.note || data.note_ar) && (
             <p className="max-w-3xl text-sm leading-relaxed text-muted-foreground">

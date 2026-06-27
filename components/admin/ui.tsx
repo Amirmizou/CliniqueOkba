@@ -2,7 +2,7 @@
 
 import { useRef, useState, useEffect, type ReactNode } from 'react'
 import Image from 'next/image'
-import { Loader2, Upload } from 'lucide-react'
+import { Loader2, Upload, X, Search, Images } from 'lucide-react'
 
 export const inputCls =
   'w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-800 outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 dark:border-slate-700 dark:bg-slate-800 dark:text-white'
@@ -92,7 +92,151 @@ export function Lines({
   return label ? <Field label={label}>{textarea}</Field> : textarea
 }
 
-/** Upload d'image vers Sanity (retourne l'assetId + l'URL d'aperçu). */
+interface SanityImageAsset {
+  _id: string
+  url: string
+  originalFilename?: string
+  width?: number
+  height?: number
+}
+
+/** Navigateur modal pour choisir parmi les images déjà uploadées dans Sanity. */
+export function ImageBrowser({
+  open,
+  onClose,
+  onSelect,
+  currentAssetId,
+}: {
+  open: boolean
+  onClose: () => void
+  onSelect: (assetId: string, url: string) => void
+  currentAssetId?: string
+}) {
+  const [images, setImages] = useState<SanityImageAsset[]>([])
+  const [loading, setLoading] = useState(false)
+  const [search, setSearch] = useState('')
+
+  useEffect(() => {
+    if (!open) return
+    setLoading(true)
+    fetch('/api/admin/media')
+      .then((r) => r.json())
+      .then((d) => setImages(d.images || []))
+      .catch(() => {})
+      .finally(() => setLoading(false))
+  }, [open])
+
+  // Fermer avec Escape
+  useEffect(() => {
+    if (!open) return
+    const handler = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose() }
+    window.addEventListener('keydown', handler)
+    return () => window.removeEventListener('keydown', handler)
+  }, [open, onClose])
+
+  if (!open) return null
+
+  const filtered = search
+    ? images.filter((img) =>
+        (img.originalFilename || '').toLowerCase().includes(search.toLowerCase()),
+      )
+    : images
+
+  return (
+    <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm" onClick={onClose}>
+      <div
+        className="flex max-h-[85vh] w-full max-w-3xl flex-col overflow-hidden rounded-2xl bg-white shadow-2xl dark:bg-slate-900"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* En-tête */}
+        <div className="flex items-center justify-between border-b border-slate-200 px-4 py-3 dark:border-slate-800">
+          <span className="text-sm font-semibold text-slate-800 dark:text-white">
+            Choisir une photo depuis la galerie
+          </span>
+          <button
+            onClick={onClose}
+            className="rounded-lg p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-600 dark:hover:bg-slate-800 dark:hover:text-white"
+          >
+            <X className="h-4 w-4" />
+          </button>
+        </div>
+
+        {/* Recherche */}
+        <div className="border-b border-slate-100 px-4 py-2 dark:border-slate-800">
+          <div className="flex items-center gap-2 rounded-lg border border-slate-200 bg-slate-50 px-3 py-1.5 dark:border-slate-700 dark:bg-slate-800">
+            <Search className="h-3.5 w-3.5 shrink-0 text-slate-400" />
+            <input
+              type="text"
+              placeholder="Rechercher par nom de fichier…"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="min-w-0 flex-1 bg-transparent text-xs text-slate-700 outline-none placeholder:text-slate-400 dark:text-slate-200"
+            />
+          </div>
+        </div>
+
+        {/* Grille */}
+        <div className="flex-1 overflow-y-auto p-3">
+          {loading ? (
+            <div className="flex h-40 items-center justify-center">
+              <Loader2 className="h-6 w-6 animate-spin text-slate-400" />
+            </div>
+          ) : filtered.length === 0 ? (
+            <div className="flex h-40 flex-col items-center justify-center gap-2 text-slate-400">
+              <Images className="h-8 w-8" />
+              <p className="text-xs">{search ? 'Aucun résultat' : 'Aucune image uploadée'}</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-3 gap-2 sm:grid-cols-4 md:grid-cols-5">
+              {filtered.map((img) => {
+                const selected = img._id === currentAssetId
+                return (
+                  <button
+                    key={img._id}
+                    onClick={() => { onSelect(img._id, img.url); onClose() }}
+                    title={img.originalFilename}
+                    className={`group relative aspect-square overflow-hidden rounded-xl border-2 transition-all ${
+                      selected
+                        ? 'border-emerald-500 ring-2 ring-emerald-500/30'
+                        : 'border-transparent hover:border-emerald-400'
+                    }`}
+                  >
+                    <Image
+                      src={img.url}
+                      alt={img.originalFilename || ''}
+                      fill
+                      sizes="150px"
+                      className="object-cover transition-transform group-hover:scale-105"
+                      unoptimized
+                    />
+                    {selected && (
+                      <div className="absolute inset-0 flex items-center justify-center bg-emerald-600/20">
+                        <div className="rounded-full bg-emerald-500 p-1">
+                          <svg className="h-3 w-3 text-white" viewBox="0 0 12 12" fill="none">
+                            <path d="M2 6l3 3 5-5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                          </svg>
+                        </div>
+                      </div>
+                    )}
+                  </button>
+                )
+              })}
+            </div>
+          )}
+        </div>
+
+        <div className="border-t border-slate-100 px-4 py-2.5 dark:border-slate-800">
+          <p className="text-xs text-slate-400">
+            {filtered.length} photo{filtered.length !== 1 ? 's' : ''} disponible{filtered.length !== 1 ? 's' : ''}
+          </p>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+/** Upload d'image vers Sanity (retourne l'assetId + l'URL d'aperçu).
+ *  Inclut un bouton "Galerie" pour sélectionner une image déjà uploadée. */
 export function ImagePicker({
   url,
   ratio = 'aspect-[3/4]',
@@ -109,6 +253,7 @@ export function ImagePicker({
   const ref = useRef<HTMLInputElement>(null)
   const [busy, setBusy] = useState(false)
   const [resolvedUrl, setResolvedUrl] = useState<string | null>(null)
+  const [browserOpen, setBrowserOpen] = useState(false)
 
   useEffect(() => {
     if (val && val.startsWith('image-')) {
@@ -139,6 +284,12 @@ export function ImagePicker({
     }
   }
 
+  const handleBrowseSelect = (assetId: string, assetUrl: string) => {
+    if (onUploaded) onUploaded(assetId, assetUrl)
+    if (onChange) onChange(assetId)
+    setResolvedUrl(assetUrl)
+  }
+
   return (
     <div>
       <div className={`relative ${ratio} w-full overflow-hidden rounded-xl border border-slate-200 bg-slate-100 dark:border-slate-700 dark:bg-slate-800`}>
@@ -162,22 +313,38 @@ export function ImagePicker({
         className="hidden"
         onChange={(e) => e.target.files?.[0] && handle(e.target.files[0])}
       />
-      <div className="flex gap-2 mt-2">
+      <div className="mt-2 flex gap-2">
         <button
+          type="button"
           onClick={() => ref.current?.click()}
           className="flex-1 rounded-lg border border-slate-300 px-3 py-1.5 text-xs font-medium text-slate-600 hover:bg-slate-50 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800"
         >
-          {displayUrl ? "Changer l'image" : 'Choisir une image'}
+          {displayUrl ? "Uploader une autre" : 'Uploader'}
+        </button>
+        <button
+          type="button"
+          onClick={() => setBrowserOpen(true)}
+          className="flex items-center gap-1 rounded-lg border border-slate-300 px-3 py-1.5 text-xs font-medium text-slate-600 hover:bg-slate-50 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800"
+        >
+          <Images className="h-3.5 w-3.5" />
+          Galerie
         </button>
         {displayUrl && onChange && (
           <button
-            onClick={() => onChange(null)}
+            type="button"
+            onClick={() => { onChange(null); setResolvedUrl(null) }}
             className="rounded-lg border border-red-300 px-3 py-1.5 text-xs font-medium text-red-600 hover:bg-red-50 dark:border-red-700/50 dark:text-red-400 dark:hover:bg-red-900/20"
           >
             Retirer
           </button>
         )}
       </div>
+      <ImageBrowser
+        open={browserOpen}
+        onClose={() => setBrowserOpen(false)}
+        onSelect={handleBrowseSelect}
+        currentAssetId={val}
+      />
     </div>
   )
 }

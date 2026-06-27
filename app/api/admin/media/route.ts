@@ -3,13 +3,30 @@ import { writeClient } from '@/sanity/lib/client'
 import { isAuthenticated } from '@/lib/admin/api'
 
 /**
- * Upload d'un média (image ou vidéo) vers les assets Sanity (CDN).
- * Retourne la référence d'asset à stocker dans un document + l'URL d'aperçu.
- *
- * POST  multipart/form-data : { file }
- *  -> { assetId, url, kind }
+ * GET  -> liste des images Sanity déjà uploadées (pour le navigateur de galerie)
+ * POST multipart/form-data : { file } -> { assetId, url, kind }
  */
 export const dynamic = 'force-dynamic'
+
+export async function GET() {
+  if (!(await isAuthenticated())) {
+    return NextResponse.json({ error: 'Non autorisé' }, { status: 401 })
+  }
+  try {
+    const images = await writeClient.fetch(
+      `*[_type == "sanity.imageAsset"] | order(_createdAt desc) [0...300] {
+        _id,
+        url,
+        originalFilename,
+        "width": metadata.dimensions.width,
+        "height": metadata.dimensions.height
+      }`,
+    )
+    return NextResponse.json({ images })
+  } catch {
+    return NextResponse.json({ error: 'Erreur de chargement' }, { status: 500 })
+  }
+}
 
 const IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif', 'image/svg+xml']
 const VIDEO_TYPES = ['video/mp4', 'video/webm']

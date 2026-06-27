@@ -96,6 +96,20 @@ function toArabic(doc: Doctor): Doctor {
   }
 }
 
+/** Sanitise a video URL — Sanity's URL field can contain duplicated/concatenated
+ *  URLs when the user pastes repeatedly. Extract the first valid URL. */
+function sanitizeVideoUrl(raw: any): string | null {
+  if (typeof raw !== 'string' || !raw) return null
+  const match = raw.match(/https?:\/\/(?:(?!https?:\/\/)[^\s"'<>])+?\.(mp4|webm|mov|m4v)/ig)
+    || raw.match(/https?:\/\/(?:(?!https?:\/\/)[^\s"'<>])+(?:youtube\.com|youtu\.be|facebook\.com|fb\.watch)[^\s"'<>]+/ig)
+
+  if (match && match.length > 0) {
+    // Return the shortest match to avoid accidentally matching concatenated garbage
+    return match.reduce((shortest: string, current: string) => current.length < shortest.length ? current : shortest)
+  }
+  return raw.trim()
+}
+
 /** Convertit les médecins Sanity en Doctor[] (repli sur les données locales) */
 function resolveDoctors(data: any[] | undefined, locale: string): Doctor[] {
   const base: Doctor[] =
@@ -116,7 +130,9 @@ function resolveDoctors(data: any[] | undefined, locale: string): Doctor[] {
           icon: ICONS[d.iconName] || Stethoscope,
           accent: d.accentColor || '#006633',
           gradient: '',
-          videos: Array.isArray(d.videos) ? d.videos.filter(Boolean) : [],
+          videos: Array.isArray(d.videos)
+            ? d.videos.map(sanitizeVideoUrl).filter(Boolean) as string[]
+            : [],
         }))
 
   return locale === 'ar' ? base.map(toArabic) : base
@@ -141,9 +157,9 @@ function DoctorCard({
   const locale = useLocale()
 
   const Icon = doctor.icon
-  // Si une couleur de section est définie, elle s'applique à tous les médecins,
-  // sinon on utilise la couleur propre au médecin, ou le vert par défaut.
-  const accent = sectionAccent || doctor.accent || '#006633'
+  // On utilise la couleur propre au médecin (définie dans Sanity), 
+  // sinon on utilise la couleur de section, ou le vert par défaut.
+  const accent = doctor.accent || sectionAccent || '#006633'
   const hasVideos = Array.isArray(doctor.videos) && doctor.videos.length > 0
   const waMessage = encodeURIComponent(
     locale === 'ar'
@@ -266,12 +282,10 @@ function DoctorCard({
               style={{ background: 'radial-gradient(circle at 50% 42%, rgba(0,0,0,0.45), rgba(0,0,0,0.12) 60%, transparent 82%)' }}
             />
             {/* Gros bouton play centré (desktop) — apparaît au survol, lance la vidéo */}
-            <button
-              type="button"
+            <div
               onClick={() => onPlay(doctor)}
-              tabIndex={-1}
               aria-hidden="true"
-              className="pointer-events-none absolute left-1/2 top-[42%] z-10 hidden -translate-x-1/2 -translate-y-1/2 flex-col items-center gap-3 opacity-0 transition-opacity duration-300 group-hover:pointer-events-auto group-hover:opacity-100 sm:flex"
+              className="pointer-events-none absolute left-1/2 top-[42%] z-10 hidden -translate-x-1/2 -translate-y-1/2 flex-col items-center gap-3 opacity-0 transition-opacity duration-300 group-hover:pointer-events-auto group-hover:opacity-100 sm:flex cursor-pointer"
             >
               <span className="relative flex h-[68px] w-[68px] items-center justify-center rounded-full bg-white/25 ring-1 ring-white/50 backdrop-blur-md transition-transform duration-300 group-hover:scale-105">
                 <span aria-hidden="true" className="absolute inset-0 rounded-full border-2 border-white/70 animate-ping" />
@@ -281,7 +295,7 @@ function DoctorCard({
                 <Play className="h-3.5 w-3.5 fill-[#FDE68A] text-[#FDE68A]" />
                 {locale === 'ar' ? 'شاهد الفيديو' : 'Voir la vidéo'}
               </span>
-            </button>
+            </div>
           </>
         )}
 
@@ -416,12 +430,10 @@ function VideoLightbox({
   const locale = useLocale()
   const videos = doctor.videos || []
   const [index, setIndex] = useState(0)
-  const [isPlaying, setIsPlaying] = useState(false)
+  const [isPlaying, setIsPlaying] = useState(true)
   const current = videos[index]
   const accent = doctor.accent || '#006633'
 
-  // Changer de vidéo réinitialise la lecture (évite l'autoplay bloqué : on
-  // remonte le lecteur sur un geste explicite, comme la section Vidéothèque).
   const selectVideo = (i: number) => {
     setIsPlaying(false)
     setIndex(i)
@@ -433,88 +445,106 @@ function VideoLightbox({
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       onClick={onClose}
-      className="fixed inset-0 z-[100] flex items-center justify-center bg-black/85 p-4 backdrop-blur-sm"
+      className="fixed inset-0 z-[100] flex items-end sm:items-center justify-center bg-black/90 backdrop-blur-sm"
     >
-      <button
-        type="button"
-        onClick={onClose}
-        aria-label={tc('close')}
-        className="absolute right-5 top-5 flex h-11 w-11 items-center justify-center rounded-full bg-white/15 text-white backdrop-blur-md transition-colors hover:bg-white/30"
-      >
-        <X className="h-5 w-5" />
-      </button>
-
       <motion.div
-        initial={{ scale: 0.92, opacity: 0 }}
-        animate={{ scale: 1, opacity: 1 }}
-        exit={{ scale: 0.92, opacity: 0 }}
-        transition={{ type: 'spring', stiffness: 220, damping: 24 }}
+        initial={{ y: 56, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        exit={{ y: 40, opacity: 0 }}
+        transition={{ type: 'spring', stiffness: 300, damping: 30 }}
         onClick={(e) => e.stopPropagation()}
-        className="w-full max-w-4xl"
+        className="relative w-full max-w-3xl overflow-hidden rounded-t-2xl sm:rounded-2xl bg-[#0d0d0d] shadow-2xl ring-1 ring-white/10"
       >
-        <div className="mb-3 flex flex-col items-center text-center">
-          <span
-            className="mb-2 inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-[11px] font-bold uppercase tracking-wide text-white shadow-lg backdrop-blur-sm"
-            style={{ backgroundColor: `${accent}E6` }}
-          >
-            <Play className="h-3 w-3 fill-current" />
-            {locale === 'ar' ? 'فيديو' : 'Vidéo'}
-          </span>
-          <h3 className="text-lg font-bold text-white">{doctor.name}</h3>
-          <p className="text-sm text-white/70">{doctor.specialty}</p>
-        </div>
+        {/* Close */}
+        <button
+          type="button"
+          onClick={onClose}
+          aria-label={tc('close')}
+          className="absolute right-3 top-3 z-20 flex h-8 w-8 items-center justify-center rounded-full bg-black/60 text-white/80 backdrop-blur-sm transition-all hover:bg-black/80 hover:text-white"
+        >
+          <X className="h-4 w-4" />
+        </button>
 
-        <div className="relative aspect-video w-full overflow-hidden rounded-2xl bg-black shadow-2xl ring-2 ring-[#FDE68A]/40">
+        {/* Video area */}
+        <div className="relative aspect-video w-full overflow-hidden bg-black">
           {current && isPlaying ? (
             <UniversalPlayer
-              key={current}
+              key={`${current}-${index}`}
               url={current}
               playing
               controls
-              className="h-full w-full object-contain bg-black"
+              className="h-full w-full"
               onEnded={() => setIsPlaying(false)}
             />
           ) : (
-            /* Affiche cliquable — le lecteur démarre sur ce geste (fiable mobile/desktop) */
             <button
               type="button"
               onClick={() => setIsPlaying(true)}
               aria-label={locale === 'ar' ? 'تشغيل الفيديو' : 'Lire la vidéo'}
-              className="group/play relative block h-full w-full cursor-pointer focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#FDE68A]/60"
+              className="group/play relative block h-full w-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40"
             >
-              <span className="absolute inset-0" style={{ background: `radial-gradient(circle at 50% 38%, ${accent}, #001b10 78%)` }} />
-              <span className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
-              <span className="absolute inset-0 flex items-center justify-center">
-                <span className="relative flex h-20 w-20 items-center justify-center sm:h-24 sm:w-24">
-                  <span aria-hidden="true" className="absolute inset-0 animate-ping rounded-full bg-white/20" style={{ animationDuration: '2.2s' }} />
-                  <span className="relative flex h-full w-full items-center justify-center rounded-full border border-white/30 bg-white/15 backdrop-blur-md transition-all duration-300 group-hover/play:scale-110 group-hover/play:bg-[#006633]/80">
-                    <Play className="ms-1 h-8 w-8 fill-white text-white sm:h-10 sm:w-10" />
+              {/* Doctor portrait as blurred backdrop */}
+              <Image
+                loader={sanityImageLoader}
+                src={doctor.poster}
+                alt=""
+                fill
+                aria-hidden="true"
+                className="object-cover scale-105 blur-sm brightness-50"
+              />
+              {/* Bottom vignette */}
+              <span className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/15 to-transparent" />
+              {/* Accent glow */}
+              <span className="absolute inset-0" style={{ background: `radial-gradient(ellipse 65% 55% at 50% 50%, ${accent}28 0%, transparent 70%)` }} />
+
+              {/* Play button */}
+              <span className="absolute inset-0 flex flex-col items-center justify-center gap-3">
+                <span className="relative flex h-16 w-16 items-center justify-center sm:h-20 sm:w-20">
+                  <span
+                    aria-hidden="true"
+                    className="absolute inset-0 rounded-full animate-ping"
+                    style={{ backgroundColor: accent, opacity: 0.28, animationDuration: '2.5s' }}
+                  />
+                  <span
+                    className="relative flex h-full w-full items-center justify-center rounded-full transition-transform duration-300 group-hover/play:scale-110"
+                    style={{ backgroundColor: `${accent}CC`, backdropFilter: 'blur(6px)' }}
+                  >
+                    <Play className="ms-0.5 h-7 w-7 fill-white text-white sm:h-8 sm:w-8" />
                   </span>
+                </span>
+                <span className="text-sm font-medium text-white/70 tracking-wide">
+                  {locale === 'ar' ? 'اضغط للتشغيل' : 'Appuyer pour lire'}
                 </span>
               </span>
             </button>
           )}
         </div>
 
-        {videos.length > 1 && (
-          <div className="mt-4 flex flex-wrap justify-center gap-2">
-            {videos.map((_, i) => (
-              <button
-                key={i}
-                type="button"
-                onClick={() => selectVideo(i)}
-                aria-label={`Vidéo ${i + 1}`}
-                className={`h-9 min-w-[2.25rem] rounded-full px-3 text-sm font-semibold transition-colors ${
-                  i === index
-                    ? 'bg-white text-slate-900'
-                    : 'bg-white/15 text-white hover:bg-white/25'
-                }`}
-              >
-                {i + 1}
-              </button>
-            ))}
+        {/* Info bar */}
+        <div className="flex items-center justify-between gap-2 border-t border-white/[0.06] px-4 py-3">
+          <div className="flex min-w-0 items-center gap-2.5">
+            <span className="h-2 w-2 shrink-0 rounded-full" style={{ backgroundColor: accent }} />
+            <div className="min-w-0">
+              <p className="truncate text-[13px] font-semibold text-white">{doctor.name}</p>
+              <p className="mt-0.5 truncate text-[11px] text-white/45">{doctor.specialty}</p>
+            </div>
           </div>
-        )}
+          {videos.length > 1 && (
+            <div className="flex shrink-0 items-center gap-1.5 py-1">
+              {videos.map((_, i) => (
+                <button
+                  key={i}
+                  type="button"
+                  onClick={() => selectVideo(i)}
+                  className={`rounded-full transition-all duration-200 ${
+                    i === index ? 'h-1.5 w-5 bg-white' : 'h-1.5 w-1.5 bg-white/30 hover:bg-white/50'
+                  }`}
+                  aria-label={locale === 'ar' ? `فيديو ${i + 1}` : `Vidéo ${i + 1}`}
+                />
+              ))}
+            </div>
+          )}
+        </div>
       </motion.div>
     </motion.div>
   )
