@@ -130,6 +130,47 @@ const screenMat   = new THREE.MeshPhysicalMaterial({
 });
 const ledCyanGlowMat = new THREE.MeshBasicMaterial({ color: 0x00ccff, transparent: true, opacity: 0.12 });
 
+// Decal Generators for maximum resemblance
+function createSymbiaBadge() {
+    const c = document.createElement('canvas');
+    c.width = 512; c.height = 128;
+    const ctx = c.getContext('2d');
+    ctx.fillStyle = '#eb5f07'; // Siemens orange
+    ctx.fillRect(0, 0, 512, 128);
+    ctx.font = 'bold 48px Inter, sans-serif';
+    ctx.fillStyle = 'white';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('SYMBIA Pro.specta', 256, 68);
+    return new THREE.CanvasTexture(c);
+}
+
+function createSiemensLogo() {
+    const c = document.createElement('canvas');
+    c.width = 512; c.height = 128;
+    const ctx = c.getContext('2d');
+    ctx.fillStyle = '#f0f0f0';
+    ctx.fillRect(0, 0, 512, 128);
+    ctx.font = 'bold 44px Inter, sans-serif';
+    ctx.fillStyle = '#00a0a0'; // Siemens teal
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('SIEMENS', 256, 40);
+    ctx.fillStyle = '#eb5f07'; // Healthineers orange
+    ctx.font = '32px Inter, sans-serif';
+    ctx.fillText('Healthineers', 256, 85);
+    // Orange dots
+    ctx.beginPath(); ctx.arc(380, 20, 6, 0, Math.PI*2); ctx.fillStyle = '#eb5f07'; ctx.fill();
+    ctx.beginPath(); ctx.arc(400, 20, 6, 0, Math.PI*2); ctx.fill();
+    ctx.beginPath(); ctx.arc(390, 35, 6, 0, Math.PI*2); ctx.fill();
+    ctx.beginPath(); ctx.arc(410, 35, 6, 0, Math.PI*2); ctx.fill();
+    ctx.beginPath(); ctx.arc(380, 50, 6, 0, Math.PI*2); ctx.fill();
+    return new THREE.CanvasTexture(c);
+}
+
+const badgeTex = createSymbiaBadge();
+const logoTex = createSiemensLogo();
+
 const root = new THREE.Group();
 
 /* ================================================================
@@ -211,6 +252,23 @@ const padGeo = new RoundedBoxGeometry(GR * 1.1, 0.35, gantryDepth + 0.6, 3, 0.06
     root.add(pad);
 });
 
+// Gantry Panel Seams (adds mechanical realism)
+const seamRingGeo1 = new THREE.TorusGeometry(BR + 0.6, 0.015, 8, 64);
+const seamRing1 = new THREE.Mesh(seamRingGeo1, footingGray);
+seamRing1.position.set(gantryX, GR * 0.92 + GCY, gantryDepth / 2);
+root.add(seamRing1);
+
+const seamRingGeo2 = new THREE.TorusGeometry(BR + 1.2, 0.015, 8, 64);
+const seamRing2 = new THREE.Mesh(seamRingGeo2, footingGray);
+seamRing2.position.set(gantryX, GR * 0.92 + GCY, gantryDepth / 2);
+root.add(seamRing2);
+
+// SYMBIA Pro.specta Badge on the right side of the gantry
+const symbiaBadgeMat = new THREE.MeshStandardMaterial({ map: badgeTex, roughness: 0.3, emissive: 0xffffff, emissiveMap: badgeTex, emissiveIntensity: 0.1 });
+const symbiaBadge = new THREE.Mesh(new THREE.PlaneGeometry(2.0, 0.5), symbiaBadgeMat);
+symbiaBadge.position.set(gantryX + GR * 0.65, GR * 0.92 + GCY - 0.2, gantryDepth / 2 + 0.005);
+root.add(symbiaBadge);
+
 /* ================================================================
    2. DETECTOR HEAD — Siemens Symbia Pro.specta
       From reference: chunky multi-segment housing, articulated
@@ -271,11 +329,11 @@ for (let i = 0; i < 6; i++) {
     detGroup.add(stripMesh);
 });
 
-// ── Orange label badge ──
-const labelGeo = new RoundedBoxGeometry(1.0, 0.03, 0.3, 2, 0.015);
-const labelMesh = new THREE.Mesh(labelGeo, orangeLabel);
-labelMesh.position.set(detW * 0.15, detH * 0.25 + 0.01, detD / 2 + 0.005);
-detGroup.add(labelMesh);
+// ── SIEMENS Healthineers Logo Badge ──
+const detLogoMat = new THREE.MeshStandardMaterial({ map: logoTex, roughness: 0.1, emissive: 0xffffff, emissiveMap: logoTex, emissiveIntensity: 0.15 });
+const detLogo = new THREE.Mesh(new THREE.PlaneGeometry(1.6, 0.4), detLogoMat);
+detLogo.position.set(0, detH * 0.25 + 0.01, detD / 2 + 0.051);
+detGroup.add(detLogo);
 
 // ── Small indicator button (like on the real unit) ──
 const btnGeo = new THREE.CylinderGeometry(0.04, 0.04, 0.02, 12);
@@ -508,43 +566,60 @@ footMesh.position.set(tableCenter, 0.2, 0);
 footMesh.receiveShadow = true;
 root.add(footMesh);
 
-// Hydraulic column
-const colGeo = new RoundedBoxGeometry(TL * 0.15, TH - 1.0, TW * 0.8, 3, 0.08);
+// Main pedestal base (dark grey)
+const colGeo = new RoundedBoxGeometry(TL * 0.45, 0.6, TW * 0.7, 3, 0.08);
 const colMesh = new THREE.Mesh(colGeo, footingGray);
-colMesh.position.set(tableCenter, (TH - 1.0) / 2 + 0.4, 0);
+colMesh.position.set(tableCenter, 0.7, 0);
 colMesh.castShadow = true;
 root.add(colMesh);
 
-// Stacked ridges (5 layers tapering outward)
-for (let i = 0; i < 5; i++) {
-    const rW = TL * 0.3 + i * TL * 0.04;
-    const rD = TW * 0.7 + i * 0.05;
-    const rGeo = new RoundedBoxGeometry(rW, 0.18, rD, 3, 0.04);
-    const rMesh = new THREE.Mesh(rGeo, i % 2 === 0 ? softWhite : panelGray);
-    rMesh.position.set(tableCenter, 0.8 + i * 0.28, 0);
-    rMesh.castShadow = true;
-    root.add(rMesh);
-}
+// Large white telescopic body (Siemens style)
+const tbW = TL * 0.65;
+const tbWhiteGeo1 = new RoundedBoxGeometry(tbW, 0.8, TW * 0.8, 4, 0.15);
+const tbWhite1 = new THREE.Mesh(tbWhiteGeo1, bodyWhite);
+tbWhite1.position.set(tableCenter, 1.4, 0);
+tbWhite1.castShadow = true;
+root.add(tbWhite1);
 
-// Main table body
-const tableBodyGeo = new RoundedBoxGeometry(TL, 0.65, TW, 6, 0.18);
-const tableBody = new THREE.Mesh(tableBodyGeo, bodyWhite);
+const tbWhiteGeo2 = new RoundedBoxGeometry(tbW + 0.5, 0.7, TW * 0.85, 4, 0.15);
+const tbWhite2 = new THREE.Mesh(tbWhiteGeo2, bodyWhite);
+tbWhite2.position.set(tableCenter, 2.15, 0);
+tbWhite2.castShadow = true;
+root.add(tbWhite2);
+
+// Main table sliding bed
+const tableBodyGeo = new RoundedBoxGeometry(TL, 0.6, TW, 6, 0.1);
+const tableBody = new THREE.Mesh(tableBodyGeo, panelGray);
 tableBody.position.set(tableCenter, TH, 0);
 tableBody.castShadow = true;
 tableBody.receiveShadow = true;
 root.add(tableBody);
 
-// Bottom panel
-const tbBotGeo = new RoundedBoxGeometry(TL - 0.1, 0.1, TW - 0.05, 4, 0.04);
-const tbBot = new THREE.Mesh(tbBotGeo, panelGray);
-tbBot.position.set(tableCenter, TH - 0.35, 0);
-root.add(tbBot);
+// Table side control panel (buttons and joysticks on the side)
+const ctrlPanelGeo = new RoundedBoxGeometry(1.6, 0.25, 0.15, 2, 0.04);
+const ctrlPanel = new THREE.Mesh(ctrlPanelGeo, footingGray);
+ctrlPanel.position.set(tableCenter - TL * 0.2, TH, TW / 2 + 0.05);
+root.add(ctrlPanel);
+
+// Mini buttons on control panel
+for(let i=0; i<5; i++) {
+    const btnMesh = new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.04, 0.1, 12), new THREE.MeshStandardMaterial({color: (i==0 ? 0xff4444 : 0xcccccc)}));
+    btnMesh.rotation.x = Math.PI / 2;
+    btnMesh.position.set(tableCenter - TL * 0.2 - 0.4 + i*0.2, TH, TW / 2 + 0.12);
+    root.add(btnMesh);
+}
+
+// Cushion base (dark border track)
+const cushW = TL - 1.0;
+const cushBaseGeo = new RoundedBoxGeometry(cushW + 0.05, 0.05, TW - 0.35, 3, 0.02);
+const cushBaseMesh = new THREE.Mesh(cushBaseGeo, new THREE.MeshStandardMaterial({color: 0x111111, roughness: 0.9}));
+cushBaseMesh.position.set(tableCenter, TH + 0.32, 0);
+root.add(cushBaseMesh);
 
 // Cushion
-const cushW = TL - 1.0;
 const cushGeo = new RoundedBoxGeometry(cushW, 0.15, TW - 0.4, 5, 0.07);
 const cushMesh = new THREE.Mesh(cushGeo, cushionMat);
-cushMesh.position.set(tableCenter, TH + 0.4, 0);
+cushMesh.position.set(tableCenter, TH + 0.42, 0);
 cushMesh.castShadow = true;
 root.add(cushMesh);
 
