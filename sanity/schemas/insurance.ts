@@ -80,6 +80,13 @@ export default defineType({
                             type: 'image',
                             options: { hotspot: true },
                         }),
+                        defineField({
+                            name: 'signaturePhotos',
+                            title: 'Photos de signature de la convention',
+                            type: 'array',
+                            description: 'Photos de l\\'événement de signature (s\\'il y en a)',
+                            of: [{ type: 'image', options: { hotspot: true } }],
+                        }),
                     ],
                     preview: {
                         select: { title: 'name', subtitle: 'description', media: 'logo' },

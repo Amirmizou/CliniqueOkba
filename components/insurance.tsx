@@ -1,11 +1,12 @@
 'use client'
 
+import { useState } from 'react'
 import Image from 'next/image'
-import { motion } from 'framer-motion'
-import { ShieldCheck, BadgeCheck, ArrowRight } from 'lucide-react'
+import { motion, AnimatePresence } from 'framer-motion'
+import { ShieldCheck, BadgeCheck, ArrowRight, Camera, X, ChevronLeft, ChevronRight } from 'lucide-react'
 import { urlFor } from '@/sanity/lib/image'
 import { AnimatedSection } from '@/components/ui/animated-section'
-import { useLocale } from 'next-intl'
+import { useLocale, useTranslations } from 'next-intl'
 
 interface InsuranceProvider {
   name: string
@@ -13,6 +14,7 @@ interface InsuranceProvider {
   description?: string
   description_ar?: string
   logo?: any
+  signaturePhotos?: any[]
 }
 
 interface InsuranceProps {
@@ -36,9 +38,11 @@ export default function Insurance({ data }: InsuranceProps) {
 
   const locale = useLocale()
   const isAr = locale === 'ar'
+  const t = useTranslations('common')
+  const [selectedProvider, setSelectedProvider] = useState<InsuranceProvider | null>(null)
+  const [photoIndex, setPhotoIndex] = useState(0)
 
   // Préparation des cartes pour le cylindre 3D
-  // Si le nombre de partenaires est trop petit, on duplique pour fermer le cercle.
   let carouselItems = [...data.providers]
   if (carouselItems.length > 0) {
     while (carouselItems.length < 8) {
@@ -49,7 +53,6 @@ export default function Insurance({ data }: InsuranceProps) {
   const total = carouselItems.length
   const angle = 360 / total
   const cardWidth = 260
-  // Calcul précis du rayon (translateZ) pour que les cartes ne se chevauchent pas
   const tz = Math.round((cardWidth / 2) / Math.tan(Math.PI / total)) + 30
 
   return (
@@ -79,7 +82,6 @@ export default function Insurance({ data }: InsuranceProps) {
 
         {/* Carrousel 3D Cylindrique */}
         <div className="relative mx-auto mt-20 h-[280px] w-full max-w-[260px] [perspective:1400px]">
-          {/* Style injecté pour l'animation native CSS (plus performant pour la 3D continue) */}
           <style dangerouslySetInnerHTML={{__html: `
             @keyframes spin-cylinder {
               0% { transform: translateZ(-${tz}px) rotateY(0deg); }
@@ -88,12 +90,13 @@ export default function Insurance({ data }: InsuranceProps) {
             .animate-spin-cylinder {
               animation: spin-cylinder ${total * 3.5}s linear infinite;
             }
-            .animate-spin-cylinder:hover {
+            .animate-spin-cylinder:hover,
+            .is-paused .animate-spin-cylinder {
               animation-play-state: paused;
             }
           `}} />
           
-          <div className="animate-spin-cylinder absolute inset-0 [transform-style:preserve-3d]">
+          <div className={`absolute inset-0 [transform-style:preserve-3d] ${selectedProvider ? 'is-paused' : 'animate-spin-cylinder'}`}>
             {carouselItems.map((provider, i) => {
               const logoUrl = typeof provider.logo === 'string'
                 ? provider.logo
@@ -101,15 +104,30 @@ export default function Insurance({ data }: InsuranceProps) {
                   ? urlFor(provider.logo).width(320).url()
                   : ''
               
+              const hasPhotos = Array.isArray(provider.signaturePhotos) && provider.signaturePhotos.length > 0
+              
               return (
-                <div
+                <motion.div
                   key={`${provider.name}-${i}`}
-                  className="absolute inset-0 flex flex-col items-center justify-center rounded-2xl border border-border/80 bg-card/95 p-6 text-center shadow-lg backdrop-blur-md transition-colors hover:border-primary/40 hover:bg-card"
+                  layoutId={hasPhotos && !selectedProvider ? `provider-${provider.name}` : undefined}
+                  className={`absolute inset-0 flex flex-col items-center justify-center rounded-2xl border bg-card/95 p-6 text-center shadow-lg backdrop-blur-md transition-colors hover:bg-card ${hasPhotos ? 'cursor-pointer hover:border-primary/60 border-primary/20' : 'border-border/80'}`}
                   style={{
                     transform: `rotateY(${i * angle}deg) translateZ(${tz}px)`,
                     backfaceVisibility: 'hidden',
                   }}
+                  onClick={() => {
+                    if (hasPhotos) {
+                      setSelectedProvider(provider)
+                      setPhotoIndex(0)
+                    }
+                  }}
                 >
+                  {hasPhotos && (
+                    <div className="absolute top-3 right-3 flex h-8 w-8 items-center justify-center rounded-full bg-brand-gold/20 text-brand-gold animate-pulse shadow-sm">
+                      <Camera className="h-4 w-4" />
+                    </div>
+                  )}
+                  
                   <div className="mb-4 flex h-16 w-full max-w-[160px] items-center justify-center rounded-xl bg-primary/5 p-2 text-primary shadow-inner">
                     {logoUrl ? (
                       <Image
@@ -131,7 +149,13 @@ export default function Insurance({ data }: InsuranceProps) {
                       {isAr ? (provider.description_ar || provider.description) : provider.description}
                     </p>
                   )}
-                </div>
+                  
+                  {hasPhotos && (
+                    <div className="mt-4 text-[11px] font-semibold text-primary/80 uppercase tracking-wide">
+                      {isAr ? 'عرض صور التوقيع' : 'Voir les photos'}
+                    </div>
+                  )}
+                </motion.div>
               )
             })}
           </div>
@@ -159,6 +183,121 @@ export default function Insurance({ data }: InsuranceProps) {
           </a>
         </motion.div>
       </div>
+
+      {/* Galerie Lightbox Plein Écran */}
+      <AnimatePresence>
+        {selectedProvider && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 p-4 backdrop-blur-sm sm:p-8"
+            onClick={() => setSelectedProvider(null)}
+          >
+            <button
+              className="absolute right-4 top-4 z-[110] flex h-12 w-12 items-center justify-center rounded-full bg-white/10 text-white backdrop-blur-md transition-colors hover:bg-white/20 sm:right-8 sm:top-8"
+              onClick={() => setSelectedProvider(null)}
+            >
+              <X className="h-6 w-6" />
+            </button>
+
+            <motion.div
+              layoutId={`provider-${selectedProvider.name}`}
+              className="relative flex h-full max-h-[85vh] w-full max-w-5xl flex-col overflow-hidden rounded-3xl bg-background shadow-2xl md:flex-row"
+              onClick={(e) => e.stopPropagation()}
+            >
+              {/* Image Actuelle */}
+              <div className="relative flex-1 bg-black/5">
+                <AnimatePresence mode="wait">
+                  <motion.div
+                    key={photoIndex}
+                    initial={{ opacity: 0, scale: 0.98 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.3 }}
+                    className="absolute inset-0"
+                  >
+                    <Image
+                      src={urlFor(selectedProvider.signaturePhotos![photoIndex]).width(1200).height(900).url()}
+                      alt={`${selectedProvider.name} signature photo ${photoIndex + 1}`}
+                      fill
+                      className="object-cover"
+                      sizes="(max-width: 768px) 100vw, 60vw"
+                    />
+                  </motion.div>
+                </AnimatePresence>
+
+                {/* Navigation Carousel */}
+                {selectedProvider.signaturePhotos!.length > 1 && (
+                  <>
+                    <button
+                      className="absolute left-4 top-1/2 -translate-y-1/2 flex h-10 w-10 items-center justify-center rounded-full bg-black/40 text-white backdrop-blur-md transition-all hover:bg-black/60"
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        setPhotoIndex((prev) => (prev - 1 + selectedProvider.signaturePhotos!.length) % selectedProvider.signaturePhotos!.length)
+                      }}
+                    >
+                      <ChevronLeft className="h-6 w-6" />
+                    </button>
+                    <button
+                      className="absolute right-4 top-1/2 -translate-y-1/2 flex h-10 w-10 items-center justify-center rounded-full bg-black/40 text-white backdrop-blur-md transition-all hover:bg-black/60"
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        setPhotoIndex((prev) => (prev + 1) % selectedProvider.signaturePhotos!.length)
+                      }}
+                    >
+                      <ChevronRight className="h-6 w-6" />
+                    </button>
+                    {/* Indicateurs (dots) */}
+                    <div className="absolute bottom-6 left-1/2 flex -translate-x-1/2 gap-2 rounded-full bg-black/40 px-3 py-2 backdrop-blur-md">
+                      {selectedProvider.signaturePhotos!.map((_, idx) => (
+                        <div
+                          key={idx}
+                          className={`h-2 rounded-full transition-all ${
+                            idx === photoIndex ? 'w-6 bg-white' : 'w-2 bg-white/40'
+                          }`}
+                        />
+                      ))}
+                    </div>
+                  </>
+                )}
+              </div>
+
+              {/* Panneau d'informations latéral */}
+              <div className="flex w-full flex-col justify-center bg-card p-8 md:w-80 lg:w-96">
+                <div className="mb-6 flex h-20 w-32 items-center justify-center rounded-2xl bg-primary/5 p-4 shadow-inner">
+                  {selectedProvider.logo ? (
+                    <Image
+                      src={typeof selectedProvider.logo === 'string' ? selectedProvider.logo : urlFor(selectedProvider.logo).width(200).url()}
+                      alt={selectedProvider.name}
+                      width={128}
+                      height={64}
+                      className="h-full w-full object-contain"
+                    />
+                  ) : (
+                    <ShieldCheck className="h-10 w-10 text-primary" />
+                  )}
+                </div>
+                <h3 className="mb-4 text-2xl font-bold text-foreground">
+                  {isAr ? (selectedProvider.name_ar || selectedProvider.name) : selectedProvider.name}
+                </h3>
+                {(selectedProvider.description || selectedProvider.description_ar) && (
+                  <p className="text-sm leading-relaxed text-muted-foreground">
+                    {isAr ? (selectedProvider.description_ar || selectedProvider.description) : selectedProvider.description}
+                  </p>
+                )}
+                
+                <div className="mt-auto pt-8">
+                  <div className="inline-flex items-center gap-2 rounded-lg bg-primary/10 px-4 py-2 text-sm font-semibold text-primary">
+                    <ShieldCheck className="h-5 w-5" />
+                    {isAr ? 'مؤمن ومدعوم بالكامل' : 'Convention Officielle'}
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </section>
   )
 }

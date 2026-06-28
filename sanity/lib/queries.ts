@@ -448,10 +448,18 @@ export const videosQuery = groq`
     title_ar,
     description,
     description_ar,
-    category,
     "videoUrl": coalesce(externalUrl, videoFile.asset->url),
-    externalUrl,
-    poster
+    category,
+    poster,
+    doctor->{
+      _id,
+      name,
+      name_ar,
+      image,
+      specialty,
+      specialty_ar,
+      accentColor
+    }
   }
 `
 
@@ -472,7 +480,8 @@ export const insuranceSectionQuery = groq`
     name_ar,
       description,
     description_ar,
-      logo
+      logo,
+      signaturePhotos
     },
     note,
     note_ar,

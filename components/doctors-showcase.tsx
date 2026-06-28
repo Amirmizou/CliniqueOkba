@@ -416,141 +416,7 @@ function PosterLightbox({
 }
 
 /* -------------------------------------------------------------------------- */
-/*  Lightbox vidéo                                                            */
-/* -------------------------------------------------------------------------- */
 
-function VideoLightbox({
-  doctor,
-  onClose,
-}: {
-  doctor: Doctor
-  onClose: () => void
-}) {
-  const tc = useTranslations('common')
-  const locale = useLocale()
-  const videos = doctor.videos || []
-  const [index, setIndex] = useState(0)
-  const [isPlaying, setIsPlaying] = useState(true)
-  const current = videos[index]
-  const accent = doctor.accent || '#006633'
-
-  const selectVideo = (i: number) => {
-    setIsPlaying(false)
-    setIndex(i)
-  }
-
-  return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      onClick={onClose}
-      className="fixed inset-0 z-[100] flex items-end sm:items-center justify-center bg-black/90 backdrop-blur-sm"
-    >
-      <motion.div
-        initial={{ y: 56, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        exit={{ y: 40, opacity: 0 }}
-        transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-        onClick={(e) => e.stopPropagation()}
-        className="relative w-full max-w-3xl overflow-hidden rounded-t-2xl sm:rounded-2xl bg-[#0d0d0d] shadow-2xl ring-1 ring-white/10"
-      >
-        {/* Close */}
-        <button
-          type="button"
-          onClick={onClose}
-          aria-label={tc('close')}
-          className="absolute right-3 top-3 z-20 flex h-8 w-8 items-center justify-center rounded-full bg-black/60 text-white/80 backdrop-blur-sm transition-all hover:bg-black/80 hover:text-white"
-        >
-          <X className="h-4 w-4" />
-        </button>
-
-        {/* Video area */}
-        <div className="relative aspect-video w-full overflow-hidden bg-black">
-          {current && isPlaying ? (
-            <UniversalPlayer
-              key={`${current}-${index}`}
-              url={current}
-              playing
-              controls
-              className="h-full w-full"
-              onEnded={() => setIsPlaying(false)}
-            />
-          ) : (
-            <button
-              type="button"
-              onClick={() => setIsPlaying(true)}
-              aria-label={locale === 'ar' ? 'تشغيل الفيديو' : 'Lire la vidéo'}
-              className="group/play relative block h-full w-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40"
-            >
-              {/* Doctor portrait as blurred backdrop */}
-              <Image
-                loader={sanityImageLoader}
-                src={doctor.poster}
-                alt=""
-                fill
-                aria-hidden="true"
-                className="object-cover scale-105 blur-sm brightness-50"
-              />
-              {/* Bottom vignette */}
-              <span className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/15 to-transparent" />
-              {/* Accent glow */}
-              <span className="absolute inset-0" style={{ background: `radial-gradient(ellipse 65% 55% at 50% 50%, ${accent}28 0%, transparent 70%)` }} />
-
-              {/* Play button */}
-              <span className="absolute inset-0 flex flex-col items-center justify-center gap-3">
-                <span className="relative flex h-16 w-16 items-center justify-center sm:h-20 sm:w-20">
-                  <span
-                    aria-hidden="true"
-                    className="absolute inset-0 rounded-full animate-ping"
-                    style={{ backgroundColor: accent, opacity: 0.28, animationDuration: '2.5s' }}
-                  />
-                  <span
-                    className="relative flex h-full w-full items-center justify-center rounded-full transition-transform duration-300 group-hover/play:scale-110"
-                    style={{ backgroundColor: `${accent}CC`, backdropFilter: 'blur(6px)' }}
-                  >
-                    <Play className="ms-0.5 h-7 w-7 fill-white text-white sm:h-8 sm:w-8" />
-                  </span>
-                </span>
-                <span className="text-sm font-medium text-white/70 tracking-wide">
-                  {locale === 'ar' ? 'اضغط للتشغيل' : 'Appuyer pour lire'}
-                </span>
-              </span>
-            </button>
-          )}
-        </div>
-
-        {/* Info bar */}
-        <div className="flex items-center justify-between gap-2 border-t border-white/[0.06] px-4 py-3">
-          <div className="flex min-w-0 items-center gap-2.5">
-            <span className="h-2 w-2 shrink-0 rounded-full" style={{ backgroundColor: accent }} />
-            <div className="min-w-0">
-              <p className="truncate text-[13px] font-semibold text-white">{doctor.name}</p>
-              <p className="mt-0.5 truncate text-[11px] text-white/45">{doctor.specialty}</p>
-            </div>
-          </div>
-          {videos.length > 1 && (
-            <div className="flex shrink-0 items-center gap-1.5 py-1">
-              {videos.map((_, i) => (
-                <button
-                  key={i}
-                  type="button"
-                  onClick={() => selectVideo(i)}
-                  className={`rounded-full transition-all duration-200 ${
-                    i === index ? 'h-1.5 w-5 bg-white' : 'h-1.5 w-1.5 bg-white/30 hover:bg-white/50'
-                  }`}
-                  aria-label={locale === 'ar' ? `فيديو ${i + 1}` : `Vidéo ${i + 1}`}
-                />
-              ))}
-            </div>
-          )}
-        </div>
-      </motion.div>
-    </motion.div>
-  )
-}
-
-/* -------------------------------------------------------------------------- */
 /*  Section principale                                                         */
 /* -------------------------------------------------------------------------- */
 
@@ -569,8 +435,15 @@ export default function DoctorsShowcase({ data, sectionContent }: { data?: any[]
   const locale = useLocale()
   const isAr = locale === 'ar'
   const [active, setActive] = useState<Doctor | null>(null)
-  const [videoDoctor, setVideoDoctor] = useState<Doctor | null>(null)
   const list = resolveDoctors(data, locale)
+  
+  const handlePlayVideo = (doctor: Doctor) => {
+    window.dispatchEvent(new CustomEvent('select-doctor-video', { detail: { doctorId: doctor.id } }))
+    const videosSection = document.getElementById('videos')
+    if (videosSection) {
+      videosSection.scrollIntoView({ behavior: 'smooth' })
+    }
+  }
   
   const sectionAccent = sectionContent?.accentColor || '#006633'
 
@@ -644,7 +517,7 @@ export default function DoctorsShowcase({ data, sectionContent }: { data?: any[]
                 key={doctor.id}
                 className="w-[85vw] shrink-0 snap-center sm:w-[calc(50%-0.75rem)] sm:shrink lg:w-[calc(33.333%-1rem)] xl:w-[calc(25%-1.125rem)]"
               >
-                <DoctorCard doctor={doctor} index={i} onOpen={setActive} onPlay={setVideoDoctor} sectionAccent={sectionAccent} />
+                <DoctorCard doctor={doctor} index={i} onOpen={setActive} onPlay={handlePlayVideo} sectionAccent={sectionAccent} />
               </div>
             ))}
           </div>
@@ -659,11 +532,6 @@ export default function DoctorsShowcase({ data, sectionContent }: { data?: any[]
       {/* Lightbox affiche */}
       <AnimatePresence>
         {active && <PosterLightbox doctor={active} onClose={() => setActive(null)} />}
-      </AnimatePresence>
-
-      {/* Lightbox vidéo */}
-      <AnimatePresence>
-        {videoDoctor && <VideoLightbox doctor={videoDoctor} onClose={() => setVideoDoctor(null)} />}
       </AnimatePresence>
     </section>
   )

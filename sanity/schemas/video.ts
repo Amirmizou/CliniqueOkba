@@ -80,6 +80,13 @@ export default defineType({
             initialValue: 'general',
         }),
         defineField({
+            name: 'doctor',
+            title: 'Médecin présentateur (Optionnel)',
+            type: 'reference',
+            to: [{ type: 'doctor' }],
+            description: 'Lier cette vidéo à un médecin pour l\\'afficher dans sa playlist éducative.',
+        }),
+        defineField({
             name: 'active',
             title: 'Active',
             type: 'boolean',
