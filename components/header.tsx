@@ -517,28 +517,60 @@ export default function Header({ siteSettings, poles }: HeaderProps) {
             ].join(','),
           }} />
 
+          {/* ══ DÉCALS DU GANTRY (Siemens logo, Symbia badge, lignes de panneaux) ══ */}
+          <div className="absolute right-[15px] bottom-[-2px] w-[150px] h-[150px] rounded-full z-[42] pointer-events-none">
+            {/* Lignes de panneaux (Seams) */}
+            <div className="absolute top-0 bottom-[50%] left-[49.5%] right-[49.5%] bg-black/[0.04]" />
+            <div className="absolute top-[49.5%] bottom-[49.5%] left-0 right-[80%] bg-black/[0.04]" />
+            <div className="absolute top-[49.5%] bottom-[49.5%] left-[80%] right-0 bg-black/[0.04]" />
+            
+            {/* Logo Siemens Healthineers (Points orange) */}
+            <div className="absolute left-[24px] top-[30px] flex gap-[2.5px] transform rotate-[-12deg]">
+              <div className="w-[2.5px] h-[2.5px] rounded-full bg-[#E2610A] shadow-[0_0_2px_rgba(226,97,10,0.5)]" />
+              <div className="w-[2.5px] h-[2.5px] rounded-full bg-[#E2610A] shadow-[0_0_2px_rgba(226,97,10,0.5)]" />
+              <div className="w-[2.5px] h-[2.5px] rounded-full bg-[#E2610A] shadow-[0_0_2px_rgba(226,97,10,0.5)]" />
+              <div className="w-[2.5px] h-[2.5px] rounded-full bg-[#E2610A] shadow-[0_0_2px_rgba(226,97,10,0.5)]" />
+              <div className="w-[2.5px] h-[2.5px] rounded-full bg-[#E2610A] shadow-[0_0_2px_rgba(226,97,10,0.5)]" />
+              <div className="w-[2.5px] h-[2.5px] rounded-full bg-[#E2610A] shadow-[0_0_2px_rgba(226,97,10,0.5)]" />
+              <div className="w-[2.5px] h-[2.5px] rounded-full bg-[#E2610A] shadow-[0_0_2px_rgba(226,97,10,0.5)]" />
+              {/* Le grand point final */}
+              <div className="w-[3.5px] h-[3.5px] -mt-[0.5px] rounded-full bg-[#E2610A] shadow-[0_0_3px_rgba(226,97,10,0.6)]" />
+            </div>
+
+            {/* Badge SYMBIA Pro.specta orange */}
+            <div className="absolute right-[5px] top-[64px] bg-[#E2610A] px-[4px] py-[2px] rounded-[1.5px] shadow-[inset_0_1px_1px_rgba(255,255,255,0.4),0_1px_2px_rgba(0,0,0,0.2)] flex flex-col items-center justify-center transform rotate-[4deg]">
+              <span className="text-[3px] font-black leading-none text-white tracking-widest">SYMBIA</span>
+              <span className="text-[2.5px] font-bold leading-[1.2] text-white/90 tracking-wide mt-[0.5px]">Pro.specta</span>
+            </div>
+          </div>
+
           {/* ══ BADGE RDV ══ */}
           <div className="absolute z-[45] pointer-events-none" style={{ right:'22px', bottom:'66px' }}>
             <div className="bg-[#006633] text-white px-1.5 py-[1px] rounded-[2px] shadow-sm text-[7px] font-extrabold tracking-[0.15em] uppercase">RDV</div>
           </div>
 
-          {/* ══ PLATEAU PATIENT ══ */}
+          {/* ══ PLATEAU PATIENT - BASE TÉLESCOPIQUE ══ */}
           <div className={cn("absolute z-[5] pointer-events-none origin-right", isHidden ? "translate-x-[200px] opacity-0 transition-all duration-[2000ms] ease-in-out" : "translate-x-0 opacity-100 transition-all duration-[1500ms] delay-[400ms] ease-out")} style={{
-            left:'30%', right:'158px', bottom:'0px', height:'34px',
-            borderRadius:'24px 8px 0 0',
-            background:'linear-gradient(180deg,#f8f8f8 0%,#e4e4e4 50%,#c8c8c8 100%)',
-            boxShadow:'0 8px 16px -4px rgba(0,0,0,0.2),inset -2px 2px 6px rgba(255,255,255,0.8),inset 4px 0 10px rgba(0,0,0,0.03)',
+            left:'25%', right:'145px', bottom:'0px', height:'32px',
+            borderRadius:'8px 8px 0 0',
+            background:'linear-gradient(180deg,#ffffff 0%,#ebebeb 50%,#cccccc 100%)',
+            boxShadow:'0 6px 12px rgba(0,0,0,0.2),inset -2px 2px 6px rgba(255,255,255,0.9),inset 4px 0 10px rgba(0,0,0,0.05)',
+            border:'1px solid #d0d0d0', borderBottom:'none'
           }}>
-            <div className="absolute top-[12px] left-[5px] right-[2px] h-[1px]" style={{ background:'linear-gradient(180deg,rgba(0,0,0,0.12),rgba(255,255,255,0.8))' }} />
-            <div className="absolute top-[22px] left-[8px] right-[2px] h-[1px]" style={{ background:'linear-gradient(180deg,rgba(0,0,0,0.08),rgba(255,255,255,0.5))' }} />
-            <div className="absolute -bottom-[2px] left-[-20px] right-0 h-[6px] rounded-tl-xl" style={{ background:'linear-gradient(180deg,#d8d8d8,#b8b8b8)', boxShadow:'0 -1px 3px rgba(0,0,0,0.1),inset 1px 1px 2px rgba(255,255,255,0.5)' }} />
+            {/* Lignes de structure (panneaux) */}
+            <div className="absolute top-0 bottom-0 left-[20%] w-px bg-black/10" />
+            <div className="absolute top-0 bottom-0 left-[50%] w-px bg-black/10" />
+            <div className="absolute top-0 bottom-0 left-[80%] w-px bg-black/10" />
+            {/* Fente horizontale en bas */}
+            <div className="absolute bottom-[6px] left-[10px] right-[10px] h-[3px] rounded-full" style={{ background:'linear-gradient(180deg,#888,#aaa)' }} />
           </div>
 
+          {/* Glissière sous la table */}
           <div className={cn("absolute z-[29] pointer-events-none origin-right", isHidden ? "translate-x-[200px] opacity-0 transition-all duration-[2000ms] ease-in-out" : "translate-x-0 opacity-100 transition-all duration-[1500ms] delay-[400ms] ease-out")} style={{
-            left:'30px', right:'145px', bottom:'26px', height:'10px',
-            borderRadius:'0 0 0 6px',
-            background:'linear-gradient(180deg,#999 0%,#ccc 30%,#777 100%)',
-            boxShadow:'inset 0 1px 2px rgba(0,0,0,0.4),0 2px 4px rgba(0,0,0,0.15)',
+            left:'20px', right:'135px', bottom:'26px', height:'6px',
+            borderRadius:'0 0 0 4px',
+            background:'linear-gradient(180deg,#666 0%,#999 40%,#555 100%)',
+            boxShadow:'inset 0 1px 3px rgba(0,0,0,0.5),0 3px 6px rgba(0,0,0,0.2)',
           }} />
 
           <div className={cn("absolute z-[30] flex flex-col justify-end origin-right hover:-translate-x-1", isHidden ? "translate-x-[200px] opacity-0 transition-all duration-[2000ms] ease-in-out" : "translate-x-0 opacity-100 transition-all duration-[1500ms] delay-[400ms] ease-out")} style={{
