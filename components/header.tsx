@@ -619,31 +619,71 @@ export default function Header({ siteSettings, poles }: HeaderProps) {
             </nav>
           </div>
 
-          {/* ══ TÊTES SPECT (détecteurs NaI avec grille collimateur + fenêtre cristal) ══ */}
+          {/* ══ ÉCRAN DE CONTRÔLE (Display Monitor) ══ */}
+          <div className="absolute z-[45] pointer-events-none" style={{ right:'145px', bottom:'115px' }}>
+            {/* Bras articulé (attaché au ring) */}
+            <div className="absolute top-[18px] left-[26px] w-[20px] h-[6px] bg-gradient-to-b from-[#bbb] to-[#888] rounded-full shadow-md transform rotate-[20deg]" />
+            <div className="absolute top-[15px] left-[38px] w-[14px] h-[10px] bg-[#666] rounded-[2px] shadow-sm transform rotate-[-10deg]" />
+            
+            {/* L'écran (casing + dalle) */}
+            <div className="relative w-[36px] h-[26px] bg-[#e4e4e4] rounded-[3px] border border-[#ccc] shadow-[0_5px_12px_rgba(0,0,0,0.35),inset_0_1px_1px_rgba(255,255,255,0.8)] flex flex-col items-center justify-center">
+              <div className="w-[32px] h-[22px] bg-[#111] rounded-[1px] border-[1px] border-[#333] shadow-[inset_0_0_0_1px_#000] flex flex-col overflow-hidden relative">
+                {/* Header UI de l'écran */}
+                <div className="h-[3px] w-full bg-[#222] flex items-center px-[2px] gap-[1px]">
+                  <div className="w-[1.5px] h-[1.5px] rounded-full bg-red-500" />
+                  <div className="w-[1.5px] h-[1.5px] rounded-full bg-yellow-500" />
+                  <div className="w-[1.5px] h-[1.5px] rounded-full bg-green-500" />
+                </div>
+                {/* Contenu de l'écran (Graphique type ECG/Scan) */}
+                <div className="flex-1 w-full bg-[#031526] relative overflow-hidden flex items-center justify-center">
+                  <svg className="absolute inset-0 w-full h-full opacity-70" viewBox="0 0 100 100" preserveAspectRatio="none">
+                    <path d="M0,50 Q15,50 25,20 T50,50 T75,80 T100,50" fill="none" stroke="#00ffcc" strokeWidth="3" />
+                  </svg>
+                  {/* Overlay scan ligne */}
+                  <div className="absolute top-0 bottom-0 left-[40%] w-[1px] bg-white/80 shadow-[0_0_3px_#00ffcc]" />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* ══ TÊTES SPECT (réalisme industriel) ══ */}
           <div className="absolute right-[15px] bottom-[-2px] w-[150px] h-[150px] z-[44] animate-[spin_32s_linear_infinite] pointer-events-none">
             {/* Tête 1 — supérieure */}
-            <div className="absolute top-[-14px] left-1/2 w-[70px] h-[28px] -translate-x-1/2 rounded-[8px] overflow-hidden" style={{
-              background:'linear-gradient(180deg,#ffffff 0%,#f0f0f0 38%,#e2e2e2 72%,#d4d4d4 100%)',
-              boxShadow:'0 7px 16px rgba(0,0,0,0.24),inset 0 2px 5px rgba(255,255,255,1),inset 0 -1px 3px rgba(0,0,0,0.08)',
-              border:'1px solid #ccc',
-            }}>
-              {/* Fenêtre cristal NaI (teinte bleue clinique) */}
-              <div className="absolute inset-[3px] rounded-[5px]" style={{ background:'linear-gradient(160deg,rgba(170,210,255,0.38) 0%,rgba(195,222,255,0.20) 50%,rgba(155,198,252,0.25) 100%)', border:'0.5px solid rgba(90,140,220,0.28)' }} />
-              {/* Grille collimateur (lignes fines) */}
-              <div className="absolute inset-[3px] rounded-[5px] overflow-hidden opacity-55" style={{ backgroundImage:'repeating-linear-gradient(0deg,transparent,transparent 3.5px,rgba(0,0,0,0.08) 3.5px,rgba(0,0,0,0.08) 4px)' }} />
-              <div className="absolute top-[1px] left-[15%] right-[15%] h-[1.5px] rounded-full bg-white/95" />
-              <div className="absolute bottom-[3px] left-[20%] right-[20%] h-[2px] rounded-full" style={{ background:'linear-gradient(90deg,transparent,rgba(236,0,22,0.90) 30%,rgba(236,0,22,0.90) 70%,transparent)', boxShadow:'0 0 6px rgba(236,0,22,0.65)' }} />
+            <div className="absolute top-[-22px] left-1/2 w-[80px] h-[38px] -translate-x-1/2 flex flex-col items-center">
+              {/* Bras de connexion */}
+              <div className="w-[34px] h-[10px] bg-gradient-to-b from-[#d0d0d0] to-[#999] rounded-t-[4px] border border-[#888] shadow-[inset_0_2px_4px_rgba(255,255,255,0.6)] z-0 relative">
+                <div className="absolute bottom-[2px] left-[4px] right-[4px] h-[1.5px] bg-black/20 rounded-full" />
+              </div>
+              {/* Boîtier du détecteur (casing) */}
+              <div className="w-full h-[28px] bg-gradient-to-b from-[#ffffff] to-[#e4e4e4] rounded-[6px] shadow-[0_5px_15px_rgba(0,0,0,0.3),inset_0_2px_4px_rgba(255,255,255,1)] border border-[#ccc] z-10 flex flex-col justify-end overflow-hidden">
+                <div className="absolute top-[4px] left-[6px] w-[8px] h-[2px] bg-[#EC0016] opacity-80 rounded-full" /> {/* Accent rouge */}
+                <div className="h-[1.5px] w-full bg-gradient-to-r from-transparent via-[#00a651] to-transparent opacity-80 mb-[2px]" />
+                {/* Face du détecteur (noir/gris sombre) avec collimateur */}
+                <div className="h-[12px] w-full bg-gradient-to-b from-[#333] to-[#111] border-t border-[#666] shadow-[inset_0_-2px_6px_rgba(0,0,0,0.8)] flex justify-center items-center">
+                  <div className="w-[92%] h-[8px] bg-[#0a0a0a] rounded-[2px] shadow-[inset_0_0_4px_rgba(0,0,0,1)] flex gap-[1px] p-[1px] opacity-80">
+                    <div className="w-full h-full bg-[repeating-linear-gradient(90deg,transparent,transparent_1.5px,rgba(255,255,255,0.15)_1.5px,rgba(255,255,255,0.15)_2.5px)]" />
+                  </div>
+                </div>
+              </div>
             </div>
+
             {/* Tête 2 — inférieure */}
-            <div className="absolute bottom-[-14px] left-1/2 w-[70px] h-[28px] -translate-x-1/2 rounded-[8px] overflow-hidden" style={{
-              background:'linear-gradient(0deg,#ffffff 0%,#f0f0f0 38%,#e2e2e2 72%,#d4d4d4 100%)',
-              boxShadow:'0 -7px 16px rgba(0,0,0,0.24),inset 0 -2px 5px rgba(255,255,255,1),inset 0 1px 3px rgba(0,0,0,0.08)',
-              border:'1px solid #ccc',
-            }}>
-              <div className="absolute inset-[3px] rounded-[5px]" style={{ background:'linear-gradient(160deg,rgba(170,210,255,0.38) 0%,rgba(195,222,255,0.20) 50%,rgba(155,198,252,0.25) 100%)', border:'0.5px solid rgba(90,140,220,0.28)' }} />
-              <div className="absolute inset-[3px] rounded-[5px] overflow-hidden opacity-55" style={{ backgroundImage:'repeating-linear-gradient(0deg,transparent,transparent 3.5px,rgba(0,0,0,0.08) 3.5px,rgba(0,0,0,0.08) 4px)' }} />
-              <div className="absolute bottom-[1px] left-[15%] right-[15%] h-[1.5px] rounded-full bg-white/95" />
-              <div className="absolute top-[3px] left-[20%] right-[20%] h-[2px] rounded-full" style={{ background:'linear-gradient(90deg,transparent,rgba(236,0,22,0.90) 30%,rgba(236,0,22,0.90) 70%,transparent)', boxShadow:'0 0 6px rgba(236,0,22,0.65)' }} />
+            <div className="absolute bottom-[-22px] left-1/2 w-[80px] h-[38px] -translate-x-1/2 flex flex-col items-center rotate-180">
+              {/* Bras de connexion */}
+              <div className="w-[34px] h-[10px] bg-gradient-to-b from-[#d0d0d0] to-[#999] rounded-t-[4px] border border-[#888] shadow-[inset_0_2px_4px_rgba(255,255,255,0.6)] z-0 relative">
+                <div className="absolute bottom-[2px] left-[4px] right-[4px] h-[1.5px] bg-black/20 rounded-full" />
+              </div>
+              {/* Boîtier du détecteur (casing) */}
+              <div className="w-full h-[28px] bg-gradient-to-b from-[#ffffff] to-[#e4e4e4] rounded-[6px] shadow-[0_5px_15px_rgba(0,0,0,0.3),inset_0_2px_4px_rgba(255,255,255,1)] border border-[#ccc] z-10 flex flex-col justify-end overflow-hidden">
+                <div className="absolute top-[4px] right-[6px] w-[8px] h-[2px] bg-[#EC0016] opacity-80 rounded-full" /> {/* Accent rouge */}
+                <div className="h-[1.5px] w-full bg-gradient-to-r from-transparent via-[#00a651] to-transparent opacity-80 mb-[2px]" />
+                {/* Face du détecteur (noir/gris sombre) avec collimateur */}
+                <div className="h-[12px] w-full bg-gradient-to-b from-[#333] to-[#111] border-t border-[#666] shadow-[inset_0_-2px_6px_rgba(0,0,0,0.8)] flex justify-center items-center">
+                  <div className="w-[92%] h-[8px] bg-[#0a0a0a] rounded-[2px] shadow-[inset_0_0_4px_rgba(0,0,0,1)] flex gap-[1px] p-[1px] opacity-80">
+                    <div className="w-full h-full bg-[repeating-linear-gradient(90deg,transparent,transparent_1.5px,rgba(255,255,255,0.15)_1.5px,rgba(255,255,255,0.15)_2.5px)]" />
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
 
