@@ -626,6 +626,10 @@ export default function Header({ siteSettings, poles }: HeaderProps) {
               <div className="flex-1 w-full h-full bg-[#051124] relative overflow-hidden flex gap-[2px] p-[1px]">
                 {/* Panel 1 */}
                 <div className="flex-1 h-full border border-[#1a3a60] relative overflow-hidden bg-[#030d1c]">
+                   {/* Logo Clinique */}
+                   <div className="absolute top-[2px] left-[2px] z-10 opacity-70">
+                     <img src="/logo.png" alt="Clinique Okba" className="w-[6px] h-[6px] object-contain drop-shadow-[0_0_2px_rgba(255,255,255,0.5)]" />
+                   </div>
                    <svg className="absolute inset-0 w-full h-full opacity-60" viewBox="0 0 100 100" preserveAspectRatio="none">
                     <path d="M0,50 Q25,30 50,50 T100,50" fill="none" stroke="#4898f2" strokeWidth="2" />
                   </svg>
@@ -650,36 +654,36 @@ export default function Header({ siteSettings, poles }: HeaderProps) {
           {/* ══ TÊTES SPECT (Massives, arrondies, logo sur face externe) ══ */}
           <div className="absolute right-[15px] bottom-[-2px] w-[150px] h-[150px] z-[44] animate-[spin_32s_linear_infinite] pointer-events-none">
             {/* Tête 1 — supérieure */}
-            <div className="absolute top-[-30px] left-1/2 w-[110px] h-[50px] -translate-x-1/2 flex flex-col items-center">
+            <div className="absolute top-[-26px] left-1/2 w-[96px] h-[44px] -translate-x-1/2 flex flex-col items-center">
               {/* Base de connexion arrière (massive) */}
-              <div className="w-[60px] h-[8px] bg-gradient-to-b from-[#f5f5f5] to-[#ddd] rounded-t-[8px] shadow-[inset_0_2px_4px_rgba(255,255,255,0.9)] z-0" />
+              <div className="w-[54px] h-[7px] bg-gradient-to-b from-[#f5f5f5] to-[#ddd] rounded-t-[8px] shadow-[inset_0_2px_4px_rgba(255,255,255,0.9)] z-0" />
               
               {/* Coque externe principale (blanche) */}
-              <div className="w-full h-[28px] bg-gradient-to-b from-[#ffffff] to-[#f0f0f0] rounded-[10px] shadow-[0_8px_20px_rgba(0,0,0,0.15),inset_0_4px_8px_rgba(255,255,255,1)] border border-[#e0e0e0] z-10 flex flex-col items-center justify-center relative">
+              <div className="w-full h-[25px] bg-gradient-to-b from-[#ffffff] to-[#f0f0f0] rounded-[10px] shadow-[0_8px_20px_rgba(0,0,0,0.15),inset_0_4px_8px_rgba(255,255,255,1)] border border-[#e0e0e0] z-10 flex flex-col items-center justify-center relative">
                 {/* Logo SIEMENS Healthineers sur la coque */}
                 <div className="flex flex-col items-center mt-[2px]">
-                  <span className="text-[3.5px] font-black text-[#0099b9] leading-none tracking-widest">SIEMENS</span>
+                  <span className="text-[3px] font-black text-[#0099b9] leading-none tracking-widest">SIEMENS</span>
                   <div className="flex items-center gap-[1px] mt-[1px]">
-                    <span className="text-[4px] font-bold text-[#E2610A] leading-none">Healthineers</span>
+                    <span className="text-[3.5px] font-bold text-[#E2610A] leading-none">Healthineers</span>
                     <div className="flex gap-[0.5px] mb-[2px]">
                       <div className="w-[1px] h-[1px] rounded-full bg-[#E2610A]" />
                       <div className="w-[1px] h-[1px] rounded-full bg-[#E2610A]" />
-                      <div className="w-[1.5px] h-[1.5px] -mt-[0.5px] rounded-full bg-[#E2610A]" />
+                      <div className="w-[1.2px] h-[1.2px] -mt-[0.5px] rounded-full bg-[#E2610A]" />
                     </div>
                   </div>
                 </div>
               </div>
 
               {/* Ligne grise de séparation + Casing inférieur (détecteur gris) */}
-              <div className="w-[98%] h-[14px] bg-gradient-to-b from-[#999] to-[#777] rounded-b-[8px] border border-[#666] shadow-[inset_0_2px_4px_rgba(0,0,0,0.2)] z-10 flex flex-col relative mt-[-2px]">
+              <div className="w-[98%] h-[12px] bg-gradient-to-b from-[#999] to-[#777] rounded-b-[8px] border border-[#666] shadow-[inset_0_2px_4px_rgba(0,0,0,0.2)] z-10 flex flex-col relative mt-[-2px]">
                 {/* Bande grise claire + Numéro "1" */}
-                <div className="h-[4px] w-full bg-[#c0c0c0] flex items-center justify-center border-b border-[#888]">
-                  <div className="text-[3px] font-black text-[#444] leading-none">1</div>
-                  <div className="w-[2px] h-[1px] bg-[#444] ml-[1px] mt-[1px]" style={{ clipPath: 'polygon(0 0, 100% 50%, 0 100%)' }} />
+                <div className="h-[3.5px] w-full bg-[#c0c0c0] flex items-center justify-center border-b border-[#888]">
+                  <div className="text-[2.5px] font-black text-[#444] leading-none">1</div>
+                  <div className="w-[1.5px] h-[1px] bg-[#444] ml-[1px] mt-[0.5px]" style={{ clipPath: 'polygon(0 0, 100% 50%, 0 100%)' }} />
                 </div>
                 {/* Face interne (Collimateur noir) vers le patient */}
                 <div className="flex-1 w-full flex justify-center items-end pb-[2px]">
-                   <div className="w-[90%] h-[6px] bg-[#111] rounded-[2px] shadow-[inset_0_0_6px_rgba(0,0,0,1)] opacity-90 overflow-hidden">
+                   <div className="w-[90%] h-[5px] bg-[#111] rounded-[2px] shadow-[inset_0_0_6px_rgba(0,0,0,1)] opacity-90 overflow-hidden">
                      <div className="w-full h-full bg-[repeating-linear-gradient(90deg,transparent,transparent_1.5px,rgba(255,255,255,0.1)_1.5px,rgba(255,255,255,0.1)_2.5px)]" />
                    </div>
                 </div>
@@ -687,24 +691,24 @@ export default function Header({ siteSettings, poles }: HeaderProps) {
             </div>
 
             {/* Tête 2 — inférieure */}
-            <div className="absolute bottom-[-30px] left-1/2 w-[110px] h-[50px] -translate-x-1/2 flex flex-col items-center rotate-180">
+            <div className="absolute bottom-[-26px] left-1/2 w-[96px] h-[44px] -translate-x-1/2 flex flex-col items-center rotate-180">
               {/* Base de connexion arrière (massive) */}
-              <div className="w-[60px] h-[8px] bg-gradient-to-b from-[#f5f5f5] to-[#ddd] rounded-t-[8px] shadow-[inset_0_2px_4px_rgba(255,255,255,0.9)] z-0" />
+              <div className="w-[54px] h-[7px] bg-gradient-to-b from-[#f5f5f5] to-[#ddd] rounded-t-[8px] shadow-[inset_0_2px_4px_rgba(255,255,255,0.9)] z-0" />
               
               {/* Coque externe principale (blanche) */}
-              <div className="w-full h-[28px] bg-gradient-to-b from-[#ffffff] to-[#f0f0f0] rounded-[10px] shadow-[0_8px_20px_rgba(0,0,0,0.15),inset_0_4px_8px_rgba(255,255,255,1)] border border-[#e0e0e0] z-10 flex flex-col items-center justify-center relative">
+              <div className="w-full h-[25px] bg-gradient-to-b from-[#ffffff] to-[#f0f0f0] rounded-[10px] shadow-[0_8px_20px_rgba(0,0,0,0.15),inset_0_4px_8px_rgba(255,255,255,1)] border border-[#e0e0e0] z-10 flex flex-col items-center justify-center relative">
               </div>
 
               {/* Ligne grise de séparation + Casing inférieur (détecteur gris) */}
-              <div className="w-[98%] h-[14px] bg-gradient-to-b from-[#999] to-[#777] rounded-b-[8px] border border-[#666] shadow-[inset_0_2px_4px_rgba(0,0,0,0.2)] z-10 flex flex-col relative mt-[-2px]">
+              <div className="w-[98%] h-[12px] bg-gradient-to-b from-[#999] to-[#777] rounded-b-[8px] border border-[#666] shadow-[inset_0_2px_4px_rgba(0,0,0,0.2)] z-10 flex flex-col relative mt-[-2px]">
                 {/* Bande grise claire + Numéro "2" */}
-                <div className="h-[4px] w-full bg-[#c0c0c0] flex items-center justify-center border-b border-[#888]">
-                  <div className="text-[3px] font-black text-[#444] leading-none">2</div>
-                  <div className="w-[2px] h-[1px] bg-[#444] ml-[1px] mt-[1px]" style={{ clipPath: 'polygon(0 0, 100% 50%, 0 100%)' }} />
+                <div className="h-[3.5px] w-full bg-[#c0c0c0] flex items-center justify-center border-b border-[#888]">
+                  <div className="text-[2.5px] font-black text-[#444] leading-none">2</div>
+                  <div className="w-[1.5px] h-[1px] bg-[#444] ml-[1px] mt-[0.5px]" style={{ clipPath: 'polygon(0 0, 100% 50%, 0 100%)' }} />
                 </div>
                 {/* Face interne (Collimateur noir) vers le patient */}
                 <div className="flex-1 w-full flex justify-center items-end pb-[2px]">
-                   <div className="w-[90%] h-[6px] bg-[#111] rounded-[2px] shadow-[inset_0_0_6px_rgba(0,0,0,1)] opacity-90 overflow-hidden">
+                   <div className="w-[90%] h-[5px] bg-[#111] rounded-[2px] shadow-[inset_0_0_6px_rgba(0,0,0,1)] opacity-90 overflow-hidden">
                      <div className="w-full h-full bg-[repeating-linear-gradient(90deg,transparent,transparent_1.5px,rgba(255,255,255,0.1)_1.5px,rgba(255,255,255,0.1)_2.5px)]" />
                    </div>
                 </div>
