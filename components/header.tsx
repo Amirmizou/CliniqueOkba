@@ -461,8 +461,8 @@ export default function Header({ siteSettings, poles }: HeaderProps) {
               'radial-gradient(ellipse 60% 50% at 70% 84%,rgba(0,0,0,0.13) 0%,rgba(0,0,0,0) 62%)',
               'conic-gradient(from 218deg at 50% 50%,#d0d0d0 0deg,#e8e8e8 28deg,#f7f7f7 58deg,#fafafa 98deg,#f2f2f2 138deg,#e4e4e4 172deg,#d2d2d2 204deg,#c6c6c6 238deg,#d0d0d0 278deg,#e2e2e2 318deg,#d0d0d0 360deg)',
             ].join(','),
-            WebkitMaskImage:'radial-gradient(circle at center,transparent 30px,black 32px)',
-            maskImage:'radial-gradient(circle at center,transparent 30px,black 32px)',
+            WebkitMaskImage:'radial-gradient(circle at center,transparent 25px,black 27px)',
+            maskImage:'radial-gradient(circle at center,transparent 25px,black 27px)',
             boxShadow:'inset 0 5px 10px rgba(255,255,255,0.92),inset 0 -12px 22px rgba(0,0,0,0.09),inset 11px 0 18px rgba(255,255,255,0.55),inset -8px 0 14px rgba(0,0,0,0.07)',
           }}>
             {/* Arcs speculaires SVG (reflet directionnel haut-gauche) */}
@@ -471,8 +471,8 @@ export default function Header({ siteSettings, poles }: HeaderProps) {
               <path d="M37 25 A53 53 0 0 1 113 25" stroke="rgba(255,255,255,0.55)" strokeWidth="2" strokeLinecap="round"/>
               <path d="M14 72 A62 62 0 0 1 22 42" stroke="rgba(255,255,255,0.40)" strokeWidth="2" strokeLinecap="round"/>
               {/* AO profond vers le bore */}
-              <circle cx="75" cy="75" r="37" stroke="rgba(0,0,0,0.20)" strokeWidth="14" fill="none"/>
-              <circle cx="75" cy="75" r="37" stroke="rgba(0,0,0,0.08)" strokeWidth="24" fill="none"/>
+              <circle cx="75" cy="75" r="28" stroke="rgba(0,0,0,0.20)" strokeWidth="10" fill="none"/>
+              <circle cx="75" cy="75" r="28" stroke="rgba(0,0,0,0.08)" strokeWidth="18" fill="none"/>
             </svg>
           </div>
 
@@ -484,20 +484,20 @@ export default function Header({ siteSettings, poles }: HeaderProps) {
 
           {/* ══ BORE — chanfrein externe (profondeur 3D) ══ */}
           <div className="absolute z-[39] rounded-full pointer-events-none" style={{
-            width:'78px', height:'78px', right:'51px', bottom:'34px',
+            width:'60px', height:'60px', right:'60px', bottom:'43px',
             background:'radial-gradient(circle at 48% 38%,#dee2e8 0%,#c4cad2 55%,#abb3bd 100%)',
             boxShadow:'inset 0 4px 10px rgba(0,0,0,0.24),inset 0 -2px 5px rgba(255,255,255,0.42)',
           }} />
 
           {/* ══ BORE — paroi tunnel (lumière clinique bleu-blanc) ══ */}
           <div className="absolute z-[40] rounded-full overflow-hidden pointer-events-none" style={{
-            width:'64px', height:'64px', right:'58px', bottom:'41px',
+            width:'50px', height:'50px', right:'65px', bottom:'48px',
             background:'radial-gradient(ellipse 72% 62% at 46% 32%,#ffffff 0%,#f2f6fb 38%,#dfe8f2 68%,#cad5e4 100%)',
             boxShadow:'inset 0 7px 20px rgba(0,20,60,0.15),inset 0 -4px 10px rgba(255,255,255,0.80),inset 0 0 32px rgba(60,120,220,0.07)',
           }}>
-            <div className="absolute inset-[8px] rounded-full" style={{ border:'1px solid rgba(0,50,120,0.09)' }} />
-            <div className="absolute inset-[15px] rounded-full" style={{ border:'1px solid rgba(0,50,120,0.06)' }} />
-            <div className="absolute inset-[22px] rounded-full" style={{ border:'0.5px solid rgba(0,50,120,0.04)' }} />
+            <div className="absolute inset-[6px] rounded-full" style={{ border:'1px solid rgba(0,50,120,0.09)' }} />
+            <div className="absolute inset-[12px] rounded-full" style={{ border:'1px solid rgba(0,50,120,0.06)' }} />
+            <div className="absolute inset-[18px] rounded-full" style={{ border:'0.5px solid rgba(0,50,120,0.04)' }} />
             <div className="absolute left-[8%] right-[8%] top-0 h-[3px] rounded-full bg-[#00a651] shadow-[0_0_14px_4px_rgba(0,166,81,0.65)]" style={{ animation:'scanLaser 2.6s ease-in-out infinite alternate' }} />
             <div className="absolute left-0 right-0 top-0 h-[18px] -mt-[8px] opacity-50" style={{ background:'radial-gradient(ellipse at center,rgba(0,166,81,0.32),transparent 70%)', animation:'scanLaser 2.6s ease-in-out infinite alternate' }} />
             <div className="absolute top-[25%] right-[15%] w-[3px] h-[3px] rounded-full bg-red-500 shadow-[0_0_8px_2px_rgba(239,68,68,0.88)] animate-pulse" />
@@ -505,7 +505,7 @@ export default function Header({ siteSettings, poles }: HeaderProps) {
 
           {/* ══ BORE — anneau LED bleu Siemens (lèvre) ══ */}
           <div className="absolute z-[41] rounded-full pointer-events-none" style={{
-            width:'64px', height:'64px', right:'58px', bottom:'41px',
+            width:'50px', height:'50px', right:'65px', bottom:'48px',
             boxShadow:[
               'inset 0 0 0 2.5px rgba(72,152,242,0.62)',
               'inset 0 0 0 6px rgba(72,152,242,0.13)',
