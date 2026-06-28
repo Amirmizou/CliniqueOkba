@@ -84,7 +84,7 @@ export default defineType({
                             name: 'signaturePhotos',
                             title: 'Photos de signature de la convention',
                             type: 'array',
-                            description: 'Photos de l\\'événement de signature (s\\'il y en a)',
+                            description: "Photos de l'événement de signature (s'il y en a)",
                             of: [{ type: 'image', options: { hotspot: true } }],
                         }),
                     ],
