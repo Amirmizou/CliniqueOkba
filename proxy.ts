@@ -28,7 +28,7 @@ const authMiddleware = withAuth(
   }
 )
 
-export default function middleware(req: NextRequest) {
+export default function proxy(req: NextRequest) {
   const isAuthRoute = req.nextUrl.pathname.startsWith('/auth')
   const isAdminRoute = req.nextUrl.pathname.startsWith('/admin')
   const isStudioRoute = req.nextUrl.pathname.startsWith('/studio')
