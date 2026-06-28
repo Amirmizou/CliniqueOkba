@@ -517,30 +517,16 @@ export default function Header({ siteSettings, poles }: HeaderProps) {
             ].join(','),
           }} />
 
-          {/* ══ DÉCALS DU GANTRY (Siemens logo, Symbia badge, lignes de panneaux) ══ */}
+          {/* ══ DÉCALS DU GANTRY ══ */}
           <div className="absolute right-[15px] bottom-[-2px] w-[150px] h-[150px] rounded-full z-[42] pointer-events-none">
             {/* Lignes de panneaux (Seams) */}
             <div className="absolute top-0 bottom-[50%] left-[49.5%] right-[49.5%] bg-black/[0.04]" />
             <div className="absolute top-[49.5%] bottom-[49.5%] left-0 right-[80%] bg-black/[0.04]" />
             <div className="absolute top-[49.5%] bottom-[49.5%] left-[80%] right-0 bg-black/[0.04]" />
             
-            {/* Logo Siemens Healthineers (Points orange) */}
-            <div className="absolute left-[24px] top-[30px] flex gap-[2.5px] transform rotate-[-12deg]">
-              <div className="w-[2.5px] h-[2.5px] rounded-full bg-[#E2610A] shadow-[0_0_2px_rgba(226,97,10,0.5)]" />
-              <div className="w-[2.5px] h-[2.5px] rounded-full bg-[#E2610A] shadow-[0_0_2px_rgba(226,97,10,0.5)]" />
-              <div className="w-[2.5px] h-[2.5px] rounded-full bg-[#E2610A] shadow-[0_0_2px_rgba(226,97,10,0.5)]" />
-              <div className="w-[2.5px] h-[2.5px] rounded-full bg-[#E2610A] shadow-[0_0_2px_rgba(226,97,10,0.5)]" />
-              <div className="w-[2.5px] h-[2.5px] rounded-full bg-[#E2610A] shadow-[0_0_2px_rgba(226,97,10,0.5)]" />
-              <div className="w-[2.5px] h-[2.5px] rounded-full bg-[#E2610A] shadow-[0_0_2px_rgba(226,97,10,0.5)]" />
-              <div className="w-[2.5px] h-[2.5px] rounded-full bg-[#E2610A] shadow-[0_0_2px_rgba(226,97,10,0.5)]" />
-              {/* Le grand point final */}
-              <div className="w-[3.5px] h-[3.5px] -mt-[0.5px] rounded-full bg-[#E2610A] shadow-[0_0_3px_rgba(226,97,10,0.6)]" />
-            </div>
-
-            {/* Badge SYMBIA Pro.specta orange */}
-            <div className="absolute right-[5px] top-[64px] bg-[#E2610A] px-[4px] py-[2px] rounded-[1.5px] shadow-[inset_0_1px_1px_rgba(255,255,255,0.4),0_1px_2px_rgba(0,0,0,0.2)] flex flex-col items-center justify-center transform rotate-[4deg]">
-              <span className="text-[3px] font-black leading-none text-white tracking-widest">SYMBIA</span>
-              <span className="text-[2.5px] font-bold leading-[1.2] text-white/90 tracking-wide mt-[0.5px]">Pro.specta</span>
+            {/* Bande orange horizontale SYMBIA Pro.specta sur la droite */}
+            <div className="absolute right-[1px] top-[72px] w-[30px] h-[7px] bg-[#E2610A] shadow-[inset_0_1px_2px_rgba(255,255,255,0.3)] flex items-center justify-start pl-[2px] transform rotate-[0deg] overflow-hidden rounded-l-[1px]">
+              <span className="text-[2.2px] font-black text-white whitespace-nowrap">SYMBIA Pro.specta</span>
             </div>
           </div>
 
@@ -573,15 +559,21 @@ export default function Header({ siteSettings, poles }: HeaderProps) {
             boxShadow:'inset 0 1px 3px rgba(0,0,0,0.5),0 3px 6px rgba(0,0,0,0.2)',
           }} />
 
+          {/* Table Patient (Matelas + Base) */}
           <div className={cn("absolute z-[30] flex flex-col justify-end origin-right hover:-translate-x-1", isHidden ? "translate-x-[200px] opacity-0 transition-all duration-[2000ms] ease-in-out" : "translate-x-0 opacity-100 transition-all duration-[1500ms] delay-[400ms] ease-out")} style={{
             left:'10px', right:'95px', bottom:'32px', height:'64px',
             borderRadius:'24px 0 0 8px',
             background:'linear-gradient(180deg,#ffffff 0%,#f2f2f2 60%,#e0e0e0 100%)',
             boxShadow:'0 10px 24px -4px rgba(0,0,0,0.25),inset 0 4px 12px rgba(255,255,255,1),inset 0 -3px 8px rgba(0,0,0,0.08)',
           }}>
-            <div className="absolute top-0 left-0 right-0 h-[10px] rounded-tl-[24px]" style={{ background:'linear-gradient(180deg,#4a4a4a 0%,#2b2b2b 100%)', boxShadow:'inset 0 1px 2px rgba(255,255,255,0.2),0 2px 4px rgba(0,0,0,0.2)' }}>
-              <div className="absolute top-[1px] left-[10px] right-[10px] h-[1px] bg-white/10" />
+            {/* Matelas noir concave */}
+            <div className="absolute top-0 left-[2px] right-0 h-[12px] rounded-tl-[24px]" style={{ background:'linear-gradient(180deg,#222 0%,#000 100%)', boxShadow:'inset 0 1px 2px rgba(255,255,255,0.1),0 2px 4px rgba(0,0,0,0.4)' }}>
+              <div className="absolute top-[1px] left-[10px] right-[10px] h-[1px] bg-white/5" />
             </div>
+            
+            {/* Poignée argentée (foot handle) */}
+            <div className="absolute top-[-4px] left-[6px] w-[20px] h-[14px] border-[2.5px] border-[#d0d0d0] rounded-l-full shadow-[-2px_0_4px_rgba(0,0,0,0.2),inset_1px_0_2px_rgba(255,255,255,0.8)] z-10" style={{ borderRight:'none' }} />
+
             <div className="absolute bottom-[8px] left-[18px] right-0 h-[3px] rounded-l-full" style={{ background:'linear-gradient(90deg,#006633 0%,#00a651 40%,rgba(0,166,81,0) 100%)', boxShadow:'0 0 6px rgba(0,166,81,0.5)' }} />
             <div aria-hidden="true" className="pointer-events-none absolute bottom-[20px] left-[25%] right-0 h-[1px] bg-black/[0.04]" />
             <div aria-hidden="true" className="pointer-events-none absolute right-0 top-0 bottom-0 w-[95px] z-10" style={{ background:'linear-gradient(to left,rgba(0,0,0,0.85) 0%,rgba(0,0,0,0.3) 50%,transparent 100%)' }} />
@@ -619,69 +611,102 @@ export default function Header({ siteSettings, poles }: HeaderProps) {
             </nav>
           </div>
 
-          {/* ══ ÉCRAN DE CONTRÔLE (Display Monitor) ══ */}
-          <div className="absolute z-[45] pointer-events-none" style={{ right:'145px', bottom:'115px' }}>
-            {/* Bras articulé (attaché au ring) */}
-            <div className="absolute top-[18px] left-[26px] w-[20px] h-[6px] bg-gradient-to-b from-[#bbb] to-[#888] rounded-full shadow-md transform rotate-[20deg]" />
-            <div className="absolute top-[15px] left-[38px] w-[14px] h-[10px] bg-[#666] rounded-[2px] shadow-sm transform rotate-[-10deg]" />
+          {/* ══ ÉCRAN DE CONTRÔLE SUSPENDU (Display Monitor) ══ */}
+          <div className="absolute z-[45] pointer-events-none" style={{ right:'-15px', top:'20px' }}>
+            {/* Bras de suspension plafond */}
+            <div className="absolute bottom-[20px] left-[18px] w-[8px] h-[80px] bg-gradient-to-r from-[#ddd] to-[#eee] border-l border-[#bbb] shadow-md -z-10" />
+            <div className="absolute bottom-[20px] left-[15px] w-[14px] h-[6px] bg-[#fff] rounded-sm shadow-sm" />
             
-            {/* L'écran (casing + dalle) */}
-            <div className="relative w-[36px] h-[26px] bg-[#e4e4e4] rounded-[3px] border border-[#ccc] shadow-[0_5px_12px_rgba(0,0,0,0.35),inset_0_1px_1px_rgba(255,255,255,0.8)] flex flex-col items-center justify-center">
-              <div className="w-[32px] h-[22px] bg-[#111] rounded-[1px] border-[1px] border-[#333] shadow-[inset_0_0_0_1px_#000] flex flex-col overflow-hidden relative">
-                {/* Header UI de l'écran */}
-                <div className="h-[3px] w-full bg-[#222] flex items-center px-[2px] gap-[1px]">
-                  <div className="w-[1.5px] h-[1.5px] rounded-full bg-red-500" />
-                  <div className="w-[1.5px] h-[1.5px] rounded-full bg-yellow-500" />
-                  <div className="w-[1.5px] h-[1.5px] rounded-full bg-green-500" />
-                </div>
-                {/* Contenu de l'écran (Graphique type ECG/Scan) */}
-                <div className="flex-1 w-full bg-[#031526] relative overflow-hidden flex items-center justify-center">
-                  <svg className="absolute inset-0 w-full h-full opacity-70" viewBox="0 0 100 100" preserveAspectRatio="none">
-                    <path d="M0,50 Q15,50 25,20 T50,50 T75,80 T100,50" fill="none" stroke="#00ffcc" strokeWidth="3" />
+            {/* Câble en spirale */}
+            <div className="absolute top-[28px] right-[4px] w-[4px] h-[40px] border-r-2 border-dashed border-[#888] opacity-70" style={{ borderRadius:'50%' }} />
+
+            {/* L'écran (casing large + double dalle) */}
+            <div className="relative w-[46px] h-[30px] bg-[#1a1a1a] rounded-[2px] border border-[#333] shadow-[0_10px_20px_rgba(0,0,0,0.4),inset_0_1px_1px_rgba(255,255,255,0.2)] flex items-center justify-center p-[2px]">
+              {/* Contenu de l'écran avec 2 fenêtres */}
+              <div className="flex-1 w-full h-full bg-[#051124] relative overflow-hidden flex gap-[2px] p-[1px]">
+                {/* Panel 1 */}
+                <div className="flex-1 h-full border border-[#1a3a60] relative overflow-hidden bg-[#030d1c]">
+                   <svg className="absolute inset-0 w-full h-full opacity-60" viewBox="0 0 100 100" preserveAspectRatio="none">
+                    <path d="M0,50 Q25,30 50,50 T100,50" fill="none" stroke="#4898f2" strokeWidth="2" />
                   </svg>
-                  {/* Overlay scan ligne */}
-                  <div className="absolute top-0 bottom-0 left-[40%] w-[1px] bg-white/80 shadow-[0_0_3px_#00ffcc]" />
+                </div>
+                {/* Panel 2 */}
+                <div className="flex-1 h-full border border-[#1a3a60] relative overflow-hidden bg-[#030d1c]">
+                   <svg className="absolute inset-0 w-full h-full opacity-60" viewBox="0 0 100 100" preserveAspectRatio="none">
+                    <path d="M0,50 Q25,70 50,50 T100,50" fill="none" stroke="#4898f2" strokeWidth="2" />
+                  </svg>
+                </div>
+                {/* Barre de menu basse */}
+                <div className="absolute bottom-0 left-0 right-0 h-[4px] bg-[#0a192f] flex justify-around items-center px-[2px]">
+                  <div className="w-[3px] h-[1px] bg-white/40" />
+                  <div className="w-[3px] h-[1px] bg-white/40" />
+                  <div className="w-[3px] h-[1px] bg-white/40" />
+                  <div className="w-[3px] h-[1px] bg-white/40" />
                 </div>
               </div>
             </div>
           </div>
 
-          {/* ══ TÊTES SPECT (réalisme industriel) ══ */}
+          {/* ══ TÊTES SPECT (Massives, arrondies, logo sur face externe) ══ */}
           <div className="absolute right-[15px] bottom-[-2px] w-[150px] h-[150px] z-[44] animate-[spin_32s_linear_infinite] pointer-events-none">
             {/* Tête 1 — supérieure */}
-            <div className="absolute top-[-22px] left-1/2 w-[80px] h-[38px] -translate-x-1/2 flex flex-col items-center">
-              {/* Bras de connexion */}
-              <div className="w-[34px] h-[10px] bg-gradient-to-b from-[#d0d0d0] to-[#999] rounded-t-[4px] border border-[#888] shadow-[inset_0_2px_4px_rgba(255,255,255,0.6)] z-0 relative">
-                <div className="absolute bottom-[2px] left-[4px] right-[4px] h-[1.5px] bg-black/20 rounded-full" />
-              </div>
-              {/* Boîtier du détecteur (casing) */}
-              <div className="w-full h-[28px] bg-gradient-to-b from-[#ffffff] to-[#e4e4e4] rounded-[6px] shadow-[0_5px_15px_rgba(0,0,0,0.3),inset_0_2px_4px_rgba(255,255,255,1)] border border-[#ccc] z-10 flex flex-col justify-end overflow-hidden">
-                <div className="absolute top-[4px] left-[6px] w-[8px] h-[2px] bg-[#EC0016] opacity-80 rounded-full" /> {/* Accent rouge */}
-                <div className="h-[1.5px] w-full bg-gradient-to-r from-transparent via-[#00a651] to-transparent opacity-80 mb-[2px]" />
-                {/* Face du détecteur (noir/gris sombre) avec collimateur */}
-                <div className="h-[12px] w-full bg-gradient-to-b from-[#333] to-[#111] border-t border-[#666] shadow-[inset_0_-2px_6px_rgba(0,0,0,0.8)] flex justify-center items-center">
-                  <div className="w-[92%] h-[8px] bg-[#0a0a0a] rounded-[2px] shadow-[inset_0_0_4px_rgba(0,0,0,1)] flex gap-[1px] p-[1px] opacity-80">
-                    <div className="w-full h-full bg-[repeating-linear-gradient(90deg,transparent,transparent_1.5px,rgba(255,255,255,0.15)_1.5px,rgba(255,255,255,0.15)_2.5px)]" />
+            <div className="absolute top-[-30px] left-1/2 w-[110px] h-[50px] -translate-x-1/2 flex flex-col items-center">
+              {/* Base de connexion arrière (massive) */}
+              <div className="w-[60px] h-[8px] bg-gradient-to-b from-[#f5f5f5] to-[#ddd] rounded-t-[8px] shadow-[inset_0_2px_4px_rgba(255,255,255,0.9)] z-0" />
+              
+              {/* Coque externe principale (blanche) */}
+              <div className="w-full h-[28px] bg-gradient-to-b from-[#ffffff] to-[#f0f0f0] rounded-[10px] shadow-[0_8px_20px_rgba(0,0,0,0.15),inset_0_4px_8px_rgba(255,255,255,1)] border border-[#e0e0e0] z-10 flex flex-col items-center justify-center relative">
+                {/* Logo SIEMENS Healthineers sur la coque */}
+                <div className="flex flex-col items-center mt-[2px]">
+                  <span className="text-[3.5px] font-black text-[#0099b9] leading-none tracking-widest">SIEMENS</span>
+                  <div className="flex items-center gap-[1px] mt-[1px]">
+                    <span className="text-[4px] font-bold text-[#E2610A] leading-none">Healthineers</span>
+                    <div className="flex gap-[0.5px] mb-[2px]">
+                      <div className="w-[1px] h-[1px] rounded-full bg-[#E2610A]" />
+                      <div className="w-[1px] h-[1px] rounded-full bg-[#E2610A]" />
+                      <div className="w-[1.5px] h-[1.5px] -mt-[0.5px] rounded-full bg-[#E2610A]" />
+                    </div>
                   </div>
+                </div>
+              </div>
+
+              {/* Ligne grise de séparation + Casing inférieur (détecteur gris) */}
+              <div className="w-[98%] h-[14px] bg-gradient-to-b from-[#999] to-[#777] rounded-b-[8px] border border-[#666] shadow-[inset_0_2px_4px_rgba(0,0,0,0.2)] z-10 flex flex-col relative mt-[-2px]">
+                {/* Bande grise claire + Numéro "1" */}
+                <div className="h-[4px] w-full bg-[#c0c0c0] flex items-center justify-center border-b border-[#888]">
+                  <div className="text-[3px] font-black text-[#444] leading-none">1</div>
+                  <div className="w-[2px] h-[1px] bg-[#444] ml-[1px] mt-[1px]" style={{ clipPath: 'polygon(0 0, 100% 50%, 0 100%)' }} />
+                </div>
+                {/* Face interne (Collimateur noir) vers le patient */}
+                <div className="flex-1 w-full flex justify-center items-end pb-[2px]">
+                   <div className="w-[90%] h-[6px] bg-[#111] rounded-[2px] shadow-[inset_0_0_6px_rgba(0,0,0,1)] opacity-90 overflow-hidden">
+                     <div className="w-full h-full bg-[repeating-linear-gradient(90deg,transparent,transparent_1.5px,rgba(255,255,255,0.1)_1.5px,rgba(255,255,255,0.1)_2.5px)]" />
+                   </div>
                 </div>
               </div>
             </div>
 
             {/* Tête 2 — inférieure */}
-            <div className="absolute bottom-[-22px] left-1/2 w-[80px] h-[38px] -translate-x-1/2 flex flex-col items-center rotate-180">
-              {/* Bras de connexion */}
-              <div className="w-[34px] h-[10px] bg-gradient-to-b from-[#d0d0d0] to-[#999] rounded-t-[4px] border border-[#888] shadow-[inset_0_2px_4px_rgba(255,255,255,0.6)] z-0 relative">
-                <div className="absolute bottom-[2px] left-[4px] right-[4px] h-[1.5px] bg-black/20 rounded-full" />
+            <div className="absolute bottom-[-30px] left-1/2 w-[110px] h-[50px] -translate-x-1/2 flex flex-col items-center rotate-180">
+              {/* Base de connexion arrière (massive) */}
+              <div className="w-[60px] h-[8px] bg-gradient-to-b from-[#f5f5f5] to-[#ddd] rounded-t-[8px] shadow-[inset_0_2px_4px_rgba(255,255,255,0.9)] z-0" />
+              
+              {/* Coque externe principale (blanche) */}
+              <div className="w-full h-[28px] bg-gradient-to-b from-[#ffffff] to-[#f0f0f0] rounded-[10px] shadow-[0_8px_20px_rgba(0,0,0,0.15),inset_0_4px_8px_rgba(255,255,255,1)] border border-[#e0e0e0] z-10 flex flex-col items-center justify-center relative">
               </div>
-              {/* Boîtier du détecteur (casing) */}
-              <div className="w-full h-[28px] bg-gradient-to-b from-[#ffffff] to-[#e4e4e4] rounded-[6px] shadow-[0_5px_15px_rgba(0,0,0,0.3),inset_0_2px_4px_rgba(255,255,255,1)] border border-[#ccc] z-10 flex flex-col justify-end overflow-hidden">
-                <div className="absolute top-[4px] right-[6px] w-[8px] h-[2px] bg-[#EC0016] opacity-80 rounded-full" /> {/* Accent rouge */}
-                <div className="h-[1.5px] w-full bg-gradient-to-r from-transparent via-[#00a651] to-transparent opacity-80 mb-[2px]" />
-                {/* Face du détecteur (noir/gris sombre) avec collimateur */}
-                <div className="h-[12px] w-full bg-gradient-to-b from-[#333] to-[#111] border-t border-[#666] shadow-[inset_0_-2px_6px_rgba(0,0,0,0.8)] flex justify-center items-center">
-                  <div className="w-[92%] h-[8px] bg-[#0a0a0a] rounded-[2px] shadow-[inset_0_0_4px_rgba(0,0,0,1)] flex gap-[1px] p-[1px] opacity-80">
-                    <div className="w-full h-full bg-[repeating-linear-gradient(90deg,transparent,transparent_1.5px,rgba(255,255,255,0.15)_1.5px,rgba(255,255,255,0.15)_2.5px)]" />
-                  </div>
+
+              {/* Ligne grise de séparation + Casing inférieur (détecteur gris) */}
+              <div className="w-[98%] h-[14px] bg-gradient-to-b from-[#999] to-[#777] rounded-b-[8px] border border-[#666] shadow-[inset_0_2px_4px_rgba(0,0,0,0.2)] z-10 flex flex-col relative mt-[-2px]">
+                {/* Bande grise claire + Numéro "2" */}
+                <div className="h-[4px] w-full bg-[#c0c0c0] flex items-center justify-center border-b border-[#888]">
+                  <div className="text-[3px] font-black text-[#444] leading-none">2</div>
+                  <div className="w-[2px] h-[1px] bg-[#444] ml-[1px] mt-[1px]" style={{ clipPath: 'polygon(0 0, 100% 50%, 0 100%)' }} />
+                </div>
+                {/* Face interne (Collimateur noir) vers le patient */}
+                <div className="flex-1 w-full flex justify-center items-end pb-[2px]">
+                   <div className="w-[90%] h-[6px] bg-[#111] rounded-[2px] shadow-[inset_0_0_6px_rgba(0,0,0,1)] opacity-90 overflow-hidden">
+                     <div className="w-full h-full bg-[repeating-linear-gradient(90deg,transparent,transparent_1.5px,rgba(255,255,255,0.1)_1.5px,rgba(255,255,255,0.1)_2.5px)]" />
+                   </div>
                 </div>
               </div>
             </div>
