@@ -119,6 +119,27 @@ export default function Header({ siteSettings, poles }: HeaderProps) {
   const { scrollY } = useScroll()
   const menuButtonRef = useRef<HTMLButtonElement>(null)
 
+  const scannerRef = useRef<HTMLDivElement>(null)
+  const [tilt, setTilt] = useState({ x: 0, y: 0 })
+  const [isScannerHovered, setIsScannerHovered] = useState(false)
+
+  const handleScannerMouseMove = (e: React.MouseEvent) => {
+    if (!scannerRef.current) return
+    const rect = scannerRef.current.getBoundingClientRect()
+    const x = e.clientX - rect.left
+    const y = e.clientY - rect.top
+    
+    const rotateY = ((x / rect.width) - 0.5) * 20
+    const rotateX = ((y / rect.height) - 0.5) * -20
+    
+    setTilt({ x: rotateX, y: rotateY })
+  }
+
+  const handleScannerMouseLeave = () => {
+    setIsScannerHovered(false)
+    setTilt({ x: 0, y: 0 })
+  }
+
   useEffect(() => {
     document.body.style.overflow = isOpen ? 'hidden' : 'unset'
     return () => {
@@ -419,114 +440,127 @@ export default function Header({ siteSettings, poles }: HeaderProps) {
           </div>
         </div>
 
-        {/* 3D SCANNER DESKTOP — Siemens Symbia Pro.specta */}
+        {/* 3D SCANNER DESKTOP — Siemens Symbia Pro.specta (FRONT VIEW) */}
         <div className={cn("pointer-events-auto relative w-full max-w-7xl mx-auto h-[140px] hidden xl:block transition-all duration-700 origin-top mt-4", isScrolled ? "scale-95 -translate-y-2 opacity-95" : "scale-100 translate-y-0 opacity-100")}>
+          <div
+            ref={scannerRef}
+            onMouseMove={handleScannerMouseMove}
+            onMouseEnter={() => setIsScannerHovered(true)}
+            onMouseLeave={handleScannerMouseLeave}
+            className="w-full h-full relative"
+            style={{
+              transition: isScannerHovered ? 'transform 0.1s ease-out' : 'transform 0.7s ease-in-out',
+              transform: `perspective(1200px) rotateX(${tilt.x}deg) rotateY(${tilt.y}deg)`
+            }}
+          >
 
-          {/* ══ FLOOR MOUNT ══ */}
-          <div className="absolute right-[10px] bottom-0 w-[174px] h-[18px] z-0 pointer-events-none" style={{
-            borderRadius: '0 0 10px 10px',
-            background: 'linear-gradient(180deg,#d2d2d2 0%,#a6a6a6 55%,#8e8e8e 100%)',
-            boxShadow: '0 6px 18px rgba(0,0,0,0.30),inset 0 1px 0 rgba(255,255,255,0.40)',
+          {/* ══ LIGNE DE BASE (Ancrage visuel de la navigation) ══ */}
+          <div className="absolute z-[5] pointer-events-none" style={{
+            left:'20px', right:'180px', bottom:'26px', height:'4px',
+            borderRadius:'2px',
+            background:'linear-gradient(90deg, transparent 0%, #d0d0d0 10%, #d0d0d0 90%, transparent 100%)',
+          }} />
+          <div className="absolute z-[5] pointer-events-none" style={{
+            left:'20px', right:'180px', bottom:'20px', height:'2px',
+            borderRadius:'1px',
+            background:'linear-gradient(90deg, transparent 0%, rgba(0,102,51,0.5) 20%, rgba(0,102,51,0.5) 80%, transparent 100%)',
           }} />
 
-          {/* ══ CORPS DROIT — panneau latéral + LED console ══ */}
-          <div className="absolute right-[5px] bottom-[16px] w-[62px] h-[116px] z-[8] pointer-events-none" style={{
-            borderRadius: '0 26px 10px 0',
-            background: 'linear-gradient(90deg,#eeeeee 0%,#dcdcdc 55%,#c4c4c4 100%)',
-            boxShadow: '5px 2px 16px rgba(0,0,0,0.16),inset -2px 0 6px rgba(0,0,0,0.06),inset 0 1px 0 rgba(255,255,255,0.50)',
-          }}>
-            <div className="absolute top-[28px] bottom-[22px] right-[10px] w-px" style={{ background:'linear-gradient(180deg,transparent,rgba(0,0,0,0.18) 20%,rgba(0,0,0,0.24) 50%,rgba(0,0,0,0.12) 80%,transparent)' }} />
-            <div className="absolute bottom-[22px] right-[8px] left-[8px] h-[3px] rounded-full" style={{ background:'linear-gradient(90deg,rgba(0,102,51,0.65),rgba(0,166,81,1),rgba(0,102,51,0.65))', boxShadow:'0 0 8px 2px rgba(0,166,81,0.55)' }} />
-            <div className="absolute bottom-[12px] right-[12px] left-[12px] h-[1.5px] rounded-full bg-black/10" />
+          {/* ══ GANTRY BASE (Pied) ══ */}
+          <div className="absolute right-[40px] bottom-[0px] w-[100px] h-[20px] z-[10] pointer-events-none" style={{
+            background: 'linear-gradient(180deg,#e0e0e0 0%,#c0c0c0 100%)',
+            borderRadius: '10px 10px 0 0',
+            boxShadow: '0 10px 20px rgba(0,0,0,0.3), inset 0 2px 5px rgba(255,255,255,0.8)'
+          }} />
+
+          {/* ══ TÊTES SPECT ROTATIVES (Vue de face, derrière l'anneau) ══ */}
+          <div className="absolute right-[25px] bottom-[5px] w-[130px] h-[130px] z-[15] pointer-events-none animate-[spin_32s_linear_infinite]">
+            {/* Tête Supérieure */}
+            <div className="absolute top-[-15px] left-1/2 -translate-x-1/2 w-[80px] h-[40px] flex flex-col items-center">
+              <div className="w-full h-[25px] bg-gradient-to-b from-[#fff] to-[#eee] rounded-t-[16px] border border-[#ccc] shadow-lg flex justify-center pt-1">
+                <span className="text-[3px] font-black text-[#0099b9] leading-none tracking-widest">SIEMENS</span>
+              </div>
+              <div className="w-[90%] h-[15px] bg-gradient-to-b from-[#888] to-[#666] rounded-b-[8px] border border-[#555] flex flex-col items-center justify-end pb-1 shadow-inner">
+                <div className="w-[80%] h-[4px] bg-[#111] rounded-[2px]" />
+              </div>
+            </div>
+            {/* Tête Inférieure */}
+            <div className="absolute bottom-[-15px] left-1/2 -translate-x-1/2 w-[80px] h-[40px] flex flex-col items-center rotate-180">
+              <div className="w-full h-[25px] bg-gradient-to-b from-[#fff] to-[#eee] rounded-t-[16px] border border-[#ccc] shadow-lg flex justify-center pt-1">
+              </div>
+              <div className="w-[90%] h-[15px] bg-gradient-to-b from-[#888] to-[#666] rounded-b-[8px] border border-[#555] flex flex-col items-center justify-end pb-1 shadow-inner">
+                <div className="w-[80%] h-[4px] bg-[#111] rounded-[2px]" />
+              </div>
+            </div>
           </div>
 
-          {/* ══ OMBRE SOL ══ */}
-          <div aria-hidden="true" className="absolute z-[2] pointer-events-none" style={{
-            right:'18px', bottom:'-6px', width:'146px', height:'26px',
-            borderRadius:'50%',
-            background:'radial-gradient(closest-side,rgba(0,0,0,0.38),rgba(0,0,0,0) 76%)',
-            filter:'blur(3px)',
-          }} />
-
-          {/* ══ ANNEAU — disque de base (drop shadow profond) ══ */}
-          <div className="absolute right-[15px] bottom-[-2px] w-[150px] h-[150px] rounded-full z-[35] pointer-events-none" style={{
-            background:'radial-gradient(circle at 46% 42%,#f9f9f9 0%,#e4e4e4 55%,#cccccc 100%)',
-            boxShadow:'0 24px 52px -6px rgba(0,0,0,0.40),0 8px 18px rgba(0,0,0,0.16),0 2px 4px rgba(0,0,0,0.10),3px 6px 14px rgba(0,0,0,0.10)',
-          }} />
-
-          {/* ══ ANNEAU — face donut (matière 3D : rim-light conic + specular) ══ */}
-          <div className="absolute right-[15px] bottom-[-2px] w-[150px] h-[150px] rounded-full z-[38] pointer-events-none overflow-hidden" style={{
-            background:[
-              'radial-gradient(ellipse 80% 44% at 36% 16%,rgba(255,255,255,0.98) 0%,rgba(255,255,255,0) 52%)',
-              'radial-gradient(ellipse 60% 50% at 70% 84%,rgba(0,0,0,0.13) 0%,rgba(0,0,0,0) 62%)',
-              'conic-gradient(from 218deg at 50% 50%,#d0d0d0 0deg,#e8e8e8 28deg,#f7f7f7 58deg,#fafafa 98deg,#f2f2f2 138deg,#e4e4e4 172deg,#d2d2d2 204deg,#c6c6c6 238deg,#d0d0d0 278deg,#e2e2e2 318deg,#d0d0d0 360deg)',
-            ].join(','),
-            WebkitMaskImage:'radial-gradient(circle at center,transparent 25px,black 27px)',
-            maskImage:'radial-gradient(circle at center,transparent 25px,black 27px)',
-            boxShadow:'inset 0 5px 10px rgba(255,255,255,0.92),inset 0 -12px 22px rgba(0,0,0,0.09),inset 11px 0 18px rgba(255,255,255,0.55),inset -8px 0 14px rgba(0,0,0,0.07)',
+          {/* ══ GANTRY RING (Anneau principal, vue de face) ══ */}
+          <div className="absolute right-[20px] bottom-[0px] w-[140px] h-[140px] z-[20] pointer-events-none rounded-full" style={{
+            background: 'radial-gradient(circle at 30% 30%, #ffffff 0%, #e6e6e6 40%, #cccccc 80%, #b3b3b3 100%)',
+            boxShadow: '0 15px 35px rgba(0,0,0,0.3), inset 0 4px 10px rgba(255,255,255,1), inset 0 -4px 15px rgba(0,0,0,0.1)'
           }}>
-            {/* Arcs speculaires SVG (reflet directionnel haut-gauche) */}
-            <svg className="absolute inset-0" viewBox="0 0 150 150" fill="none" aria-hidden="true">
-              <path d="M33 20 A59 59 0 0 1 117 20" stroke="rgba(255,255,255,0.95)" strokeWidth="3.5" strokeLinecap="round"/>
-              <path d="M37 25 A53 53 0 0 1 113 25" stroke="rgba(255,255,255,0.55)" strokeWidth="2" strokeLinecap="round"/>
-              <path d="M14 72 A62 62 0 0 1 22 42" stroke="rgba(255,255,255,0.40)" strokeWidth="2" strokeLinecap="round"/>
-              {/* AO profond vers le bore */}
-              <circle cx="75" cy="75" r="28" stroke="rgba(0,0,0,0.20)" strokeWidth="10" fill="none"/>
-              <circle cx="75" cy="75" r="28" stroke="rgba(0,0,0,0.08)" strokeWidth="18" fill="none"/>
-            </svg>
-          </div>
-
-          {/* ══ Liseré vert signature ══ */}
-          <div className="absolute z-[39] rounded-full pointer-events-none" style={{
-            right:'22px', bottom:'5px', width:'136px', height:'136px',
-            boxShadow:'inset 0 0 0 2px rgba(0,102,51,0.52),inset 0 0 0 4px rgba(0,102,51,0.08)',
-          }} />
-
-          {/* ══ BORE — chanfrein externe (profondeur 3D) ══ */}
-          <div className="absolute z-[39] rounded-full pointer-events-none" style={{
-            width:'60px', height:'60px', right:'60px', bottom:'43px',
-            background:'radial-gradient(circle at 48% 38%,#dee2e8 0%,#c4cad2 55%,#abb3bd 100%)',
-            boxShadow:'inset 0 4px 10px rgba(0,0,0,0.24),inset 0 -2px 5px rgba(255,255,255,0.42)',
-          }} />
-
-          {/* ══ BORE — paroi tunnel (lumière clinique bleu-blanc) ══ */}
-          <div className="absolute z-[40] rounded-full overflow-hidden pointer-events-none" style={{
-            width:'50px', height:'50px', right:'65px', bottom:'48px',
-            background:'radial-gradient(ellipse 72% 62% at 46% 32%,#ffffff 0%,#f2f6fb 38%,#dfe8f2 68%,#cad5e4 100%)',
-            boxShadow:'inset 0 7px 20px rgba(0,20,60,0.15),inset 0 -4px 10px rgba(255,255,255,0.80),inset 0 0 32px rgba(60,120,220,0.07)',
-          }}>
-            <div className="absolute inset-[6px] rounded-full" style={{ border:'1px solid rgba(0,50,120,0.09)' }} />
-            <div className="absolute inset-[12px] rounded-full" style={{ border:'1px solid rgba(0,50,120,0.06)' }} />
-            <div className="absolute inset-[18px] rounded-full" style={{ border:'0.5px solid rgba(0,50,120,0.04)' }} />
-            <div className="absolute left-[8%] right-[8%] top-0 h-[3px] rounded-full bg-[#00a651] shadow-[0_0_14px_4px_rgba(0,166,81,0.65)]" style={{ animation:'scanLaser 2.6s ease-in-out infinite alternate' }} />
-            <div className="absolute left-0 right-0 top-0 h-[18px] -mt-[8px] opacity-50" style={{ background:'radial-gradient(ellipse at center,rgba(0,166,81,0.32),transparent 70%)', animation:'scanLaser 2.6s ease-in-out infinite alternate' }} />
-            <div className="absolute top-[25%] right-[15%] w-[3px] h-[3px] rounded-full bg-red-500 shadow-[0_0_8px_2px_rgba(239,68,68,0.88)] animate-pulse" />
-          </div>
-
-          {/* ══ BORE — anneau LED bleu Siemens (lèvre) ══ */}
-          <div className="absolute z-[41] rounded-full pointer-events-none" style={{
-            width:'50px', height:'50px', right:'65px', bottom:'48px',
-            boxShadow:[
-              'inset 0 0 0 2.5px rgba(72,152,242,0.62)',
-              'inset 0 0 0 6px rgba(72,152,242,0.13)',
-              'inset 0 0 20px rgba(72,152,242,0.08)',
-              'inset 0 2px 5px rgba(0,0,0,0.12)',
-              'inset 0 -2px 4px rgba(255,255,255,0.65)',
-              '0 0 0 1px rgba(0,0,0,0.11)',
-              '0 0 16px rgba(72,152,242,0.16)',
-            ].join(','),
-          }} />
-
-          {/* ══ DÉCALS DU GANTRY ══ */}
-          <div className="absolute right-[15px] bottom-[-2px] w-[150px] h-[150px] rounded-full z-[42] pointer-events-none">
-            {/* Lignes de panneaux (Seams) */}
-            <div className="absolute top-0 bottom-[50%] left-[49.5%] right-[49.5%] bg-black/[0.04]" />
-            <div className="absolute top-[49.5%] bottom-[49.5%] left-0 right-[80%] bg-black/[0.04]" />
-            <div className="absolute top-[49.5%] bottom-[49.5%] left-[80%] right-0 bg-black/[0.04]" />
+            {/* Liseré vert signature */}
+            <div className="absolute inset-[6px] rounded-full border-[1.5px] border-[#006633] opacity-60" />
             
-            {/* Bande orange horizontale SYMBIA Pro.specta sur la droite */}
-            <div className="absolute right-[1px] top-[72px] w-[30px] h-[7px] bg-[#E2610A] shadow-[inset_0_1px_2px_rgba(255,255,255,0.3)] flex items-center justify-start pl-[2px] transform rotate-[0deg] overflow-hidden rounded-l-[1px]">
-              <span className="text-[2.2px] font-black text-white whitespace-nowrap">SYMBIA Pro.specta</span>
+            {/* Décal orange Symbia */}
+            <div className="absolute right-[8px] top-[66px] w-[25px] h-[6px] bg-[#E2610A] rounded-[1px] flex items-center pl-1 shadow-sm">
+              <span className="text-[2px] font-black text-white">SYMBIA Pro.specta</span>
+            </div>
+          </div>
+
+          {/* ══ TUNNEL (Bore) ══ */}
+          <div className="absolute right-[50px] bottom-[30px] w-[80px] h-[80px] z-[25] pointer-events-none rounded-full overflow-hidden" style={{
+            background: 'radial-gradient(circle at 50% 50%, #d0d5dc 0%, #b8c0c8 60%, #9aa3ae 100%)',
+            boxShadow: 'inset 0 10px 25px rgba(0,0,0,0.4), 0 2px 4px rgba(255,255,255,0.8)'
+          }}>
+            {/* Lumière annulaire bleue */}
+            <div className="absolute inset-0 rounded-full border-[3px] border-[#4898f2] opacity-40 shadow-[0_0_15px_#4898f2,inset_0_0_15px_#4898f2]" />
+            {/* Laser de scan */}
+            <div className="absolute left-0 right-0 top-1/2 h-[2px] bg-[#00a651] shadow-[0_0_10px_3px_rgba(0,166,81,0.6)]" style={{ animation: 'scanLaserMobile 2.6s ease-in-out infinite alternate' }} />
+          </div>
+
+          {/* ══ LIT PATIENT (Venant vers nous) ══ */}
+          <div className="absolute right-[65px] bottom-[-10px] w-[50px] h-[60px] z-[30] pointer-events-none flex flex-col items-center" style={{
+            transform: 'perspective(200px) rotateX(45deg)',
+            transformOrigin: 'top center'
+          }}>
+            {/* Matelas */}
+            <div className="w-full h-full bg-[#222] rounded-[8px] border-x border-t border-[#444] shadow-[0_20px_30px_rgba(0,0,0,0.5)] flex justify-center">
+              {/* Ligne lumineuse au centre */}
+              <div className="w-[2px] h-full bg-white opacity-10" />
+            </div>
+          </div>
+
+          {/* ══ ÉCRAN DE CONTRÔLE SUSPENDU (Display Monitor) ══ */}
+          <div className="absolute z-[45] pointer-events-none" style={{ right:'0px', top:'10px' }}>
+            {/* Bras de suspension plafond */}
+            <div className="absolute bottom-[15px] left-[18px] w-[6px] h-[60px] bg-gradient-to-r from-[#ddd] to-[#eee] border-l border-[#bbb] shadow-md -z-10" />
+            <div className="absolute bottom-[15px] left-[15px] w-[12px] h-[5px] bg-[#fff] rounded-sm shadow-sm" />
+            
+            {/* Câble en spirale */}
+            <div className="absolute top-[20px] right-[6px] w-[3px] h-[30px] border-r-2 border-dashed border-[#888] opacity-70" style={{ borderRadius:'50%' }} />
+
+            {/* L'écran (casing large + double dalle) */}
+            <div className="relative w-[40px] h-[26px] bg-[#1a1a1a] rounded-[2px] border border-[#333] shadow-[0_10px_20px_rgba(0,0,0,0.4),inset_0_1px_1px_rgba(255,255,255,0.2)] flex items-center justify-center p-[2px]">
+              {/* Contenu de l'écran avec 2 fenêtres */}
+              <div className="flex-1 w-full h-full bg-[#051124] relative overflow-hidden flex gap-[2px] p-[1px]">
+                {/* Panel 1 */}
+                <div className="flex-1 h-full border border-[#1a3a60] relative overflow-hidden bg-[#030d1c]">
+                   {/* Logo Clinique */}
+                   <div className="absolute top-[2px] left-[2px] z-10 opacity-70">
+                     <img src="/logo.png" alt="Clinique Okba" className="w-[5px] h-[5px] object-contain drop-shadow-[0_0_2px_rgba(255,255,255,0.5)]" />
+                   </div>
+                   <svg className="absolute inset-0 w-full h-full opacity-60" viewBox="0 0 100 100" preserveAspectRatio="none">
+                    <path d="M0,50 Q25,30 50,50 T100,50" fill="none" stroke="#4898f2" strokeWidth="2" />
+                  </svg>
+                </div>
+                {/* Panel 2 */}
+                <div className="flex-1 h-full border border-[#1a3a60] relative overflow-hidden bg-[#030d1c]">
+                   <svg className="absolute inset-0 w-full h-full opacity-60" viewBox="0 0 100 100" preserveAspectRatio="none">
+                    <path d="M0,50 Q25,70 50,50 T100,50" fill="none" stroke="#4898f2" strokeWidth="2" />
+                  </svg>
+                </div>
+              </div>
             </div>
           </div>
 
@@ -535,51 +569,19 @@ export default function Header({ siteSettings, poles }: HeaderProps) {
             <div className="bg-[#006633] text-white px-1.5 py-[1px] rounded-[2px] shadow-sm text-[7px] font-extrabold tracking-[0.15em] uppercase">RDV</div>
           </div>
 
-          {/* ══ PLATEAU PATIENT - BASE TÉLESCOPIQUE ══ */}
-          <div className={cn("absolute z-[5] pointer-events-none origin-right", isHidden ? "translate-x-[200px] opacity-0 transition-all duration-[2000ms] ease-in-out" : "translate-x-0 opacity-100 transition-all duration-[1500ms] delay-[400ms] ease-out")} style={{
-            left:'25%', right:'145px', bottom:'0px', height:'32px',
-            borderRadius:'8px 8px 0 0',
-            background:'linear-gradient(180deg,#ffffff 0%,#ebebeb 50%,#cccccc 100%)',
-            boxShadow:'0 6px 12px rgba(0,0,0,0.2),inset -2px 2px 6px rgba(255,255,255,0.9),inset 4px 0 10px rgba(0,0,0,0.05)',
-            border:'1px solid #d0d0d0', borderBottom:'none'
-          }}>
-            {/* Lignes de structure (panneaux) */}
-            <div className="absolute top-0 bottom-0 left-[20%] w-px bg-black/10" />
-            <div className="absolute top-0 bottom-0 left-[50%] w-px bg-black/10" />
-            <div className="absolute top-0 bottom-0 left-[80%] w-px bg-black/10" />
-            {/* Fente horizontale en bas */}
-            <div className="absolute bottom-[6px] left-[10px] right-[10px] h-[3px] rounded-full" style={{ background:'linear-gradient(180deg,#888,#aaa)' }} />
-          </div>
-
-          {/* Glissière sous la table */}
-          <div className={cn("absolute z-[29] pointer-events-none origin-right", isHidden ? "translate-x-[200px] opacity-0 transition-all duration-[2000ms] ease-in-out" : "translate-x-0 opacity-100 transition-all duration-[1500ms] delay-[400ms] ease-out")} style={{
-            left:'20px', right:'135px', bottom:'26px', height:'6px',
-            borderRadius:'0 0 0 4px',
-            background:'linear-gradient(180deg,#666 0%,#999 40%,#555 100%)',
-            boxShadow:'inset 0 1px 3px rgba(0,0,0,0.5),0 3px 6px rgba(0,0,0,0.2)',
-          }} />
-
-          {/* Table Patient (Matelas + Base) */}
-          <div className={cn("absolute z-[30] flex flex-col justify-end origin-right hover:-translate-x-1", isHidden ? "translate-x-[200px] opacity-0 transition-all duration-[2000ms] ease-in-out" : "translate-x-0 opacity-100 transition-all duration-[1500ms] delay-[400ms] ease-out")} style={{
-            left:'10px', right:'95px', bottom:'32px', height:'64px',
-            borderRadius:'24px 0 0 8px',
-            background:'linear-gradient(180deg,#ffffff 0%,#f2f2f2 60%,#e0e0e0 100%)',
-            boxShadow:'0 10px 24px -4px rgba(0,0,0,0.25),inset 0 4px 12px rgba(255,255,255,1),inset 0 -3px 8px rgba(0,0,0,0.08)',
-          }}>
-            {/* Matelas noir concave */}
-            <div className="absolute top-0 left-[2px] right-0 h-[12px] rounded-tl-[24px]" style={{ background:'linear-gradient(180deg,#222 0%,#000 100%)', boxShadow:'inset 0 1px 2px rgba(255,255,255,0.1),0 2px 4px rgba(0,0,0,0.4)' }}>
-              <div className="absolute top-[1px] left-[10px] right-[10px] h-[1px] bg-white/5" />
-            </div>
-            
-            {/* Poignée argentée (foot handle) */}
-            <div className="absolute top-[-4px] left-[6px] w-[20px] h-[14px] border-[2.5px] border-[#d0d0d0] rounded-l-full shadow-[-2px_0_4px_rgba(0,0,0,0.2),inset_1px_0_2px_rgba(255,255,255,0.8)] z-10" style={{ borderRight:'none' }} />
-
-            <div className="absolute bottom-[8px] left-[18px] right-0 h-[3px] rounded-l-full" style={{ background:'linear-gradient(90deg,#006633 0%,#00a651 40%,rgba(0,166,81,0) 100%)', boxShadow:'0 0 6px rgba(0,166,81,0.5)' }} />
-            <div aria-hidden="true" className="pointer-events-none absolute bottom-[20px] left-[25%] right-0 h-[1px] bg-black/[0.04]" />
-            <div aria-hidden="true" className="pointer-events-none absolute right-0 top-0 bottom-0 w-[95px] z-10" style={{ background:'linear-gradient(to left,rgba(0,0,0,0.85) 0%,rgba(0,0,0,0.3) 50%,transparent 100%)' }} />
-            <div aria-hidden="true" className="pointer-events-none absolute bottom-[7px] right-0 h-[3px] w-[90px] z-[11]" style={{ background:'linear-gradient(to right,rgba(0,255,136,0.7) 0%,rgba(0,102,51,0) 100%)' }} />
-            <div aria-hidden="true" className="pointer-events-none absolute right-0 top-0 bottom-0 w-[25px] z-20" style={{ backdropFilter:'blur(2px)' }} />
-          </div>
+          {/* ══ BOUTON GANTRY — Prendre RDV ══ */}
+          <button
+            onClick={() => scrollToSection('#contact')}
+            aria-label={t('appointment')}
+            title={t('appointment')}
+            className="group absolute z-[46] rounded-full pointer-events-auto cursor-pointer transition-transform duration-300 hover:scale-[1.02] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#006633] focus-visible:ring-offset-2"
+            style={{ right:'20px', bottom:'0px', width:'140px', height:'140px' }}
+          >
+            <span aria-hidden="true" className="absolute inset-[5px] rounded-full transition-all duration-300 group-hover:shadow-[0_0_0_3px_rgba(0,102,51,0.55),0_0_30px_rgba(0,255,136,0.45)] group-focus-visible:shadow-[0_0_0_3px_rgba(0,102,51,0.6)]" />
+            <span className="pointer-events-none absolute right-full top-1/2 mr-1 -translate-y-1/2 whitespace-nowrap rounded-md bg-[#006633] px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-white opacity-0 shadow-lg transition-opacity duration-200 group-hover:opacity-100 group-focus-visible:opacity-100">
+              {t('appointment')}
+            </span>
+          </button>
 
           {/* ══ NAVIGATION ══ */}
           <div
@@ -611,125 +613,7 @@ export default function Header({ siteSettings, poles }: HeaderProps) {
             </nav>
           </div>
 
-          {/* ══ ÉCRAN DE CONTRÔLE SUSPENDU (Display Monitor) ══ */}
-          <div className="absolute z-[45] pointer-events-none" style={{ right:'-15px', top:'20px' }}>
-            {/* Bras de suspension plafond */}
-            <div className="absolute bottom-[20px] left-[18px] w-[8px] h-[80px] bg-gradient-to-r from-[#ddd] to-[#eee] border-l border-[#bbb] shadow-md -z-10" />
-            <div className="absolute bottom-[20px] left-[15px] w-[14px] h-[6px] bg-[#fff] rounded-sm shadow-sm" />
-            
-            {/* Câble en spirale */}
-            <div className="absolute top-[28px] right-[4px] w-[4px] h-[40px] border-r-2 border-dashed border-[#888] opacity-70" style={{ borderRadius:'50%' }} />
-
-            {/* L'écran (casing large + double dalle) */}
-            <div className="relative w-[46px] h-[30px] bg-[#1a1a1a] rounded-[2px] border border-[#333] shadow-[0_10px_20px_rgba(0,0,0,0.4),inset_0_1px_1px_rgba(255,255,255,0.2)] flex items-center justify-center p-[2px]">
-              {/* Contenu de l'écran avec 2 fenêtres */}
-              <div className="flex-1 w-full h-full bg-[#051124] relative overflow-hidden flex gap-[2px] p-[1px]">
-                {/* Panel 1 */}
-                <div className="flex-1 h-full border border-[#1a3a60] relative overflow-hidden bg-[#030d1c]">
-                   {/* Logo Clinique */}
-                   <div className="absolute top-[2px] left-[2px] z-10 opacity-70">
-                     <img src="/logo.png" alt="Clinique Okba" className="w-[6px] h-[6px] object-contain drop-shadow-[0_0_2px_rgba(255,255,255,0.5)]" />
-                   </div>
-                   <svg className="absolute inset-0 w-full h-full opacity-60" viewBox="0 0 100 100" preserveAspectRatio="none">
-                    <path d="M0,50 Q25,30 50,50 T100,50" fill="none" stroke="#4898f2" strokeWidth="2" />
-                  </svg>
-                </div>
-                {/* Panel 2 */}
-                <div className="flex-1 h-full border border-[#1a3a60] relative overflow-hidden bg-[#030d1c]">
-                   <svg className="absolute inset-0 w-full h-full opacity-60" viewBox="0 0 100 100" preserveAspectRatio="none">
-                    <path d="M0,50 Q25,70 50,50 T100,50" fill="none" stroke="#4898f2" strokeWidth="2" />
-                  </svg>
-                </div>
-                {/* Barre de menu basse */}
-                <div className="absolute bottom-0 left-0 right-0 h-[4px] bg-[#0a192f] flex justify-around items-center px-[2px]">
-                  <div className="w-[3px] h-[1px] bg-white/40" />
-                  <div className="w-[3px] h-[1px] bg-white/40" />
-                  <div className="w-[3px] h-[1px] bg-white/40" />
-                  <div className="w-[3px] h-[1px] bg-white/40" />
-                </div>
-              </div>
-            </div>
           </div>
-
-          {/* ══ TÊTES SPECT (Massives, arrondies, logo sur face externe) ══ */}
-          <div className="absolute right-[15px] bottom-[-2px] w-[150px] h-[150px] z-[44] animate-[spin_32s_linear_infinite] pointer-events-none">
-            {/* Tête 1 — supérieure */}
-            <div className="absolute top-[-26px] left-1/2 w-[96px] h-[44px] -translate-x-1/2 flex flex-col items-center">
-              {/* Base de connexion arrière (massive) */}
-              <div className="w-[54px] h-[7px] bg-gradient-to-b from-[#f5f5f5] to-[#ddd] rounded-t-[8px] shadow-[inset_0_2px_4px_rgba(255,255,255,0.9)] z-0" />
-              
-              {/* Coque externe principale (blanche) */}
-              <div className="w-full h-[25px] bg-gradient-to-b from-[#ffffff] to-[#f0f0f0] rounded-[10px] shadow-[0_8px_20px_rgba(0,0,0,0.15),inset_0_4px_8px_rgba(255,255,255,1)] border border-[#e0e0e0] z-10 flex flex-col items-center justify-center relative">
-                {/* Logo SIEMENS Healthineers sur la coque */}
-                <div className="flex flex-col items-center mt-[2px]">
-                  <span className="text-[3px] font-black text-[#0099b9] leading-none tracking-widest">SIEMENS</span>
-                  <div className="flex items-center gap-[1px] mt-[1px]">
-                    <span className="text-[3.5px] font-bold text-[#E2610A] leading-none">Healthineers</span>
-                    <div className="flex gap-[0.5px] mb-[2px]">
-                      <div className="w-[1px] h-[1px] rounded-full bg-[#E2610A]" />
-                      <div className="w-[1px] h-[1px] rounded-full bg-[#E2610A]" />
-                      <div className="w-[1.2px] h-[1.2px] -mt-[0.5px] rounded-full bg-[#E2610A]" />
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Ligne grise de séparation + Casing inférieur (détecteur gris) */}
-              <div className="w-[98%] h-[12px] bg-gradient-to-b from-[#999] to-[#777] rounded-b-[8px] border border-[#666] shadow-[inset_0_2px_4px_rgba(0,0,0,0.2)] z-10 flex flex-col relative mt-[-2px]">
-                {/* Bande grise claire + Numéro "1" */}
-                <div className="h-[3.5px] w-full bg-[#c0c0c0] flex items-center justify-center border-b border-[#888]">
-                  <div className="text-[2.5px] font-black text-[#444] leading-none">1</div>
-                  <div className="w-[1.5px] h-[1px] bg-[#444] ml-[1px] mt-[0.5px]" style={{ clipPath: 'polygon(0 0, 100% 50%, 0 100%)' }} />
-                </div>
-                {/* Face interne (Collimateur noir) vers le patient */}
-                <div className="flex-1 w-full flex justify-center items-end pb-[2px]">
-                   <div className="w-[90%] h-[5px] bg-[#111] rounded-[2px] shadow-[inset_0_0_6px_rgba(0,0,0,1)] opacity-90 overflow-hidden">
-                     <div className="w-full h-full bg-[repeating-linear-gradient(90deg,transparent,transparent_1.5px,rgba(255,255,255,0.1)_1.5px,rgba(255,255,255,0.1)_2.5px)]" />
-                   </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Tête 2 — inférieure */}
-            <div className="absolute bottom-[-26px] left-1/2 w-[96px] h-[44px] -translate-x-1/2 flex flex-col items-center rotate-180">
-              {/* Base de connexion arrière (massive) */}
-              <div className="w-[54px] h-[7px] bg-gradient-to-b from-[#f5f5f5] to-[#ddd] rounded-t-[8px] shadow-[inset_0_2px_4px_rgba(255,255,255,0.9)] z-0" />
-              
-              {/* Coque externe principale (blanche) */}
-              <div className="w-full h-[25px] bg-gradient-to-b from-[#ffffff] to-[#f0f0f0] rounded-[10px] shadow-[0_8px_20px_rgba(0,0,0,0.15),inset_0_4px_8px_rgba(255,255,255,1)] border border-[#e0e0e0] z-10 flex flex-col items-center justify-center relative">
-              </div>
-
-              {/* Ligne grise de séparation + Casing inférieur (détecteur gris) */}
-              <div className="w-[98%] h-[12px] bg-gradient-to-b from-[#999] to-[#777] rounded-b-[8px] border border-[#666] shadow-[inset_0_2px_4px_rgba(0,0,0,0.2)] z-10 flex flex-col relative mt-[-2px]">
-                {/* Bande grise claire + Numéro "2" */}
-                <div className="h-[3.5px] w-full bg-[#c0c0c0] flex items-center justify-center border-b border-[#888]">
-                  <div className="text-[2.5px] font-black text-[#444] leading-none">2</div>
-                  <div className="w-[1.5px] h-[1px] bg-[#444] ml-[1px] mt-[0.5px]" style={{ clipPath: 'polygon(0 0, 100% 50%, 0 100%)' }} />
-                </div>
-                {/* Face interne (Collimateur noir) vers le patient */}
-                <div className="flex-1 w-full flex justify-center items-end pb-[2px]">
-                   <div className="w-[90%] h-[5px] bg-[#111] rounded-[2px] shadow-[inset_0_0_6px_rgba(0,0,0,1)] opacity-90 overflow-hidden">
-                     <div className="w-full h-full bg-[repeating-linear-gradient(90deg,transparent,transparent_1.5px,rgba(255,255,255,0.1)_1.5px,rgba(255,255,255,0.1)_2.5px)]" />
-                   </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* ══ BOUTON GANTRY — Prendre RDV ══ */}
-          <button
-            onClick={() => scrollToSection('#contact')}
-            aria-label={t('appointment')}
-            title={t('appointment')}
-            className="group absolute z-[46] rounded-full pointer-events-auto cursor-pointer transition-transform duration-300 hover:scale-[1.02] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#006633] focus-visible:ring-offset-2"
-            style={{ right:'15px', bottom:'-2px', width:'150px', height:'150px' }}
-          >
-            <span aria-hidden="true" className="absolute inset-[5px] rounded-full transition-all duration-300 group-hover:shadow-[0_0_0_3px_rgba(0,102,51,0.55),0_0_30px_rgba(0,255,136,0.45)] group-focus-visible:shadow-[0_0_0_3px_rgba(0,102,51,0.6)]" />
-            <span className="pointer-events-none absolute right-full top-1/2 mr-1 -translate-y-1/2 whitespace-nowrap rounded-md bg-[#006633] px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-white opacity-0 shadow-lg transition-opacity duration-200 group-hover:opacity-100 group-focus-visible:opacity-100">
-              {t('appointment')}
-            </span>
-          </button>
-
         </div>
       </header>
 

@@ -174,7 +174,7 @@ export default function LocationBento({ address, coordinates, className }: Locat
           transition={{ duration: 0.5, delay: 0.3 }}
           className="col-span-1 md:col-span-2 lg:col-span-1 row-span-1 rounded-3xl p-1 bg-gradient-to-br from-primary to-secondary shadow-lg relative overflow-hidden group"
         >
-          <div className="absolute inset-0 bg-[url('/noise.png')] opacity-10 mix-blend-overlay" />
+          <div className="absolute inset-0 opacity-10 mix-blend-overlay" />
           <div className="w-full h-full bg-card/95 dark:bg-card/90 backdrop-blur-xl rounded-[22px] p-5 flex flex-col justify-center gap-3 relative z-10">
             
             <a href={googleMapsUrl} target="_blank" rel="noopener noreferrer" className="flex items-center justify-between bg-primary/10 hover:bg-primary/20 text-primary p-3 rounded-xl transition-colors group/btn">
