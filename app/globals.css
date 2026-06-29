@@ -149,6 +149,10 @@
   body {
     @apply bg-background text-foreground;
     line-height: 1.65;
+    /* Filet de sécurité mobile : aucun élément ne doit provoquer de
+       défilement horizontal. `clip` n'altère pas position: sticky. */
+    overflow-x: hidden;
+    overflow-x: clip;
   }
 
   /* L'arabe a besoin de plus d'interligne pour la lisibilité des diacritiques */
@@ -242,6 +246,8 @@ html {
   scroll-behavior: smooth;
   scroll-padding-top: 80px;
   /* Offset pour header sticky */
+  overflow-x: hidden;
+  overflow-x: clip;
 }
 
 /* Glassmorphism Utilities */

@@ -106,7 +106,7 @@ export default function Footer({ siteSettings, footerContent, sanityPoles }: Foo
         />
       </div>
 
-      <div className='relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pb-12'>
+      <div className='relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pb-28 md:pb-12'>
         <motion.div
           variants={containerVariants}
           initial="hidden"
