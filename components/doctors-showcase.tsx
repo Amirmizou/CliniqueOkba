@@ -31,6 +31,32 @@ import { urlFor, sanityImageLoader, hiResImage } from '@/sanity/lib/image'
 import { AnimatedSection } from '@/components/ui/animated-section'
 import { LineReveal } from '@/components/ui/reveal-text'
 import { UniversalPlayer } from '@/components/ui/universal-player'
+import { cn } from '@/lib/utils'
+
+/* Couverture thématique « laboratoire » — utilisée quand un médecin ne
+   souhaite pas que sa photo soit partagée. Remplace l'affiche par un visuel
+   propre et lisible lié au laboratoire (sans aucune photo). */
+function DoctorLabCover({ label }: { label: string }) {
+  return (
+    <div className="absolute inset-0 overflow-hidden">
+      <div className="absolute inset-0" style={{ background: 'linear-gradient(160deg, #8B5CF6 0%, #4f46e5 46%, #1e1b4b 100%)' }} />
+      {/* Trame de points (molécules) */}
+      <div className="absolute inset-0 opacity-20" style={{ backgroundImage: 'radial-gradient(circle, #fff 1.2px, transparent 1.2px)', backgroundSize: '24px 24px' }} />
+      {/* Halos doux */}
+      <div className="absolute -right-10 -top-10 h-44 w-44 rounded-full bg-white/10 blur-3xl" />
+      <div className="absolute -bottom-12 -left-10 h-40 w-40 rounded-full bg-cyan-300/10 blur-3xl" />
+      {/* Grande fiole centrale */}
+      <div className="absolute inset-0 flex items-center justify-center">
+        <FlaskConical className="h-28 w-28 text-white/25" strokeWidth={1.1} aria-hidden="true" />
+      </div>
+      {/* Badge « Laboratoire » */}
+      <div className="absolute left-4 top-4 inline-flex items-center gap-1.5 rounded-full bg-white/15 px-2.5 py-1 text-[11px] font-bold text-white ring-1 ring-white/20 backdrop-blur-sm">
+        <FlaskConical className="h-3.5 w-3.5" aria-hidden="true" />
+        {label}
+      </div>
+    </div>
+  )
+}
 
 // Résolution des icônes Sanity (chaîne -> composant Lucide)
 const ICONS: Record<string, LucideIcon> = {
@@ -161,6 +187,9 @@ function DoctorCard({
   // sinon on utilise la couleur de section, ou le vert par défaut.
   const accent = doctor.accent || sectionAccent || '#006633'
   const hasVideos = Array.isArray(doctor.videos) && doctor.videos.length > 0
+  // Dr Aissaoui ne souhaite pas que sa photo soit partagée : on remplace
+  // l'affiche par une couverture thématique « laboratoire » (et pas de zoom).
+  const photoHidden = /aissaoui/i.test(doctor.name || '')
   const waMessage = encodeURIComponent(
     locale === 'ar'
       ? `مرحباً، أرغب في حجز موعد مع ${doctor.name} (${doctor.specialty}) في عيادة OKBA.`
@@ -182,33 +211,42 @@ function DoctorCard({
         {/* ----- Affiche ----- */}
         <button
           type="button"
-          onClick={() => onOpen(doctor)}
-          aria-label={`Agrandir la photo de ${doctor.name}`}
-          className="relative block aspect-[3/4] w-full overflow-hidden bg-slate-100 dark:bg-slate-800 cursor-zoom-in touch-manipulation"
+          onClick={photoHidden ? undefined : () => onOpen(doctor)}
+          aria-label={photoHidden ? doctor.name : `Agrandir la photo de ${doctor.name}`}
+          className={cn(
+            'relative block aspect-[3/4] w-full overflow-hidden bg-slate-100 touch-manipulation dark:bg-slate-800',
+            photoHidden ? 'cursor-default' : 'cursor-zoom-in',
+          )}
         >
-          <Image
-            loader={sanityImageLoader}
-            src={doctor.poster}
-            alt={`Photo ${doctor.name} – ${doctor.specialty}`}
-            fill
-            draggable={false}
-            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
-            className="object-cover transition-transform duration-700 group-hover:scale-[1.06] select-none"
-          />
+          {photoHidden ? (
+            <DoctorLabCover label={locale === 'ar' ? 'المختبر الطبي' : 'Laboratoire médical'} />
+          ) : (
+            <Image
+              loader={sanityImageLoader}
+              src={doctor.poster}
+              alt={`Photo ${doctor.name} – ${doctor.specialty}`}
+              fill
+              draggable={false}
+              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+              className="object-cover transition-transform duration-700 group-hover:scale-[1.06] select-none"
+            />
+          )}
 
           {/* Liseré supérieur (identité visuelle) */}
-          <div 
-            className="absolute inset-x-0 top-0 h-1" 
+          <div
+            className="absolute inset-x-0 top-0 h-1"
             style={{ backgroundImage: `linear-gradient(to right, ${accent}, #FDE68A, ${accent})` }}
           />
 
           {/* Voile sombre bas (lisibilité du nom) */}
           <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
 
-          {/* Indice "agrandir" */}
-          <div className="absolute right-4 top-4 flex h-9 w-9 items-center justify-center rounded-full bg-white/20 text-white opacity-0 backdrop-blur-md transition-opacity duration-300 group-hover:opacity-100">
-            <Maximize2 className="h-4 w-4" />
-          </div>
+          {/* Indice "agrandir" (sauf si la photo est masquée) */}
+          {!photoHidden && (
+            <div className="absolute right-4 top-4 flex h-9 w-9 items-center justify-center rounded-full bg-white/20 text-white opacity-0 backdrop-blur-md transition-opacity duration-300 group-hover:opacity-100">
+              <Maximize2 className="h-4 w-4" />
+            </div>
+          )}
 
           {/* Spécialité, Nom + expérience (toujours visibles, posés sur le voile) */}
           <div

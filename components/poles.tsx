@@ -153,22 +153,23 @@ function PoleCard({ pole, index }: { pole: Pole & { imageUrl?: string }; index: 
             sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
             className="object-cover transition-transform duration-700 ease-out group-hover:scale-105"
           />
-          {/* Overlay gradient (du bas vers le haut) */}
+          {/* Voile dégradé concentré en bas — la photo reste visible en haut */}
           <div
             className="absolute inset-0 transition-opacity duration-500"
             style={{
               background: `linear-gradient(
                 to top,
-                ${pole.accent}f0 0%,
-                ${pole.accent}cc 25%,
-                ${pole.accent}88 50%,
-                ${pole.accent}30 75%,
-                transparent 100%
+                ${pole.accent}f2 0%,
+                ${pole.accent}c0 25%,
+                ${pole.accent}5c 48%,
+                transparent 72%
               )`,
             }}
           />
-          {/* Secondary dark overlay for readability */}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
+          {/* Scrim sombre léger, bas uniquement (lisibilité du nom) */}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-black/10 to-transparent" />
+          {/* Fine teinte de marque uniforme (cohésion, n'efface pas la photo) */}
+          <div className="absolute inset-0" style={{ backgroundColor: `${pole.accent}14` }} />
         </div>
 
         {/* Bandeau accent haut (fin trait lumineux) */}
