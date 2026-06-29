@@ -549,7 +549,7 @@ export default function DoctorsShowcase({ data, sectionContent }: { data?: any[]
           {/* Fondu droit — indicateur de scroll mobile */}
           <div className="pointer-events-none absolute bottom-8 right-0 top-0 z-10 w-16 bg-gradient-to-l from-background to-transparent sm:hidden" aria-hidden="true" />
 
-          <div className="flex flex-nowrap overflow-x-auto pb-8 snap-x snap-proximity touch-pan-x gap-4 overscroll-x-contain sm:gap-6 sm:flex-wrap sm:justify-center sm:overflow-visible sm:pb-0 sm:snap-none sm:touch-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+          <div className="flex flex-nowrap overflow-x-auto pb-8 snap-x snap-proximity touch-pan-x touch-pan-y gap-4 overscroll-x-contain sm:gap-6 sm:flex-wrap sm:justify-center sm:overflow-visible sm:pb-0 sm:snap-none sm:touch-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
             {list.map((doctor, i) => (
               <div
                 key={doctor.id}
