@@ -31,16 +31,19 @@ import {
   Clock,
   Facebook,
   Instagram,
+  Sun,
+  Moon,
   type LucideIcon,
 } from 'lucide-react'
-import { ThemeToggle } from '@/components/theme-toggle'
 import { LanguageSwitcher } from '@/components/language-switcher'
 import { useTranslations, useLocale } from 'next-intl'
+import { useTheme } from 'next-themes'
 import Image from 'next/image'
 import { motion, AnimatePresence, useScroll, useMotionValueEvent } from 'framer-motion'
 import { cn } from '@/lib/utils'
 import { poles as localPoles } from '@/data/poles'
 import Link from 'next/link'
+import { useRouter, usePathname } from 'next/navigation'
 
 const POLE_ICONS: Record<string, LucideIcon> = {
   ScanLine,
@@ -868,21 +871,8 @@ export default function Header({ siteSettings, poles }: HeaderProps) {
                   </motion.div>
                 )}
 
-                {/* Paramètres (langue + apparence) */}
-                <div className="mt-3 rounded-2xl border border-gray-100 bg-gray-50 p-3 dark:border-slate-700 dark:bg-slate-800/60">
-                  <p className="mb-1 px-1 text-[10px] font-bold uppercase tracking-widest text-gray-400">
-                    Paramètres
-                  </p>
-                  <div className="flex items-center justify-between px-1 py-2.5">
-                    <span className="text-sm font-medium text-gray-700 dark:text-gray-200">Langue</span>
-                    <LanguageSwitcher />
-                  </div>
-                  <div className="mx-1 h-px bg-gray-200 dark:bg-slate-700" />
-                  <div className="flex items-center justify-between px-1 py-2.5">
-                    <span className="text-sm font-medium text-gray-700 dark:text-gray-200">Apparence</span>
-                    <ThemeToggle />
-                  </div>
-                </div>
+                {/* Paramètres (langue + apparence) — barres segmentées claires */}
+                <MenuSettings />
 
               </div>
             </div>
@@ -890,6 +880,82 @@ export default function Header({ siteSettings, poles }: HeaderProps) {
         )}
       </AnimatePresence>
     </>
+  )
+}
+
+/* Réglages du menu mobile — barres segmentées claires et lisibles
+   (Apparence : Clair/Sombre, Langue : Français/العربية). Remplace les
+   contrôles toggle peu lisibles dans le menu plein écran. */
+function MenuSettings() {
+  const locale = useLocale()
+  const isAr = locale === 'ar'
+  const pathname = usePathname()
+  const router = useRouter()
+  const { theme, setTheme } = useTheme()
+  const [mounted, setMounted] = useState(false)
+  useEffect(() => setMounted(true), [])
+  const isDark = mounted && theme === 'dark'
+
+  const localizedPath = (target: string) => {
+    if (!pathname) return target === 'fr' ? '/' : `/${target}`
+    const seg = pathname.split('/')
+    const hasPrefix = seg[1] === 'fr' || seg[1] === 'ar'
+    if (hasPrefix) {
+      if (target === 'fr') {
+        seg.splice(1, 1)
+        return seg.join('/') || '/'
+      }
+      seg[1] = target
+      return seg.join('/')
+    }
+    return target === 'fr' ? pathname : `/${target}${pathname === '/' ? '' : pathname}`
+  }
+  const switchLang = (target: string) => {
+    if (target !== locale) router.replace(localizedPath(target), { scroll: false })
+  }
+
+  const seg = (active: boolean) =>
+    cn(
+      'flex items-center justify-center gap-1.5 rounded-lg py-2.5 text-sm font-bold transition-all duration-200',
+      active
+        ? 'bg-white text-[#006633] shadow-sm ring-1 ring-black/5 dark:bg-slate-900 dark:text-emerald-400'
+        : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200',
+    )
+
+  return (
+    <div className="mt-3 rounded-2xl border border-gray-100 bg-gray-50 p-3 dark:border-slate-700 dark:bg-slate-800/60">
+      <p className="mb-2 px-1 text-[10px] font-bold uppercase tracking-widest text-gray-400">
+        {isAr ? 'الإعدادات' : 'Paramètres'}
+      </p>
+
+      {/* Apparence */}
+      <p className="mb-1.5 px-1 text-xs font-semibold text-gray-500 dark:text-gray-400">
+        {isAr ? 'المظهر' : 'Apparence'}
+      </p>
+      <div className="grid grid-cols-2 gap-1 rounded-xl bg-gray-200/70 p-1 dark:bg-slate-700/50">
+        <button type="button" onClick={() => setTheme('light')} aria-pressed={!isDark} className={seg(!isDark)}>
+          <Sun className="h-4 w-4" aria-hidden="true" />
+          {isAr ? 'فاتح' : 'Clair'}
+        </button>
+        <button type="button" onClick={() => setTheme('dark')} aria-pressed={isDark} className={seg(isDark)}>
+          <Moon className="h-4 w-4" aria-hidden="true" />
+          {isAr ? 'داكن' : 'Sombre'}
+        </button>
+      </div>
+
+      {/* Langue */}
+      <p className="mb-1.5 mt-3 px-1 text-xs font-semibold text-gray-500 dark:text-gray-400">
+        {isAr ? 'اللغة' : 'Langue'}
+      </p>
+      <div className="grid grid-cols-2 gap-1 rounded-xl bg-gray-200/70 p-1 dark:bg-slate-700/50">
+        <button type="button" onClick={() => switchLang('fr')} aria-pressed={!isAr} className={seg(!isAr)}>
+          Français
+        </button>
+        <button type="button" onClick={() => switchLang('ar')} aria-pressed={isAr} className={seg(isAr)}>
+          العربية
+        </button>
+      </div>
+    </div>
   )
 }
 
