@@ -98,6 +98,7 @@ function resolvePole(slug: string, locale: string, sanityPoles?: any[]) {
         iconName: sanity?.iconName || local?.iconName || 'Stethoscope',
         accent: sanity?.accentColor || local?.accent || '#006633',
         badge,
+        phone: sanity?.phone || local?.phone || undefined,
         urgent: sanity?.urgent ?? local?.urgent ?? false,
         aiBoosted: sanity?.aiBoosted ?? local?.aiBoosted ?? false,
         videos: Array.isArray(sanity?.videos) && sanity.videos.length > 0
@@ -157,7 +158,8 @@ export default async function PolePage({
     if (!resolved) notFound()
 
     const photos = buildPhotos(resolved.categories, facilityPhotos)
-    const phone = siteSettings?.phone || CLINIC_PHONE
+    // Ligne directe du pôle si renseignée (ex : Imagerie), sinon numéro principal.
+    const phone = resolved.pole.phone || siteSettings?.phone || CLINIC_PHONE
 
     // Filter equipments if the pole has an equipment category match
     // 'imagerie' -> 'imaging', 'laboratoire' -> 'laboratory', etc.

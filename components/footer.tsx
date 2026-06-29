@@ -78,6 +78,7 @@ export default function Footer({ siteSettings, footerContent, sanityPoles }: Foo
     { label: isAr ? 'الاستعجالات' : 'Urgences / Standard', number: '+213 770 88 42 42', urgent: true },
     { label: isAr ? '' : '', number: '+213 770 88 43 43', urgent: true, hideLabel: true },
     { label: isAr ? 'الاستقبال' : 'Réception', number: '0550 25 00 54' },
+    { label: isAr ? 'التصوير الطبي' : 'Imagerie médicale', number: '0560 78 27 67' },
     { label: isAr ? 'مخبر التحاليل' : 'Laboratoire d\'analyses', number: '0550 25 00 58' },
     { label: isAr ? 'الهاتف الثابت' : 'Fix', number: '039 33 88 71' },
     { label: isAr ? '' : '', number: '039 33 81 27', hideLabel: true },
@@ -236,7 +237,7 @@ export default function Footer({ siteSettings, footerContent, sanityPoles }: Foo
                       {!item.hideLabel && (
                          <p className="text-[10px] text-white/40 font-bold uppercase tracking-wider mb-1">{item.label}</p>
                       )}
-                      <p className={cn("text-[14px] font-medium tracking-wide ltr:text-left rtl:text-right", item.urgent ? "text-red-400" : "text-white/80")} dir="ltr">{item.number}</p>
+                      <a href={`tel:${item.number.replace(/[^+\d]/g, '')}`} aria-label={`${isAr ? 'اتصل' : 'Appeler'} ${item.label || ''} ${item.number}`} className={cn("w-fit cursor-pointer text-[14px] font-medium tracking-wide ltr:text-left rtl:text-right underline-offset-2 transition-colors hover:underline", item.urgent ? "text-red-400 hover:text-red-300" : "text-white/80 hover:text-white")} dir="ltr">{item.number}</a>
                     </div>
                   ))}
                 </div>

@@ -80,6 +80,7 @@ function resolvePoles(data?: any[]): (Pole & { imageUrl?: string })[] {
     iconName: d.iconName || 'Stethoscope',
     accent: d.accentColor || '#006633',
     badge: d.badge || undefined,
+    phone: d.phone || undefined,
     urgent: d.urgent ?? false,
     featured: d.featured ?? false,
     galleryCategories: Array.isArray(d.galleryCategories) ? d.galleryCategories : [],
@@ -104,6 +105,11 @@ function PoleCard({ pole, index }: { pole: Pole & { imageUrl?: string }; index: 
 
   const Icon = ICONS[pole.iconName] || Stethoscope
   const variant = ecgVariantForIcon(pole.iconName)
+
+  // Ligne directe du service si renseignée, sinon numéro principal de la clinique.
+  const callNumber = pole.phone || CLINIC_PHONE
+  const callHref = `tel:${callNumber.replace(/[^+\d]/g, '')}`
+  const callLabel = `${t('call')} — ${title}`
 
   // Image de fond : Sanity > fallback local
   const bgImage = pole.imageUrl || DEFAULT_IMAGES[pole.iconName] || '/images/specialties/internal-medicine.png'
@@ -279,9 +285,11 @@ function PoleCard({ pole, index }: { pole: Pole & { imageUrl?: string }; index: 
               {t('discover')}
               <ArrowRight className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-1" />
             </Link>
-            {pole.urgent ? (
+            {pole.urgent || pole.phone ? (
+              // Urgences OU service avec ligne directe → bouton d'appel libellé
               <a
-                href={`tel:${CLINIC_PHONE}`}
+                href={callHref}
+                aria-label={callLabel}
                 className="inline-flex items-center gap-2 rounded-xl bg-white px-4 py-2.5 text-sm font-bold shadow-lg transition-transform duration-200 hover:scale-[1.03] active:scale-95"
                 style={{ color: pole.accent }}
               >
@@ -290,8 +298,8 @@ function PoleCard({ pole, index }: { pole: Pole & { imageUrl?: string }; index: 
               </a>
             ) : (
               <a
-                href={`tel:${CLINIC_PHONE}`}
-                aria-label={t('call')}
+                href={callHref}
+                aria-label={callLabel}
                 className="inline-flex items-center justify-center rounded-full border border-white/30 bg-white/10 p-2.5 text-white backdrop-blur-sm transition-all duration-200 hover:bg-white/25 touch-target min-w-[40px]"
               >
                 <Phone className="h-4 w-4" />

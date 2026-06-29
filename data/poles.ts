@@ -24,6 +24,8 @@ export interface Pole {
   /** Badge (ex : « 24h/24 ») */
   badge?: string
   badge_ar?: string
+  /** Ligne directe du service (sinon numéro principal de la clinique) */
+  phone?: string
   /** Pôle mis en avant (urgences) avec style distinct */
   urgent?: boolean
   /** Pôle vedette : carte mise en évidence (halo, ring, ruban « À la une ») */
@@ -64,6 +66,7 @@ export const poles: Pole[] = [
     ],
     iconName: 'ScanLine',
     accent: '#3B82F6',
+    phone: '0560 78 27 67',
     galleryCategories: ['imagerie'],
     aiBoosted: true,
     intro:

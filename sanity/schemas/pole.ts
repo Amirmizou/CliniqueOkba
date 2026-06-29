@@ -164,6 +164,12 @@ export default defineType({
             ],
         }),
         defineField({
+            name: 'phone',
+            title: 'Téléphone direct du service (optionnel)',
+            type: 'string',
+            description: 'Ligne directe de ce service (ex : 0560 78 27 67). Si vide, le numéro principal de la clinique est utilisé.',
+        }),
+        defineField({
             name: 'badge',
             title: 'Badge (FR) (optionnel)',
             type: 'string',

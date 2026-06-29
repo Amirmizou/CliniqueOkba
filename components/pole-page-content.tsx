@@ -80,6 +80,7 @@ export interface PolePageData {
   aiBoosted?: boolean
   videos?: PoleVideo[]
   imageUrl?: string
+  phone?: string
 }
 
 export default function PolePageContent({
@@ -249,7 +250,7 @@ export default function PolePageContent({
               {/* CTAs */}
               <div className="flex flex-wrap gap-3">
                 <a
-                  href={`tel:${phone}`}
+                  href={`tel:${phone.replace(/[^+\d]/g, '')}`}
                   className="inline-flex items-center gap-2 rounded-xl px-5 py-3 text-sm font-bold text-white shadow-lg transition-all duration-200 hover:brightness-110 active:scale-[0.97]"
                   style={{ backgroundColor: pole.accent }}
                 >
@@ -272,6 +273,19 @@ export default function PolePageContent({
                   {t('locate')}
                 </Link>
               </div>
+
+              {/* Ligne directe du service (numéro affiché et cliquable) */}
+              {phone && (
+                <a
+                  href={`tel:${phone.replace(/[^+\d]/g, '')}`}
+                  className="mt-4 inline-flex items-center gap-2 text-sm font-semibold transition-opacity hover:opacity-80"
+                  style={{ color: pole.accent }}
+                >
+                  <Phone className="h-4 w-4 shrink-0" />
+                  <span>{isAr ? 'الخط المباشر' : 'Ligne directe'} :</span>
+                  <span dir="ltr" className="font-bold tracking-wide">{phone}</span>
+                </a>
+              )}
             </motion.div>
 
             {/* ── Right: Featured photo with scan beam ── */}

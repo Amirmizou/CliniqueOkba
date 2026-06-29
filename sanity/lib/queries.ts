@@ -158,6 +158,7 @@ export const polesQuery = groq`
     },
     badge,
     badge_ar,
+    phone,
     urgent,
     featured
   }
