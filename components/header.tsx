@@ -526,12 +526,18 @@ export default function Header({ siteSettings, poles }: HeaderProps) {
             <div className="absolute bottom-[12px] right-[12px] left-[12px] h-[1.5px] rounded-full bg-black/10" />
           </div>
 
-          {/* ══ OMBRE SOL ══ */}
+          {/* ══ OMBRE SOL — ancrage 3D (contact net + halo ambiant large) ══ */}
           <div aria-hidden="true" className="absolute z-[2] pointer-events-none" style={{
-            right:'18px', bottom:'-6px', width:'146px', height:'26px',
+            right:'26px', bottom:'-9px', width:'130px', height:'22px',
             borderRadius:'50%',
-            background:'radial-gradient(closest-side,rgba(0,0,0,0.38),rgba(0,0,0,0) 76%)',
-            filter:'blur(3px)',
+            background:'radial-gradient(closest-side,rgba(0,0,0,0.44),rgba(0,0,0,0) 74%)',
+            filter:'blur(2.5px)',
+          }} />
+          <div aria-hidden="true" className="absolute z-[1] pointer-events-none" style={{
+            right:'2px', bottom:'-16px', width:'188px', height:'34px',
+            borderRadius:'50%',
+            background:'radial-gradient(closest-side,rgba(0,40,20,0.13),rgba(0,0,0,0) 78%)',
+            filter:'blur(8px)',
           }} />
 
           {/* ══ ANNEAU — disque de base (drop shadow profond) ══ */}
@@ -584,6 +590,8 @@ export default function Header({ siteSettings, poles }: HeaderProps) {
             <div className="absolute inset-[6px] rounded-full" style={{ border:'1px solid rgba(0,50,120,0.09)' }} />
             <div className="absolute inset-[12px] rounded-full" style={{ border:'1px solid rgba(0,50,120,0.06)' }} />
             <div className="absolute inset-[18px] rounded-full" style={{ border:'0.5px solid rgba(0,50,120,0.04)' }} />
+            {/* Catchlight verre (reflet spéculaire → tunnel « verre » 3D) */}
+            <div className="absolute left-[20%] top-[15%] z-[15] w-[12px] h-[7px] rounded-full pointer-events-none" style={{ background:'radial-gradient(ellipse at center,rgba(255,255,255,0.95),rgba(255,255,255,0) 72%)', transform:'rotate(-24deg)' }} />
             
             {/* Branche d'olivier au centre exact du gantry (isolée sans être coupée) */}
             <div className="absolute z-10 w-[42px] h-[34px] top-[7px] flex justify-center overflow-hidden pointer-events-none mix-blend-multiply" style={{ filter: 'contrast(1.15) brightness(1.05)' }}>
@@ -618,10 +626,8 @@ export default function Header({ siteSettings, poles }: HeaderProps) {
             <div className="absolute top-[49.5%] bottom-[49.5%] left-0 right-[80%] bg-black/[0.04]" />
             <div className="absolute top-[49.5%] bottom-[49.5%] left-[80%] right-0 bg-black/[0.04]" />
             
-            {/* Bande orange horizontale SYMBIA Pro.specta sur la droite */}
-            <div className="absolute right-[1px] top-[72px] w-[30px] h-[7px] bg-[#E2610A] shadow-[inset_0_1px_2px_rgba(255,255,255,0.3)] flex items-center justify-start pl-[2px] transform rotate-[0deg] overflow-hidden rounded-l-[1px]">
-              <span className="text-[2.2px] font-black text-white whitespace-nowrap">SYMBIA Pro.specta</span>
-            </div>
+            {/* Bande signature verte (marque OKBA — aucune marque tierce) */}
+            <div className="absolute right-[1px] top-[72px] w-[30px] h-[7px] overflow-hidden rounded-l-[1px] shadow-[inset_0_1px_2px_rgba(255,255,255,0.35)]" style={{ background: 'linear-gradient(90deg,#004d26 0%,#006633 42%,#00a651 100%)' }} />
           </div>
 
           {/* ══ BADGE RDV — s'efface pendant l'intro « OKBA » puis revient ══ */}
@@ -759,17 +765,10 @@ export default function Header({ siteSettings, poles }: HeaderProps) {
               
               {/* Coque externe principale (blanche) */}
               <div className="w-full h-[25px] bg-gradient-to-b from-[#ffffff] to-[#f0f0f0] rounded-[10px] shadow-[0_8px_20px_rgba(0,0,0,0.15),inset_0_4px_8px_rgba(255,255,255,1)] border border-[#e0e0e0] z-10 flex flex-col items-center justify-center relative">
-                {/* Logo SIEMENS Healthineers sur la coque */}
-                <div className="flex flex-col items-center mt-[2px]">
-                  <span className="text-[3px] font-black text-[#0099b9] leading-none tracking-widest">SIEMENS</span>
-                  <div className="flex items-center gap-[1px] mt-[1px]">
-                    <span className="text-[3.5px] font-bold text-[#E2610A] leading-none">Healthineers</span>
-                    <div className="flex gap-[0.5px] mb-[2px]">
-                      <div className="w-[1px] h-[1px] rounded-full bg-[#E2610A]" />
-                      <div className="w-[1px] h-[1px] rounded-full bg-[#E2610A]" />
-                      <div className="w-[1.2px] h-[1.2px] -mt-[0.5px] rounded-full bg-[#E2610A]" />
-                    </div>
-                  </div>
+                {/* Marque OKBA sur la coque (remplace toute marque tierce) */}
+                <div className="flex flex-col items-center mt-[3px]">
+                  <span className="text-[4px] font-black text-[#006633] leading-none tracking-[0.18em]">OKBA</span>
+                  <span className="mt-[1px] h-[0.8px] w-[10px] rounded-full bg-[#00a651]" />
                 </div>
               </div>
 
