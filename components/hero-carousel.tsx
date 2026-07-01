@@ -21,11 +21,11 @@ import Image from 'next/image'
 import { useTranslations, useLocale } from 'next-intl'
 import { useReducedMotion } from '@/hooks/use-reduced-motion'
 import { urlFor, sanityImageLoader } from '@/sanity/lib/image'
-import { siteConfig } from '@/data/site-config'
 import { buildWhatsAppUrl } from '@/lib/whatsapp'
 import { AnimatedLogo } from '@/components/ui/animated-logo'
 import { WordReveal } from '@/components/ui/reveal-text'
 import { Magnetic } from '@/components/ui/magnetic'
+import { CallMenu } from '@/components/call-menu'
 
 // Courbe d'easing forte (sortie) — plus de « punch » que les easings CSS par défaut
 const EASE_OUT = [0.23, 1, 0.32, 1] as const
@@ -70,6 +70,7 @@ export default function HeroCarousel({ slides: rawSlides = [], siteSettings, sec
     const [currentIndex, setCurrentIndex] = useState(0)
     const [isAutoPlaying, setIsAutoPlaying] = useState(true)
     const [progress, setProgress] = useState(0)
+    const [callOpen, setCallOpen] = useState(false)
     const prefersReducedMotion = useReducedMotion()
     const heroRef = useRef<HTMLElement>(null)
 
@@ -79,9 +80,6 @@ export default function HeroCarousel({ slides: rawSlides = [], siteSettings, sec
     const yContent = useTransform(scrollY, [0, 600], [0, 90])
     const contentOpacity = useTransform(scrollY, [0, 480], [1, 0])
 
-    /* Téléphone pour le CTA « Appeler » (Sanity sinon config locale) */
-    const phoneDisplay = (siteSettings?.phone || siteConfig.contact.phone).split('/')[0].trim()
-    const phoneHref = `tel:${phoneDisplay.replace(/[^+\d]/g, '')}`
 
     /* Auto-play */
     useEffect(() => {
@@ -361,13 +359,15 @@ export default function HeroCarousel({ slides: rawSlides = [], siteSettings, sec
                                 </button>
                             </Magnetic>
 
-                            <a
-                                href={phoneHref}
+                            <button
+                                type="button"
+                                onClick={() => setCallOpen(true)}
+                                aria-haspopup="dialog"
                                 className="group inline-flex w-full cursor-pointer items-center justify-center gap-2 rounded-full border border-white/25 bg-white/10 px-7 py-4 text-sm font-semibold text-white backdrop-blur-md transition duration-300 hover:border-white/50 hover:bg-white/20 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-white/30 active:scale-[0.97] sm:w-auto sm:text-base touch-target"
                             >
                                 <Phone className="h-5 w-5 text-emerald-300" />
                                 {t('cta.call')}
-                            </a>
+                            </button>
                         </motion.div>
                     </div>
                 </div>
@@ -497,6 +497,9 @@ export default function HeroCarousel({ slides: rawSlides = [], siteSettings, sec
                     />
                 </svg>
             </div>
+
+            {/* Menu des numéros (ouvert par le CTA « Appeler ») */}
+            <CallMenu open={callOpen} onClose={() => setCallOpen(false)} />
         </section>
     )
 }

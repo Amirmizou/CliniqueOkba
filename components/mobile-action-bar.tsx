@@ -6,6 +6,7 @@ import { Phone, MessageCircle, MapPin } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import { siteConfig } from '@/data/site-config'
 import { buildWhatsAppUrl } from '@/lib/whatsapp'
+import { CallMenu } from '@/components/call-menu'
 
 interface MobileActionBarProps {
   siteSettings?: {
@@ -20,16 +21,12 @@ interface MobileActionBarProps {
 export default function MobileActionBar({ siteSettings }: MobileActionBarProps) {
   const t = useTranslations('actionBar')
   const [visible, setVisible] = useState(false)
+  const [callOpen, setCallOpen] = useState(false)
   const { scrollY } = useScroll()
 
   useMotionValueEvent(scrollY, 'change', (latest) => {
     setVisible(latest > 480)
   })
-
-  const phoneDisplay = (siteSettings?.phone || siteConfig.contact.phone)
-    .split('/')[0]
-    .trim()
-  const phoneHref = `tel:${phoneDisplay.replace(/[^+\d]/g, '')}`
 
   const clinic = siteSettings?.clinicName || 'la Clinique OKBA'
   const waMessage =
@@ -44,6 +41,7 @@ export default function MobileActionBar({ siteSettings }: MobileActionBarProps) 
   const directionsUrl = `https://www.google.com/maps/dir/?api=1&destination=${coords.lat},${coords.lng}`
 
   return (
+    <>
     <AnimatePresence>
       {visible && (
         <motion.nav
@@ -56,15 +54,17 @@ export default function MobileActionBar({ siteSettings }: MobileActionBarProps) 
           style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
         >
           <div className="grid grid-cols-3 gap-2 rounded-2xl border border-border/40 bg-background/90 p-2 shadow-2xl shadow-black/20 backdrop-blur-xl">
-            {/* Call */}
-            <a
-              href={phoneHref}
-              aria-label={t('callAria') || `Appeler la clinique : ${phoneDisplay}`}
+            {/* Call — ouvre le menu des numéros (l'utilisateur choisit le service) */}
+            <button
+              type="button"
+              onClick={() => setCallOpen(true)}
+              aria-haspopup="dialog"
+              aria-label={t('callAria') || 'Appeler la clinique — choisir un service'}
               className="group flex min-h-[56px] flex-col items-center justify-center gap-1 rounded-xl bg-[#006633] px-2 py-3 text-white shadow-md transition-all active:scale-95 hover:bg-[#004d26] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#006633] focus-visible:ring-offset-2 cursor-pointer"
             >
               <Phone className="h-5 w-5" aria-hidden="true" />
               <span className="text-xs font-semibold leading-none">{t('call')}</span>
-            </a>
+            </button>
 
             {/* WhatsApp / Appointment */}
             <a
@@ -93,5 +93,7 @@ export default function MobileActionBar({ siteSettings }: MobileActionBarProps) 
         </motion.nav>
       )}
     </AnimatePresence>
+    <CallMenu open={callOpen} onClose={() => setCallOpen(false)} />
+    </>
   )
 }
