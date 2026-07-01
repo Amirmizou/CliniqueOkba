@@ -511,9 +511,12 @@ export default function Header({ siteSettings, poles }: HeaderProps) {
           {/* ══ FLOOR MOUNT ══ */}
           <div className="absolute right-[10px] bottom-0 w-[174px] h-[18px] z-0 pointer-events-none" style={{
             borderRadius: '0 0 10px 10px',
-            background: 'linear-gradient(180deg,#d2d2d2 0%,#a6a6a6 55%,#8e8e8e 100%)',
-            boxShadow: '0 6px 18px rgba(0,0,0,0.30),inset 0 1px 0 rgba(255,255,255,0.40)',
-          }} />
+            background: 'linear-gradient(180deg,#dedede 0%,#b0b0b0 52%,#8e8e8e 100%)',
+            boxShadow: '0 6px 18px rgba(0,0,0,0.30),inset 0 1px 0 rgba(255,255,255,0.55)',
+          }}>
+            {/* Arête métallique brillante (haut) */}
+            <div className="absolute inset-x-[6px] top-0 h-[2px] rounded-full" style={{ background:'linear-gradient(90deg,transparent,rgba(255,255,255,0.92),transparent)' }} />
+          </div>
 
           {/* ══ CORPS DROIT — panneau latéral + LED console ══ */}
           <div className="absolute right-[5px] bottom-[16px] w-[62px] h-[116px] z-[8] pointer-events-none" style={{
@@ -521,6 +524,11 @@ export default function Header({ siteSettings, poles }: HeaderProps) {
             background: 'linear-gradient(90deg,#eeeeee 0%,#dcdcdc 55%,#c4c4c4 100%)',
             boxShadow: '5px 2px 16px rgba(0,0,0,0.16),inset -2px 0 6px rgba(0,0,0,0.06),inset 0 1px 0 rgba(255,255,255,0.50)',
           }}>
+            {/* Métal brossé vertical + reflet diagonal (clippé à la coque) */}
+            <div className="absolute inset-0 overflow-hidden pointer-events-none" style={{ borderRadius:'0 26px 10px 0' }}>
+              <div className="absolute inset-0 opacity-50" style={{ background:'repeating-linear-gradient(90deg,rgba(255,255,255,0.09) 0px,rgba(255,255,255,0.09) 1px,transparent 1px,transparent 3px)' }} />
+              <div className="absolute inset-0" style={{ background:'linear-gradient(115deg,rgba(255,255,255,0.50) 0%,rgba(255,255,255,0) 30%,rgba(255,255,255,0) 72%,rgba(0,0,0,0.05) 100%)' }} />
+            </div>
             <div className="absolute top-[28px] bottom-[22px] right-[10px] w-px" style={{ background:'linear-gradient(180deg,transparent,rgba(0,0,0,0.18) 20%,rgba(0,0,0,0.24) 50%,rgba(0,0,0,0.12) 80%,transparent)' }} />
             <div className="absolute bottom-[22px] right-[8px] left-[8px] h-[3px] rounded-full" style={{ background:'linear-gradient(90deg,rgba(0,102,51,0.65),rgba(0,166,81,1),rgba(0,102,51,0.65))', boxShadow:'0 0 8px 2px rgba(0,166,81,0.55)' }} />
             <div className="absolute bottom-[12px] right-[12px] left-[12px] h-[1.5px] rounded-full bg-black/10" />
@@ -566,6 +574,8 @@ export default function Header({ siteSettings, poles }: HeaderProps) {
               <circle cx="75" cy="75" r="28" stroke="rgba(0,0,0,0.20)" strokeWidth="10" fill="none"/>
               <circle cx="75" cy="75" r="28" stroke="rgba(0,0,0,0.08)" strokeWidth="18" fill="none"/>
             </svg>
+            {/* Reflet d'environnement froid (bas de l'anneau → métal réaliste) */}
+            <div className="absolute inset-x-0 bottom-0 h-[42%] pointer-events-none" style={{ background:'linear-gradient(0deg,rgba(176,202,232,0.20),rgba(176,202,232,0) 100%)' }} />
           </div>
 
           {/* ══ Liseré vert signature ══ */}
