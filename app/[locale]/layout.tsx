@@ -36,7 +36,6 @@ export default async function LocaleLayout({
   params: Promise<{ locale: string }>
 }) {
   const { locale } = await params;
-  console.log('[DEBUG locale]', JSON.stringify(locale));
   setRequestLocale(locale);
   const messages = await getMessages({ locale })
 

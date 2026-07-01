@@ -158,7 +158,7 @@ export function LogoBadge({
             transition={{ duration: 3.6, repeat: Infinity, ease: 'easeInOut', delay: 1.0 }}
           >
             <Image
-              src="/logo.png"
+              src="/logo-main.png"
               alt="Clinique OKBA"
               fill
               sizes={`${Math.round(size)}px`}

@@ -263,7 +263,7 @@ export function AnimatedLogo({ className, size = 96 }: { className?: string; siz
           transition={{ duration: 0.55, delay: 0.7, ease: EASE }}
         >
           <Image
-            src="/logo.png"
+            src="/logo-main.png"
             alt="Clinique OKBA"
             fill
             sizes={`${Math.round(size)}px`}

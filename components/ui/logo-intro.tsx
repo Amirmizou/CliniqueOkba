@@ -135,7 +135,7 @@ function LogoAnimation({ onComplete }: { onComplete: () => void }) {
           }}
         >
           <Image
-            src="/logo.png"
+            src="/logo-main.png"
             alt="Clinique OKBA"
             fill
             sizes="280px"
@@ -164,7 +164,7 @@ function LogoAnimation({ onComplete }: { onComplete: () => void }) {
         }}
       >
         <Image
-          src="/logo.png"
+          src="/logo-main.png"
           alt=""
           fill
           sizes="280px"

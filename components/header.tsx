@@ -42,6 +42,8 @@ import Image from 'next/image'
 import { motion, AnimatePresence, useScroll, useMotionValueEvent } from 'framer-motion'
 import { cn } from '@/lib/utils'
 import { poles as localPoles } from '@/data/poles'
+import GantryWordmark from '@/components/gantry-wordmark'
+import SiteSearch from '@/components/site-search'
 import Link from 'next/link'
 import { useRouter, usePathname } from 'next/navigation'
 
@@ -184,6 +186,16 @@ export default function Header({ siteSettings, poles }: HeaderProps) {
 
   const homeHref = locale === 'ar' ? '/ar' : '/'
 
+  // Sections indexées par la recherche (ancres sur la page d'accueil).
+  const searchSections = [
+    { id: 'about', label: t('center'), anchor: '#about' },
+    { id: 'specialties', label: t('specialties'), anchor: '#specialties' },
+    { id: 'equipements', label: t('equipment'), anchor: '#equipements' },
+    { id: 'medecins', label: t('doctors'), anchor: '#medecins' },
+    { id: 'faq', label: t('faq'), anchor: '#faq' },
+    { id: 'contact', label: t('contact'), anchor: '#contact' },
+  ]
+
   const scrollToSection = (href: string) => {
     setIsOpen(false)
     const isHomepage = window.location.pathname === '/' || window.location.pathname === '/ar'
@@ -227,6 +239,16 @@ export default function Header({ siteSettings, poles }: HeaderProps) {
           15% { opacity: 1; }
           85% { opacity: 1; }
           100% { transform: translateY(28px); opacity: 0; }
+        }
+        @keyframes floatGlyph {
+          0%, 100% { transform: translateY(0); }
+          50% { transform: translateY(-7px); }
+        }
+        @keyframes ecgSweep {
+          0% { left: -6%; opacity: 0; }
+          8% { opacity: 1; }
+          92% { opacity: 1; }
+          100% { left: 104%; opacity: 0; }
         }
       `}} />
       {/* ═══ BARRE UTILITAIRE (desktop) — infos essentielles (dans le flux) ═══ */}
@@ -278,20 +300,71 @@ export default function Header({ siteSettings, poles }: HeaderProps) {
       </div>
 
       <header className="relative z-[60] flex justify-center px-4 py-3 bg-white/95 backdrop-blur-md border-b border-black/[0.06] shadow-[0_2px_14px_rgba(0,0,0,0.06)] dark:bg-slate-950/90 dark:border-white/10">
+        
+        {/* LOGO CENTRÉ DANS LA MARGE GAUCHE (Desktop) */}
+        <div className="absolute inset-y-0 left-0 w-[calc(50vw-640px)] hidden xl:flex items-center justify-center pointer-events-auto z-[100]">
+          <a href={homeHref} className="group relative block">
+            <div className="relative h-[100px] w-[100px] 2xl:h-[140px] 2xl:w-[140px] flex items-center justify-center">
+              <Image src="/logo-main.png" alt="Clinique OKBA" fill sizes="(max-width: 1536px) 100px, 140px" className="object-contain" priority />
+            </div>
+          </a>
+        </div>
 
-        {/* ═══ Décor médical subtil (réduit le vide de la bande, desktop) ═══ */}
+        {/* Ligne d'impulsion vitale (ECG) ultra-fine sur le bord supérieur - Identité visuelle */}
+        <div className="absolute top-0 left-0 right-0 h-[1.5px] overflow-hidden opacity-80 z-[70]">
+          <motion.div
+            className="h-full w-[30%]"
+            style={{
+              background: 'linear-gradient(90deg, transparent, rgba(0,102,51,0.2), #00a651, rgba(0,102,51,0.2), transparent)',
+              boxShadow: '0 0 12px rgba(0, 166, 81, 0.6)'
+            }}
+            animate={{ x: ['-200%', '400%'] }}
+            transition={{ repeat: Infinity, duration: 4.5, ease: 'linear' }}
+          />
+        </div>
+
+        {/* ═══ Décor médical (remplit élégamment la bande blanche, desktop) ═══ */}
         <div aria-hidden="true" className="pointer-events-none absolute inset-0 z-0 hidden overflow-hidden xl:block">
+          {/* Lueur de marque douce — réchauffe le blanc et donne de la profondeur */}
+          <div
+            className="absolute inset-x-0 -top-16 h-[210px]"
+            style={{ background: 'radial-gradient(ellipse 52% 100% at 36% 0%, rgba(0,102,51,0.07), transparent 72%)' }}
+          />
           {/* Trame de points fine — dense sur les côtés, estompée derrière le menu */}
           <div
             className="absolute inset-0 text-[#006633]"
             style={{
               backgroundImage: 'radial-gradient(currentColor 1px, transparent 1px)',
               backgroundSize: '22px 22px',
-              opacity: 0.05,
-              WebkitMaskImage: 'linear-gradient(90deg, #000, transparent 28%, transparent 72%, #000)',
-              maskImage: 'linear-gradient(90deg, #000, transparent 28%, transparent 72%, #000)',
+              opacity: 0.06,
+              WebkitMaskImage: 'linear-gradient(90deg, #000, transparent 30%, transparent 70%, #000)',
+              maskImage: 'linear-gradient(90deg, #000, transparent 30%, transparent 70%, #000)',
             }}
           />
+
+          {/* Ligne ECG haute — remplit la bande, avec un point lumineux qui la parcourt */}
+          <div className="absolute left-0 right-[160px] top-[15px] h-7">
+            <svg className="absolute inset-0 h-full w-full text-[#006633]/[0.22]" viewBox="0 0 1200 40" preserveAspectRatio="none" fill="none">
+              <path
+                d="M0 20 H250 l8 -12 l7 24 l8 -19 l6 7 H470 l9 -7 l7 15 l6 -8 H700 l8 -11 l7 22 l8 -17 l6 6 H980 l9 -8 l7 16 l6 -8 H1200"
+                stroke="currentColor"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+            <span
+              className="absolute top-1/2 h-1.5 w-1.5 -translate-y-1/2 rounded-full bg-[#00a651]"
+              style={{ boxShadow: '0 0 8px 2px rgba(0,166,81,0.55)', animation: 'ecgSweep 7s linear infinite' }}
+            />
+          </div>
+
+          {/* Glyphes médicaux flottants — comblent le vide gauche/centre (langage de la clinique pluridisciplinaire) */}
+          <Heart className="absolute left-[13%] top-[20px] h-5 w-5 text-[#006633]" style={{ opacity: 0.1, animation: 'floatGlyph 6s ease-in-out infinite' }} />
+          <Activity className="absolute left-[26%] top-[34px] h-6 w-6 text-[#006633]" style={{ opacity: 0.09, animation: 'floatGlyph 7s ease-in-out infinite 0.8s' }} />
+          <FlaskConical className="absolute left-[40%] top-[19px] h-5 w-5 text-[#006633]" style={{ opacity: 0.09, animation: 'floatGlyph 6.5s ease-in-out infinite 1.4s' }} />
+          <Stethoscope className="absolute left-[53%] top-[33px] h-5 w-5 text-[#006633]" style={{ opacity: 0.09, animation: 'floatGlyph 7.5s ease-in-out infinite 0.4s' }} />
+
           {/* Ligne ECG / pouls fine en bas (langage visuel médical, vert identité) */}
           <svg
             className="absolute bottom-1.5 left-0 h-6 w-full text-[#006633]/15"
@@ -343,19 +416,11 @@ export default function Header({ siteSettings, poles }: HeaderProps) {
             }} />
 
             {/* Logo + marque — prend tout l'espace disponible (plus de troncature) */}
+            {/* Logo (sans texte HTML car inclus dans l'image) */}
             <a href={homeHref} className="group relative z-10 flex min-w-0 flex-1 items-center gap-2.5">
-              <div className="relative h-10 w-10 shrink-0 transition-transform duration-300 group-active:scale-95">
-                <svg className="pointer-events-none absolute inset-[-6px] animate-[spin_8s_linear_infinite]" viewBox="0 0 52 52" fill="none" aria-hidden="true">
-                  <circle cx="26" cy="26" r="24" stroke="rgba(0,102,51,0.30)" strokeWidth="1.5" strokeDasharray="24 52" strokeLinecap="round" />
-                </svg>
-                <div className="relative h-10 w-10 overflow-hidden rounded-full bg-white shadow-md ring-1 ring-gray-100 dark:ring-white/10">
-                  <Image src="/logo.png" alt="Logo Clinique OKBA" fill sizes="40px" className="object-contain p-1.5" />
-                </div>
+              <div className="relative h-[56px] w-[56px] shrink-0 transition-transform duration-300 group-active:scale-95 rounded-xl bg-white shadow-sm ring-1 ring-gray-200 overflow-hidden">
+                <Image src="/logo-main.png" alt="Logo Clinique OKBA" fill sizes="56px" className="object-cover p-1" />
               </div>
-              <span className="flex min-w-0 flex-col gap-[3px]">
-                <span className="truncate text-[14px] font-black uppercase leading-none tracking-tight text-[#006633]">{clinicNameText}</span>
-                <span className="truncate text-[9px] font-semibold uppercase leading-none tracking-wide text-[#EC0016]">{t('tagline')}</span>
-              </span>
             </a>
 
             {/* Contrôles — menu + mini-scanner RDV (langue dispo dans le menu) */}
@@ -417,13 +482,31 @@ export default function Header({ siteSettings, poles }: HeaderProps) {
                 {/* Halo vert au tap/focus + micro-badge RDV */}
                 <span aria-hidden="true" className="absolute right-0 top-1/2 h-[54px] w-[54px] -translate-y-1/2 rounded-full transition-all duration-300 group-active:shadow-[0_0_0_2px_rgba(0,102,51,0.55),0_0_16px_rgba(0,255,136,0.45)] group-focus-visible:shadow-[0_0_0_2px_rgba(0,102,51,0.6)]" />
                 <span aria-hidden="true" className="absolute right-[3px] top-[3px] z-10 rounded-[2px] bg-[#006633] px-[3px] py-[1px] text-[6px] font-extrabold uppercase leading-none tracking-[0.12em] text-white shadow-sm">RDV</span>
+
+                {/* Intro « OKBA » — jaillit du mini-bore */}
+                <GantryWordmark variant="mobile" />
               </button>
             </div>
           </div>
         </div>
 
+        {/* ═══ COLONNE DESKTOP — bande claire (logo + recherche) au-dessus du scanner ═══ */}
+        <div className="relative z-10 mx-auto hidden w-full max-w-7xl flex-col xl:flex">
+
+        {/* ── Rangée claire : recherche + langue (centrés) ── */}
+        <div className="flex items-center justify-center pt-0 pb-0">
+          <div className="flex w-full max-w-xl items-center gap-3">
+            <div className="flex-1">
+              <SiteSearch locale={locale} sections={searchSections} className="w-full" />
+            </div>
+            <div className="shrink-0 pointer-events-auto">
+              <LanguageSwitcher />
+            </div>
+          </div>
+        </div>
+
         {/* 3D SCANNER DESKTOP — Siemens Symbia Pro.specta */}
-        <div className={cn("pointer-events-auto relative w-full max-w-7xl mx-auto h-[140px] hidden xl:block transition-all duration-700 origin-top mt-4", isScrolled ? "scale-95 -translate-y-2 opacity-95" : "scale-100 translate-y-0 opacity-100")}>
+        <div className={cn("pointer-events-auto relative w-full h-[140px] transition-all duration-700 origin-top mt-0", isScrolled ? "scale-95 -translate-y-2 opacity-95" : "scale-100 translate-y-0 opacity-100")}>
 
           {/* ══ FLOOR MOUNT ══ */}
           <div className="absolute right-[10px] bottom-0 w-[174px] h-[18px] z-0 pointer-events-none" style={{
@@ -493,7 +576,7 @@ export default function Header({ siteSettings, poles }: HeaderProps) {
           }} />
 
           {/* ══ BORE — paroi tunnel (lumière clinique bleu-blanc) ══ */}
-          <div className="absolute z-[40] rounded-full overflow-hidden pointer-events-none" style={{
+          <div className="absolute z-[40] rounded-full overflow-hidden pointer-events-none flex items-center justify-center" style={{
             width:'50px', height:'50px', right:'65px', bottom:'48px',
             background:'radial-gradient(ellipse 72% 62% at 46% 32%,#ffffff 0%,#f2f6fb 38%,#dfe8f2 68%,#cad5e4 100%)',
             boxShadow:'inset 0 7px 20px rgba(0,20,60,0.15),inset 0 -4px 10px rgba(255,255,255,0.80),inset 0 0 32px rgba(60,120,220,0.07)',
@@ -501,9 +584,17 @@ export default function Header({ siteSettings, poles }: HeaderProps) {
             <div className="absolute inset-[6px] rounded-full" style={{ border:'1px solid rgba(0,50,120,0.09)' }} />
             <div className="absolute inset-[12px] rounded-full" style={{ border:'1px solid rgba(0,50,120,0.06)' }} />
             <div className="absolute inset-[18px] rounded-full" style={{ border:'0.5px solid rgba(0,50,120,0.04)' }} />
-            <div className="absolute left-[8%] right-[8%] top-0 h-[3px] rounded-full bg-[#00a651] shadow-[0_0_14px_4px_rgba(0,166,81,0.65)]" style={{ animation:'scanLaser 2.6s ease-in-out infinite alternate' }} />
-            <div className="absolute left-0 right-0 top-0 h-[18px] -mt-[8px] opacity-50" style={{ background:'radial-gradient(ellipse at center,rgba(0,166,81,0.32),transparent 70%)', animation:'scanLaser 2.6s ease-in-out infinite alternate' }} />
-            <div className="absolute top-[25%] right-[15%] w-[3px] h-[3px] rounded-full bg-red-500 shadow-[0_0_8px_2px_rgba(239,68,68,0.88)] animate-pulse" />
+            
+            {/* Branche d'olivier au centre exact du gantry (isolée sans être coupée) */}
+            <div className="absolute z-10 w-[42px] h-[34px] top-[7px] flex justify-center overflow-hidden pointer-events-none mix-blend-multiply" style={{ filter: 'contrast(1.15) brightness(1.05)' }}>
+              <div className="relative w-[42px] h-[42px]">
+                <Image src="/logo-main.png" alt="Branche Olivier" fill sizes="42px" className="object-contain scale-[1.4] origin-top" priority />
+              </div>
+            </div>
+
+            <div className="absolute left-[8%] right-[8%] top-0 h-[3px] z-20 rounded-full bg-[#00a651] shadow-[0_0_14px_4px_rgba(0,166,81,0.65)]" style={{ animation:'scanLaser 2.6s ease-in-out infinite alternate' }} />
+            <div className="absolute left-0 right-0 top-0 h-[18px] z-20 -mt-[8px] opacity-50" style={{ background:'radial-gradient(ellipse at center,rgba(0,166,81,0.32),transparent 70%)', animation:'scanLaser 2.6s ease-in-out infinite alternate' }} />
+            <div className="absolute top-[25%] right-[15%] z-20 w-[3px] h-[3px] rounded-full bg-red-500 shadow-[0_0_8px_2px_rgba(239,68,68,0.88)] animate-pulse" />
           </div>
 
           {/* ══ BORE — anneau LED bleu Siemens (lèvre) ══ */}
@@ -533,84 +624,86 @@ export default function Header({ siteSettings, poles }: HeaderProps) {
             </div>
           </div>
 
-          {/* ══ BADGE RDV ══ */}
-          <div className="absolute z-[45] pointer-events-none" style={{ right:'22px', bottom:'66px' }}>
+          {/* ══ BADGE RDV — s'efface pendant l'intro « OKBA » puis revient ══ */}
+          <motion.div
+            className="absolute z-[45] pointer-events-none"
+            style={{ right:'22px', bottom:'66px' }}
+            initial={{ opacity: 1 }}
+            animate={{ opacity: [1, 0, 0, 1] }}
+            transition={{ duration: 3.9, times: [0, 0.08, 0.85, 1], ease: 'easeInOut' }}
+          >
             <div className="bg-[#006633] text-white px-1.5 py-[1px] rounded-[2px] shadow-sm text-[7px] font-extrabold tracking-[0.15em] uppercase">RDV</div>
-          </div>
+          </motion.div>
 
           {/* ══ PLATEAU PATIENT - BASE TÉLESCOPIQUE ══ */}
           <div className={cn("absolute z-[5] pointer-events-none origin-right", isHidden ? "translate-x-[200px] opacity-0 transition-all duration-[2000ms] ease-in-out" : "translate-x-0 opacity-100 transition-all duration-[1500ms] delay-[400ms] ease-out")} style={{
-            left:'25%', right:'145px', bottom:'0px', height:'32px',
-            borderRadius:'8px 8px 0 0',
-            background:'linear-gradient(180deg,#ffffff 0%,#ebebeb 50%,#cccccc 100%)',
-            boxShadow:'0 6px 12px rgba(0,0,0,0.2),inset -2px 2px 6px rgba(255,255,255,0.9),inset 4px 0 10px rgba(0,0,0,0.05)',
+            left:'20%', right:'145px', bottom:'0px', height:'32px',
+            borderRadius:'4px 4px 0 0',
+            background:'linear-gradient(180deg, #fcfcfc 0%, #e6e6e6 70%, #d4d4d4 100%)',
+            boxShadow:'0 6px 12px rgba(0,0,0,0.2), inset 2px 0 6px rgba(255,255,255,0.9)',
             border:'1px solid #d0d0d0', borderBottom:'none'
           }}>
             {/* Lignes de structure (panneaux) */}
             <div className="absolute top-0 bottom-0 left-[20%] w-px bg-black/10" />
             <div className="absolute top-0 bottom-0 left-[50%] w-px bg-black/10" />
             <div className="absolute top-0 bottom-0 left-[80%] w-px bg-black/10" />
-            {/* Fente horizontale en bas */}
-            <div className="absolute bottom-[6px] left-[10px] right-[10px] h-[3px] rounded-full" style={{ background:'linear-gradient(180deg,#888,#aaa)' }} />
+            {/* Grey plinth at the bottom */}
+            <div className="absolute bottom-0 left-[2%] right-[2%] h-[12px] bg-gradient-to-b from-[#a0a0a0] to-[#888888] rounded-t-sm shadow-[inset_0_2px_4px_rgba(0,0,0,0.2)]" />
           </div>
 
           {/* Glissière sous la table */}
           <div className={cn("absolute z-[29] pointer-events-none origin-right", isHidden ? "translate-x-[200px] opacity-0 transition-all duration-[2000ms] ease-in-out" : "translate-x-0 opacity-100 transition-all duration-[1500ms] delay-[400ms] ease-out")} style={{
-            left:'20px', right:'135px', bottom:'26px', height:'6px',
+            left:'20px', right:'135px', bottom:'26px', height:'8px',
             borderRadius:'0 0 0 4px',
-            background:'linear-gradient(180deg,#666 0%,#999 40%,#555 100%)',
-            boxShadow:'inset 0 1px 3px rgba(0,0,0,0.5),0 3px 6px rgba(0,0,0,0.2)',
+            background:'linear-gradient(180deg,#888 0%,#bbb 40%,#777 100%)',
+            boxShadow:'inset 0 1px 3px rgba(0,0,0,0.5), 0 3px 6px rgba(0,0,0,0.2)',
           }} />
 
-          {/* Table Patient (Matelas + Base) */}
+          {/* Table Patient (Matelas + Base Blanche Principale) */}
           <div className={cn("absolute z-[30] flex flex-col justify-end origin-right hover:-translate-x-1", isHidden ? "translate-x-[200px] opacity-0 transition-all duration-[2000ms] ease-in-out" : "translate-x-0 opacity-100 transition-all duration-[1500ms] delay-[400ms] ease-out")} style={{
             left:'10px', right:'95px', bottom:'32px', height:'64px',
-            borderRadius:'24px 0 0 8px',
-            background:'linear-gradient(180deg,#ffffff 0%,#f2f2f2 60%,#e0e0e0 100%)',
-            boxShadow:'0 10px 24px -4px rgba(0,0,0,0.25),inset 0 4px 12px rgba(255,255,255,1),inset 0 -3px 8px rgba(0,0,0,0.08)',
+            borderRadius:'12px 0 0 8px',
+            background:'linear-gradient(180deg, #ffffff 0%, #f4f4f4 80%, #e8e8e8 100%)',
+            boxShadow:'0 12px 24px -4px rgba(0,0,0,0.3), inset 0 2px 6px rgba(255,255,255,1)',
+            border:'1px solid #eaeaea'
           }}>
-            {/* Matelas noir concave */}
-            <div className="absolute top-0 left-[2px] right-0 h-[12px] rounded-tl-[24px]" style={{ background:'linear-gradient(180deg,#222 0%,#000 100%)', boxShadow:'inset 0 1px 2px rgba(255,255,255,0.1),0 2px 4px rgba(0,0,0,0.4)' }}>
-              <div className="absolute top-[1px] left-[10px] right-[10px] h-[1px] bg-white/5" />
+            {/* Matelas (Coussin noir/gris foncé) */}
+            <div className="absolute top-0 left-[2px] right-0 h-[8px] rounded-tl-[10px]" style={{ 
+                background:'linear-gradient(180deg, #333 0%, #1a1a1a 100%)', 
+                boxShadow:'inset 0 1px 1px rgba(255,255,255,0.15), 0 2px 4px rgba(0,0,0,0.4)' 
+            }}>
+              {/* Rails latéraux métalliques de la table */}
+              <div className="absolute top-[2px] left-0 right-0 h-[2px] bg-gradient-to-r from-[#888] to-[#666] opacity-50" />
             </div>
             
-            {/* Poignée argentée (foot handle) */}
-            <div className="absolute top-[-4px] left-[6px] w-[20px] h-[14px] border-[2.5px] border-[#d0d0d0] rounded-l-full shadow-[-2px_0_4px_rgba(0,0,0,0.2),inset_1px_0_2px_rgba(255,255,255,0.8)] z-10" style={{ borderRight:'none' }} />
+            {/* (Logo déplacé dans la marge globale du header) */}
 
-            <div className="absolute bottom-[8px] left-[18px] right-0 h-[3px] rounded-l-full" style={{ background:'linear-gradient(90deg,#006633 0%,#00a651 40%,rgba(0,166,81,0) 100%)', boxShadow:'0 0 6px rgba(0,166,81,0.5)' }} />
-            <div aria-hidden="true" className="pointer-events-none absolute bottom-[20px] left-[25%] right-0 h-[1px] bg-black/[0.04]" />
-            <div aria-hidden="true" className="pointer-events-none absolute right-0 top-0 bottom-0 w-[95px] z-10" style={{ background:'linear-gradient(to left,rgba(0,0,0,0.85) 0%,rgba(0,0,0,0.3) 50%,transparent 100%)' }} />
-            <div aria-hidden="true" className="pointer-events-none absolute bottom-[7px] right-0 h-[3px] w-[90px] z-[11]" style={{ background:'linear-gradient(to right,rgba(0,255,136,0.7) 0%,rgba(0,102,51,0) 100%)' }} />
-            <div aria-hidden="true" className="pointer-events-none absolute right-0 top-0 bottom-0 w-[25px] z-20" style={{ backdropFilter:'blur(2px)' }} />
+
+
+            {/* Lignes de structure horizontales (fentes) */}
+            <div className="absolute bottom-[16px] left-[15px] right-[5px] h-[1.5px] bg-black/[0.08] rounded-full" />
+            <div className="absolute bottom-[8px] left-[15px] right-[5px] h-[1.5px] bg-black/[0.08] rounded-full" />
+            
+            {/* L'ombre de profondeur / d'insertion dans le gantry */}
+            <div aria-hidden="true" className="pointer-events-none absolute right-0 top-0 bottom-0 w-[120px] z-10" style={{ background:'linear-gradient(to left,rgba(0,0,0,0.6) 0%,rgba(0,0,0,0.1) 50%,transparent 100%)' }} />
+            <div aria-hidden="true" className="pointer-events-none absolute right-0 top-0 bottom-0 w-[30px] z-20" style={{ backdropFilter:'blur(2px)' }} />
           </div>
 
           {/* ══ NAVIGATION ══ */}
           <div
             className={cn(
-              "absolute z-[34] flex items-center pl-7 origin-right",
+              "absolute z-[34] flex items-center pl-[60px] origin-right",
               isHidden ? "translate-x-[200px] opacity-0 transition-all duration-[2000ms] ease-in-out" : "translate-x-0 opacity-100 transition-all duration-[1500ms] delay-[400ms] ease-out",
             )}
             style={{ left:'10px', right:'220px', bottom:'32px', height:'64px' }}
           >
-            <div className="shrink-0 mr-2 md:mr-4 pointer-events-auto">
-              <LanguageSwitcher />
-            </div>
-            <a href={homeHref} className="flex items-center gap-3 shrink-0 mr-4 md:mr-6 group pointer-events-auto">
-              <div className="relative h-14 w-14 rounded-full bg-white p-1 shadow-sm ring-1 ring-gray-100 transition-transform group-hover:scale-105">
-                <Image src="/logo.png" alt="Logo" fill sizes="40px" className="object-contain p-1" />
-              </div>
-              <div className="flex flex-col whitespace-nowrap">
-                <span className="text-[12px] md:text-[14px] font-extrabold text-[#006633] leading-none uppercase">Clinique</span>
-                <span className="text-[12px] md:text-[14px] font-extrabold text-[#006633] leading-none uppercase mt-0.5">Okba</span>
-              </div>
-            </a>
-            <nav className="flex flex-1 min-w-0 items-center justify-center gap-1 xl:gap-2 2xl:gap-6 pointer-events-auto overflow-hidden" onMouseLeave={() => setHovered(null)}>
-              <NavIconLink icon={Home} label={t('center')} isActive={indicatorKey === 'about'} onClick={() => scrollToSection('#about')} onHover={() => setHovered('about')} />
-              <NavIconDropdown icon={Stethoscope} label={t('specialties')} isActive={indicatorKey === 'specialties'} onHover={() => setHovered('specialties')} onClick={() => scrollToSection('#specialties')} poles={navPoles} locale={locale} />
-              <NavIconLink icon={Activity} label={t('equipment')} isActive={indicatorKey === 'equipements'} onClick={() => scrollToSection('#equipements')} onHover={() => setHovered('equipements')} />
-              <NavIconLink icon={Users} label={t('doctors')} isActive={indicatorKey === 'medecins'} onClick={() => scrollToSection('#medecins')} onHover={() => setHovered('medecins')} />
-              <NavIconLink icon={Info} label={t('faq')} isActive={indicatorKey === 'faq'} onClick={() => scrollToSection('#faq')} onHover={() => setHovered('faq')} />
-              <NavIconLink icon={Mail} label={t('contact')} isActive={indicatorKey === 'contact'} onClick={() => scrollToSection('#contact')} onHover={() => setHovered('contact')} />
+            <nav className="flex flex-1 min-w-0 items-center justify-center gap-1 xl:gap-2 2xl:gap-6 pointer-events-auto relative" onMouseLeave={() => setHovered(null)}>
+              <NavIconLink id="about" icon={Home} label={t('center')} indicatorKey={indicatorKey} activeTab={activeTab} onClick={() => scrollToSection('#about')} onHover={() => setHovered('about')} />
+              <NavIconDropdown id="specialties" icon={Stethoscope} label={t('specialties')} indicatorKey={indicatorKey} activeTab={activeTab} onHover={() => setHovered('specialties')} onClick={() => scrollToSection('#specialties')} poles={navPoles} locale={locale} />
+              <NavIconLink id="equipements" icon={Activity} label={t('equipment')} indicatorKey={indicatorKey} activeTab={activeTab} onClick={() => scrollToSection('#equipements')} onHover={() => setHovered('equipements')} />
+              <NavIconLink id="medecins" icon={Users} label={t('doctors')} indicatorKey={indicatorKey} activeTab={activeTab} onClick={() => scrollToSection('#medecins')} onHover={() => setHovered('medecins')} />
+              <NavIconLink id="faq" icon={Info} label={t('faq')} indicatorKey={indicatorKey} activeTab={activeTab} onClick={() => scrollToSection('#faq')} onHover={() => setHovered('faq')} />
+              <NavIconLink id="contact" icon={Mail} label={t('contact')} indicatorKey={indicatorKey} activeTab={activeTab} onClick={() => scrollToSection('#contact')} onHover={() => setHovered('contact')} />
             </nav>
           </div>
 
@@ -629,10 +722,6 @@ export default function Header({ siteSettings, poles }: HeaderProps) {
               <div className="flex-1 w-full h-full bg-[#051124] relative overflow-hidden flex gap-[2px] p-[1px]">
                 {/* Panel 1 */}
                 <div className="flex-1 h-full border border-[#1a3a60] relative overflow-hidden bg-[#030d1c]">
-                   {/* Logo Clinique */}
-                   <div className="absolute top-[2px] left-[2px] z-10 opacity-70">
-                     <img src="/logo.png" alt="Clinique Okba" className="w-[6px] h-[6px] object-contain drop-shadow-[0_0_2px_rgba(255,255,255,0.5)]" />
-                   </div>
                    <svg className="absolute inset-0 w-full h-full opacity-60" viewBox="0 0 100 100" preserveAspectRatio="none">
                     <path d="M0,50 Q25,30 50,50 T100,50" fill="none" stroke="#4898f2" strokeWidth="2" />
                   </svg>
@@ -643,6 +732,13 @@ export default function Header({ siteSettings, poles }: HeaderProps) {
                     <path d="M0,50 Q25,70 50,50 T100,50" fill="none" stroke="#4898f2" strokeWidth="2" />
                   </svg>
                 </div>
+                {/* Logo Clinique (recadré sur l'icône) — affiché au centre de l'écran du moniteur */}
+                <div className="pointer-events-none absolute inset-0 z-20 flex items-center justify-center">
+                  <div className="relative h-[22px] w-[22px] overflow-hidden rounded-full drop-shadow-[0_0_4px_rgba(120,200,255,0.7)]">
+                    <img src="/logo-main.png" alt="Clinique Okba" className="absolute top-0 left-0 w-full h-full object-cover scale-[1.75] origin-top opacity-95" />
+                  </div>
+                </div>
+
                 {/* Barre de menu basse */}
                 <div className="absolute bottom-0 left-0 right-0 h-[4px] bg-[#0a192f] flex justify-around items-center px-[2px]">
                   <div className="w-[3px] h-[1px] bg-white/40" />
@@ -733,6 +829,10 @@ export default function Header({ siteSettings, poles }: HeaderProps) {
             </span>
           </button>
 
+          {/* ══ INTRO « OKBA » — jaillit du bore, s'assemble, se rétracte ══ */}
+          <GantryWordmark variant="desktop" />
+
+        </div>
         </div>
       </header>
 
@@ -757,8 +857,8 @@ export default function Header({ siteSettings, poles }: HeaderProps) {
             >
               <div className="flex items-center justify-between">
                 <div className="flex min-w-0 items-center gap-3">
-                  <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-full bg-white/15 ring-1 ring-white/20">
-                    <Image src="/logo.png" alt="Clinique OKBA" fill sizes="32px" className="object-contain p-1.5" />
+                  <div className="relative h-[48px] w-[48px] shrink-0 overflow-hidden rounded-full bg-[#006633] shadow-md ring-2 ring-white/80">
+                    <Image src="/logo-main.png" alt="Clinique OKBA" fill sizes="48px" className="object-cover scale-[1.75] origin-top" />
                   </div>
                   <div className="min-w-0">
                     <p className="truncate text-[13px] font-black uppercase leading-none tracking-tight text-white">
@@ -782,6 +882,11 @@ export default function Header({ siteSettings, poles }: HeaderProps) {
             {/* ── Corps défilant ── */}
             <div className="flex-1 overflow-y-auto overscroll-contain">
               <div className="px-4 pt-3 pb-6">
+
+                {/* Recherche */}
+                <div className="mb-3">
+                  <SiteSearch locale={locale} sections={searchSections} variant="inline" />
+                </div>
 
                 {/* Urgences */}
                 {utilPhone && (
@@ -959,28 +1064,40 @@ function MenuSettings() {
   )
 }
 
-function NavIconLink({ icon: Icon, label, isActive, onClick, onHover }: any) {
+function NavIconLink({ icon: Icon, label, id, indicatorKey, activeTab, onClick, onHover }: any) {
+  const isHighlighted = indicatorKey === id;
+  const isCurrent = activeTab === id;
   return (
     <button
       onClick={onClick}
       onMouseEnter={onHover}
       onFocus={onHover}
       className={cn(
-        'group relative flex flex-row items-center gap-1 rounded-xl px-2 py-1.5 transition-all duration-300 hover:-translate-y-0.5 focus-visible:outline-none whitespace-nowrap',
-        isActive ? 'text-[#006633]' : 'text-gray-600 hover:text-[#006633]'
+        'group relative flex flex-row items-center gap-1.5 rounded-full px-3 py-2 transition-all duration-300 focus-visible:outline-none whitespace-nowrap',
+        isHighlighted ? 'text-[#006633]' : 'text-gray-600 hover:text-[#006633]'
       )}
     >
-      <Icon className="w-3.5 h-3.5 stroke-[2px] shrink-0" />
-      <span className="text-[9px] md:text-[10px] xl:text-[11px] font-extrabold tracking-wide uppercase truncate">{label}</span>
-      {isActive && (
-        <span className="absolute -bottom-1 left-2 right-2 h-[2px] bg-[#006633] rounded-full shadow-[0_0_4px_rgba(0,102,51,0.6)]" />
+      {isHighlighted && (
+        <motion.div
+          layoutId="nav-indicator"
+          className="absolute inset-0 rounded-full bg-[#006633]/10 dark:bg-[#00a651]/15"
+          initial={false}
+          transition={{ type: 'spring', stiffness: 400, damping: 30 }}
+        />
+      )}
+      <Icon className="relative z-10 w-4 h-4 stroke-[2px] shrink-0" />
+      <span className="relative z-10 text-[10px] md:text-[11px] xl:text-[12px] font-extrabold tracking-wide uppercase truncate">{label}</span>
+      {isCurrent && !isHighlighted && (
+        <span className="absolute -bottom-1 left-4 right-4 h-[2px] bg-[#006633]/40 rounded-full" />
       )}
     </button>
   )
 }
 
-function NavIconDropdown({ icon: Icon, label, isActive, onHover, onClick, poles, locale }: any) {
+function NavIconDropdown({ icon: Icon, label, id, indicatorKey, activeTab, onHover, onClick, poles, locale }: any) {
   const [open, setOpen] = useState(false)
+  const isHighlighted = indicatorKey === id || open;
+  const isCurrent = activeTab === id;
   return (
     <div
       className="relative flex justify-center"
@@ -997,14 +1114,22 @@ function NavIconDropdown({ icon: Icon, label, isActive, onHover, onClick, poles,
         }}
         onFocus={onHover}
         className={cn(
-          'group relative flex flex-row items-center gap-1 rounded-xl px-2 py-1.5 transition-all duration-300 hover:-translate-y-0.5 focus-visible:outline-none whitespace-nowrap',
-          isActive || open ? 'text-[#006633]' : 'text-gray-600 hover:text-[#006633]'
+          'group relative flex flex-row items-center gap-1.5 rounded-full px-3 py-2 transition-all duration-300 focus-visible:outline-none whitespace-nowrap',
+          isHighlighted ? 'text-[#006633]' : 'text-gray-600 hover:text-[#006633]'
         )}
       >
-        <Icon className="w-3.5 h-3.5 stroke-[2px] shrink-0" />
-        <span className="text-[9px] md:text-[10px] xl:text-[11px] font-extrabold tracking-wide uppercase truncate">{label}</span>
-        {(isActive || open) && (
-          <span className="absolute -bottom-1 left-2 right-2 h-[2px] bg-[#006633] rounded-full shadow-[0_0_4px_rgba(0,102,51,0.6)]" />
+        {isHighlighted && (
+          <motion.div
+            layoutId="nav-indicator"
+            className="absolute inset-0 rounded-full bg-[#006633]/10 dark:bg-[#00a651]/15"
+            initial={false}
+            transition={{ type: 'spring', stiffness: 400, damping: 30 }}
+          />
+        )}
+        <Icon className="relative z-10 w-4 h-4 stroke-[2px] shrink-0" />
+        <span className="relative z-10 text-[10px] md:text-[11px] xl:text-[12px] font-extrabold tracking-wide uppercase truncate">{label}</span>
+        {isCurrent && !isHighlighted && (
+          <span className="absolute -bottom-1 left-4 right-4 h-[2px] bg-[#006633]/40 rounded-full" />
         )}
       </button>
 
@@ -1016,27 +1141,34 @@ function NavIconDropdown({ icon: Icon, label, isActive, onHover, onClick, poles,
             exit={{ opacity: 0, y: 10, scale: 0.95 }}
             className="absolute top-full left-1/2 -translate-x-1/2 pt-4 w-[280px] z-50"
           >
-            <div className="overflow-hidden rounded-xl bg-white shadow-xl ring-1 ring-black/5 p-2">
-              <div className="grid grid-cols-1 gap-1">
+            <div className="overflow-hidden rounded-xl bg-white/95 backdrop-blur-md shadow-[0_10px_40px_rgba(0,102,51,0.08)] ring-1 ring-black/5 p-2 border-t-[3px] border-[#006633] dark:bg-slate-900/95 dark:border-[#00a651]">
+              <div className="grid grid-cols-1 gap-1 relative z-10">
                 {poles.map((pole: any) => {
                   const PoleIcon = POLE_ICONS[pole.iconName] || Stethoscope
                   return (
                     <Link
                       key={pole.slug}
                       href={`/${locale}/poles/${pole.slug}`}
-                      className="group/item flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors duration-200 hover:bg-gray-50"
+                      className="group/item flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition-all duration-200 hover:bg-[#006633]/5 dark:hover:bg-white/5"
                       onClick={() => setOpen(false)}
                     >
                       <span
-                        className="flex h-8 w-8 items-center justify-center rounded-md text-white shadow-sm"
+                        className="flex h-8 w-8 items-center justify-center rounded-md text-white shadow-sm transition-transform group-hover/item:scale-110"
                         style={{ backgroundColor: pole.accent }}
                       >
                         <PoleIcon className="h-4 w-4" />
                       </span>
-                      <span className="font-bold text-gray-800">{pole.title}</span>
+                      <span className="font-bold text-gray-800 transition-colors group-hover/item:text-[#006633] dark:text-gray-200 dark:group-hover/item:text-[#00a651]">{pole.title}</span>
                     </Link>
                   )
                 })}
+              </div>
+              
+              {/* Filigrane identité visuelle dans le menu déroulant */}
+              <div className="absolute right-0 bottom-0 pointer-events-none opacity-[0.03] dark:opacity-[0.06] translate-x-1/4 translate-y-1/4">
+                 <svg width="150" height="150" viewBox="0 0 64 64" fill="currentColor" className="text-[#006633] dark:text-[#00a651]">
+                    <path d="M32 0 L64 16 L64 48 L32 64 L0 48 L0 16 Z" />
+                 </svg>
               </div>
             </div>
           </motion.div>

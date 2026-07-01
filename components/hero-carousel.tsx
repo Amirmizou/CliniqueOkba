@@ -275,9 +275,6 @@ export default function HeroCarousel({ slides: rawSlides = [], siteSettings, sec
                 <div className="grid w-full items-center gap-10 lg:grid-cols-12">
                     {/* Colonne texte */}
                     <div className="lg:col-span-7">
-                        {/* Logo animé (motion graphic) — masqué sur mobile (déjà présent dans le header) */}
-                        <AnimatedLogo className="mb-6 hidden sm:block" size={96} />
-
                         {/* Badge (fixe) */}
                         <motion.div
                             initial={{ opacity: 0, y: 12 }}

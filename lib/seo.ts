@@ -92,7 +92,7 @@ export const generateStructuredData = () => {
     alternateName: 'Clinique OKBA Constantine',
     description,
     url: baseUrl,
-    logo: `${baseUrl}/logo.png`,
+    logo: `${baseUrl}/logo-main.png`,
     image: `${baseUrl}/uploads/hero/1763826628906-Gemini_Generated_Image_ubdtr0ubdtr0ubdt.png`,
     telephone:
       process.env.NEXT_PUBLIC_CONTACT_PHONE ||
