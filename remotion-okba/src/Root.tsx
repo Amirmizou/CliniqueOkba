@@ -2,10 +2,21 @@ import './index.css'
 import { Composition } from 'remotion'
 import { OkbaLogo } from './OkbaLogo'
 import { ClinicBackdrop } from './ClinicBackdrop'
+import { ClinicDrone3D } from './ClinicDrone3D'
 
 export const RemotionRoot: React.FC = () => {
   return (
     <>
+      {/* Survol drone 3D — vraies photos transformées en relief 3D (12 s) */}
+      <Composition
+        id="ClinicDrone3D"
+        component={ClinicDrone3D}
+        durationInFrames={360}
+        fps={30}
+        width={1920}
+        height={1080}
+      />
+
       {/* Fond cinématique de la clinique (vraies photos, 2.5D) — section À propos
           • 360 f @ 30 fps = 12 s : aérien → façade rue → entrée, fondus enchaînés
       */}
