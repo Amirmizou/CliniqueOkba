@@ -42,7 +42,7 @@ import Image from 'next/image'
 import { motion, AnimatePresence, useScroll, useMotionValueEvent } from 'framer-motion'
 import { cn } from '@/lib/utils'
 import { poles as localPoles } from '@/data/poles'
-import GantryWordmark from '@/components/gantry-wordmark'
+import LogoReveal from '@/components/logo-reveal'
 import SiteSearch from '@/components/site-search'
 import Link from 'next/link'
 import { useRouter, usePathname } from 'next/navigation'
@@ -304,9 +304,13 @@ export default function Header({ siteSettings, poles }: HeaderProps) {
         {/* LOGO CENTRÉ DANS LA MARGE GAUCHE (Desktop) */}
         <div className="absolute inset-y-0 left-0 w-[calc(50vw-640px)] hidden xl:flex items-center justify-center pointer-events-auto z-[100]">
           <a href={homeHref} className="group relative block">
-            <div className="relative h-[100px] w-[100px] 2xl:h-[140px] 2xl:w-[140px] flex items-center justify-center">
-              <Image src="/logo-main.png" alt="Clinique OKBA" fill sizes="(max-width: 1536px) 100px, 140px" className="object-contain" priority />
-            </div>
+            <LogoReveal
+              src="/logo-main.png"
+              alt="Clinique OKBA"
+              sizes="(max-width: 1536px) 100px, 140px"
+              lab
+              className="h-[100px] w-[100px] transition-transform duration-300 group-hover:scale-105 2xl:h-[140px] 2xl:w-[140px]"
+            />
           </a>
         </div>
 
@@ -418,9 +422,13 @@ export default function Header({ siteSettings, poles }: HeaderProps) {
             {/* Logo + marque — prend tout l'espace disponible (plus de troncature) */}
             {/* Logo (sans texte HTML car inclus dans l'image) */}
             <a href={homeHref} className="group relative z-10 flex min-w-0 flex-1 items-center gap-2.5">
-              <div className="relative h-[56px] w-[56px] shrink-0 transition-transform duration-300 group-active:scale-95 rounded-xl bg-white shadow-sm ring-1 ring-gray-200 overflow-hidden">
-                <Image src="/logo-main.png" alt="Logo Clinique OKBA" fill sizes="56px" className="object-cover p-1" />
-              </div>
+              <LogoReveal
+                src="/logo-main.png"
+                alt="Logo Clinique OKBA"
+                sizes="56px"
+                imageClassName="object-cover p-1"
+                className="h-[56px] w-[56px] shrink-0 overflow-hidden rounded-xl bg-white shadow-sm ring-1 ring-gray-200 transition-transform duration-300 group-active:scale-95"
+              />
             </a>
 
             {/* Contrôles — menu + mini-scanner RDV (langue dispo dans le menu) */}
@@ -482,9 +490,6 @@ export default function Header({ siteSettings, poles }: HeaderProps) {
                 {/* Halo vert au tap/focus + micro-badge RDV */}
                 <span aria-hidden="true" className="absolute right-0 top-1/2 h-[54px] w-[54px] -translate-y-1/2 rounded-full transition-all duration-300 group-active:shadow-[0_0_0_2px_rgba(0,102,51,0.55),0_0_16px_rgba(0,255,136,0.45)] group-focus-visible:shadow-[0_0_0_2px_rgba(0,102,51,0.6)]" />
                 <span aria-hidden="true" className="absolute right-[3px] top-[3px] z-10 rounded-[2px] bg-[#006633] px-[3px] py-[1px] text-[6px] font-extrabold uppercase leading-none tracking-[0.12em] text-white shadow-sm">RDV</span>
-
-                {/* Intro « OKBA » — jaillit du mini-bore */}
-                <GantryWordmark variant="mobile" />
               </button>
             </div>
           </div>
@@ -640,16 +645,10 @@ export default function Header({ siteSettings, poles }: HeaderProps) {
             <div className="absolute right-[1px] top-[72px] w-[30px] h-[7px] overflow-hidden rounded-l-[1px] shadow-[inset_0_1px_2px_rgba(255,255,255,0.35)]" style={{ background: 'linear-gradient(90deg,#004d26 0%,#006633 42%,#00a651 100%)' }} />
           </div>
 
-          {/* ══ BADGE RDV — s'efface pendant l'intro « OKBA » puis revient ══ */}
-          <motion.div
-            className="absolute z-[45] pointer-events-none"
-            style={{ right:'22px', bottom:'66px' }}
-            initial={{ opacity: 1 }}
-            animate={{ opacity: [1, 0, 0, 1] }}
-            transition={{ duration: 3.9, times: [0, 0.08, 0.85, 1], ease: 'easeInOut' }}
-          >
+          {/* ══ BADGE RDV ══ */}
+          <div className="absolute z-[45] pointer-events-none" style={{ right:'22px', bottom:'66px' }}>
             <div className="bg-[#006633] text-white px-1.5 py-[1px] rounded-[2px] shadow-sm text-[7px] font-extrabold tracking-[0.15em] uppercase">RDV</div>
-          </motion.div>
+          </div>
 
           {/* ══ PLATEAU PATIENT - BASE TÉLESCOPIQUE ══ */}
           <div className={cn("absolute z-[5] pointer-events-none origin-right", isHidden ? "translate-x-[200px] opacity-0 transition-all duration-[2000ms] ease-in-out" : "translate-x-0 opacity-100 transition-all duration-[1500ms] delay-[400ms] ease-out")} style={{
@@ -837,9 +836,6 @@ export default function Header({ siteSettings, poles }: HeaderProps) {
               {t('appointment')}
             </span>
           </button>
-
-          {/* ══ INTRO « OKBA » — jaillit du bore, s'assemble, se rétracte ══ */}
-          <GantryWordmark variant="desktop" />
 
         </div>
         </div>
