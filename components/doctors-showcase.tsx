@@ -454,6 +454,57 @@ function PosterLightbox({
 }
 
 /* -------------------------------------------------------------------------- */
+/*  Lightbox vidéo                                                            */
+/* -------------------------------------------------------------------------- */
+
+function VideoLightbox({
+  doctor,
+  onClose,
+}: {
+  doctor: Doctor
+  onClose: () => void
+}) {
+  const tc = useTranslations('common')
+  const videoUrl = doctor.videos?.[0]
+  if (!videoUrl) return null
+
+  return (
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      onClick={onClose}
+      className="fixed inset-0 z-[100] flex items-center justify-center bg-black/90 p-4 backdrop-blur-md"
+    >
+      <button
+        type="button"
+        onClick={onClose}
+        aria-label={tc('close')}
+        className="absolute right-5 top-5 z-[110] flex h-11 w-11 items-center justify-center rounded-full bg-white/15 text-white backdrop-blur-md transition-colors hover:bg-white/30"
+      >
+        <X className="h-5 w-5" />
+      </button>
+
+      <motion.div
+        initial={{ scale: 0.9, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        exit={{ scale: 0.9, opacity: 0 }}
+        transition={{ type: 'spring', stiffness: 220, damping: 24 }}
+        onClick={(e) => e.stopPropagation()}
+        className="relative w-full max-w-5xl aspect-video overflow-hidden rounded-2xl shadow-2xl bg-black"
+      >
+        <UniversalPlayer
+          url={videoUrl}
+          playing={true}
+          controls={true}
+          className="h-full w-full object-contain bg-black"
+        />
+      </motion.div>
+    </motion.div>
+  )
+}
+
+/* -------------------------------------------------------------------------- */
 
 /*  Section principale                                                         */
 /* -------------------------------------------------------------------------- */
@@ -473,14 +524,11 @@ export default function DoctorsShowcase({ data, sectionContent }: { data?: any[]
   const locale = useLocale()
   const isAr = locale === 'ar'
   const [active, setActive] = useState<Doctor | null>(null)
+  const [activeVideo, setActiveVideo] = useState<Doctor | null>(null)
   const list = resolveDoctors(data, locale)
   
   const handlePlayVideo = (doctor: Doctor) => {
-    window.dispatchEvent(new CustomEvent('select-doctor-video', { detail: { doctorId: doctor.id } }))
-    const videosSection = document.getElementById('videos')
-    if (videosSection) {
-      videosSection.scrollIntoView({ behavior: 'smooth' })
-    }
+    setActiveVideo(doctor)
   }
   
   const sectionAccent = sectionContent?.accentColor || '#006633'
@@ -570,6 +618,7 @@ export default function DoctorsShowcase({ data, sectionContent }: { data?: any[]
       {/* Lightbox affiche */}
       <AnimatePresence>
         {active && <PosterLightbox doctor={active} onClose={() => setActive(null)} />}
+        {activeVideo && <VideoLightbox doctor={activeVideo} onClose={() => setActiveVideo(null)} />}
       </AnimatePresence>
     </section>
   )
