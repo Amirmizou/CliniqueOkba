@@ -104,6 +104,12 @@ for (const d of doctors) {
   }
 }
 
+/* Dictionnaire local par nom : sert à COMPLÉTER une fiche Sanity dont certains
+   champs (spécialité, prestations…) ne sont pas encore renseignés. On ne
+   remplit que ce qui manque — Sanity reste prioritaire quand il est rempli. */
+const LOCAL_BY_NAME = new Map<string, Doctor>()
+for (const d of doctors) LOCAL_BY_NAME.set(normalizeKey(d.name), d)
+
 /* Traduit en arabe un médecin déjà résolu, via les dictionnaires FR → AR.
    Si une valeur est déjà en arabe (Sanity localisé) ou inconnue, on la garde. */
 function toArabic(doc: Doctor): Doctor {
@@ -141,25 +147,30 @@ function resolveDoctors(data: any[] | undefined, locale: string): Doctor[] {
   const base: Doctor[] =
     !data || data.length === 0
       ? doctors
-      : data.map((d, i) => ({
-          id: d._id || String(i),
-          name: [d.title, d.name].filter(Boolean).join(' ').trim() || d.name,
-          specialty: d.specialty || '',
-          subtitle: d.subtitle || undefined,
-          services: Array.isArray(d.services) ? d.services : [],
-          experience: d.experience || undefined,
-          customBadge: d.customBadge || undefined,
-          customBadge_ar: d.customBadge_ar || undefined,
-          days: d.consultationDays || '',
-          hours: d.consultationHours || '',
-          poster: d.image ? urlFor(d.image).width(620).height(827).url() : '',
-          icon: ICONS[d.iconName] || Stethoscope,
-          accent: d.accentColor || '#006633',
-          gradient: '',
-          videos: Array.isArray(d.videos)
-            ? d.videos.map(sanitizeVideoUrl).filter(Boolean) as string[]
-            : [],
-        }))
+      : data.map((d, i) => {
+          // Complément local (par nom) pour les champs non renseignés dans Sanity.
+          const local = LOCAL_BY_NAME.get(normalizeKey(d.name || ''))
+          const sanityServices = Array.isArray(d.services) ? d.services.filter(Boolean) : []
+          return {
+            id: d._id || String(i),
+            name: [d.title, d.name].filter(Boolean).join(' ').trim() || d.name,
+            specialty: d.specialty || local?.specialty || '',
+            subtitle: d.subtitle || local?.subtitle || undefined,
+            services: sanityServices.length > 0 ? sanityServices : (local?.services || []),
+            experience: d.experience || local?.experience || undefined,
+            customBadge: d.customBadge || undefined,
+            customBadge_ar: d.customBadge_ar || undefined,
+            days: d.consultationDays || local?.days || '',
+            hours: d.consultationHours || local?.hours || '',
+            poster: d.image ? urlFor(d.image).width(620).height(827).url() : (local?.poster || ''),
+            icon: ICONS[d.iconName] || local?.icon || Stethoscope,
+            accent: d.accentColor || local?.accent || '#006633',
+            gradient: '',
+            videos: Array.isArray(d.videos)
+              ? d.videos.map(sanitizeVideoUrl).filter(Boolean) as string[]
+              : [],
+          }
+        })
 
   return locale === 'ar' ? base.map(toArabic) : base
 }

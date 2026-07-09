@@ -135,6 +135,16 @@ export const equipements: EquipementItem[] = [
     featured: true,
   },
   {
+    id: 'eq-imagerie-salle-scanner',
+    src: '/images/equipements/scanner-room-imagerie.jpg',
+    category: 'imagerie',
+    title: 'Salle de scanner — Service d’imagerie',
+    title_ar: 'قاعة السكانير — قسم التصوير الطبي',
+    description: 'Salle d’imagerie moderne et apaisante, équipée d’un scanner Siemens Healthineers de dernière génération, avec accompagnement personnalisé du patient.',
+    description_ar: 'قاعة تصوير حديثة ومريحة، مجهزة بجهاز سكانير Siemens Healthineers من الجيل الأحدث، مع مرافقة شخصية للمريض.',
+    featured: true,
+  },
+  {
     id: 'eq-33',
     src: '/images/equipements/eq-33.jpg',
     category: 'imagerie',
