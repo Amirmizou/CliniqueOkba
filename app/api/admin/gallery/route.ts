@@ -1,10 +1,14 @@
 import { NextResponse } from 'next/server'
 import { galleryImages } from '@/data/gallery'
+import { isAuthenticated } from '@/lib/admin/api'
 
 // API en lecture seule - Les images sont configurées dans data/gallery.ts
 // Pour modifier, éditez ce fichier et pushez sur Git
 
 export async function GET() {
+    if (!(await isAuthenticated())) {
+        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
     try {
         // Retourne simplement le tableau statique
         return NextResponse.json(galleryImages)

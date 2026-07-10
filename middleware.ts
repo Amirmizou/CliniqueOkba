@@ -29,35 +29,34 @@ const authMiddleware = withAuth(
 )
 
 export default function middleware(req: NextRequest) {
-  const isAuthRoute = req.nextUrl.pathname.startsWith('/auth')
-  const isAdminRoute = req.nextUrl.pathname.startsWith('/admin')
-  const isStudioRoute = req.nextUrl.pathname.startsWith('/studio')
-  const isAdminDashboard = req.nextUrl.pathname.startsWith('/admin/dashboard') ||
-    req.nextUrl.pathname.startsWith('/admin/api')
+  const { pathname } = req.nextUrl
 
-  // Strip locale from admin routes and redirect to unlocalized /admin
-  const localePrefixMatch = req.nextUrl.pathname.match(/^\/(fr|ar)\/(admin|studio)(.*)$/);
+  // Strip locale from admin/studio routes and redirect to the unlocalized path
+  const localePrefixMatch = pathname.match(/^\/(fr|ar)\/(admin|studio)(.*)$/)
   if (localePrefixMatch) {
-    const newPath = `/${localePrefixMatch[2]}${localePrefixMatch[3]}`;
-    const url = req.nextUrl.clone();
-    url.pathname = newPath;
-    return NextResponse.redirect(url);
+    const url = req.nextUrl.clone()
+    url.pathname = `/${localePrefixMatch[2]}${localePrefixMatch[3]}`
+    return NextResponse.redirect(url)
   }
 
-  // Auth, admin, and studio routes should not be processed by intl middleware
-  if (isAuthRoute || isAdminRoute || isStudioRoute) {
-    // Only apply auth middleware to dashboard
-    if (isAdminDashboard) {
-      return (authMiddleware as any)(req)
-    }
-    // For /admin, /auth, and /studio, no middleware
+  // La page de connexion reste publique
+  if (pathname.startsWith('/auth')) {
     return
   }
 
+  // Tout /admin (dashboard + panneau) et /studio exige une authentification
+  // côté serveur : les non-connectés sont redirigés vers /auth/signin AVANT
+  // que la page ne se rende (défense au-delà du contrôle client).
+  if (pathname.startsWith('/admin') || pathname.startsWith('/studio')) {
+    return (authMiddleware as any)(req)
+  }
+
+  // Pages publiques → internationalisation
   return intlMiddleware(req)
 }
 
 export const config = {
-  // Match only internationalized pathnames, exclude auth, admin, and studio routes
-  matcher: ['/((?!api|auth|admin|studio|_next|.*\\..*).*)', '/studio/:path*']
+  // Traite toutes les pages sauf les API, les assets Next et les fichiers.
+  // /admin et /studio sont désormais inclus pour être protégés par NextAuth.
+  matcher: ['/((?!api|_next|.*\\..*).*)'],
 }

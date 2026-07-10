@@ -23,15 +23,11 @@ function SignInForm() {
         setError('')
         setIsLoading(true)
 
-        console.log('📝 Form submitted with password:', password ? '***' : 'empty')
-
         try {
             const result = await signIn('credentials', {
                 password,
                 redirect: false,
             })
-
-            console.log('🔄 SignIn result:', result)
 
             if (result?.error) {
                 setError('Mot de passe incorrect')
