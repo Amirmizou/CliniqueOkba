@@ -31,10 +31,26 @@ export const metadata = {
 async function ArticlesList({ locale }: { locale: string }) {
     const t = await getTranslations('news')
     const dateLocale = locale === 'ar' ? 'ar-DZ' : 'fr-FR'
+    let articles: Article[] = []
     try {
-        const articles: Article[] = localizeSanityData(await getArticles(), locale)
+        articles = localizeSanityData(await getArticles(), locale)
+    } catch (error) {
+        console.error('Error loading articles:', error)
+        return (
+            <div className="text-center py-16">
+                <div className="bg-destructive/10 rounded-2xl p-12 max-w-lg mx-auto">
+                    <p className="text-destructive text-lg font-semibold mb-2">
+                        {t('errorTitle')}
+                    </p>
+                    <p className="text-muted-foreground text-sm">
+                        {t('loadError')}
+                    </p>
+                </div>
+            </div>
+        )
+    }
 
-        if (!articles || articles.length === 0) {
+    if (!articles || articles.length === 0) {
             return (
                 <div className="text-center py-16">
                     <div className="bg-muted/30 rounded-2xl p-12 max-w-lg mx-auto">
@@ -109,21 +125,6 @@ async function ArticlesList({ locale }: { locale: string }) {
                 ))}
             </div>
         )
-    } catch (error) {
-        console.error('Error loading articles:', error)
-        return (
-            <div className="text-center py-16">
-                <div className="bg-destructive/10 rounded-2xl p-12 max-w-lg mx-auto">
-                    <p className="text-destructive text-lg font-semibold mb-2">
-                        {t('errorTitle')}
-                    </p>
-                    <p className="text-muted-foreground text-sm">
-                        {t('loadError')}
-                    </p>
-                </div>
-            </div>
-        )
-    }
 }
 
 export default async function ActualitesPage({

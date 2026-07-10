@@ -143,7 +143,7 @@ export default function About({ data, sectionContent }: AboutProps) {
             <div className='from-secondary/30 to-primary/20 absolute inset-0 bg-gradient-to-br z-10'></div>
             <Image
               loader={sanityImageLoader}
-              src={data?.image ? urlFor(data.image).url() : '/uploads/hero/1763826628906-Gemini_Generated_Image_ubdtr0ubdtr0ubdt.png'}
+              src={data?.image ? urlFor(data.image).url() : '/uploads/hero/hero-facade.webp'}
               alt={data?.title || 'Façade architecturale moderne de la Clinique OKBA située à Constantine, Ali Mendjeli'}
               className='h-full w-full object-cover'
               fill

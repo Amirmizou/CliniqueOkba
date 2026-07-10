@@ -16,7 +16,7 @@ export const galleryImages = [
     },
     {
         id: '3',
-        image: '/uploads/gallery/1763827420029-Gemini_Generated_Image_gzjk7ygzjk7ygzjk.png',
+        image: '/uploads/gallery/gallery-1763827420029.webp',
         caption: 'Vue extérieure',
         category: 'exterior'
     }
