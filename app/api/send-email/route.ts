@@ -24,7 +24,7 @@ export async function POST(request: Request) {
   try {
     const ip = request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || 'unknown';
     
-    const rateLimitResult = emailRateLimiter.check(ip, 5);
+    const rateLimitResult = await emailRateLimiter.check(ip, 5);
     
     if (!rateLimitResult.success) {
       return NextResponse.json(
