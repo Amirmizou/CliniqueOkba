@@ -3,7 +3,8 @@
 import { useState } from 'react'
 import Image from 'next/image'
 import { motion, AnimatePresence } from 'framer-motion'
-import { ShieldCheck, BadgeCheck, ArrowRight, Camera, X, ChevronLeft, ChevronRight } from 'lucide-react'
+import { ShieldCheck, BadgeCheck, ArrowRight, Camera, X, ChevronLeft, ChevronRight, UserPlus } from 'lucide-react'
+import { Link } from '@/navigation'
 import { urlFor } from '@/sanity/lib/image'
 import { AnimatedSection } from '@/components/ui/animated-section'
 import { useLocale, useTranslations } from 'next-intl'
@@ -174,13 +175,22 @@ export default function Insurance({ data }: InsuranceProps) {
               {isAr ? (data.note_ar || data.note) : data.note}
             </p>
           )}
-          <a
-            href="#contact"
-            className="group inline-flex shrink-0 items-center justify-center gap-2 rounded-full bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground shadow-md transition-all duration-300 hover:scale-[1.03] hover:shadow-lg active:scale-95"
-          >
-            {isAr ? (data.ctaText_ar || data.ctaText) : data.ctaText}
-            <ArrowRight className={isAr ? "h-4 w-4 transition-transform group-hover:-translate-x-1 rotate-180" : "h-4 w-4 transition-transform group-hover:translate-x-1"} />
-          </a>
+          <div className="flex shrink-0 flex-col gap-3 sm:flex-row">
+            <a
+              href="#contact"
+              className="group inline-flex items-center justify-center gap-2 rounded-full bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground shadow-md transition-all duration-300 hover:scale-[1.03] hover:shadow-lg active:scale-95"
+            >
+              {isAr ? (data.ctaText_ar || data.ctaText) : data.ctaText}
+              <ArrowRight className={isAr ? "h-4 w-4 transition-transform group-hover:-translate-x-1 rotate-180" : "h-4 w-4 transition-transform group-hover:translate-x-1"} />
+            </a>
+            <Link
+              href="/inscription-beneficiaire"
+              className="group inline-flex items-center justify-center gap-2 rounded-full border border-primary/30 bg-background px-6 py-3 text-sm font-semibold text-primary transition-all duration-300 hover:scale-[1.03] hover:bg-primary/5 active:scale-95"
+            >
+              {isAr ? 'تسجيل المستفيدين' : 'Inscription bénéficiaire'}
+              <UserPlus className="h-4 w-4" />
+            </Link>
+          </div>
         </motion.div>
       </div>
 

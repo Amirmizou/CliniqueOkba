@@ -109,6 +109,15 @@ export const adminSections: AdminSection[] = [
     ready: true,
     group: 'Contenu',
   },
+  {
+    key: 'beneficiaires',
+    label: 'Bénéficiaires',
+    description: 'Inscriptions des organismes conventionnés, liste par organisme.',
+    icon: 'Users',
+    href: '/admin/beneficiaires',
+    ready: true,
+    group: 'Contenu',
+  },
   // --- Configuration ---
   {
     key: 'parametres',
