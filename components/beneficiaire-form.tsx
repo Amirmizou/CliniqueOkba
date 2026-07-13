@@ -250,6 +250,13 @@ export default function BeneficiaireForm({ organismes }: { organismes: string[] 
 
   return (
     <div dir={isRtl ? 'rtl' : 'ltr'}>
+      <style>{`
+        @keyframes beneficiaire-nudge { 0%,100%{transform:translateX(0)} 50%{transform:translateX(5px)} }
+        @keyframes beneficiaire-nudge-rtl { 0%,100%{transform:translateX(0)} 50%{transform:translateX(-5px)} }
+        .beneficiaire-nudge { animation: beneficiaire-nudge 1.1s ease-in-out infinite; }
+        [dir="rtl"] .beneficiaire-nudge { animation-name: beneficiaire-nudge-rtl; }
+        @media (prefers-reduced-motion: reduce) { .beneficiaire-nudge { animation: none; } }
+      `}</style>
       {/* Bascule de langue */}
       <div className="mb-6 flex items-center justify-center gap-2">
         <span className="text-sm text-slate-400">{t('langChoose')} :</span>
@@ -456,44 +463,53 @@ export default function BeneficiaireForm({ organismes }: { organismes: string[] 
         </p>
       )}
 
-      {/* Navigation */}
-      <div className="mt-8 flex items-center justify-between gap-3">
-        {step > 0 ? (
-          <Button type="button" variant="outline" size="lg" onClick={back}>
-            <BackIcon className="me-2 h-5 w-5" />
-            {t('back')}
-          </Button>
-        ) : (
-          <span />
+      {/* Navigation — barre collante en bas pour rester toujours visible */}
+      <div className="sticky bottom-0 z-10 mt-8 border-t border-slate-200 bg-white/95 py-4 backdrop-blur dark:border-slate-800 dark:bg-slate-900/95">
+        {step === 2 && (
+          <button type="button" onClick={next} className="mb-3 block w-full text-center text-base font-medium text-slate-500 hover:text-slate-700 hover:underline dark:text-slate-400">
+            {t('skipStep')}
+          </button>
         )}
-
-        {step < TOTAL_STEPS - 1 ? (
-          <div className="flex items-center gap-2">
-            {step === 2 && (
-              <Button type="button" variant="ghost" size="lg" onClick={next}>
-                {t('skipStep')}
-              </Button>
-            )}
-            <Button type="button" size="lg" onClick={next}>
-              {t('next')}
-              <NextIcon className="ms-2 h-5 w-5" />
+        <div className="flex items-stretch gap-3">
+          {step > 0 && (
+            <Button type="button" variant="outline" size="lg" onClick={back} className="h-14 shrink-0 px-5">
+              <BackIcon className="h-5 w-5" />
+              <span className="hidden sm:inline">{t('back')}</span>
             </Button>
-          </div>
-        ) : (
-          <Button type="button" size="lg" onClick={handleSubmit} disabled={submitting} className="bg-emerald-600 hover:bg-emerald-700">
-            {submitting ? (
-              <>
-                <Loader2 className="me-2 h-5 w-5 animate-spin" />
-                {t('submitting')}
-              </>
-            ) : (
-              <>
-                <Check className="me-2 h-5 w-5" />
-                {t('finish')}
-              </>
-            )}
-          </Button>
-        )}
+          )}
+
+          {step < TOTAL_STEPS - 1 ? (
+            <Button
+              type="button"
+              size="lg"
+              onClick={next}
+              className="h-14 flex-1 text-lg font-bold shadow-lg shadow-emerald-600/30 ring-2 ring-emerald-500/20"
+            >
+              {t('next')}
+              <NextIcon className="beneficiaire-nudge ms-2 h-6 w-6" />
+            </Button>
+          ) : (
+            <Button
+              type="button"
+              size="lg"
+              onClick={handleSubmit}
+              disabled={submitting}
+              className="h-14 flex-1 bg-emerald-600 text-lg font-bold shadow-lg shadow-emerald-600/30 hover:bg-emerald-700"
+            >
+              {submitting ? (
+                <>
+                  <Loader2 className="me-2 h-5 w-5 animate-spin" />
+                  {t('submitting')}
+                </>
+              ) : (
+                <>
+                  <Check className="me-2 h-6 w-6" />
+                  {t('finish')}
+                </>
+              )}
+            </Button>
+          )}
+        </div>
       </div>
     </div>
   )

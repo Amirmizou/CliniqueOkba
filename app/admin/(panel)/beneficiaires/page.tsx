@@ -18,6 +18,7 @@ import {
   XCircle,
   CheckCheck,
   RotateCcw,
+  UserRound,
 } from 'lucide-react'
 import * as Dialog from '@radix-ui/react-dialog'
 
@@ -298,16 +299,36 @@ export default function BeneficiairesPage() {
                   }
                 >
                   <td className="px-4 py-3 font-medium text-slate-800 dark:text-white">
-                    <span className="inline-flex items-center gap-2">
-                      {b.traite && (
-                        <span className="inline-flex items-center gap-1 rounded-full bg-emerald-600 px-1.5 py-0.5 text-[10px] font-semibold uppercase text-white">
-                          <CheckCheck className="h-3 w-3" />
-                          Traité
+                    <div className="flex items-center gap-3">
+                      {b.photoUrl ? (
+                        <a href={b.photoUrl} target="_blank" rel="noreferrer" title="Voir la photo en grand" className="shrink-0">
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img
+                            src={b.photoUrl}
+                            alt={`${b.prenom} ${b.nom}`}
+                            className="h-11 w-11 rounded-full object-cover ring-1 ring-slate-200 transition hover:ring-2 hover:ring-emerald-500 dark:ring-slate-700"
+                          />
+                        </a>
+                      ) : (
+                        <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-slate-100 text-slate-400 dark:bg-slate-800">
+                          <UserRound className="h-5 w-5" />
                         </span>
                       )}
-                      {b.prenom} {b.nom}
-                    </span>
-                    {b.num_assure && <span className="ms-1 text-xs text-slate-400">#{b.num_assure}</span>}
+                      <div className="min-w-0">
+                        <div className="flex items-center gap-2">
+                          {b.traite && (
+                            <span className="inline-flex items-center gap-1 rounded-full bg-emerald-600 px-1.5 py-0.5 text-[10px] font-semibold uppercase text-white">
+                              <CheckCheck className="h-3 w-3" />
+                              Traité
+                            </span>
+                          )}
+                          <span className="truncate">
+                            {b.prenom} {b.nom}
+                          </span>
+                        </div>
+                        {b.num_assure && <span className="text-xs text-slate-400">#{b.num_assure}</span>}
+                      </div>
+                    </div>
                   </td>
                   <td className="px-4 py-3 text-slate-600 dark:text-slate-300">{b.organisme}</td>
                   <td className="px-4 py-3 text-slate-600 dark:text-slate-300">{b.telephone}</td>
