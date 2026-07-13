@@ -19,6 +19,8 @@ interface BeneficiaryRow {
   photo_path: string | null
   document_path: string | null
   status: string
+  traite: boolean
+  traite_at: string | null
   notes_admin: string | null
   created_at: string
 }
@@ -37,6 +39,7 @@ export async function GET(request: Request) {
   const url = new URL(request.url)
   const organisme = url.searchParams.get('organisme') || ''
   const status = url.searchParams.get('status') || ''
+  const traite = url.searchParams.get('traite') || '' // '', 'true', 'false'
   // Nettoyage : on retire les caractères qui ont un sens dans la syntaxe
   // PostgREST .or() (virgules, parenthèses, %, *) pour éviter de casser le filtre.
   const search = (url.searchParams.get('search') || '').replace(/[,()%*]/g, ' ').trim()
@@ -45,6 +48,8 @@ export async function GET(request: Request) {
   let query = supabase.from('beneficiaries').select('*').order('created_at', { ascending: false })
   if (organisme) query = query.eq('organisme', organisme)
   if (status) query = query.eq('status', status)
+  if (traite === 'true') query = query.eq('traite', true)
+  if (traite === 'false') query = query.eq('traite', false)
   if (search) query = query.or(`nom.ilike.%${search}%,prenom.ilike.%${search}%,telephone.ilike.%${search}%`)
 
   const { data, error } = await query
@@ -65,6 +70,8 @@ export async function GET(request: Request) {
       'Adresse',
       'N° assuré',
       'Statut',
+      'Traité',
+      'Date traitement',
       'Membres famille',
       'Date inscription',
     ]
@@ -78,6 +85,8 @@ export async function GET(request: Request) {
         r.adresse,
         r.num_assure,
         r.status,
+        r.traite ? 'Oui' : 'Non',
+        r.traite_at ? new Date(r.traite_at).toLocaleString('fr-FR') : '',
         (r.family_members || [])
           .map((m) => `${m.prenom || ''} ${m.nom || ''} (${m.lien_parente || '—'})`.trim())
           .join(' ; '),
@@ -130,12 +139,16 @@ export async function PATCH(request: Request) {
   if (!supabase) return NextResponse.json({ error: 'Supabase non configuré' }, { status: 503 })
 
   try {
-    const { id, status, notes_admin } = await request.json()
+    const { id, status, notes_admin, traite } = await request.json()
     if (!id) return NextResponse.json({ error: 'ID manquant' }, { status: 400 })
 
     const patch: Record<string, unknown> = {}
     if (status && ['en_attente', 'valide', 'rejete'].includes(status)) patch.status = status
     if (typeof notes_admin === 'string') patch.notes_admin = notes_admin
+    if (typeof traite === 'boolean') {
+      patch.traite = traite
+      patch.traite_at = traite ? new Date().toISOString() : null
+    }
     if (Object.keys(patch).length === 0) return NextResponse.json({ error: 'Rien à modifier' }, { status: 400 })
 
     const { error } = await supabase.from('beneficiaries').update(patch).eq('id', id)

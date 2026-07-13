@@ -32,6 +32,10 @@ create table if not exists public.beneficiaries (
   document_path  text,                            -- chemin dans le bucket "beneficiaires"
   status         text        not null default 'en_attente'
                  check (status in ('en_attente', 'valide', 'rejete')),
+  -- "Traité" : les coordonnées ont été utilisées pour compléter/créer le
+  -- dossier du bénéficiaire dans l'application métier externe.
+  traite         boolean     not null default false,
+  traite_at      timestamptz,
   notes_admin    text,                            -- note interne facultative
   created_at     timestamptz not null default now(),
   updated_at     timestamptz not null default now()
@@ -39,6 +43,7 @@ create table if not exists public.beneficiaries (
 
 create index if not exists beneficiaries_organisme_idx on public.beneficiaries (organisme);
 create index if not exists beneficiaries_status_idx    on public.beneficiaries (status);
+create index if not exists beneficiaries_traite_idx    on public.beneficiaries (traite);
 create index if not exists beneficiaries_created_idx   on public.beneficiaries (created_at desc);
 
 -- Maintien de updated_at

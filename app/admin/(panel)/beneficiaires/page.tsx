@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { useToast } from '@/components/admin/ui'
@@ -16,6 +16,8 @@ import {
   CheckCircle2,
   Clock,
   XCircle,
+  CheckCheck,
+  RotateCcw,
 } from 'lucide-react'
 import * as Dialog from '@radix-ui/react-dialog'
 
@@ -36,6 +38,8 @@ interface Beneficiary {
   num_assure: string | null
   family_members: Member[]
   status: string
+  traite: boolean
+  traite_at: string | null
   notes_admin: string | null
   created_at: string
   photoUrl: string | null
@@ -50,6 +54,12 @@ const STATUS: Record<string, { label: string; cls: string; icon: any }> = {
 
 const inputCls =
   'rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-800 outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 dark:border-slate-700 dark:bg-slate-800 dark:text-white'
+
+const TRAITE_TABS: { key: string; label: string }[] = [
+  { key: '', label: 'Tous' },
+  { key: 'false', label: 'À traiter' },
+  { key: 'true', label: 'Traités' },
+]
 
 function StatusBadge({ status }: { status: string }) {
   const s = STATUS[status] || STATUS.en_attente
@@ -68,33 +78,43 @@ export default function BeneficiairesPage() {
   const [loading, setLoading] = useState(true)
   const [organisme, setOrganisme] = useState('')
   const [status, setStatus] = useState('')
+  const [traiteFilter, setTraiteFilter] = useState('')
   const [search, setSearch] = useState('')
   const [detail, setDetail] = useState<Beneficiary | null>(null)
-  const { toast } = useToast()
+  const { toast, ToastView } = useToast()
 
-  const load = useCallback(async () => {
-    setLoading(true)
-    try {
-      const qs = new URLSearchParams()
-      if (organisme) qs.set('organisme', organisme)
-      if (status) qs.set('status', status)
-      if (search.trim()) qs.set('search', search.trim())
-      const res = await fetch(`/api/admin/beneficiaires?${qs.toString()}`)
-      if (!res.ok) throw new Error()
-      const json = await res.json()
-      setList(json.beneficiaries || [])
-      setByOrganisme(json.byOrganisme || {})
-    } catch {
-      toast({ title: 'Erreur', description: 'Impossible de charger les bénéficiaires.', variant: 'destructive' })
-    } finally {
-      setLoading(false)
-    }
-  }, [organisme, status, search, toast])
-
+  // Chargement (debouncé). Ne dépend que des filtres primitifs : c'est ce qui
+  // évite la boucle de rafraîchissement (le `toast` de useToast n'est pas stable
+  // entre les rendus, il ne doit donc PAS figurer dans les dépendances).
   useEffect(() => {
-    const id = setTimeout(load, 300)
-    return () => clearTimeout(id)
-  }, [load])
+    let cancelled = false
+    const timer = setTimeout(async () => {
+      setLoading(true)
+      try {
+        const qs = new URLSearchParams()
+        if (organisme) qs.set('organisme', organisme)
+        if (status) qs.set('status', status)
+        if (traiteFilter) qs.set('traite', traiteFilter)
+        if (search.trim()) qs.set('search', search.trim())
+        const res = await fetch(`/api/admin/beneficiaires?${qs.toString()}`)
+        if (!res.ok) throw new Error()
+        const json = await res.json()
+        if (cancelled) return
+        setList(json.beneficiaries || [])
+        setByOrganisme(json.byOrganisme || {})
+      } catch {
+        if (!cancelled)
+          toast({ title: 'Erreur', description: 'Impossible de charger les bénéficiaires.', variant: 'destructive' })
+      } finally {
+        if (!cancelled) setLoading(false)
+      }
+    }, 300)
+    return () => {
+      cancelled = true
+      clearTimeout(timer)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [organisme, status, traiteFilter, search])
 
   const changeStatus = async (id: string, newStatus: string) => {
     try {
@@ -107,6 +127,31 @@ export default function BeneficiairesPage() {
       setList((l) => l.map((b) => (b.id === id ? { ...b, status: newStatus } : b)))
       setDetail((d) => (d && d.id === id ? { ...d, status: newStatus } : d))
       toast({ title: 'Statut mis à jour' })
+    } catch {
+      toast({ title: 'Erreur', description: 'Échec de la mise à jour.', variant: 'destructive' })
+    }
+  }
+
+  const toggleTraite = async (id: string, value: boolean) => {
+    try {
+      const res = await fetch('/api/admin/beneficiaires', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id, traite: value }),
+      })
+      if (!res.ok) throw new Error()
+      const now = value ? new Date().toISOString() : null
+      // Si un filtre "À traiter"/"Traités" est actif et que la ligne ne
+      // correspond plus, on la retire de la vue ; sinon on la met à jour.
+      const dropFromView =
+        (traiteFilter === 'false' && value === true) || (traiteFilter === 'true' && value === false)
+      setList((l) =>
+        dropFromView
+          ? l.filter((b) => b.id !== id)
+          : l.map((b) => (b.id === id ? { ...b, traite: value, traite_at: now } : b)),
+      )
+      setDetail((d) => (d && d.id === id ? { ...d, traite: value, traite_at: now } : d))
+      toast({ title: value ? 'Marqué comme traité' : 'Rétabli — à traiter' })
     } catch {
       toast({ title: 'Erreur', description: 'Échec de la mise à jour.', variant: 'destructive' })
     }
@@ -133,6 +178,7 @@ export default function BeneficiairesPage() {
     const qs = new URLSearchParams({ format: 'csv' })
     if (organisme) qs.set('organisme', organisme)
     if (status) qs.set('status', status)
+    if (traiteFilter) qs.set('traite', traiteFilter)
     window.open(`/api/admin/beneficiaires?${qs.toString()}`, '_blank')
   }
 
@@ -189,6 +235,24 @@ export default function BeneficiairesPage() {
             className={`${inputCls} w-full ps-8`}
           />
         </div>
+
+        {/* Filtre segmenté Traité */}
+        <div className="inline-flex rounded-lg border border-slate-200 bg-slate-50 p-0.5 dark:border-slate-700 dark:bg-slate-800">
+          {TRAITE_TABS.map((tab) => (
+            <button
+              key={tab.key}
+              onClick={() => setTraiteFilter(tab.key)}
+              className={`rounded-md px-3 py-1.5 text-sm font-medium transition ${
+                traiteFilter === tab.key
+                  ? 'bg-white text-emerald-700 shadow-sm dark:bg-slate-950 dark:text-emerald-400'
+                  : 'text-slate-500 hover:text-slate-700 dark:text-slate-400'
+              }`}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </div>
+
         <select value={status} onChange={(e) => setStatus(e.target.value)} className={inputCls}>
           <option value="">Tous les statuts</option>
           <option value="en_attente">En attente</option>
@@ -225,9 +289,24 @@ export default function BeneficiairesPage() {
             </thead>
             <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
               {list.map((b) => (
-                <tr key={b.id} className="bg-white hover:bg-slate-50 dark:bg-slate-950 dark:hover:bg-slate-900">
+                <tr
+                  key={b.id}
+                  className={
+                    b.traite
+                      ? 'bg-emerald-50/60 hover:bg-emerald-50 dark:bg-emerald-950/20 dark:hover:bg-emerald-950/30'
+                      : 'bg-white hover:bg-slate-50 dark:bg-slate-950 dark:hover:bg-slate-900'
+                  }
+                >
                   <td className="px-4 py-3 font-medium text-slate-800 dark:text-white">
-                    {b.prenom} {b.nom}
+                    <span className="inline-flex items-center gap-2">
+                      {b.traite && (
+                        <span className="inline-flex items-center gap-1 rounded-full bg-emerald-600 px-1.5 py-0.5 text-[10px] font-semibold uppercase text-white">
+                          <CheckCheck className="h-3 w-3" />
+                          Traité
+                        </span>
+                      )}
+                      {b.prenom} {b.nom}
+                    </span>
                     {b.num_assure && <span className="ms-1 text-xs text-slate-400">#{b.num_assure}</span>}
                   </td>
                   <td className="px-4 py-3 text-slate-600 dark:text-slate-300">{b.organisme}</td>
@@ -239,6 +318,16 @@ export default function BeneficiairesPage() {
                   <td className="px-4 py-3 text-slate-500">{new Date(b.created_at).toLocaleDateString('fr-FR')}</td>
                   <td className="px-4 py-3">
                     <div className="flex items-center justify-end gap-1">
+                      <Button
+                        variant={b.traite ? 'default' : 'ghost'}
+                        size="icon-sm"
+                        onClick={() => toggleTraite(b.id, !b.traite)}
+                        aria-label={b.traite ? 'Rétablir (à traiter)' : 'Marquer comme traité'}
+                        title={b.traite ? 'Rétablir (à traiter)' : 'Marquer comme traité'}
+                        className={b.traite ? 'bg-emerald-600 hover:bg-emerald-700' : 'text-emerald-600'}
+                      >
+                        {b.traite ? <RotateCcw className="h-4 w-4" /> : <CheckCheck className="h-4 w-4" />}
+                      </Button>
                       <Button variant="ghost" size="icon-sm" onClick={() => setDetail(b)} aria-label="Détails">
                         <Eye className="h-4 w-4" />
                       </Button>
@@ -263,8 +352,14 @@ export default function BeneficiairesPage() {
               <>
                 <div className="mb-4 flex items-start justify-between gap-3">
                   <div>
-                    <Dialog.Title className="text-xl font-bold text-slate-800 dark:text-white">
+                    <Dialog.Title className="flex items-center gap-2 text-xl font-bold text-slate-800 dark:text-white">
                       {detail.prenom} {detail.nom}
+                      {detail.traite && (
+                        <span className="inline-flex items-center gap-1 rounded-full bg-emerald-600 px-2 py-0.5 text-[11px] font-semibold uppercase text-white">
+                          <CheckCheck className="h-3 w-3" />
+                          Traité
+                        </span>
+                      )}
                     </Dialog.Title>
                     <p className="text-sm text-slate-500">{detail.organisme}</p>
                   </div>
@@ -276,6 +371,29 @@ export default function BeneficiairesPage() {
                   <Info label="E-mail" value={detail.email} />
                   <Info label="N° assuré" value={detail.num_assure} />
                   <Info label="Adresse" value={detail.adresse} />
+                </div>
+
+                {/* Traitement */}
+                <div className="mt-5 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-slate-200 bg-slate-50 p-4 dark:border-slate-800 dark:bg-slate-800/40">
+                  <div>
+                    <p className="text-sm font-medium text-slate-700 dark:text-slate-200">Traitement du dossier</p>
+                    <p className="text-xs text-slate-500">
+                      {detail.traite
+                        ? `Traité le ${detail.traite_at ? new Date(detail.traite_at).toLocaleString('fr-FR') : ''}`
+                        : "Données pas encore reportées dans l'application métier."}
+                    </p>
+                  </div>
+                  {detail.traite ? (
+                    <Button size="sm" variant="outline" onClick={() => toggleTraite(detail.id, false)}>
+                      <RotateCcw className="me-1.5 h-4 w-4" />
+                      Rétablir (à traiter)
+                    </Button>
+                  ) : (
+                    <Button size="sm" onClick={() => toggleTraite(detail.id, true)} className="bg-emerald-600 hover:bg-emerald-700">
+                      <CheckCheck className="me-1.5 h-4 w-4" />
+                      Marquer comme traité
+                    </Button>
+                  )}
                 </div>
 
                 {/* Membres */}
@@ -367,6 +485,8 @@ export default function BeneficiairesPage() {
           </Dialog.Content>
         </Dialog.Portal>
       </Dialog.Root>
+
+      <ToastView />
     </div>
   )
 }
