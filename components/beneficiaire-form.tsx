@@ -35,6 +35,28 @@ const emptyMember = (): FamilyMember => ({ nom: '', prenom: '', date_naissance: 
 const ARABIC_RE = /[؀-ۿݐ-ݿࢠ-ࣿﭐ-﷿ﹰ-﻿]/g
 const stripArabic = (v: string) => v.replace(ARABIC_RE, '')
 
+// La convention « Promotion Dembri » (parfois orthographiée Dambri) regroupe les
+// acquéreurs ; la résidence/îlot est une sous-catégorie choisie ensuite.
+const isDembri = (o: string) => {
+  const s = (o || '').toLowerCase()
+  return s.includes('dembri') || s.includes('dambri')
+}
+
+// Résidences des acquéreurs de la Promotion Dembri (sous-catégories).
+const DEMBRI_RESIDENCES = [
+  'RESIDENCE MALIKA GAID 292/1448 ILOT 01',
+  'RESIDENCE MALIKA GAID 162/1448 ILOT 02',
+  'RESIDENCE MALIKA GAID 357/1448 ILOT 3A',
+  'RESIDENCE MALIKA GAID 227/1448 ILOT 3B',
+  'RESIDENCE MALIKA GAID 208/1448 ILOT 04',
+  'RESIDENCE MALIKA GAID 177/1448 ILOT 05',
+  'RESIDENCE MALIKA GAID 246/1448 ILOT 06',
+  'RESIDENCE MERIEM 138-UV20',
+  'RESIDENCE MERIEM 147-UV20',
+  'RESIDENCE MERIEM 269-UV.20',
+  'LOGEMENT L.S.P 529/609 UV.18',
+]
+
 const inputClass =
   'w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-base text-slate-800 outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 dark:border-slate-700 dark:bg-slate-800 dark:text-white'
 const labelClass = 'mb-1.5 block text-base font-medium text-slate-700 dark:text-slate-200'
@@ -197,7 +219,7 @@ export default function BeneficiaireForm({ organismes }: { organismes: string[] 
     setLockedOrganisme(match)
     // On ne saute l'étape organisme que si le dossier est complet : DAMBRI
     // exige un projet dédié, donc on ne saute pas si le projet manque.
-    const needsProjet = match.toLowerCase().includes('dambri')
+    const needsProjet = isDembri(match)
     if (!needsProjet || projetParam) {
       setStep(1)
       setMinStep(1)
@@ -211,8 +233,8 @@ export default function BeneficiaireForm({ organismes }: { organismes: string[] 
   const next = () => {
     setError('')
     if (step === 0 && !form.organisme) return setError(t('errorOrganisme'))
-    if (step === 0 && form.organisme.toLowerCase().includes('dambri') && !form.projet_dedie) {
-      return setError(isRtl ? 'يرجى اختيار المشروع' : 'Veuillez sélectionner le projet dédié')
+    if (step === 0 && isDembri(form.organisme) && !form.projet_dedie) {
+      return setError(isRtl ? 'يرجى اختيار الإقامة' : 'Veuillez sélectionner votre résidence')
     }
     if (step === 1 && (!form.prenom || !form.nom || !form.telephone)) return setError(t('errorRequired'))
     if (step === 2 && !form.situation_familiale) return setError(t('errorSituation'))
@@ -231,7 +253,7 @@ export default function BeneficiaireForm({ organismes }: { organismes: string[] 
   const selectOrganisme = (o: string) => {
     setError('')
     set('organisme', o)
-    if (!o.toLowerCase().includes('dambri')) {
+    if (!isDembri(o)) {
       setStep(1)
       goTop()
     }
@@ -423,10 +445,10 @@ export default function BeneficiaireForm({ organismes }: { organismes: string[] 
               ))
             )}
             
-            {form.organisme.toLowerCase().includes('dambri') && (
+            {isDembri(form.organisme) && (
               <div className="mt-4 rounded-xl border border-emerald-200 bg-emerald-50/50 p-4 dark:border-emerald-900/50 dark:bg-emerald-950/20">
                 <label className={labelClass} htmlFor="projet_dedie">
-                  {isRtl ? 'المشروع المخصص' : 'Projet dédié'} <span className="text-red-500">*</span>
+                  {isRtl ? 'الإقامة' : 'Votre résidence'} <span className="text-red-500">*</span>
                 </label>
                 <select
                   id="projet_dedie"
@@ -434,17 +456,18 @@ export default function BeneficiaireForm({ organismes }: { organismes: string[] 
                   value={form.projet_dedie}
                   onChange={(e) => selectProjet(e.target.value)}
                 >
-                  <option value="">{isRtl ? 'اختر المشروع...' : 'Sélectionnez le projet...'}</option>
-                  <option value="Résidence Malika Gaid - Ilot 1">Résidence Malika Gaid - Ilot 1</option>
-                  <option value="Résidence Malika Gaid - Ilot 2">Résidence Malika Gaid - Ilot 2</option>
-                  <option value="Résidence Malika Gaid - Ilot 3B">Résidence Malika Gaid - Ilot 3B</option>
-                  <option value="Résidence Malika Gaid - Ilot 4">Résidence Malika Gaid - Ilot 4</option>
-                  <option value="Résidence Malika Gaid - Ilot 5">Résidence Malika Gaid - Ilot 5</option>
-                  <option value="Résidence Malika Gaid - Ilot 6">Résidence Malika Gaid - Ilot 6</option>
-                  <option value="Autre">Autre</option>
+                  <option value="">{isRtl ? 'اختر الإقامة...' : 'Sélectionnez votre résidence...'}</option>
+                  {DEMBRI_RESIDENCES.map((r) => (
+                    <option key={r} value={r}>
+                      {r}
+                    </option>
+                  ))}
+                  <option value="Autre">{isRtl ? 'أخرى' : 'Autre'}</option>
                 </select>
                 <p className="mt-2 text-sm text-slate-500">
-                  {isRtl ? 'اختر المشروع الذي تنتمي إليه.' : 'Sélectionnez le projet auquel vous appartenez.'}
+                  {isRtl
+                    ? 'اختر الإقامة التي تنتمي إليها ضمن ترقية دمبري.'
+                    : 'Sélectionnez la résidence à laquelle vous appartenez (acquéreurs de la Promotion Dembri).'}
                 </p>
               </div>
             )}
