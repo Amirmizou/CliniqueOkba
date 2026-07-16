@@ -8,6 +8,7 @@ dotenv.config({ path: '.env' })
 
 import { poles } from '../data/poles'
 import { equipements } from '../data/equipements'
+import { doctors } from '../data/doctors'
 
 const client = createClient({
     projectId: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID,
@@ -266,6 +267,99 @@ async function run() {
             console.log(`  ✅ Synchronized equipment & photo: ${eq.title}`)
         } catch (error: any) {
             console.error(`  ❌ Error processing equipment ${eq.title}:`, error.message)
+        }
+    }
+
+    // 5. Sync Doctors
+    console.log('\n👨‍⚕️ Synchronizing Doctors...')
+    const existingDoctors = await client.fetch('*[_type == "doctor"]')
+    
+    function getIconName(specialty: string) {
+        const s = specialty.toLowerCase()
+        if (s.includes('gynéco') || s.includes('pédiatre')) return 'Baby'
+        if (s.includes('endocrin')) return 'Activity'
+        if (s.includes('orl')) return 'Ear'
+        if (s.includes('laboratoire')) return 'FlaskConical'
+        if (s.includes('radio')) return 'ScanLine'
+        return 'Stethoscope'
+    }
+    
+    for (let i = 0; i < doctors.length; i++) {
+        const d = doctors[i]
+        try {
+            console.log(`⏳ Processing Doctor: ${d.name}...`)
+            
+            let imageAssetId = null
+            if (d.poster) {
+                const imagePath = path.join(process.cwd(), 'public', d.poster)
+                imageAssetId = await uploadImageCached(imagePath)
+            }
+
+            let title = 'Dr.'
+            let name = d.name
+            const match = d.name.match(/^(Dr\.|Pr\.|Prof\.|Docteur|Professeur)\s+(.*)/i)
+            if (match) {
+                title = match[1]
+                name = match[2]
+            }
+
+            let title_ar = d.name_ar?.startsWith('د.') ? 'د.' : d.name_ar?.startsWith('أ.د.') ? 'أ.د.' : ''
+            let name_ar = d.name_ar || ''
+            if (title_ar) {
+                name_ar = name_ar.replace(title_ar, '').trim()
+            }
+
+            const patchData: any = {
+                title,
+                name,
+                title_ar,
+                name_ar,
+                slug: { _type: 'slug', current: d.id },
+                specialty: d.specialty,
+                specialty_ar: d.specialty_ar,
+                subtitle: d.subtitle,
+                subtitle_ar: d.subtitle_ar,
+                experience: d.experience,
+                experience_ar: d.experience_ar,
+                services: d.services,
+                services_ar: d.services_ar,
+                customBadge: d.customBadge,
+                customBadge_ar: d.customBadge_ar,
+                consultationDays: d.days,
+                consultationDays_ar: d.days_ar,
+                consultationHours: d.hours,
+                consultationHours_ar: d.hours_ar,
+                accentColor: d.accent,
+                iconName: getIconName(d.specialty),
+                phone: (d as any).phone,
+                order: i,
+                active: true,
+            }
+
+            if (imageAssetId) {
+                patchData.image = {
+                    _type: 'image',
+                    asset: {
+                        _type: 'reference',
+                        _ref: imageAssetId,
+                    },
+                }
+            }
+
+            const existing = existingDoctors.find((ed: any) => ed.slug?.current === d.id)
+            if (existing) {
+                await client.patch(existing._id).set(patchData).commit()
+                console.log(`  ✅ Doctor patched: ${d.name}`)
+            } else {
+                await client.create({
+                    _id: `doctor-${d.id}`,
+                    _type: 'doctor',
+                    ...patchData,
+                })
+                console.log(`  ✅ Doctor created: ${d.name}`)
+            }
+        } catch (error: any) {
+            console.error(`  ❌ Error processing doctor ${d.name}:`, error.message)
         }
     }
 

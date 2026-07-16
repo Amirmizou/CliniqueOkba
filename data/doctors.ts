@@ -5,7 +5,6 @@ import {
   Baby,
   Activity,
   Stethoscope,
-  Ear,
   FlaskConical,
   ScanLine,
   type LucideIcon,
@@ -47,6 +46,8 @@ export interface Doctor {
   gradient: string
   /** Vidéos de présentation (liens YouTube / Facebook / MP4) */
   videos?: string[]
+  /** Numéro de téléphone spécifique au médecin ou service (optionnel) */
+  phone?: string
 }
 
 export const doctors: Doctor[] = [
@@ -179,46 +180,13 @@ export const doctors: Doctor[] = [
     gradient: 'from-blue-600 via-blue-500 to-indigo-500',
   },
   {
-    id: 'boughanout-seyfeddine',
-    name: 'Dr. Boughanout Seyfeddine',
-    name_ar: 'د. بوغانوت سيف الدين',
-    specialty: 'ORL',
-    specialty_ar: 'أنف وأذن وحنجرة',
-    subtitle: 'Chirurgie de l’oreille, du nez, de la gorge, de la face & du cou',
-    subtitle_ar: 'جراحة الأذن والأنف والحنجرة والوجه والرقبة',
-    services: [
-      'Traitement des allergies & vertiges',
-      'Audiométrie & tympanométrie',
-      'Endoscopie de l’oreille & du nez',
-      'Chirurgie des amygdales & végétations',
-      'Chirurgie de la thyroïde, glandes salivaires & lymphatiques',
-      'Chirurgie endoscopique',
-    ],
-    services_ar: [
-      'علاج الحساسية والدوار',
-      'قياس السمع والطبلة',
-      'تنظير الأذن والأنف',
-      'جراحة اللوزتين واللحمية',
-      'جراحة الغدة الدرقية والغدد اللعابية واللمفاوية',
-      'الجراحة بالمنظار',
-    ],
-    days: 'Du samedi au mercredi',
-    days_ar: 'من السبت إلى الأربعاء',
-    hours: '08h00 – 16h00',
-    hours_ar: 'من 08:00 إلى 16:00',
-    poster: '/images/spec/portrait-boughanout-seyfeddine.jpeg',
-    icon: Ear,
-    accent: '#F97316',
-    gradient: 'from-orange-500 via-orange-400 to-yellow-500',
-  },
-  {
     id: 'latreche-khadidja',
     name: 'Dr. Latreche Khadidja',
     name_ar: 'د. لطرش خديجة',
     specialty: 'Médecin radiologue',
     specialty_ar: 'طبيبة أشعة',
-    subtitle: 'Imagerie médicale & radiologie',
-    subtitle_ar: 'التصوير الطبي والأشعة',
+    subtitle: 'Spécialiste en imagerie médicale & radiologie',
+    subtitle_ar: 'أخصائية في التصوير الطبي والأشعة',
     services: [
       'IRM 1,5T',
       'Scanner',
@@ -241,6 +209,7 @@ export const doctors: Doctor[] = [
     days_ar: 'من السبت إلى الخميس',
     hours: '08h00 – 16h00',
     hours_ar: 'من 08:00 إلى 16:00',
+    phone: '0560782767',
     poster: '/images/spec/portrait-latreche-khadidja.jpg',
     icon: ScanLine,
     accent: '#3B82F6',
@@ -252,8 +221,8 @@ export const doctors: Doctor[] = [
     name_ar: 'د. فردي رانيا نهاد',
     specialty: 'Médecin radiologue',
     specialty_ar: 'طبيبة أشعة',
-    subtitle: 'Imagerie médicale & radiologie',
-    subtitle_ar: 'التصوير الطبي والأشعة',
+    subtitle: 'Spécialiste en imagerie médicale & radiologie',
+    subtitle_ar: 'أخصائية في التصوير الطبي والأشعة',
     services: [
       'IRM 1,5T',
       'Scanner',
@@ -276,6 +245,7 @@ export const doctors: Doctor[] = [
     days_ar: 'من السبت إلى الخميس',
     hours: '08h00 – 16h00',
     hours_ar: 'من 08:00 إلى 16:00',
+    phone: '0560782767',
     poster: '/images/spec/portrait-ferdi-rania-nihed.jpg',
     icon: ScanLine,
     accent: '#3B82F6',

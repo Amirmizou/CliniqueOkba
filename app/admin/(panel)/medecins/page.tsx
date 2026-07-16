@@ -77,7 +77,10 @@ export default function MedecinsEditor() {
     if (!confirm(`Supprimer ${d.name || 'ce médecin'} ?`)) return
     if (d._id) {
       const res = await fetch(`/api/admin/doctors?id=${d._id}`, { method: 'DELETE' })
-      if (!res.ok) return notify('Suppression échouée', false)
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        return notify(`Suppression échouée: ${err.details || err.error || ''}`, false)
+      }
     }
     setList((prev) => prev.filter((_, idx) => idx !== i))
     notify('Supprimé')

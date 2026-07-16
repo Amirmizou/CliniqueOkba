@@ -22,8 +22,28 @@ import {
   Stethoscope,
   Ear,
   Heart,
+  HeartPulse,
   Smile,
   FlaskConical,
+  Brain,
+  Bone,
+  Eye,
+  ScanLine,
+  Microscope,
+  TestTube,
+  Dna,
+  Droplet,
+  Wind,
+  Pill,
+  Syringe,
+  Scissors,
+  Cross,
+  Thermometer,
+  Hand,
+  Ribbon,
+  Accessibility,
+  PersonStanding,
+  Footprints,
   type LucideIcon,
 } from 'lucide-react'
 import { doctors, CLINIC_WHATSAPP, CLINIC_PHONE, type Doctor } from '@/data/doctors'
@@ -58,15 +78,36 @@ function DoctorLabCover({ label }: { label: string }) {
   )
 }
 
-// Résolution des icônes Sanity (chaîne -> composant Lucide)
+// Résolution des icônes Sanity (chaîne -> composant Lucide).
+// Couvre toutes les spécialités proposées dans le schéma Sanity (doctor.iconName).
 const ICONS: Record<string, LucideIcon> = {
   Baby,
   Activity,
   Stethoscope,
   Ear,
   Heart,
+  HeartPulse,
   Smile,
   FlaskConical,
+  Brain,
+  Bone,
+  Eye,
+  ScanLine,
+  Microscope,
+  TestTube,
+  Dna,
+  Droplet,
+  Wind,
+  Pill,
+  Syringe,
+  Scissors,
+  Cross,
+  Thermometer,
+  Hand,
+  Ribbon,
+  Accessibility,
+  PersonStanding,
+  Footprints,
 }
 
 /* Normalise un libellé pour la correspondance FR → AR (insensible à la casse,
@@ -149,19 +190,34 @@ function resolveDoctors(data: any[] | undefined, locale: string): Doctor[] {
       ? doctors
       : data.map((d, i) => {
           // Complément local (par nom) pour les champs non renseignés dans Sanity.
-          const local = LOCAL_BY_NAME.get(normalizeKey(d.name || ''))
-          const sanityServices = Array.isArray(d.services) ? d.services.filter(Boolean) : []
+          const normalizedSanityName = normalizeKey(d.name || '')
+          let local = LOCAL_BY_NAME.get(normalizedSanityName)
+          if (!local && normalizedSanityName.length > 2) {
+            local = Array.from(LOCAL_BY_NAME.values()).find((doc) => {
+              const localName = normalizeKey(doc.name)
+              if (localName.includes(normalizedSanityName) || normalizedSanityName.includes(localName)) return true
+              // Correspondance par mot-clé (ex: "Ferdi Nihed" matchera "Ferdi Rania Nihed")
+              const sanityTokens = normalizedSanityName.split(' ').filter(Boolean)
+              const localTokens = localName.split(' ').filter(Boolean)
+              return sanityTokens.some(t => t.length > 2 && localTokens.includes(t))
+            })
+          }
+
+          const sanityServices = Array.isArray(d.services)
+            ? d.services.filter((s: unknown) => typeof s === 'string' && s.trim().length > 0)
+            : []
+            
           return {
             id: d._id || String(i),
             name: [d.title, d.name].filter(Boolean).join(' ').trim() || d.name,
-            specialty: d.specialty || local?.specialty || '',
-            subtitle: d.subtitle || local?.subtitle || undefined,
+            specialty: (d.specialty || '').trim() || local?.specialty || '',
+            subtitle: (d.subtitle || '').trim() || local?.subtitle || undefined,
             services: sanityServices.length > 0 ? sanityServices : (local?.services || []),
-            experience: d.experience || local?.experience || undefined,
-            customBadge: d.customBadge || undefined,
-            customBadge_ar: d.customBadge_ar || undefined,
-            days: d.consultationDays || local?.days || '',
-            hours: d.consultationHours || local?.hours || '',
+            experience: (d.experience || '').trim() || local?.experience || undefined,
+            customBadge: (d.customBadge || '').trim() || undefined,
+            customBadge_ar: (d.customBadge_ar || '').trim() || undefined,
+            days: (d.consultationDays || '').trim() || local?.days || '',
+            hours: (d.consultationHours || '').trim() || local?.hours || '',
             poster: d.image ? urlFor(d.image).width(620).height(827).url() : (local?.poster || ''),
             icon: ICONS[d.iconName] || local?.icon || Stethoscope,
             accent: d.accentColor || local?.accent || '#006633',
@@ -169,6 +225,7 @@ function resolveDoctors(data: any[] | undefined, locale: string): Doctor[] {
             videos: Array.isArray(d.videos)
               ? d.videos.map(sanitizeVideoUrl).filter(Boolean) as string[]
               : [],
+            phone: (d.phone || '').trim() || local?.phone,
           }
         })
 
@@ -399,7 +456,7 @@ function DoctorCard({
               {t('bookShort')}
             </a>
             <a
-              href={`tel:${CLINIC_PHONE}`}
+              href={`tel:${doctor.phone || CLINIC_PHONE}`}
               aria-label={t('callFor', { name: doctor.name })}
               className="inline-flex items-center justify-center rounded-xl border px-3 py-2.5 text-foreground/80 transition-colors hover:bg-foreground/5 touch-target min-w-[48px]"
               style={{ borderColor: `${accent}55` }}

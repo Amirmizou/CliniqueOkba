@@ -65,10 +65,13 @@ export async function DELETE(request: Request) {
   try {
     const id = new URL(request.url).searchParams.get('id')
     if (!id) return NextResponse.json({ error: 'id manquant' }, { status: 400 })
-    await writeClient.delete(id)
+    const publishedId = id.replace(/^drafts\./, '')
+    const draftId = `drafts.${publishedId}`
+    await writeClient.transaction().delete(publishedId).delete(draftId).commit()
     revalidateSite()
     return NextResponse.json({ ok: true })
   } catch (e) {
-    return NextResponse.json({ error: 'Échec de la suppression' }, { status: 500 })
+    console.error('Erreur suppression médecin:', e)
+    return NextResponse.json({ error: 'Échec de la suppression', details: e instanceof Error ? e.message : String(e) }, { status: 500 })
   }
 }
