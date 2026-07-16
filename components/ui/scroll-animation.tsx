@@ -1,8 +1,26 @@
 "use client"
 
-import { motion, useInView, Variant } from "framer-motion"
-import { useRef } from "react"
-import { cn } from "@/lib/utils"
+import { motion, Variant } from "framer-motion"
+
+// Composants motion pré-créés HORS rendu. Créer un composant motion pendant le
+// rendu (motion.create/motion()) génère un nouveau type à chaque render, ce qui
+// force React à démonter/remonter tout le sous-arbre (perte de focus dans les
+// formulaires, animations qui rejouent). On mappe donc les balises supportées.
+const MOTION_TAGS = {
+    div: motion.div,
+    section: motion.section,
+    article: motion.article,
+    span: motion.span,
+    ul: motion.ul,
+    li: motion.li,
+    header: motion.header,
+    footer: motion.footer,
+    nav: motion.nav,
+    aside: motion.aside,
+    p: motion.p,
+} as const
+
+type MotionTag = keyof typeof MOTION_TAGS
 
 type AnimationVariant =
     | "fadeUp"
@@ -24,7 +42,7 @@ interface ScrollAnimationProps {
         margin?: string
         amount?: number | "some" | "all"
     }
-    as?: React.ElementType
+    as?: MotionTag
 }
 
 const variants: Record<string, Record<string, Variant>> = {
@@ -65,9 +83,10 @@ export default function ScrollAnimation({
     delay = 0,
     duration = 0.5,
     viewport = { once: true, margin: "-50px" },
-    as: Component = "div"
+    as = "div"
 }: ScrollAnimationProps) {
-    const MotionComponent = motion.create(Component)
+    // Sélection d'un composant motion stable (pré-créé hors rendu).
+    const MotionComponent = MOTION_TAGS[as] ?? MOTION_TAGS.div
 
     return (
         <MotionComponent
