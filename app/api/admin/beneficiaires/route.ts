@@ -15,6 +15,7 @@ interface BeneficiaryRow {
   email: string | null
   adresse: string | null
   num_assure: string | null
+  situation_familiale: string | null
   family_members: Array<{ nom?: string; prenom?: string; date_naissance?: string; lien_parente?: string }>
   photo_path: string | null
   document_path: string | null
@@ -69,6 +70,7 @@ export async function GET(request: Request) {
       'Email',
       'Adresse',
       'N° assuré',
+      'Situation familiale',
       'Statut',
       'Traité',
       'Date traitement',
@@ -84,6 +86,7 @@ export async function GET(request: Request) {
         r.email,
         r.adresse,
         r.num_assure,
+        r.situation_familiale === 'marie' ? 'Marié(e)' : r.situation_familiale === 'celibataire' ? 'Célibataire' : '',
         r.status,
         r.traite ? 'Oui' : 'Non',
         r.traite_at ? new Date(r.traite_at).toLocaleString('fr-FR') : '',

@@ -30,6 +30,11 @@ interface FamilyMember {
 
 const emptyMember = (): FamilyMember => ({ nom: '', prenom: '', date_naissance: '', lien_parente: '' })
 
+// Les nom/prénom doivent rester en caractères latins (français) pour l'app
+// métier : on retire toute lettre arabe saisie, y compris en formulaire arabe.
+const ARABIC_RE = /[؀-ۿݐ-ݿࢠ-ࣿﭐ-﷿ﹰ-﻿]/g
+const stripArabic = (v: string) => v.replace(ARABIC_RE, '')
+
 const inputClass =
   'w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-base text-slate-800 outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 dark:border-slate-700 dark:bg-slate-800 dark:text-white'
 const labelClass = 'mb-1.5 block text-base font-medium text-slate-700 dark:text-slate-200'
@@ -146,6 +151,10 @@ export default function BeneficiaireForm({ organismes }: { organismes: string[] 
   const isRtl = locale === 'ar'
 
   const [step, setStep] = useState(0)
+  // Étape minimale accessible : passe à 1 quand l'organisme est pré-rempli via
+  // un lien partagé (ex. ?org=SEACO), pour sauter l'étape de choix d'organisme.
+  const [minStep, setMinStep] = useState(0)
+  const [lockedOrganisme, setLockedOrganisme] = useState('')
   const [form, setForm] = useState({
     organisme: '',
     nom: '',
@@ -154,6 +163,8 @@ export default function BeneficiaireForm({ organismes }: { organismes: string[] 
     email: '',
     adresse: '',
     num_assure: '',
+    projet_dedie: '',
+    situation_familiale: '',
   })
   const [showMore, setShowMore] = useState(false)
   const [members, setMembers] = useState<FamilyMember[]>([])
@@ -168,30 +179,97 @@ export default function BeneficiaireForm({ organismes }: { organismes: string[] 
   const updateMember = (i: number, k: keyof FamilyMember, v: string) =>
     setMembers((m) => m.map((mem, idx) => (idx === i ? { ...mem, [k]: v } : mem)))
 
+  // Pré-remplissage via lien partagé : ?org=SEACO (ou ?org=SEACO&projet=...).
+  // On lit window.location pour éviter le besoin d'un Suspense (useSearchParams).
+  // Initialisation depuis un système externe (l'URL) au montage uniquement.
+  /* eslint-disable react-hooks/set-state-in-effect */
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search)
+    const orgParam = (params.get('org') || params.get('organisme') || '').trim()
+    if (!orgParam) return
+    const norm = (s: string) => s.toLowerCase().trim()
+    const match =
+      organismes.find((o) => norm(o) === norm(orgParam)) ??
+      organismes.find((o) => norm(o).includes(norm(orgParam)))
+    if (!match) return
+    const projetParam = (params.get('projet') || '').trim()
+    setForm((f) => ({ ...f, organisme: match, projet_dedie: projetParam || f.projet_dedie }))
+    setLockedOrganisme(match)
+    // On ne saute l'étape organisme que si le dossier est complet : DAMBRI
+    // exige un projet dédié, donc on ne saute pas si le projet manque.
+    const needsProjet = match.toLowerCase().includes('dambri')
+    if (!needsProjet || projetParam) {
+      setStep(1)
+      setMinStep(1)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+  /* eslint-enable react-hooks/set-state-in-effect */
+
   const goTop = () => window.scrollTo({ top: 0, behavior: 'smooth' })
 
   const next = () => {
     setError('')
     if (step === 0 && !form.organisme) return setError(t('errorOrganisme'))
+    if (step === 0 && form.organisme.toLowerCase().includes('dambri') && !form.projet_dedie) {
+      return setError(isRtl ? 'يرجى اختيار المشروع' : 'Veuillez sélectionner le projet dédié')
+    }
     if (step === 1 && (!form.prenom || !form.nom || !form.telephone)) return setError(t('errorRequired'))
+    if (step === 2 && !form.situation_familiale) return setError(t('errorSituation'))
     setStep((s) => Math.min(s + 1, TOTAL_STEPS - 1))
     goTop()
   }
   const back = () => {
     setError('')
-    setStep((s) => Math.max(s - 1, 0))
+    setStep((s) => Math.max(s - 1, minStep))
     goTop()
   }
 
+  // Sélection d'un organisme : on avance automatiquement à l'étape suivante
+  // pour éviter de descendre chercher le bouton « Suivant ». DAMBRI a besoin
+  // du projet dédié : on attend alors le choix du projet pour avancer.
+  const selectOrganisme = (o: string) => {
+    setError('')
+    set('organisme', o)
+    if (!o.toLowerCase().includes('dambri')) {
+      setStep(1)
+      goTop()
+    }
+  }
+  const selectProjet = (v: string) => {
+    set('projet_dedie', v)
+    if (v) {
+      setError('')
+      setStep(1)
+      goTop()
+    }
+  }
+
+  // Ajoute un ayant droit avec un lien de parenté pré-rempli (parent, conjoint…).
+  const addMemberWith = (lien: string) =>
+    setMembers((m) => [...m, { ...emptyMember(), lien_parente: lien }])
+
   const resetForm = () => {
-    setForm({ organisme: '', nom: '', prenom: '', telephone: '', email: '', adresse: '', num_assure: '' })
+    // Sur un lien partagé, on garde l'organisme (et le projet) pré-remplis pour
+    // enchaîner les inscriptions sans re-choisir l'organisme à chaque fois.
+    setForm((f) => ({
+      organisme: lockedOrganisme || '',
+      nom: '',
+      prenom: '',
+      telephone: '',
+      email: '',
+      adresse: '',
+      num_assure: '',
+      projet_dedie: lockedOrganisme ? f.projet_dedie : '',
+      situation_familiale: '',
+    }))
     setMembers([])
     setPhoto(null)
     setDocument(null)
     setConsent(false)
     setSuccess(false)
     setError('')
-    setStep(0)
+    setStep(minStep)
   }
 
   const handleSubmit = async () => {
@@ -207,6 +285,8 @@ export default function BeneficiaireForm({ organismes }: { organismes: string[] 
       fd.append('email', form.email)
       fd.append('adresse', form.adresse)
       fd.append('num_assure', form.num_assure)
+      if (form.projet_dedie) fd.append('projet_dedie', form.projet_dedie)
+      if (form.situation_familiale) fd.append('situation_familiale', form.situation_familiale)
       fd.append('family_members', JSON.stringify(members.filter((m) => m.nom.trim() && m.prenom.trim())))
       if (photo) fd.append('photo', photo)
       if (document) fd.append('document', document)
@@ -282,16 +362,27 @@ export default function BeneficiaireForm({ organismes }: { organismes: string[] 
         </div>
       </div>
 
-      {/* Progression */}
+      {/* Organisme pré-sélectionné via un lien partagé */}
+      {lockedOrganisme && minStep > 0 && (
+        <div className="mb-6 flex items-center gap-2.5 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 dark:border-emerald-900 dark:bg-emerald-950/40">
+          <Building2 className="h-5 w-5 shrink-0 text-emerald-600" />
+          <p className="text-sm font-medium text-emerald-800 dark:text-emerald-300">
+            {isRtl ? 'الهيئة' : 'Organisme'} : <span className="font-bold">{lockedOrganisme}</span>
+            {form.projet_dedie ? ` — ${form.projet_dedie}` : ''}
+          </p>
+        </div>
+      )}
+
+      {/* Progression (recalée quand l'étape organisme est sautée via un lien) */}
       <div className="mb-6">
         <div className="mb-2 flex items-center justify-between text-sm font-medium text-slate-500">
-          <span>{t('stepOf', { current: step + 1, total: TOTAL_STEPS })}</span>
-          <span>{Math.round(((step + 1) / TOTAL_STEPS) * 100)}%</span>
+          <span>{t('stepOf', { current: step - minStep + 1, total: TOTAL_STEPS - minStep })}</span>
+          <span>{Math.round(((step - minStep + 1) / (TOTAL_STEPS - minStep)) * 100)}%</span>
         </div>
         <div className="h-2.5 w-full overflow-hidden rounded-full bg-slate-200 dark:bg-slate-800">
           <div
             className="h-full rounded-full bg-emerald-600 transition-all duration-300"
-            style={{ width: `${((step + 1) / TOTAL_STEPS) * 100}%` }}
+            style={{ width: `${((step - minStep + 1) / (TOTAL_STEPS - minStep)) * 100}%` }}
           />
         </div>
       </div>
@@ -319,7 +410,7 @@ export default function BeneficiaireForm({ organismes }: { organismes: string[] 
                 <button
                   key={o}
                   type="button"
-                  onClick={() => set('organisme', o)}
+                  onClick={() => selectOrganisme(o)}
                   className={`flex w-full items-center justify-between rounded-2xl border-2 px-5 py-4 text-start text-lg font-semibold transition ${
                     form.organisme === o
                       ? 'border-emerald-600 bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300'
@@ -331,6 +422,32 @@ export default function BeneficiaireForm({ organismes }: { organismes: string[] 
                 </button>
               ))
             )}
+            
+            {form.organisme.toLowerCase().includes('dambri') && (
+              <div className="mt-4 rounded-xl border border-emerald-200 bg-emerald-50/50 p-4 dark:border-emerald-900/50 dark:bg-emerald-950/20">
+                <label className={labelClass} htmlFor="projet_dedie">
+                  {isRtl ? 'المشروع المخصص' : 'Projet dédié'} <span className="text-red-500">*</span>
+                </label>
+                <select
+                  id="projet_dedie"
+                  className={inputClass}
+                  value={form.projet_dedie}
+                  onChange={(e) => selectProjet(e.target.value)}
+                >
+                  <option value="">{isRtl ? 'اختر المشروع...' : 'Sélectionnez le projet...'}</option>
+                  <option value="Résidence Malika Gaid - Ilot 1">Résidence Malika Gaid - Ilot 1</option>
+                  <option value="Résidence Malika Gaid - Ilot 2">Résidence Malika Gaid - Ilot 2</option>
+                  <option value="Résidence Malika Gaid - Ilot 3B">Résidence Malika Gaid - Ilot 3B</option>
+                  <option value="Résidence Malika Gaid - Ilot 4">Résidence Malika Gaid - Ilot 4</option>
+                  <option value="Résidence Malika Gaid - Ilot 5">Résidence Malika Gaid - Ilot 5</option>
+                  <option value="Résidence Malika Gaid - Ilot 6">Résidence Malika Gaid - Ilot 6</option>
+                  <option value="Autre">Autre</option>
+                </select>
+                <p className="mt-2 text-sm text-slate-500">
+                  {isRtl ? 'اختر المشروع الذي تنتمي إليه.' : 'Sélectionnez le projet auquel vous appartenez.'}
+                </p>
+              </div>
+            )}
           </div>
         )}
 
@@ -341,13 +458,14 @@ export default function BeneficiaireForm({ organismes }: { organismes: string[] 
               <label className={labelClass} htmlFor="prenom">
                 {t('prenom')} <span className="text-red-500">*</span>
               </label>
-              <input id="prenom" className={inputClass} value={form.prenom} onChange={(e) => set('prenom', e.target.value)} />
+              <input id="prenom" dir="ltr" lang="fr" className={inputClass} value={form.prenom} onChange={(e) => set('prenom', stripArabic(e.target.value))} />
             </div>
             <div>
               <label className={labelClass} htmlFor="nom">
                 {t('nom')} <span className="text-red-500">*</span>
               </label>
-              <input id="nom" className={inputClass} value={form.nom} onChange={(e) => set('nom', e.target.value)} />
+              <input id="nom" dir="ltr" lang="fr" className={inputClass} value={form.nom} onChange={(e) => set('nom', stripArabic(e.target.value))} />
+              <p className="mt-1.5 text-sm text-amber-600 dark:text-amber-400">{t('nameLatinHint')}</p>
             </div>
             <div>
               <label className={labelClass} htmlFor="telephone">
@@ -385,33 +503,91 @@ export default function BeneficiaireForm({ organismes }: { organismes: string[] 
           </div>
         )}
 
-        {/* Étape 3 : Famille */}
+        {/* Étape 3 : Situation familiale + ayants droit */}
         {step === 2 && (
-          <div className="space-y-4">
-            {members.map((m, i) => (
-              <div key={i} className="rounded-2xl border border-slate-200 bg-slate-50 p-4 dark:border-slate-700 dark:bg-slate-800/50">
-                <div className="grid gap-3 sm:grid-cols-2">
-                  <input placeholder={t('memberPrenom')} className={inputClass} value={m.prenom} onChange={(e) => updateMember(i, 'prenom', e.target.value)} />
-                  <input placeholder={t('memberNom')} className={inputClass} value={m.nom} onChange={(e) => updateMember(i, 'nom', e.target.value)} />
-                  <input type="date" aria-label={t('dateNaissance')} className={inputClass} value={m.date_naissance} onChange={(e) => updateMember(i, 'date_naissance', e.target.value)} />
-                  <select aria-label={t('lienParente')} className={inputClass} value={m.lien_parente} onChange={(e) => updateMember(i, 'lien_parente', e.target.value)}>
-                    <option value="">{t('lienParente')}</option>
-                    <option value={t('lienConjoint')}>{t('lienConjoint')}</option>
-                    <option value={t('lienEnfant')}>{t('lienEnfant')}</option>
-                    <option value={t('lienParent')}>{t('lienParent')}</option>
-                    <option value={t('lienAutre')}>{t('lienAutre')}</option>
-                  </select>
-                </div>
-                <button type="button" onClick={() => setMembers((arr) => arr.filter((_, idx) => idx !== i))} className="mt-3 inline-flex items-center gap-1.5 text-sm font-medium text-red-600">
-                  <Trash2 className="h-4 w-4" />
-                  {t('removeMember')}
-                </button>
+          <div className="space-y-5">
+            {/* Situation familiale (oriente les ayants droit à saisir) */}
+            <div>
+              <p className={labelClass}>
+                {t('situationLabel')} <span className="text-red-500">*</span>
+              </p>
+              <div className="grid grid-cols-2 gap-3">
+                {[
+                  { key: 'celibataire', label: t('situationCelibataire') },
+                  { key: 'marie', label: t('situationMarie') },
+                ].map((s) => (
+                  <button
+                    key={s.key}
+                    type="button"
+                    onClick={() => {
+                      setError('')
+                      set('situation_familiale', s.key)
+                    }}
+                    className={`rounded-2xl border-2 px-4 py-4 text-base font-semibold transition ${
+                      form.situation_familiale === s.key
+                        ? 'border-emerald-600 bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300'
+                        : 'border-slate-200 bg-white text-slate-700 hover:border-emerald-300 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200'
+                    }`}
+                  >
+                    {s.label}
+                  </button>
+                ))}
               </div>
-            ))}
-            <Button type="button" variant="outline" size="lg" onClick={() => setMembers((m) => [...m, emptyMember()])} className="w-full">
-              <UserPlus className="me-2 h-5 w-5" />
-              {t('addMember')}
-            </Button>
+            </div>
+
+            {form.situation_familiale && (
+              <>
+                <p className="rounded-xl bg-emerald-50 px-4 py-3 text-sm text-emerald-800 dark:bg-emerald-950/30 dark:text-emerald-300">
+                  {form.situation_familiale === 'marie' ? t('ayantsDroitMarie') : t('ayantsDroitCelibataire')}
+                </p>
+                {members.length > 0 && (
+                  <p className="text-sm text-amber-600 dark:text-amber-400">{t('nameLatinHint')}</p>
+                )}
+
+                {members.map((m, i) => (
+                  <div key={i} className="rounded-2xl border border-slate-200 bg-slate-50 p-4 dark:border-slate-700 dark:bg-slate-800/50">
+                    <div className="grid gap-3 sm:grid-cols-2">
+                      <input placeholder={t('memberPrenom')} dir="ltr" lang="fr" className={inputClass} value={m.prenom} onChange={(e) => updateMember(i, 'prenom', stripArabic(e.target.value))} />
+                      <input placeholder={t('memberNom')} dir="ltr" lang="fr" className={inputClass} value={m.nom} onChange={(e) => updateMember(i, 'nom', stripArabic(e.target.value))} />
+                      <input type="date" aria-label={t('dateNaissance')} className={inputClass} value={m.date_naissance} onChange={(e) => updateMember(i, 'date_naissance', e.target.value)} />
+                      <select aria-label={t('lienParente')} className={inputClass} value={m.lien_parente} onChange={(e) => updateMember(i, 'lien_parente', e.target.value)}>
+                        <option value="">{t('lienParente')}</option>
+                        {form.situation_familiale === 'marie' && <option value={t('lienConjoint')}>{t('lienConjoint')}</option>}
+                        {form.situation_familiale === 'marie' && <option value={t('lienEnfant')}>{t('lienEnfant')}</option>}
+                        <option value={t('lienParent')}>{t('lienParent')}</option>
+                        <option value={t('lienAutre')}>{t('lienAutre')}</option>
+                      </select>
+                    </div>
+                    <button type="button" onClick={() => setMembers((arr) => arr.filter((_, idx) => idx !== i))} className="mt-3 inline-flex items-center gap-1.5 text-sm font-medium text-red-600">
+                      <Trash2 className="h-4 w-4" />
+                      {t('removeMember')}
+                    </button>
+                  </div>
+                ))}
+
+                {/* Boutons d'ajout ciblés selon la situation */}
+                <div className="grid gap-2 sm:grid-cols-3">
+                  {form.situation_familiale === 'marie' && (
+                    <Button type="button" variant="outline" size="lg" onClick={() => addMemberWith(t('lienConjoint'))} className="w-full">
+                      <UserPlus className="me-2 h-5 w-5" />
+                      {t('addConjoint')}
+                    </Button>
+                  )}
+                  {form.situation_familiale === 'marie' && (
+                    <Button type="button" variant="outline" size="lg" onClick={() => addMemberWith(t('lienEnfant'))} className="w-full">
+                      <UserPlus className="me-2 h-5 w-5" />
+                      {t('addEnfant')}
+                    </Button>
+                  )}
+                  <Button type="button" variant="outline" size="lg" onClick={() => addMemberWith(t('lienParent'))} className="w-full">
+                    <UserPlus className="me-2 h-5 w-5" />
+                    {t('addParent')}
+                  </Button>
+                </div>
+
+                <p className="text-sm text-slate-500 dark:text-slate-400">{t('ayantsDroitNote')}</p>
+              </>
+            )}
           </div>
         )}
 
@@ -465,13 +641,8 @@ export default function BeneficiaireForm({ organismes }: { organismes: string[] 
 
       {/* Navigation — barre collante en bas pour rester toujours visible */}
       <div className="sticky bottom-0 z-10 mt-8 border-t border-slate-200 bg-white/95 py-4 backdrop-blur dark:border-slate-800 dark:bg-slate-900/95">
-        {step === 2 && (
-          <button type="button" onClick={next} className="mb-3 block w-full text-center text-base font-medium text-slate-500 hover:text-slate-700 hover:underline dark:text-slate-400">
-            {t('skipStep')}
-          </button>
-        )}
         <div className="flex items-stretch gap-3">
-          {step > 0 && (
+          {step > minStep && (
             <Button type="button" variant="outline" size="lg" onClick={back} className="h-14 shrink-0 px-5">
               <BackIcon className="h-5 w-5" />
               <span className="hidden sm:inline">{t('back')}</span>

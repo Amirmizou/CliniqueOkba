@@ -19,6 +19,10 @@ import {
   CheckCheck,
   RotateCcw,
   UserRound,
+  Link2,
+  Copy,
+  Check,
+  ChevronDown,
 } from 'lucide-react'
 import * as Dialog from '@radix-ui/react-dialog'
 
@@ -37,6 +41,8 @@ interface Beneficiary {
   email: string | null
   adresse: string | null
   num_assure: string | null
+  projet_dedie: string | null
+  situation_familiale: string | null
   family_members: Member[]
   status: string
   traite: boolean
@@ -199,6 +205,9 @@ export default function BeneficiairesPage() {
           Exporter CSV
         </Button>
       </div>
+
+      {/* Liens de partage à destination des responsables d'organisme */}
+      <ShareLinks toast={toast} />
 
       {/* Résumé par organisme */}
       {organismes.length > 0 && (
@@ -392,6 +401,17 @@ export default function BeneficiairesPage() {
                   <Info label="E-mail" value={detail.email} />
                   <Info label="N° assuré" value={detail.num_assure} />
                   <Info label="Adresse" value={detail.adresse} />
+                  <Info
+                    label="Situation familiale"
+                    value={
+                      detail.situation_familiale === 'marie'
+                        ? 'Marié(e)'
+                        : detail.situation_familiale === 'celibataire'
+                          ? 'Célibataire'
+                          : null
+                    }
+                  />
+                  {detail.projet_dedie && <Info label="Projet dédié" value={detail.projet_dedie} />}
                 </div>
 
                 {/* Traitement */}
@@ -417,10 +437,13 @@ export default function BeneficiairesPage() {
                   )}
                 </div>
 
-                {/* Membres */}
+                {/* Membres (ayants droit) — à comparer avec la fiche familiale */}
                 <div className="mt-5">
-                  <h3 className="mb-2 text-sm font-semibold text-slate-700 dark:text-slate-200">
-                    Membres de la famille ({detail.family_members?.length || 0})
+                  <h3 className="mb-2 flex flex-wrap items-center gap-2 text-sm font-semibold text-slate-700 dark:text-slate-200">
+                    Ayants droit déclarés ({detail.family_members?.length || 0})
+                    <span className="rounded-full bg-amber-100 px-2 py-0.5 text-[11px] font-medium text-amber-700 dark:bg-amber-950 dark:text-amber-400">
+                      À vérifier avec la fiche familiale
+                    </span>
                   </h3>
                   {detail.family_members?.length ? (
                     <ul className="divide-y divide-slate-100 rounded-lg border border-slate-200 dark:divide-slate-800 dark:border-slate-800">
@@ -509,6 +532,99 @@ export default function BeneficiairesPage() {
 
       <ToastView />
     </div>
+  )
+}
+
+/** Génère et copie des liens d'inscription pré-remplis par organisme, à partager
+ *  avec les responsables (ex. lien SEACO qui saute l'étape de choix d'organisme). */
+function ShareLinks({ toast }: { toast: (o: any) => void }) {
+  const [open, setOpen] = useState(false)
+  const [organismes, setOrganismes] = useState<string[]>([])
+  const [loaded, setLoaded] = useState(false)
+  const [copied, setCopied] = useState<string | null>(null)
+
+  useEffect(() => {
+    if (!open || loaded) return
+    fetch('/api/beneficiaires')
+      .then((r) => r.json())
+      .then((j) => setOrganismes(j.organismes || []))
+      .catch(() => setOrganismes([]))
+      .finally(() => setLoaded(true))
+  }, [open, loaded])
+
+  const buildLink = (o: string) =>
+    `${window.location.origin}/inscription-beneficiaire?org=${encodeURIComponent(o)}`
+
+  const copy = async (o: string) => {
+    const link = buildLink(o)
+    try {
+      await navigator.clipboard.writeText(link)
+      setCopied(o)
+      toast({ title: 'Lien copié', description: o })
+      setTimeout(() => setCopied((c) => (c === o ? null : c)), 2000)
+    } catch {
+      toast({ title: 'Erreur', description: 'Impossible de copier le lien.', variant: 'destructive' })
+    }
+  }
+
+  return (
+    <Card>
+      <CardContent className="p-0">
+        <button
+          onClick={() => setOpen((v) => !v)}
+          className="flex w-full items-center justify-between gap-3 px-4 py-3 text-left"
+        >
+          <span className="flex items-center gap-2 font-medium text-slate-800 dark:text-white">
+            <Link2 className="h-4 w-4 text-emerald-600" />
+            Liens de partage par organisme
+          </span>
+          <ChevronDown className={`h-4 w-4 text-slate-400 transition-transform ${open ? 'rotate-180' : ''}`} />
+        </button>
+
+        {open && (
+          <div className="border-t border-slate-100 px-4 py-4 dark:border-slate-800">
+            <p className="mb-3 text-sm text-slate-500 dark:text-slate-400">
+              Partagez ces liens avec les responsables d&apos;organisme. Le lien pré-sélectionne
+              l&apos;organisme et saute directement à la saisie des informations.
+            </p>
+            {!loaded ? (
+              <div className="flex justify-center py-6">
+                <Loader2 className="h-5 w-5 animate-spin text-emerald-600" />
+              </div>
+            ) : organismes.length === 0 ? (
+              <p className="text-sm text-slate-400">Aucun organisme configuré dans Sanity.</p>
+            ) : (
+              <ul className="space-y-2">
+                {organismes.map((o) => (
+                  <li
+                    key={o}
+                    className="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 dark:border-slate-700 dark:bg-slate-800/50"
+                  >
+                    <div className="min-w-0">
+                      <p className="font-medium text-slate-700 dark:text-slate-200">{o}</p>
+                      <p className="truncate text-xs text-slate-400">{buildLink(o)}</p>
+                    </div>
+                    <Button size="sm" variant={copied === o ? 'default' : 'outline'} onClick={() => copy(o)}>
+                      {copied === o ? (
+                        <>
+                          <Check className="me-1.5 h-4 w-4" />
+                          Copié
+                        </>
+                      ) : (
+                        <>
+                          <Copy className="me-1.5 h-4 w-4" />
+                          Copier le lien
+                        </>
+                      )}
+                    </Button>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+        )}
+      </CardContent>
+    </Card>
   )
 }
 

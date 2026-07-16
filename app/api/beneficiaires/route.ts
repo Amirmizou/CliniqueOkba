@@ -3,8 +3,26 @@ import { z } from 'zod'
 import { Resend } from 'resend'
 import { RateLimiter } from '@/lib/rate-limit'
 import { getSupabaseAdmin, BENEFICIAIRES_BUCKET } from '@/lib/supabase'
+import { getInsuranceSection } from '@/sanity/lib/fetch'
 
 export const dynamic = 'force-dynamic'
+
+// Liste des organismes conventionnés (info publique, déjà visible sur la page
+// d'inscription). Sert à générer les liens de partage côté admin.
+export async function GET() {
+  try {
+    const insurance = await getInsuranceSection()
+    const organismes: string[] = Array.isArray((insurance as any)?.providers)
+      ? (insurance as any).providers
+          .map((p: { name?: string }) => (p?.name || '').trim())
+          .filter((n: string) => n.length > 0)
+      : []
+    return NextResponse.json({ organismes })
+  } catch (e) {
+    console.error('Erreur GET organismes bénéficiaires:', e)
+    return NextResponse.json({ organismes: [] })
+  }
+}
 
 // Un bénéficiaire ne devrait pas soumettre en rafale : 3 / minute / IP.
 const rateLimiter = new RateLimiter({
@@ -33,7 +51,14 @@ const beneficiarySchema = z.object({
   adresse: z.string().trim().max(300).optional().or(z.literal('')),
   num_assure: z.string().trim().max(60).optional().or(z.literal('')),
   family_members: z.array(familyMemberSchema).max(20).default([]),
+  projet_dedie: z.string().trim().max(120).optional().or(z.literal('')),
+  situation_familiale: z.enum(['celibataire', 'marie']).optional().or(z.literal('')),
 })
+
+// Les nom/prénom doivent rester en caractères latins (français) pour l'app
+// métier : on retire toute lettre arabe, même si l'API est appelée directement.
+const ARABIC_RE = /[؀-ۿݐ-ݿࢠ-ࣿﭐ-﷿ﹰ-﻿]/g
+const stripArabic = (s: string) => s.replace(ARABIC_RE, '').replace(/\s{2,}/g, ' ').trim()
 
 function escapeHtml(s: string) {
   return s
@@ -120,6 +145,8 @@ export async function POST(request: Request) {
       email: form.get('email') ?? '',
       adresse: form.get('adresse') ?? '',
       num_assure: form.get('num_assure') ?? '',
+      projet_dedie: form.get('projet_dedie') ?? '',
+      situation_familiale: form.get('situation_familiale') ?? '',
       family_members: familyMembers,
     })
 
@@ -130,6 +157,17 @@ export async function POST(request: Request) {
       )
     }
     const data = parsed.data
+    // Nom/prénom en caractères latins uniquement (bénéficiaire + ayants droit).
+    data.nom = stripArabic(data.nom)
+    data.prenom = stripArabic(data.prenom)
+    data.family_members = data.family_members.map((m) => ({
+      ...m,
+      nom: stripArabic(m.nom),
+      prenom: stripArabic(m.prenom),
+    }))
+    if (!data.nom || !data.prenom) {
+      return NextResponse.json({ error: 'Nom et prénom requis en caractères latins.' }, { status: 400 })
+    }
     const orgSlug = slugify(data.organisme)
 
     // Uploads (optionnels mais fortement recommandés)
@@ -160,6 +198,8 @@ export async function POST(request: Request) {
         email: data.email || null,
         adresse: data.adresse || null,
         num_assure: data.num_assure || null,
+        projet_dedie: data.projet_dedie || null,
+        situation_familiale: data.situation_familiale || null,
         family_members: data.family_members,
         photo_path: photoPath ?? null,
         document_path: documentPath ?? null,

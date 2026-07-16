@@ -25,6 +25,8 @@ create table if not exists public.beneficiaries (
   email          text,
   adresse        text,
   num_assure     text,                            -- matricule / n° d'assuré (optionnel)
+  situation_familiale text                         -- 'celibataire' | 'marie' (oriente les ayants droit)
+                 check (situation_familiale in ('celibataire', 'marie')),
   -- Membres de la famille : tableau d'objets
   -- [{ nom, prenom, date_naissance, lien_parente }]
   family_members jsonb       not null default '[]'::jsonb,
