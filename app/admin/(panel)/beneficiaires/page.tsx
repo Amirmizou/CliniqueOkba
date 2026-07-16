@@ -538,7 +538,7 @@ export default function BeneficiairesPage() {
 /** Génère et copie des liens d'inscription pré-remplis par organisme, à partager
  *  avec les responsables (ex. lien SEACO qui saute l'étape de choix d'organisme). */
 function ShareLinks({ toast }: { toast: (o: any) => void }) {
-  const [open, setOpen] = useState(false)
+  const [open, setOpen] = useState(true)
   const [organismes, setOrganismes] = useState<string[]>([])
   const [loaded, setLoaded] = useState(false)
   const [copied, setCopied] = useState<string | null>(null)
@@ -572,13 +572,13 @@ function ShareLinks({ toast }: { toast: (o: any) => void }) {
       <CardContent className="p-0">
         <button
           onClick={() => setOpen((v) => !v)}
-          className="flex w-full items-center justify-between gap-3 px-4 py-3 text-left"
+          className="flex w-full items-center justify-between gap-3 rounded-t-xl bg-emerald-50 px-4 py-3 text-left dark:bg-emerald-950/30"
         >
-          <span className="flex items-center gap-2 font-medium text-slate-800 dark:text-white">
-            <Link2 className="h-4 w-4 text-emerald-600" />
+          <span className="flex items-center gap-2 text-base font-semibold text-emerald-800 dark:text-emerald-300">
+            <Link2 className="h-5 w-5 text-emerald-600" />
             Liens de partage par organisme
           </span>
-          <ChevronDown className={`h-4 w-4 text-slate-400 transition-transform ${open ? 'rotate-180' : ''}`} />
+          <ChevronDown className={`h-5 w-5 text-emerald-600 transition-transform ${open ? 'rotate-180' : ''}`} />
         </button>
 
         {open && (
