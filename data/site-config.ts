@@ -16,9 +16,9 @@ export const siteConfig = {
     },
     hours: {
         emergency: "24h/24 - 7j/7",
-        consultation: "08:00 - 18:00",
-        weekdays: "08:00 - 18:00",
-        saturday: "08:00 - 14:00"
+        consultation: "7j/7 · 24h/24",
+        weekdays: "7j/7 · 24h/24",
+        saturday: "7j/7 · 24h/24"
     }
 }
 

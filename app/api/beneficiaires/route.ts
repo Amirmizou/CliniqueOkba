@@ -222,10 +222,11 @@ export async function POST(request: Request) {
     const apiKey = process.env.RESEND_API_KEY
     if (apiKey) {
       const toEmail = process.env.CLINIC_EMAIL || 'contact@cliniqueokba.com'
+      const fromEmail = process.env.MAIL_FROM || 'Clinique Okba <onboarding@resend.dev>'
       const resend = new Resend(apiKey)
       resend.emails
         .send({
-          from: 'Clinique Okba <onboarding@resend.dev>',
+          from: fromEmail,
           to: [toEmail],
           subject: `Nouvelle inscription bénéficiaire — ${escapeHtml(data.organisme)}`,
           html: `<p>Nouvelle inscription de bénéficiaire en attente de validation.</p>

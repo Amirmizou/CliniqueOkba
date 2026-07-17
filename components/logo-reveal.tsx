@@ -13,8 +13,10 @@ import Image from 'next/image'
  *  2. Signal vital — une fois reconstruit, le logo donne un battement (pulse).
  *  3. Option scanner — disque + anneau en pointillés qui tourne + onde qui se
  *     propage (utile pour un logo circulaire).
+ *  4. Option `lab` — motif « analyse » au trait (fiole, goutte, onde de lecture,
+ *     étincelle de validation) qui rejoue périodiquement.
  *
- * Respecte prefers-reduced-motion (logo net, sans balayage).
+ * Respecte prefers-reduced-motion (logo net, sans balayage ni motif).
  */
 
 interface Props {
@@ -28,7 +30,7 @@ interface Props {
   disc?: boolean
   /** Anneau de scanner en pointillés + onde qui se propage (logo circulaire). */
   ring?: boolean
-  /** Éprouvette d'analyse qui se remplit (référence labo), puis s'estompe. */
+  /** Motif « analyse » au trait (référence laboratoire), joué périodiquement. */
   lab?: boolean
 }
 
@@ -36,6 +38,21 @@ interface Props {
 const SWEEP_DELAY = 0.3
 const SWEEP_DUR = 1.1
 const BEAT_AT = SWEEP_DELAY + SWEEP_DUR // ~1.4s
+
+/**
+ * Cycle du motif « analyse » : LAB_VISIBLE secondes à l'écran, puis LAB_GAP de
+ * repos. Chaque élément du motif se répète sur la même période LAB_PERIOD (via
+ * `repeatDelay = LAB_PERIOD - duration`) : c'est ce qui les garde synchronisés
+ * sans machine à états impérative.
+ */
+const LAB_VISIBLE = 4
+const LAB_GAP = 7
+const LAB_PERIOD = LAB_VISIBLE + LAB_GAP
+/** Décalage de chaque étape à l'intérieur du cycle. */
+const LAB_START = 0.4
+const DROP_AT = LAB_START + 0.5
+const RIPPLE_AT = LAB_START + 1.5
+const SPARK_AT = LAB_START + 2.2
 
 export default function LogoReveal({
   src = '/logo-main.png',
@@ -113,64 +130,121 @@ export default function LogoReveal({
         </div>
       </motion.div>
 
-      {/* Éprouvette d'analyse — apparaît, se remplit de liquide vert, puis s'estompe */}
+      {/* ═══ ANALYSE — motif laboratoire au trait, joué périodiquement ═══
+          Remplace l'ancienne éprouvette remplie de liquide vert, qui se lisait
+          comme du sang et n'évoquait qu'un seul pôle. Ici : une fiole dessinée au
+          trait, une goutte déposée, l'onde de lecture, puis l'étincelle dorée de
+          validation — le geste d'analyse, sans fluide corporel. */}
       {lab && !reduce && (
-        <motion.div
-          className="pointer-events-none absolute z-10"
-          style={{ right: '1%', bottom: '3%', width: '15%', height: '55%' }}
-          initial={{ opacity: 0, y: 6, rotate: -4 }}
-          animate={{ opacity: [0, 1, 1, 0], y: [6, 0, 0, 0], rotate: [-4, 0, 0, 0] }}
-          transition={{ duration: 3.1, delay: 0.35, times: [0, 0.18, 0.72, 1], ease: 'easeInOut' }}
+        <div
+          className="pointer-events-none absolute z-20"
+          style={{ right: '-6%', bottom: '2%', width: '26%', height: '58%' }}
         >
-          {/* Lèvre / ouverture du tube */}
-          <div
-            className="absolute -top-[3px] left-1/2 h-[3px] -translate-x-1/2 rounded-full"
-            style={{ width: '150%', background: 'rgba(0,102,51,0.55)' }}
-          />
-          {/* Verre */}
-          <div
-            className="absolute inset-0 overflow-hidden"
-            style={{
-              borderRadius: '2px 2px 999px 999px',
-              border: '1.5px solid rgba(0,102,51,0.45)',
-              borderTop: 'none',
-              background: 'rgba(255,255,255,0.5)',
-              boxShadow: 'inset 0 2px 6px rgba(255,255,255,0.7)',
+          <motion.div
+            className="relative h-full w-full"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: [0, 1, 1, 0] }}
+            transition={{
+              duration: LAB_VISIBLE,
+              times: [0, 0.14, 0.82, 1],
+              delay: LAB_START,
+              repeat: Infinity,
+              repeatDelay: LAB_GAP,
+              ease: 'easeInOut',
             }}
           >
-            {/* Liquide vert qui monte */}
-            <motion.div
-              className="absolute inset-x-0 bottom-0"
-              style={{
-                background: 'linear-gradient(180deg,#00c766,#008a41)',
-                boxShadow: '0 0 8px rgba(0,166,81,0.5)',
-              }}
-              initial={{ height: '6%' }}
-              animate={{ height: ['6%', '68%', '68%'] }}
-              transition={{ duration: 1.3, delay: 0.55, times: [0, 0.7, 1], ease: 'easeOut' }}
+            {/* Fiole au trait — verre suggéré, jamais rempli */}
+            <svg
+              viewBox="0 0 24 32"
+              className="absolute inset-0 h-full w-full"
+              fill="none"
+              aria-hidden="true"
             >
-              {/* Ménisque (surface du liquide) */}
-              <div className="absolute inset-x-0 top-0 h-[2px] bg-white/55" />
-            </motion.div>
-            {/* Bulles qui remontent */}
-            <motion.span
-              className="absolute bottom-[10%] left-[34%] rounded-full bg-white/60"
-              style={{ width: '24%', height: '11%' }}
-              animate={{ y: ['0%', '-320%'], opacity: [0, 0.85, 0] }}
-              transition={{ duration: 1.4, delay: 0.85, repeat: Infinity, repeatDelay: 0.35, ease: 'easeOut' }}
-            />
-            <motion.span
-              className="absolute bottom-[6%] left-[58%] rounded-full bg-white/50"
-              style={{ width: '17%', height: '8%' }}
-              animate={{ y: ['0%', '-380%'], opacity: [0, 0.75, 0] }}
-              transition={{ duration: 1.7, delay: 1.15, repeat: Infinity, repeatDelay: 0.5, ease: 'easeOut' }}
-            />
-            {/* Reflet vertical du verre */}
-            <div className="absolute left-[16%] top-[8%] bottom-[14%] w-[8%] rounded-full bg-white/40" />
-          </div>
-        </motion.div>
-      )}
+              {/* Col + corps conique, tracé d'un seul geste */}
+              <path
+                d="M10 3 L10 11 L4.6 25.6 Q3.9 29 7.4 29 L16.6 29 Q20.1 29 19.4 25.6 L14 11 L14 3"
+                stroke="#006633"
+                strokeWidth="1.3"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                opacity="0.75"
+              />
+              {/* Lèvre du col */}
+              <path d="M8.8 3 H15.2" stroke="#006633" strokeWidth="1.3" strokeLinecap="round" opacity="0.75" />
+              {/* Trait de jauge — repère de mesure, pas un niveau de liquide */}
+              <path d="M7.4 24.5 H16.6" stroke="#006633" strokeWidth="0.9" strokeLinecap="round" opacity="0.3" />
+            </svg>
 
+            {/* La goutte déposée — tombe du col vers le fond */}
+            <motion.span
+              className="absolute left-1/2 rounded-full"
+              style={{
+                width: '9%',
+                height: '7%',
+                marginLeft: '-4.5%',
+                background: '#00a651',
+                boxShadow: '0 0 5px rgba(0,166,81,0.7)',
+              }}
+              initial={{ top: '2%', opacity: 0 }}
+              animate={{ top: ['2%', '74%'], opacity: [0, 1, 1, 0] }}
+              transition={{
+                duration: 1,
+                times: [0, 0.15, 0.8, 1],
+                delay: DROP_AT,
+                repeat: Infinity,
+                repeatDelay: LAB_PERIOD - 1,
+                ease: 'easeIn',
+              }}
+            />
+
+            {/* Onde de lecture — deux cercles concentriques après le dépôt */}
+            {[0, 0.3].map((offset) => (
+              <motion.span
+                key={offset}
+                className="absolute left-1/2 rounded-full"
+                style={{
+                  bottom: '10%',
+                  width: '46%',
+                  height: '26%',
+                  marginLeft: '-23%',
+                  border: '1px solid rgba(0,166,81,0.75)',
+                }}
+                initial={{ opacity: 0, scale: 0.3 }}
+                animate={{ opacity: [0, 0.7, 0], scale: [0.3, 1.5] }}
+                transition={{
+                  duration: 1.4,
+                  delay: RIPPLE_AT + offset,
+                  repeat: Infinity,
+                  repeatDelay: LAB_PERIOD - 1.4,
+                  ease: 'easeOut',
+                }}
+              />
+            ))}
+
+            {/* Étincelle dorée — la lecture est validée (2e couleur du logo) */}
+            <motion.span
+              className="absolute rounded-full"
+              style={{
+                right: '4%',
+                top: '18%',
+                width: '13%',
+                height: '10%',
+                background: '#FDE68A',
+                boxShadow: '0 0 7px rgba(253,230,138,0.95)',
+              }}
+              initial={{ opacity: 0, scale: 0 }}
+              animate={{ opacity: [0, 1, 0], scale: [0, 1.25, 0] }}
+              transition={{
+                duration: 0.9,
+                delay: SPARK_AT,
+                repeat: Infinity,
+                repeatDelay: LAB_PERIOD - 0.9,
+                ease: 'easeInOut',
+              }}
+            />
+          </motion.div>
+        </div>
+      )}
       {/* Onde verte qui se propage (signal vital) — variante circulaire */}
       {ring && !reduce && (
         <motion.span

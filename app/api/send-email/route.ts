@@ -57,11 +57,15 @@ export async function POST(request: Request) {
     }
     const resend = new Resend(apiKey);
 
-    const fromEmail = 'onboarding@resend.dev';
+    // Expéditeur configurable : après vérification du domaine sur resend.com/domains,
+    // définir MAIL_FROM="Clinique Okba <contact@clinique-okba.com>" pour pouvoir
+    // envoyer vers n'importe quelle adresse. Par défaut : domaine de test Resend
+    // (n'envoie qu'à l'adresse propriétaire du compte).
+    const fromEmail = process.env.MAIL_FROM || 'Clinique Okba <onboarding@resend.dev>';
     const toEmail = process.env.CLINIC_EMAIL || 'contact@cliniqueokba.com';
 
     const { data, error } = await resend.emails.send({
-      from: `Clinique Okba <${fromEmail}>`,
+      from: fromEmail,
       to: [toEmail],
       subject: 'Nouveau message depuis le formulaire de contact',
       html: `<p>Vous avez reçu un nouveau message de <strong>${escapeHtml(firstName)} ${escapeHtml(lastName)}</strong>.</p>
@@ -73,7 +77,10 @@ export async function POST(request: Request) {
 
     if (error) {
       console.error('Resend email error:', error);
-      return NextResponse.json({ error: 'Failed to send email' }, { status: 500 });
+      return NextResponse.json(
+        { error: "Échec de l'envoi de l'email", details: error.message },
+        { status: 502 },
+      );
     }
 
     return NextResponse.json({ success: true });

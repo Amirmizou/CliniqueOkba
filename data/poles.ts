@@ -48,14 +48,15 @@ export const poles: Pole[] = [
     title: 'Imagerie médicale de pointe',
     title_ar: 'التصوير الطبي المتقدم',
     description:
-      'Un plateau d’imagerie complet pour des diagnostics rapides et précis.',
-    description_ar: 'منصة تصوير طبي متكاملة لتشخيص سريع ودقيق.',
+      'Un plateau d’imagerie complet pour des diagnostics rapides et précis. Résultats et compte rendu remis en 24h.',
+    description_ar: 'منصة تصوير طبي متكاملة لتشخيص سريع ودقيق. النتائج والتقرير الطبي تُسلَّم خلال 24 ساعة.',
     items: [
       'Scanner SOMATOM go.Top (TDM)',
       'IRM MAGNETOM Altea 1.5T',
       'Mammographie MAMMOMAT (tomosynthèse 3D)',
       'Échographie ACUSON Juniper',
       'Radiologie numérique MULTIX Impact',
+      'Résultats et compte rendu en 24h',
     ],
     items_ar: [
       'سكانير SOMATOM go.Top (التصوير المقطعي)',
@@ -63,6 +64,7 @@ export const poles: Pole[] = [
       'تصوير الثدي MAMMOMAT (ثلاثي الأبعاد)',
       'الموجات فوق الصوتية ACUSON Juniper',
       'الأشعة الرقمية MULTIX Impact',
+      'النتائج والتقرير خلال 24 ساعة',
     ],
     iconName: 'ScanLine',
     accent: '#3B82F6',
@@ -70,8 +72,8 @@ export const poles: Pole[] = [
     galleryCategories: ['imagerie'],
     aiBoosted: true,
     intro:
-      'Notre service d’imagerie réunit un plateau technique complet de dernière génération Siemens Healthineers : scanner SOMATOM go.Top, IRM MAGNETOM Altea 1.5T, mammographe MAMMOMAT (tomosynthèse 3D), échographe ACUSON Juniper et radiologie numérique MULTIX Impact. L’ensemble du plateau est augmenté par l’intelligence artificielle — positionnement du patient, reconstruction des images et aide à la lecture — pour des résultats plus précis, plus rapides et reproductibles, à dose maîtrisée.',
-    intro_ar: 'يضم قسم التصوير لدينا منصة تقنية متكاملة من الجيل الأحدث من Siemens Healthineers: سكانير SOMATOM go.Top، رنين مغناطيسي MAGNETOM Altea 1.5T، جهاز تصوير ثدي MAMMOMAT (ثلاثي الأبعاد)، جهاز موجات فوق صوتية ACUSON Juniper، وأشعة رقمية MULTIX Impact. كامل المنصة معزّز بالذكاء الاصطناعي — وضع المريض، إعادة بناء الصور والمساعدة في القراءة — لنتائج أدقّ وأسرع وقابلة للتكرار، وبجرعة محكومة.',
+      'Notre service d’imagerie réunit un plateau technique complet de dernière génération Siemens Healthineers : scanner SOMATOM go.Top, IRM MAGNETOM Altea 1.5T, mammographe MAMMOMAT (tomosynthèse 3D), échographe ACUSON Juniper et radiologie numérique MULTIX Impact. L’ensemble du plateau est augmenté par l’intelligence artificielle — positionnement du patient, reconstruction des images et aide à la lecture — pour des résultats plus précis, plus rapides et reproductibles, à dose maîtrisée. Les résultats et le compte rendu médical sont remis dans un délai de 24h.',
+    intro_ar: 'يضم قسم التصوير لدينا منصة تقنية متكاملة من الجيل الأحدث من Siemens Healthineers: سكانير SOMATOM go.Top، رنين مغناطيسي MAGNETOM Altea 1.5T، جهاز تصوير ثدي MAMMOMAT (ثلاثي الأبعاد)، جهاز موجات فوق صوتية ACUSON Juniper، وأشعة رقمية MULTIX Impact. كامل المنصة معزّز بالذكاء الاصطناعي — وضع المريض، إعادة بناء الصور والمساعدة في القراءة — لنتائج أدقّ وأسرع وقابلة للتكرار، وبجرعة محكومة. تُسلَّم النتائج والتقرير الطبي في غضون 24 ساعة.',
   },
   {
     id: 'medecine-nucleaire',

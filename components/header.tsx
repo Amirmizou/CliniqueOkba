@@ -43,6 +43,7 @@ import { motion, AnimatePresence, useScroll, useMotionValueEvent } from 'framer-
 import { cn } from '@/lib/utils'
 import { poles as localPoles } from '@/data/poles'
 import { siteConfig as siteConfigFallback } from '@/data/site-config'
+import PoleMotifRotator from '@/components/pole-motif-rotator'
 import LogoReveal from '@/components/logo-reveal'
 import SiteSearch from '@/components/site-search'
 import Link from 'next/link'
@@ -218,10 +219,16 @@ export default function Header({ siteSettings, poles }: HeaderProps) {
     ? siteSettings.clinicName
     : (locale === 'ar' ? 'المصحة الطبية عقبة' : 'Clinique OKBA')
 
+  // Marque bicolore : 1er mot en vert clair, le reste en vert foncé (comme le lockup).
+  const clinicNameFirst = clinicNameText.includes(' ') ? clinicNameText.split(' ')[0] : ''
+  const clinicNameRest = clinicNameText.includes(' ')
+    ? clinicNameText.slice(clinicNameText.indexOf(' ') + 1)
+    : clinicNameText
+
   /* Barre utilitaire — infos essentielles (depuis Sanity siteSettings) */
   const utilPhone = (siteSettings?.phone || '').split('/')[0].trim()
   const utilPhoneHref = `tel:${utilPhone.replace(/[^+\d]/g, '')}`
-  const utilHours = siteSettings?.hours?.weekdays || ''
+  const utilHours = siteSettings?.hours?.weekdays || siteConfigFallback.hours.weekdays || ''
   const utilAddress = siteSettings?.address || ''
   const utilFacebook = siteSettings?.social?.facebook || siteConfigFallback.social.facebook
   const utilInstagram = siteSettings?.social?.instagram || siteConfigFallback.social.instagram
@@ -234,16 +241,6 @@ export default function Header({ siteSettings, poles }: HeaderProps) {
           15% { opacity: 1; }
           85% { opacity: 1; }
           100% { transform: translateY(56px); opacity: 0; }
-        }
-        @keyframes scanLaserMobile {
-          0% { transform: translateY(2px); opacity: 0; }
-          15% { opacity: 1; }
-          85% { opacity: 1; }
-          100% { transform: translateY(28px); opacity: 0; }
-        }
-        @keyframes floatGlyph {
-          0%, 100% { transform: translateY(0); }
-          50% { transform: translateY(-7px); }
         }
         @keyframes ecgSweep {
           0% { left: -6%; opacity: 0; }
@@ -269,12 +266,10 @@ export default function Header({ siteSettings, poles }: HeaderProps) {
                   <span dir="ltr" className="whitespace-nowrap">{utilPhone}</span>
                 </a>
               )}
-              {utilHours && (
-                <span className="hidden shrink-0 items-center gap-1.5 text-white/85 xl:flex">
+              <span className="hidden shrink-0 items-center gap-1.5 text-white/85 xl:flex">
                   <Clock className="h-3.5 w-3.5 shrink-0" />
-                  <span className="whitespace-nowrap">{utilHours}</span>
+                  <span className="whitespace-nowrap">7j/7 · 24h/24</span>
                 </span>
-              )}
               {utilAddress && (
                 <span className="hidden min-w-0 items-center gap-1.5 text-white/85 xl:flex">
                   <MapPin className="h-3.5 w-3.5 shrink-0" />
@@ -300,20 +295,79 @@ export default function Header({ siteSettings, poles }: HeaderProps) {
         </div>
       </div>
 
-      <header className="relative z-[60] flex justify-center px-4 py-3 bg-white/95 backdrop-blur-md border-b border-black/[0.06] shadow-[0_2px_14px_rgba(0,0,0,0.06)] dark:bg-slate-950/90 dark:border-white/10">
+      {/* La bande porte le vert de marque (#006633) en voile : assez présent pour
+          l'identité, assez léger pour garder le menu et la scène du scanner lisibles.
+          La bordure basse est remplacée par le dégradé vert → or (voir plus bas). */}
+      <header className="relative z-[60] flex justify-center px-4 py-3 bg-gradient-to-b from-[#eaf5ee]/95 to-[#d9ebe0]/95 backdrop-blur-md shadow-[0_2px_14px_rgba(0,102,51,0.10)] dark:from-slate-950/90 dark:to-[#04120b]/90">
         
-        {/* LOGO CENTRÉ DANS LA MARGE GAUCHE (Desktop) */}
+        {/* LOGO — Design circulaire premium */}
         <div className="absolute inset-y-0 left-0 w-[calc(50vw-640px)] hidden xl:flex items-center justify-center pointer-events-auto z-[100]">
-          <a href={homeHref} className="group relative block">
-            <LogoReveal
-              src="/logo-main.png"
-              alt="Clinique OKBA"
-              sizes="(max-width: 1536px) 100px, 140px"
-              lab
-              className="h-[100px] w-[100px] transition-transform duration-300 group-hover:scale-105 2xl:h-[140px] 2xl:w-[140px]"
-            />
+          <a href={homeHref} className="group relative flex flex-col items-center">
+            {/* Bloc circulaire (disque + anneaux) — dimensionné à part du texte */}
+            <div className="relative h-[84px] w-[84px] 2xl:h-[112px] 2xl:w-[112px]">
+              {/* Halo vert doux — profondeur de marque */}
+              <div
+                className="absolute inset-[-18%] rounded-full transition-all duration-500 group-hover:inset-[-24%] group-hover:opacity-90"
+                style={{
+                  background: 'radial-gradient(ellipse at center, rgba(0,166,81,0.18) 0%, rgba(0,102,51,0.10) 45%, transparent 72%)',
+                  filter: 'blur(2px)',
+                }}
+              />
+              {/* Cercle doré — accent identitaire */}
+              <div
+                className="absolute inset-[-6%] rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+                style={{
+                  border: '1.5px solid rgba(253,230,138,0.55)',
+                  boxShadow: '0 0 18px rgba(253,230,138,0.25)',
+                }}
+              />
+              {/* Anneau vert rotatif */}
+              <div
+                className="absolute inset-[-4%] rounded-full animate-[spin_12s_linear_infinite] opacity-40 group-hover:opacity-80 transition-opacity duration-500"
+                style={{
+                  border: '1px dashed rgba(0,166,81,0.6)',
+                  borderRadius: '50%',
+                }}
+              />
+              {/* Disque fond blanc circulaire */}
+              <div
+                className="absolute inset-0 rounded-full transition-all duration-300 group-hover:scale-105"
+                style={{
+                  background: 'radial-gradient(circle at 38% 35%, #ffffff 55%, #f0f9f4 100%)',
+                  boxShadow: '0 4px 20px rgba(0,102,51,0.20), 0 1px 4px rgba(0,0,0,0.08), inset 0 1px 2px rgba(255,255,255,0.9)',
+                }}
+              />
+              <LogoReveal
+                src="/logo-mark.png"
+                alt="Clinique OKBA"
+                sizes="(max-width: 1536px) 84px, 112px"
+                imageClassName="object-contain p-[10%]"
+                lab
+                className="relative h-full w-full transition-transform duration-300 group-hover:scale-105"
+              />
+            </div>
+
+            {/* Marque + slogan — en vrai texte (net à toute taille, traduisible).
+                Affiché seulement à partir de 2xl : en dessous, la marge
+                calc(50vw-640px) est trop étroite et le bloc déborde de l'écran. */}
+            <span className="mt-2.5 hidden max-w-[124px] flex-col items-center text-center 2xl:flex">
+              <span className="text-[13px] font-bold uppercase leading-none tracking-[0.06em] text-[#00532a] dark:text-white">
+                {clinicNameFirst && <span className="text-[#00a651]">{clinicNameFirst} </span>}
+                {clinicNameRest}
+              </span>
+              <span className="mt-1.5 text-[9.5px] font-medium italic leading-snug text-[#006633]/60 dark:text-white/55">
+                {t('slogan')}
+              </span>
+            </span>
           </a>
         </div>
+
+        {/* Bordure basse aux couleurs du logo : vert de marque → or */}
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute bottom-0 left-0 right-0 h-[2px] z-[70]"
+          style={{ background: 'linear-gradient(90deg, #006633 0%, #4caf6e 45%, #FDE68A 75%, #006633 100%)' }}
+        />
 
         {/* Ligne d'impulsion vitale (ECG) ultra-fine sur le bord supérieur - Identité visuelle */}
         <div className="absolute top-0 left-0 right-0 h-[1.5px] overflow-hidden opacity-80 z-[70]">
@@ -333,7 +387,12 @@ export default function Header({ siteSettings, poles }: HeaderProps) {
           {/* Lueur de marque douce — réchauffe le blanc et donne de la profondeur */}
           <div
             className="absolute inset-x-0 -top-16 h-[210px]"
-            style={{ background: 'radial-gradient(ellipse 52% 100% at 36% 0%, rgba(0,102,51,0.07), transparent 72%)' }}
+            style={{ background: 'radial-gradient(ellipse 52% 100% at 36% 0%, rgba(0,102,51,0.16), transparent 72%)' }}
+          />
+          {/* Rappel doré discret côté opposé — la 2e couleur du logo */}
+          <div
+            className="absolute inset-y-0 right-0 w-[38%]"
+            style={{ background: 'radial-gradient(ellipse 70% 120% at 100% 50%, rgba(253,230,138,0.20), transparent 70%)' }}
           />
           {/* Trame de points fine — dense sur les côtés, estompée derrière le menu */}
           <div
@@ -341,7 +400,7 @@ export default function Header({ siteSettings, poles }: HeaderProps) {
             style={{
               backgroundImage: 'radial-gradient(currentColor 1px, transparent 1px)',
               backgroundSize: '22px 22px',
-              opacity: 0.06,
+              opacity: 0.1,
               WebkitMaskImage: 'linear-gradient(90deg, #000, transparent 30%, transparent 70%, #000)',
               maskImage: 'linear-gradient(90deg, #000, transparent 30%, transparent 70%, #000)',
             }}
@@ -364,11 +423,12 @@ export default function Header({ siteSettings, poles }: HeaderProps) {
             />
           </div>
 
-          {/* Glyphes médicaux flottants — comblent le vide gauche/centre (langage de la clinique pluridisciplinaire) */}
-          <Heart className="absolute left-[13%] top-[20px] h-5 w-5 text-[#006633]" style={{ opacity: 0.1, animation: 'floatGlyph 6s ease-in-out infinite' }} />
-          <Activity className="absolute left-[26%] top-[34px] h-6 w-6 text-[#006633]" style={{ opacity: 0.09, animation: 'floatGlyph 7s ease-in-out infinite 0.8s' }} />
-          <FlaskConical className="absolute left-[40%] top-[19px] h-5 w-5 text-[#006633]" style={{ opacity: 0.09, animation: 'floatGlyph 6.5s ease-in-out infinite 1.4s' }} />
-          <Stethoscope className="absolute left-[53%] top-[33px] h-5 w-5 text-[#006633]" style={{ opacity: 0.09, animation: 'floatGlyph 7.5s ease-in-out infinite 0.4s' }} />
+          {/* Les 7 pôles évoqués à tour de rôle — un seul motif animé à la fois.
+              Remplace les 4 glyphes flottants, qui n'évoquaient que 4 pôles et
+              bougeaient tous en même temps. */}
+          <div className="absolute left-[13%] top-[26px]">
+            <PoleMotifRotator locale={locale} />
+          </div>
 
           {/* Ligne ECG / pouls fine en bas (langage visuel médical, vert identité) */}
           <svg
@@ -420,77 +480,56 @@ export default function Header({ siteSettings, poles }: HeaderProps) {
               background: 'linear-gradient(90deg, transparent, #006633 18%, #4caf6e 48%, #FDE68A 68%, #006633 88%, transparent)',
             }} />
 
-            {/* Logo + marque — prend tout l'espace disponible (plus de troncature) */}
-            {/* Logo (sans texte HTML car inclus dans l'image) */}
+            {/* Logo — emblème rond + marque en texte (le lockup complet est illisible à 56px) */}
             <a href={homeHref} className="group relative z-10 flex min-w-0 flex-1 items-center gap-2.5">
               <LogoReveal
-                src="/logo-main.png"
-                alt="Logo Clinique OKBA"
-                sizes="56px"
-                imageClassName="object-cover p-1"
-                className="h-[56px] w-[56px] shrink-0 overflow-hidden rounded-xl bg-white shadow-sm ring-1 ring-gray-200 transition-transform duration-300 group-active:scale-95"
+                src="/logo-mark.png"
+                alt="Clinique OKBA"
+                sizes="48px"
+                imageClassName="object-contain p-[9%]"
+                className="h-[48px] w-[48px] shrink-0 rounded-full bg-white shadow-[0_2px_10px_rgba(0,102,51,0.18)] ring-1 ring-[#006633]/15 transition-transform duration-300 group-active:scale-95"
               />
+              <span className="flex min-w-0 flex-col">
+                <span className="truncate text-[15px] font-bold leading-none tracking-tight text-[#00532a] dark:text-white">
+                  {clinicNameFirst && <span className="text-[#00a651]">{clinicNameFirst} </span>}
+                  {clinicNameRest}
+                </span>
+                <span className="mt-[5px] text-[8.5px] font-medium italic leading-tight text-[#006633]/60 dark:text-white/55">
+                  {t('slogan')}
+                </span>
+              </span>
             </a>
 
-            {/* Contrôles — menu + mini-scanner RDV (langue dispo dans le menu) */}
+            {/* Contrôles — menu + CTA « RDV » (langue dispo dans le menu) */}
             <div className="relative z-10 flex shrink-0 items-center gap-1.5">
+              {/* Menu — cible tactile 44px (l'ancien bouton faisait 36px, sous la
+                  norme WCAG/Apple). Style discret : le vert plein est réservé au
+                  CTA « RDV » pour qu'il n'y ait qu'une action primaire visible. */}
               <button
                 ref={menuButtonRef}
                 aria-label="Ouvrir le menu"
                 aria-expanded={isOpen}
                 aria-controls="mobile-menu"
-                className="flex h-9 w-9 shrink-0 cursor-pointer items-center justify-center rounded-full bg-[#006633] text-white shadow-sm transition-all hover:bg-[#004d26] active:scale-95"
+                className="flex h-11 w-11 shrink-0 cursor-pointer items-center justify-center rounded-full border border-[#006633]/20 bg-[#006633]/[0.06] text-[#006633] transition-colors active:scale-95 active:bg-[#006633]/15 dark:border-white/15 dark:bg-white/5 dark:text-white"
                 onClick={() => setIsOpen((v) => !v)}
               >
-                <Menu className="h-[18px] w-[18px]" />
+                <Menu className="h-5 w-5" strokeWidth={2.2} />
               </button>
 
-              {/* ═══ MINI GANTRY SCANNER — bouton « Prendre RDV » (identité imagerie) ═══ */}
+              {/* RDV — CTA lisible. Remplace le mini-gantry CT : celui-ci empilait
+                  ~15 calques (dégradés, masques, ombres internes) et 3 animations
+                  infinies dans un header sticky, pour un libellé de 6px illisible.
+                  Coût de rendu permanent sur mobile, bénéfice nul. */}
               <button
                 onClick={() => scrollToSection('#contact')}
                 aria-label={t('appointment')}
                 title={t('appointment')}
-                className="group relative h-[58px] w-[58px] shrink-0 cursor-pointer focus-visible:outline-none"
+                className="group flex h-11 shrink-0 cursor-pointer items-center gap-1.5 rounded-full bg-[#006633] px-3.5 text-white shadow-[0_4px_12px_rgba(0,102,51,0.28)] transition-all active:scale-95 active:bg-[#004d26]"
               >
-                {/* Ombre de contact au sol */}
-                <span aria-hidden="true" className="absolute bottom-[2px] left-1/2 h-[8px] w-[44px] -translate-x-1/2 rounded-full" style={{ background: 'radial-gradient(closest-side, rgba(0,0,0,0.28), transparent 75%)', filter: 'blur(2px)' }} />
-
-                {/* Plateau patient — entre dans le bore depuis la gauche */}
-                <span aria-hidden="true" className="absolute left-[1px] top-1/2 h-[7px] w-[20px] -translate-y-1/2 rounded-l-[3px]" style={{ background: 'linear-gradient(180deg,#ffffff,#e6e6e6)', boxShadow: '0 2px 4px rgba(0,0,0,0.15), inset 0 1px 1px rgba(255,255,255,0.9)' }}>
-                  <span className="absolute bottom-[1px] left-0 right-[3px] h-[1.5px] rounded-full" style={{ background: 'linear-gradient(90deg,#006633,rgba(0,166,81,0))' }} />
+                <CalendarDays className="h-[17px] w-[17px] shrink-0" strokeWidth={2.2} />
+                <span className="text-[12px] font-extrabold uppercase leading-none tracking-[0.08em]">
+                  {locale === 'ar' ? 'موعد' : 'RDV'}
                 </span>
-
-                {/* Disque gantry (base) */}
-                <span aria-hidden="true" className="absolute right-0 top-1/2 h-[54px] w-[54px] -translate-y-1/2 rounded-full" style={{ background: 'radial-gradient(125% 125% at 36% 20%, #fff 0%, #f3f3f3 46%, #e2e2e2 78%, #cdcdcd 100%)', boxShadow: '0 6px 16px -4px rgba(0,0,0,0.30), 0 2px 5px rgba(0,0,0,0.12)' }} />
-
-                {/* Face donut trouée (tunnel) */}
-                <span aria-hidden="true" className="absolute right-0 top-1/2 h-[54px] w-[54px] -translate-y-1/2 overflow-hidden rounded-full" style={{ background: 'radial-gradient(130% 130% at 36% 18%, #fff 0%, #f4f4f4 44%, #e4e4e4 74%, #d2d2d2 100%)', WebkitMaskImage: 'radial-gradient(circle at center, transparent 11px, black 12px)', maskImage: 'radial-gradient(circle at center, transparent 11px, black 12px)', boxShadow: 'inset 0 1px 4px rgba(255,255,255,0.9), inset 0 -4px 9px rgba(0,0,0,0.10)' }} />
-
-                {/* Liseré signature vert */}
-                <span aria-hidden="true" className="absolute right-[2px] top-1/2 h-[50px] w-[50px] -translate-y-1/2 rounded-full" style={{ boxShadow: 'inset 0 0 0 1.5px rgba(0,102,51,0.55)' }} />
-
-                {/* Bore illuminé + laser + LED */}
-                <span aria-hidden="true" className="absolute right-[15px] top-1/2 h-[24px] w-[24px] -translate-y-1/2 overflow-hidden rounded-full" style={{ background: 'radial-gradient(circle at 50% 35%, #fff 0%, #eef1f4 55%, #d6dbe1 100%)', boxShadow: 'inset 0 3px 7px rgba(0,0,0,0.12), inset 0 -1px 4px rgba(255,255,255,0.7)' }}>
-                  <span className="absolute inset-[3px] rounded-full border border-black/[0.06]" />
-                  <span className="absolute left-[10%] right-[10%] top-0 h-[2px] rounded-full bg-[#00a651] shadow-[0_0_6px_2px_rgba(0,166,81,0.6)]" style={{ animation: 'scanLaserMobile 2.6s ease-in-out infinite alternate' }} />
-                  <span className="absolute right-[16%] top-[24%] h-[2px] w-[2px] rounded-full bg-red-500 shadow-[0_0_4px_1px_rgba(239,68,68,0.8)] animate-pulse" />
-                </span>
-
-                {/* Têtes SPECT rotatives */}
-                <span aria-hidden="true" className="absolute right-0 top-1/2 h-[54px] w-[54px] -translate-y-1/2 animate-[spin_32s_linear_infinite]">
-                  <span className="absolute left-1/2 top-[-3px] h-[10px] w-[24px] -translate-x-1/2 rounded-[4px]" style={{ background: 'linear-gradient(180deg,#fff,#e6e6e6)', border: '1px solid #d0d0d0', boxShadow: '0 2px 5px rgba(0,0,0,0.18)' }}>
-                    <span className="absolute left-[6%] right-[6%] top-1/2 h-[1.5px] -translate-y-1/2 rounded-full bg-[#b0b0b0]" />
-                    <span className="absolute bottom-[1px] left-[15%] right-[15%] h-[1px] rounded-full bg-[#EC0016]/70" />
-                  </span>
-                  <span className="absolute bottom-[-3px] left-1/2 h-[10px] w-[24px] -translate-x-1/2 rounded-[4px]" style={{ background: 'linear-gradient(0deg,#fff,#e6e6e6)', border: '1px solid #d0d0d0', boxShadow: '0 -2px 5px rgba(0,0,0,0.18)' }}>
-                    <span className="absolute left-[6%] right-[6%] top-1/2 h-[1.5px] -translate-y-1/2 rounded-full bg-[#b0b0b0]" />
-                    <span className="absolute top-[1px] left-[15%] right-[15%] h-[1px] rounded-full bg-[#EC0016]/70" />
-                  </span>
-                </span>
-
-                {/* Halo vert au tap/focus + micro-badge RDV */}
-                <span aria-hidden="true" className="absolute right-0 top-1/2 h-[54px] w-[54px] -translate-y-1/2 rounded-full transition-all duration-300 group-active:shadow-[0_0_0_2px_rgba(0,102,51,0.55),0_0_16px_rgba(0,255,136,0.45)] group-focus-visible:shadow-[0_0_0_2px_rgba(0,102,51,0.6)]" />
-                <span aria-hidden="true" className="absolute right-[3px] top-[3px] z-10 rounded-[2px] bg-[#006633] px-[3px] py-[1px] text-[6px] font-extrabold uppercase leading-none tracking-[0.12em] text-white shadow-sm">RDV</span>
               </button>
             </div>
           </div>
@@ -609,11 +648,9 @@ export default function Header({ siteSettings, poles }: HeaderProps) {
             {/* Catchlight verre (reflet spéculaire → tunnel « verre » 3D) */}
             <div className="absolute left-[20%] top-[15%] z-[15] w-[12px] h-[7px] rounded-full pointer-events-none" style={{ background:'radial-gradient(ellipse at center,rgba(255,255,255,0.95),rgba(255,255,255,0) 72%)', transform:'rotate(-24deg)' }} />
             
-            {/* Branche d'olivier au centre exact du gantry (isolée sans être coupée) */}
-            <div className="absolute z-10 w-[42px] h-[34px] top-[7px] flex justify-center overflow-hidden pointer-events-none mix-blend-multiply" style={{ filter: 'contrast(1.15) brightness(1.05)' }}>
-              <div className="relative w-[42px] h-[42px]">
-                <Image src="/logo-main.png" alt="Branche Olivier" fill sizes="42px" className="object-contain scale-[1.4] origin-top" priority />
-              </div>
+            {/* Branche d'olivier au centre exact du gantry */}
+            <div className="absolute left-1/2 top-1/2 z-10 h-[30px] w-[30px] -translate-x-1/2 -translate-y-1/2 pointer-events-none mix-blend-multiply" style={{ filter: 'contrast(1.1)' }}>
+              <Image src="/logo-mark.png" alt="" fill sizes="30px" className="object-contain" priority />
             </div>
 
             <div className="absolute left-[8%] right-[8%] top-0 h-[3px] z-20 rounded-full bg-[#00a651] shadow-[0_0_14px_4px_rgba(0,166,81,0.65)]" style={{ animation:'scanLaser 2.6s ease-in-out infinite alternate' }} />
@@ -750,8 +787,8 @@ export default function Header({ siteSettings, poles }: HeaderProps) {
                 </div>
                 {/* Logo Clinique (recadré sur l'icône) — affiché au centre de l'écran du moniteur */}
                 <div className="pointer-events-none absolute inset-0 z-20 flex items-center justify-center">
-                  <div className="relative h-[22px] w-[22px] overflow-hidden rounded-full drop-shadow-[0_0_4px_rgba(120,200,255,0.7)]">
-                    <img src="/logo-main.png" alt="Clinique Okba" className="absolute top-0 left-0 w-full h-full object-cover scale-[1.75] origin-top opacity-95" />
+                  <div className="relative h-[22px] w-[22px] rounded-full bg-white/90 p-[1px] drop-shadow-[0_0_4px_rgba(120,200,255,0.7)]">
+                    <img src="/logo-mark.png" alt="Clinique Okba" className="absolute inset-0 h-full w-full object-contain opacity-95" />
                   </div>
                 </div>
 
@@ -863,8 +900,8 @@ export default function Header({ siteSettings, poles }: HeaderProps) {
             >
               <div className="flex items-center justify-between">
                 <div className="flex min-w-0 items-center gap-3">
-                  <div className="relative h-[48px] w-[48px] shrink-0 overflow-hidden rounded-full bg-[#006633] shadow-md ring-2 ring-white/80">
-                    <Image src="/logo-main.png" alt="Clinique OKBA" fill sizes="48px" className="object-cover scale-[1.75] origin-top" />
+                  <div className="relative h-[48px] w-[48px] shrink-0 rounded-full bg-white shadow-md ring-2 ring-white/80">
+                    <Image src="/logo-mark.png" alt="Clinique OKBA" fill sizes="48px" className="object-contain p-[9%]" />
                   </div>
                   <div className="min-w-0">
                     <p className="truncate text-[13px] font-black uppercase leading-none tracking-tight text-white">
