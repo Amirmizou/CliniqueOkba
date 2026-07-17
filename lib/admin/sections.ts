@@ -120,6 +120,15 @@ export const adminSections: AdminSection[] = [
   },
   // --- Configuration ---
   {
+    key: 'statistiques',
+    label: 'Visites du site',
+    description: 'Nombre de visites et pages les plus consultées.',
+    icon: 'BarChart3',
+    href: '/admin/statistiques',
+    ready: true,
+    group: 'Configuration',
+  },
+  {
     key: 'parametres',
     label: 'Paramètres du site',
     description: 'Nom, téléphone, WhatsApp, adresse, horaires, réseaux sociaux.',

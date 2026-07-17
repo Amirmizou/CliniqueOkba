@@ -316,9 +316,9 @@ const FAQ_DOCS = [
     question: 'Quels sont les moyens de paiement acceptés ?',
     question_ar: 'ما هي وسائل الدفع المقبولة؟',
     answer:
-      'Le paiement s’effectue à l’accueil. Selon votre situation, une prise en charge CNAS / CASNOS peut s’appliquer. Renseignez-vous auprès de notre équipe administrative.',
+      'Le paiement s’effectue à l’accueil. Si vous relevez d’un organisme conventionné avec la clinique, une prise en charge peut s’appliquer. Renseignez-vous auprès de notre équipe administrative.',
     answer_ar:
-      'يتم الدفع في الاستقبال. حسب وضعيتكم، يمكن تطبيق التكفل عبر CNAS / CASNOS. استفسروا لدى فريقنا الإداري.',
+      'يتم الدفع في الاستقبال. إذا كنتم تابعين لهيئة متعاقدة مع المصحة، يمكن تطبيق التكفل. استفسروا لدى فريقنا الإداري.',
     category: 'payment',
     order: 3,
   },

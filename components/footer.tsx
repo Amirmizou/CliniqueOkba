@@ -6,6 +6,7 @@ import { Facebook, Instagram, Mail, MapPin, Phone, ArrowRight, HeartPulse } from
 import { useTranslations, useLocale } from 'next-intl'
 import { cn } from '@/lib/utils'
 import { poles } from '@/data/poles'
+import { siteConfig as siteConfigFallback } from '@/data/site-config'
 
 interface SiteSettings {
   clinicName?: string
@@ -40,7 +41,12 @@ export default function Footer({ siteSettings, footerContent, sanityPoles }: Foo
       phone: siteSettings?.phone || '',
       email: siteSettings?.email || '',
     },
-    social: siteSettings?.social || { facebook: '', instagram: '' },
+    // Les URL Sanity priment ; à défaut on garde les pages officielles plutôt
+    // qu'un href vide qui renverrait sur la page courante.
+    social: {
+      facebook: siteSettings?.social?.facebook || siteConfigFallback.social.facebook,
+      instagram: siteSettings?.social?.instagram || siteConfigFallback.social.instagram,
+    },
   }
 
   const containerVariants = {
@@ -144,26 +150,32 @@ export default function Footer({ siteSettings, footerContent, sanityPoles }: Foo
             </p>
             
             <div className='flex gap-4 mt-10'>
-              <motion.a
-                href={siteConfig?.social?.facebook || '#'}
-                target="_blank"
-                rel="noopener noreferrer"
-                whileHover={{ y: -4, scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                className='h-11 w-11 bg-white/[0.03] backdrop-blur-md rounded-full text-white/60 hover:text-white hover:bg-[#1877F2]/20 hover:border-[#1877F2]/50 transition-all duration-300 border border-white/[0.05] flex items-center justify-center shadow-lg group'
-              >
-                <Facebook size={18} strokeWidth={1.5} className="group-hover:text-[#1877F2] transition-colors" />
-              </motion.a>
-              <motion.a
-                href={siteConfig?.social?.instagram || '#'}
-                target="_blank"
-                rel="noopener noreferrer"
-                whileHover={{ y: -4, scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                className='h-11 w-11 bg-white/[0.03] backdrop-blur-md rounded-full text-white/60 hover:text-white hover:bg-[#E4405F]/20 hover:border-[#E4405F]/50 transition-all duration-300 border border-white/[0.05] flex items-center justify-center shadow-lg group'
-              >
-                <Instagram size={18} strokeWidth={1.5} className="group-hover:text-[#E4405F] transition-colors" />
-              </motion.a>
+              {siteConfig.social.facebook && (
+                <motion.a
+                  href={siteConfig.social.facebook}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Facebook"
+                  whileHover={{ y: -4, scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  className='h-11 w-11 bg-white/[0.03] backdrop-blur-md rounded-full text-white/60 hover:text-white hover:bg-[#1877F2]/20 hover:border-[#1877F2]/50 transition-all duration-300 border border-white/[0.05] flex items-center justify-center shadow-lg group'
+                >
+                  <Facebook size={18} strokeWidth={1.5} className="group-hover:text-[#1877F2] transition-colors" />
+                </motion.a>
+              )}
+              {siteConfig.social.instagram && (
+                <motion.a
+                  href={siteConfig.social.instagram}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Instagram"
+                  whileHover={{ y: -4, scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  className='h-11 w-11 bg-white/[0.03] backdrop-blur-md rounded-full text-white/60 hover:text-white hover:bg-[#E4405F]/20 hover:border-[#E4405F]/50 transition-all duration-300 border border-white/[0.05] flex items-center justify-center shadow-lg group'
+                >
+                  <Instagram size={18} strokeWidth={1.5} className="group-hover:text-[#E4405F] transition-colors" />
+                </motion.a>
+              )}
             </div>
           </motion.div>
 

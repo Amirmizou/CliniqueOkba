@@ -20,6 +20,7 @@ import {
 } from 'lucide-react'
 import LocationBento from '@/components/location-bento'
 import WhatsAppBooking from '@/components/whatsapp-booking'
+import { siteConfig as siteConfigFallback } from '@/data/site-config'
 
 
 interface SiteSettings {
@@ -57,7 +58,12 @@ export default function Contact({ siteSettings, sectionContent }: ContactProps) 
     email: siteSettings?.email || '',
     coordinates: siteSettings?.coordinates || { lat: 35.700010, lng: -0.569500 },
     hours: siteSettings?.hours || { emergency: '24h/24 et 7j/7', weekdays: '08:00 - 20:00', saturday: '08:00 - 18:00' },
-    social: siteSettings?.social || { facebook: '', instagram: '' },
+    // Les URL Sanity priment ; à défaut on garde les pages officielles plutôt
+    // qu'un href vide qui renverrait sur la page courante.
+    social: {
+      facebook: siteSettings?.social?.facebook || siteConfigFallback.social.facebook,
+      instagram: siteSettings?.social?.instagram || siteConfigFallback.social.instagram,
+    },
     description: siteSettings?.description || 'La Clinique OKBA est votre partenaire de confiance pour votre santé.',
   }
   const [formData, setFormData] = useState({
@@ -364,22 +370,28 @@ export default function Contact({ siteSettings, sectionContent }: ContactProps) 
             <div className='border-border border-t pt-8 mt-8'>
               <p className='text-foreground mb-4 font-semibold'>{ti('followUs')}</p>
               <div className='flex gap-3'>
-                <a
-                  href={contactData.social?.facebook || '#'}
-                  target='_blank'
-                  rel='noopener noreferrer'
-                  className='group bg-blue-600 hover:bg-blue-700 flex h-11 w-11 items-center justify-center rounded-xl transition-all duration-300 hover:scale-110 hover:shadow-lg hover:shadow-blue-600/30'
-                >
-                  <Facebook className='w-5 h-5 text-white' />
-                </a>
-                <a
-                  href={contactData.social?.instagram || '#'}
-                  target='_blank'
-                  rel='noopener noreferrer'
-                  className='group bg-gradient-to-br from-purple-600 via-pink-500 to-orange-400 hover:from-purple-700 hover:via-pink-600 hover:to-orange-500 flex h-11 w-11 items-center justify-center rounded-xl transition-all duration-300 hover:scale-110 hover:shadow-lg hover:shadow-pink-500/30'
-                >
-                  <Instagram className='w-5 h-5 text-white' />
-                </a>
+                {contactData.social.facebook && (
+                  <a
+                    href={contactData.social.facebook}
+                    target='_blank'
+                    rel='noopener noreferrer'
+                    aria-label='Facebook'
+                    className='group bg-blue-600 hover:bg-blue-700 flex h-11 w-11 items-center justify-center rounded-xl transition-all duration-300 hover:scale-110 hover:shadow-lg hover:shadow-blue-600/30'
+                  >
+                    <Facebook className='w-5 h-5 text-white' />
+                  </a>
+                )}
+                {contactData.social.instagram && (
+                  <a
+                    href={contactData.social.instagram}
+                    target='_blank'
+                    rel='noopener noreferrer'
+                    aria-label='Instagram'
+                    className='group bg-gradient-to-br from-purple-600 via-pink-500 to-orange-400 hover:from-purple-700 hover:via-pink-600 hover:to-orange-500 flex h-11 w-11 items-center justify-center rounded-xl transition-all duration-300 hover:scale-110 hover:shadow-lg hover:shadow-pink-500/30'
+                  >
+                    <Instagram className='w-5 h-5 text-white' />
+                  </a>
+                )}
               </div>
             </div>
           </ScrollAnimation>

@@ -110,21 +110,23 @@ async function run() {
   const insuranceSection = await client.fetch(`*[_type == "insuranceSection"][0]`)
   if (insuranceSection) {
     const defaultProviders = [
-      { _key: 'prov1', name: 'CNAS', name_ar: 'CNAS', description: 'Caisse Nationale des Assurances Sociales des Travailleurs Salariés', description_ar: 'الصندوق الوطني للتأمينات الاجتماعية للعمال الأجراء' },
-      { _key: 'prov2', name: 'CASNOS', name_ar: 'CASNOS', description: 'Caisse Nationale de Sécurité Sociale des Non-Salariés', description_ar: 'الصندوق الوطني للضمان الاجتماعي لغير الأجراء' }
+      { _key: 'prov1', name: 'SEACO', name_ar: 'سياكو', description: "Société de l'Eau et de l'Assainissement de Constantine.", description_ar: 'شركة المياه والتطهير بقسنطينة.' },
+      { _key: 'prov2', name: 'ENSB', name_ar: 'المدرسة الوطنية العليا للبيوتكنولوجيا', description: 'École Nationale Supérieure de Biotechnologie.', description_ar: 'المدرسة الوطنية العليا للبيوتكنولوجيا.' },
+      { _key: 'prov3', name: 'Promotion Dambri Saddek', name_ar: 'ترقية دمبري صادق', description: 'Acquéreurs de la promotion Dambri Saddek.', description_ar: 'المستفيدون من ترقية دمبري صادق.' },
+      { _key: 'prov4', name: 'Association Oncologica', name_ar: 'جمعية أونكولوجيكا', description: "Association Oncologica Constantine pour l'aide des cancéreux.", description_ar: 'جمعية أونكولوجيكا قسنطينة لمساعدة مرضى السرطان.' }
     ]
     await client.patch(insuranceSection._id).setIfMissing({
       badge: 'Prise en charge',
-      badge_ar: 'تكفل',
-      title: 'Conventions & Remboursement',
-      title_ar: 'الاتفاقيات والتعويضات',
-      subtitle: 'La Clinique OKBA vous accompagne dans vos démarches de prise en charge et de remboursement.',
-      subtitle_ar: 'عيادة عقبة ترافقكم في إجراءات التكفل والتعويض.',
+      badge_ar: 'التكفل الطبي',
+      title: 'Conventions & Partenaires',
+      title_ar: 'الاتفاقيات والشركاء',
+      subtitle: "La Clinique OKBA est fière de collaborer avec ses partenaires pour vous faciliter l'accès aux soins.",
+      subtitle_ar: 'تفتخر المصحة الطبية عقبة بالتعاون مع شركائها لتسهيل حصولكم على الرعاية الطبية.',
       providers: defaultProviders,
-      note: 'Présentez votre carte CHIFA à l’accueil. Pour toute question sur votre prise en charge, contactez-nous.',
-      note_ar: 'قدم بطاقة الشفاء الخاصة بك في الاستقبال. لأي أسئلة حول التكفل، اتصل بنا.',
-      ctaText: 'Vérifier ma prise en charge',
-      ctaText_ar: 'التحقق من التكفل'
+      note: "Pour toute information supplémentaire concernant nos conventions, n'hésitez pas à nous contacter.",
+      note_ar: 'لمزيد من المعلومات حول اتفاقياتنا، لا تترددوا في الاتصال بنا.',
+      ctaText: 'Nous contacter',
+      ctaText_ar: 'اتصل بنا'
     }).commit()
     console.log('insuranceSection populated')
   }
@@ -135,7 +137,7 @@ async function run() {
     const faqData = [
       { question: "Quels sont vos horaires d'ouverture ?", question_ar: "ما هي أوقات العمل لديكم؟", answer: "Notre service des urgences est ouvert 24h/24 et 7j/7. Les consultations spécialisées se font sur rendez-vous du dimanche au jeudi de 8h à 20h, et le samedi de 8h à 18h.", answer_ar: "قسم الطوارئ لدينا مفتوح على مدار 24 ساعة طوال أيام الأسبوع. الاستشارات المتخصصة تتم بموعد من الأحد إلى الخميس من الساعة 8 صباحًا حتى 8 مساءً، ويوم السبت من 8 صباحًا حتى 6 مساءً." },
       { question: "Comment puis-je prendre rendez-vous ?", question_ar: "كيف يمكنني حجز موعد؟", answer: "Vous pouvez prendre rendez-vous directement via notre site web, par téléphone, ou via WhatsApp pour une réponse rapide.", answer_ar: "يمكنك حجز موعد مباشرة عبر موقعنا الإلكتروني، عبر الهاتف، أو عبر تطبيق الواتساب للحصول على استجابة سريعة." },
-      { question: "Acceptez-vous la carte CHIFA ?", question_ar: "هل تقبلون بطاقة الشفاء؟", answer: "Oui, la Clinique OKBA est conventionnée avec la CNAS et la CASNOS. N'oubliez pas de vous munir de votre carte CHIFA lors de votre visite.", answer_ar: "نعم، عيادة عقبة متعاقدة مع CNAS و CASNOS. لا تنس إحضار بطاقة الشفاء الخاصة بك عند زيارتك." },
+      { question: "Quels sont les moyens de paiement acceptés ?", question_ar: "ما هي وسائل الدفع المقبولة؟", answer: "Le paiement s'effectue à l'accueil. Si vous relevez d'un organisme conventionné avec la clinique, une prise en charge peut s'appliquer. Renseignez-vous auprès de notre équipe administrative.", answer_ar: "يتم الدفع في الاستقبال. إذا كنتم تابعين لهيئة متعاقدة مع المصحة، يمكن تطبيق التكفل. استفسروا لدى فريقنا الإداري." },
       { question: "Où êtes-vous situés exactement ?", question_ar: "أين تقعون بالضبط؟", answer: "Nous sommes situés à Hai Khemisti (Ex Cumo) USTO, Bir El Djir 31011, Oran. Un parking est à la disposition de nos patients.", answer_ar: "نحن نقع في حي خميستي (إكس كومو) إيسطو، بئر الجير 31011، وهران. يوجد موقف سيارات متاح لمرضانا." }
     ]
     for (const [idx, item] of faqData.entries()) {

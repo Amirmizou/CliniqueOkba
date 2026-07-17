@@ -27,6 +27,10 @@ Copy `.env.example` to `.env`. Required variables:
 - `SANITY_API_TOKEN` — Write token, only needed for `npm run seed`
 - `SANITY_REVALIDATE_SECRET` — Shared secret for the Sanity webhook ISR trigger
 
+Optional:
+
+- `VISITS_DATA_DIR` — Directory holding the visit counter's `visits.json` (see Visit Counter below). Defaults to `.data/` at the project root; point it outside the project on hosts that wipe the app directory on deploy.
+
 ## Architecture
 
 ### Routing & Internationalisation
@@ -81,6 +85,12 @@ Heavy below-the-fold components (Testimonials, HomeCare, EquipementsGallery) are
 ### Images
 
 All Sanity images go through `@sanity/image-url` (see `sanity/lib/image.ts`). Remote patterns in `next.config.ts` only allow `cdn.sanity.io`. The Next.js Image component is configured to prefer AVIF format with a 1-year cache TTL.
+
+### Visit Counter
+
+A self-hosted page-view counter, independent of Google Analytics. `components/visit-tracker.tsx` (mounted in `app/[locale]/layout.tsx`) beacons each navigation to `POST /api/track`; `lib/visits.ts` keeps the counters in memory and flushes them to `visits.json` atomically every 5s. Results are shown at `/admin/statistiques`, served by `GET /api/admin/stats` (`DELETE` resets them). Day keys use the `Africa/Algiers` timezone, history is pruned to 400 days, and known bot user-agents are ignored.
+
+State lives on the server's filesystem, so it is per-instance and does not survive a wiped deploy directory — see `VISITS_DATA_DIR` above.
 
 ### Remotion (Video)
 

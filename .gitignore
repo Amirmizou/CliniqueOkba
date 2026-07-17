@@ -37,6 +37,9 @@ yarn-error.log*
 # vercel
 .vercel
 
+# compteur de visites (lib/visits.ts)
+/.data/
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts

@@ -42,6 +42,7 @@ import Image from 'next/image'
 import { motion, AnimatePresence, useScroll, useMotionValueEvent } from 'framer-motion'
 import { cn } from '@/lib/utils'
 import { poles as localPoles } from '@/data/poles'
+import { siteConfig as siteConfigFallback } from '@/data/site-config'
 import LogoReveal from '@/components/logo-reveal'
 import SiteSearch from '@/components/site-search'
 import Link from 'next/link'
@@ -222,8 +223,8 @@ export default function Header({ siteSettings, poles }: HeaderProps) {
   const utilPhoneHref = `tel:${utilPhone.replace(/[^+\d]/g, '')}`
   const utilHours = siteSettings?.hours?.weekdays || ''
   const utilAddress = siteSettings?.address || ''
-  const utilFacebook = siteSettings?.social?.facebook
-  const utilInstagram = siteSettings?.social?.instagram
+  const utilFacebook = siteSettings?.social?.facebook || siteConfigFallback.social.facebook
+  const utilInstagram = siteSettings?.social?.instagram || siteConfigFallback.social.instagram
 
   return (
     <>

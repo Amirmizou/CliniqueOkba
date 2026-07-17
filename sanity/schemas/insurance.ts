@@ -46,7 +46,7 @@ export default defineType({
             name: 'providers',
             title: 'Organismes & dispositifs',
             type: 'array',
-            description: 'CNAS, CASNOS, mutuelles, tiers payant, etc.',
+            description: 'Entreprises, écoles, associations et promotions conventionnées avec la clinique.',
             of: [
                 {
                     type: 'object',

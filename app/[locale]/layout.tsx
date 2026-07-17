@@ -11,6 +11,7 @@ import { getMessages, setRequestLocale } from 'next-intl/server'
 import PageTransition from '@/components/page-transition'
 import { ServiceWorkerRegistration as SWRegistrationComponent } from '@/components/service-worker-registration'
 import { AuraBackground } from '@/components/ui/aura-background'
+import { VisitTracker } from '@/components/visit-tracker'
 
 import { LogoIntroWrapper } from '@/components/ui/logo-intro-wrapper'
 
@@ -62,6 +63,8 @@ export default async function LocaleLayout({
           </PageTransition>
         </AuraBackground>
         <SWRegistrationComponent />
+        {/* Compteur de visites interne — résultats dans /admin/statistiques */}
+        <VisitTracker />
         {process.env.NEXT_PUBLIC_GA_ID && (
           <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID} />
         )}
