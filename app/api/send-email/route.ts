@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { Resend } from 'resend';
+import nodemailer from 'nodemailer';
 import { emailRateLimiter } from '@/lib/rate-limit';
 import { z } from 'zod';
 
@@ -50,35 +50,51 @@ export async function POST(request: Request) {
     
     const { firstName, lastName, email, phone, message } = validationResult.data;
 
-    const apiKey = process.env.RESEND_API_KEY;
-    if (!apiKey) {
-      console.error('RESEND_API_KEY is not configured');
+    const smtpHost = process.env.SMTP_HOST;
+    const smtpUser = process.env.SMTP_USER;
+    const smtpPass = process.env.SMTP_PASS;
+    if (!smtpHost || !smtpUser || !smtpPass) {
+      console.error('SMTP configuration is incomplete (SMTP_HOST / SMTP_USER / SMTP_PASS)');
       return NextResponse.json({ error: 'Email service unavailable' }, { status: 503 });
     }
-    const resend = new Resend(apiKey);
 
-    // Expéditeur configurable : après vérification du domaine sur resend.com/domains,
-    // définir MAIL_FROM="Clinique Okba <contact@clinique-okba.com>" pour pouvoir
-    // envoyer vers n'importe quelle adresse. Par défaut : domaine de test Resend
-    // (n'envoie qu'à l'adresse propriétaire du compte).
-    const fromEmail = process.env.MAIL_FROM || 'Clinique Okba <onboarding@resend.dev>';
-    const toEmail = process.env.CLINIC_EMAIL || 'contact@cliniqueokba.com';
+    const smtpPort = Number(process.env.SMTP_PORT) || 465;
+    // SMTP_SECURE=true => connexion TLS directe (port 465). false => STARTTLS (port 587).
+    const smtpSecure = process.env.SMTP_SECURE
+      ? process.env.SMTP_SECURE === 'true'
+      : smtpPort === 465;
 
-    const { data, error } = await resend.emails.send({
-      from: fromEmail,
-      to: [toEmail],
-      subject: 'Nouveau message depuis le formulaire de contact',
-      html: `<p>Vous avez reçu un nouveau message de <strong>${escapeHtml(firstName)} ${escapeHtml(lastName)}</strong>.</p>
-             <p><strong>Email:</strong> ${escapeHtml(email)}</p>
-             <p><strong>Téléphone:</strong> ${escapeHtml(phone || 'Non renseigné')}</p>
-             <p><strong>Message:</strong></p>
-             <p>${escapeHtml(message).replace(/\n/g, '<br/>')}</p>`,
+    const transporter = nodemailer.createTransport({
+      host: smtpHost,
+      port: smtpPort,
+      secure: smtpSecure,
+      auth: {
+        user: smtpUser,
+        pass: smtpPass,
+      },
     });
 
-    if (error) {
-      console.error('Resend email error:', error);
+    // Expéditeur : sur Hostinger l'adresse "from" doit correspondre à la boîte SMTP.
+    // Par défaut on réutilise SMTP_USER. Destinataire = MAIL_TO (ou SMTP_USER).
+    const fromEmail = process.env.MAIL_FROM || `Clinique Okba <${smtpUser}>`;
+    const toEmail = process.env.MAIL_TO || process.env.CLINIC_EMAIL || smtpUser;
+
+    try {
+      await transporter.sendMail({
+        from: fromEmail,
+        to: toEmail,
+        replyTo: email,
+        subject: 'Nouveau message depuis le formulaire de contact',
+        html: `<p>Vous avez reçu un nouveau message de <strong>${escapeHtml(firstName)} ${escapeHtml(lastName)}</strong>.</p>
+               <p><strong>Email:</strong> ${escapeHtml(email)}</p>
+               <p><strong>Téléphone:</strong> ${escapeHtml(phone || 'Non renseigné')}</p>
+               <p><strong>Message:</strong></p>
+               <p>${escapeHtml(message).replace(/\n/g, '<br/>')}</p>`,
+      });
+    } catch (sendError) {
+      console.error('SMTP email error:', sendError);
       return NextResponse.json(
-        { error: "Échec de l'envoi de l'email", details: error.message },
+        { error: "Échec de l'envoi de l'email" },
         { status: 502 },
       );
     }
