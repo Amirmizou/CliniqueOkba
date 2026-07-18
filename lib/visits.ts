@@ -12,6 +12,8 @@ import path from 'node:path'
 
 const DATA_DIR = process.env.VISITS_DATA_DIR || path.join(process.cwd(), '.data')
 const FILE = path.join(DATA_DIR, 'visits.json')
+/** Sauvegarde du dernier état avant une réinitialisation (permet d'annuler). */
+const BACKUP_FILE = path.join(DATA_DIR, 'visits.backup.json')
 
 /** Nombre de jours d'historique conservés. */
 const RETENTION_DAYS = 400
@@ -25,17 +27,64 @@ export interface DayCounts {
   visits: number
 }
 
+/** Type d'appareil déduit du user-agent. */
+export type DeviceKind = 'desktop' | 'mobile' | 'tablet'
+
+export const DEVICE_KINDS: DeviceKind[] = ['desktop', 'mobile', 'tablet']
+
+/** Répartition par appareil (compteurs par type d'appareil). */
+export type DeviceCounts = Record<DeviceKind, DayCounts>
+
+/** Compteurs d'un jour, avec le détail par appareil. */
+export interface DayEntry extends DayCounts {
+  /** Détail par appareil pour ce jour (absent sur les anciens fichiers). */
+  devices?: DeviceCounts
+}
+
 export interface VisitStore {
   version: 1
   totalViews: number
   totalVisits: number
   firstDay: string | null
-  days: Record<string, DayCounts>
+  days: Record<string, DayEntry>
   paths: Record<string, number>
+  /** Répartition par appareil, cumulée depuis le début (toute la durée). */
+  devices: DeviceCounts
+}
+
+function emptyDevices(): DeviceCounts {
+  return {
+    desktop: { views: 0, visits: 0 },
+    mobile: { views: 0, visits: 0 },
+    tablet: { views: 0, visits: 0 },
+  }
 }
 
 function emptyStore(): VisitStore {
-  return { version: 1, totalViews: 0, totalVisits: 0, firstDay: null, days: {}, paths: {} }
+  return {
+    version: 1,
+    totalViews: 0,
+    totalVisits: 0,
+    firstDay: null,
+    days: {},
+    paths: {},
+    devices: emptyDevices(),
+  }
+}
+
+/**
+ * Déduit le type d'appareil du user-agent.
+ *
+ * Ordre important : Android est présent sur mobiles ET tablettes, seules les
+ * tablettes n'annoncent pas « Mobile ». À noter : iPadOS 13+ se déclare comme
+ * un Macintosh, ces iPad sont donc comptés en « ordinateur » (limite connue,
+ * indétectable côté serveur).
+ */
+export function detectDevice(ua: string): DeviceKind {
+  const s = (ua || '').toLowerCase()
+  if (/ipad|tablet|playbook|silk|kindle|(android(?!.*mobile))/.test(s)) return 'tablet'
+  if (/mobile|iphone|ipod|android|blackberry|opera mini|iemobile|windows phone/.test(s)) return 'mobile'
+  return 'desktop'
 }
 
 let store: VisitStore | null = null
@@ -67,8 +116,9 @@ async function load(): Promise<VisitStore> {
   loading = (async () => {
     try {
       const raw = await fs.readFile(FILE, 'utf8')
-      const parsed = JSON.parse(raw) as VisitStore
-      store = { ...emptyStore(), ...parsed }
+      const parsed = JSON.parse(raw) as Partial<VisitStore>
+      // Les fichiers écrits avant le suivi par appareil n'ont pas de `devices`.
+      store = { ...emptyStore(), ...parsed, devices: { ...emptyDevices(), ...parsed.devices } }
     } catch {
       // Fichier absent ou illisible : on repart d'un compteur vide.
       store = emptyStore()
@@ -114,7 +164,11 @@ function prune(s: VisitStore) {
 }
 
 /** Enregistre une page vue. `newVisit` = première page de la session. */
-export async function recordView(rawPath: string, newVisit: boolean): Promise<void> {
+export async function recordView(
+  rawPath: string,
+  newVisit: boolean,
+  device: DeviceKind = 'desktop',
+): Promise<void> {
   const s = await load()
   const day = today()
 
@@ -126,6 +180,16 @@ export async function recordView(rawPath: string, newVisit: boolean): Promise<vo
     s.totalVisits += 1
   }
   s.firstDay ??= day
+
+  // Cumul par appareil, toute la durée…
+  const dev = (s.devices[device] ??= { views: 0, visits: 0 })
+  dev.views += 1
+  if (newVisit) dev.visits += 1
+
+  // …et détail par appareil pour ce jour (permet les vues par période).
+  const dayDev = ((d.devices ??= emptyDevices())[device] ??= { views: 0, visits: 0 })
+  dayDev.views += 1
+  if (newVisit) dayDev.visits += 1
 
   const key = normalizePath(rawPath)
   if (s.paths[key] !== undefined || Object.keys(s.paths).length < MAX_PATHS) {
@@ -154,6 +218,13 @@ export interface VisitsSummary {
   /** 30 derniers jours, du plus ancien au plus récent. */
   series: Array<{ day: string; views: number; visits: number }>
   topPaths: Array<{ path: string; views: number }>
+  /** Répartition par appareil, par période. `total` = depuis le début. */
+  devices: {
+    today: DeviceCounts
+    last7: DeviceCounts
+    last30: DeviceCounts
+    total: DeviceCounts
+  }
 }
 
 function sumRange(s: VisitStore, from: string, to: string): DayCounts {
@@ -166,6 +237,19 @@ function sumRange(s: VisitStore, from: string, to: string): DayCounts {
     }
   }
   return { views, visits }
+}
+
+/** Cumule le détail par appareil sur une plage de jours (inclusive). */
+function sumDeviceRange(s: VisitStore, from: string, to: string): DeviceCounts {
+  const acc = emptyDevices()
+  for (const [day, c] of Object.entries(s.days)) {
+    if (day < from || day > to || !c.devices) continue
+    for (const k of DEVICE_KINDS) {
+      acc[k].views += c.devices[k]?.views || 0
+      acc[k].visits += c.devices[k]?.visits || 0
+    }
+  }
+  return acc
 }
 
 export async function getSummary(): Promise<VisitsSummary> {
@@ -193,12 +277,61 @@ export async function getSummary(): Promise<VisitsSummary> {
     since: s.firstDay,
     series,
     topPaths,
+    devices: {
+      today: sumDeviceRange(s, day, day),
+      last7: sumDeviceRange(s, shiftDay(day, -6), day),
+      last30: sumDeviceRange(s, shiftDay(day, -29), day),
+      total: { ...emptyDevices(), ...s.devices },
+    },
   }
 }
 
-/** Remet tous les compteurs à zéro. */
+/**
+ * Remet tous les compteurs à zéro.
+ *
+ * Avant l'effacement, l'état courant est copié dans un fichier de sauvegarde
+ * (`visits.backup.json`) pour permettre une annulation via `restoreVisits()`.
+ */
 export async function resetVisits(): Promise<void> {
+  const current = await load()
+  // On ne remplace la sauvegarde que s'il y a quelque chose à sauver : évite
+  // d'écraser une sauvegarde utile par un état déjà vide (double reset).
+  if (current.totalViews > 0 || current.totalVisits > 0) {
+    try {
+      await fs.mkdir(DATA_DIR, { recursive: true })
+      await fs.writeFile(BACKUP_FILE, JSON.stringify(current), 'utf8')
+    } catch (e) {
+      console.error('[visits] sauvegarde avant réinitialisation impossible:', e)
+    }
+  }
   store = emptyStore()
   scheduleFlush()
   await flush()
+}
+
+/** Indique si une sauvegarde restaurable existe. */
+export async function hasBackup(): Promise<boolean> {
+  try {
+    await fs.access(BACKUP_FILE)
+    return true
+  } catch {
+    return false
+  }
+}
+
+/**
+ * Restaure les compteurs depuis la dernière sauvegarde (annule un reset).
+ * Renvoie `true` si une sauvegarde a été restaurée, `false` s'il n'y en a pas.
+ */
+export async function restoreVisits(): Promise<boolean> {
+  try {
+    const raw = await fs.readFile(BACKUP_FILE, 'utf8')
+    const parsed = JSON.parse(raw) as Partial<VisitStore>
+    store = { ...emptyStore(), ...parsed, devices: { ...emptyDevices(), ...parsed.devices } }
+    scheduleFlush()
+    await flush()
+    return true
+  } catch {
+    return false
+  }
 }

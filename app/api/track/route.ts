@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { recordView } from '@/lib/visits'
+import { recordView, detectDevice } from '@/lib/visits'
 
 /**
  * Point d'entrée public du compteur de visites (voir lib/visits.ts).
@@ -20,7 +20,7 @@ export async function POST(request: Request) {
     const body = await request.json()
     const path = typeof body?.path === 'string' ? body.path : '/'
     const newVisit = body?.newVisit === true
-    await recordView(path, newVisit)
+    await recordView(path, newVisit, detectDevice(ua))
   } catch {
     // Un compteur ne doit jamais casser la navigation : on ignore l'erreur.
   }
