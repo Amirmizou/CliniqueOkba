@@ -93,8 +93,18 @@ export async function POST(request: Request) {
       });
     } catch (sendError) {
       console.error('SMTP email error:', sendError);
+      const err = sendError as { message?: string; code?: string; command?: string; response?: string };
       return NextResponse.json(
-        { error: "Échec de l'envoi de l'email" },
+        {
+          error: "Échec de l'envoi de l'email",
+          // Diagnostic temporaire — à retirer une fois le problème résolu.
+          debug: {
+            message: err?.message,
+            code: err?.code,
+            command: err?.command,
+            response: err?.response,
+          },
+        },
         { status: 502 },
       );
     }
