@@ -1,8 +1,5 @@
 import type React from 'react'
 import type { Metadata } from 'next'
-import dynamic from 'next/dynamic'
-import { Analytics } from '@vercel/analytics/next'
-import { SpeedInsights } from '@vercel/speed-insights/next'
 import { ThemeProvider } from '@/components/theme-provider'
 import { GoogleAnalytics } from '@/lib/analytics'
 import { defaultMetadata, generateStructuredData } from '@/lib/seo'
@@ -69,10 +66,6 @@ export default async function LocaleLayout({
           <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID} />
         )}
       </ThemeProvider>
-
-      {/* Analytics et SpeedInsights différés */}
-      <Analytics />
-      <SpeedInsights />
     </NextIntlClientProvider>
   )
 }
