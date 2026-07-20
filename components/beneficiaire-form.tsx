@@ -21,6 +21,9 @@ import {
   User,
   Users,
   Image as ImageIcon,
+  AlertCircle,
+  Pencil,
+  Lock,
 } from 'lucide-react'
 
 interface FamilyMember {
@@ -224,10 +227,16 @@ export default function BeneficiaireForm({ organismes, logos = {} }: { organisme
   const [members, setMembers] = useState<FamilyMember[]>([])
   const [photo, setPhoto] = useState<File | null>(null)
   const [document, setDocument] = useState<File | null>(null)
+  // Justificatif de propriété (facture élec/gaz/eau) — acquéreurs Dembri.
+  const [justificatif, setJustificatif] = useState<File | null>(null)
   const [consent, setConsent] = useState(false)
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState(false)
+  // Modification d'une inscription existante (après vérification d'identité).
+  const [editMode, setEditMode] = useState(false)
+  const [duplicate, setDuplicate] = useState<{ canModify: boolean; message: string } | null>(null)
+  const [modifyLoading, setModifyLoading] = useState(false)
 
   const set = (k: keyof typeof form, v: string) => setForm((f) => ({ ...f, [k]: v }))
   const updateMember = (i: number, k: keyof FamilyMember, v: string) =>
@@ -320,9 +329,12 @@ export default function BeneficiaireForm({ organismes, logos = {} }: { organisme
     setMembers([])
     setPhoto(null)
     setDocument(null)
+    setJustificatif(null)
     setConsent(false)
     setSuccess(false)
     setError('')
+    setEditMode(false)
+    setDuplicate(null)
     setStep(minStep)
   }
 
@@ -344,8 +356,16 @@ export default function BeneficiaireForm({ organismes, logos = {} }: { organisme
       fd.append('family_members', JSON.stringify(members.filter((m) => m.nom.trim() && m.prenom.trim())))
       if (photo) fd.append('photo', photo)
       if (document) fd.append('document', document)
+      if (justificatif && isDembri(form.organisme)) fd.append('justificatif', justificatif)
 
-      const res = await fetch('/api/beneficiaires', { method: 'POST', body: fd })
+      const res = await fetch('/api/beneficiaires', { method: editMode ? 'PATCH' : 'POST', body: fd })
+      // Déjà inscrit : on ne crée pas de doublon, on propose la modification.
+      if (res.status === 409) {
+        const j = await res.json().catch(() => ({}))
+        setDuplicate({ canModify: !!j.canModify, message: j.error || '' })
+        goTop()
+        return
+      }
       if (!res.ok) {
         const j = await res.json().catch(() => ({}))
         throw new Error(j.error || t('errorGeneric'))
@@ -356,6 +376,59 @@ export default function BeneficiaireForm({ organismes, logos = {} }: { organisme
       setError(err?.message || t('errorGeneric'))
     } finally {
       setSubmitting(false)
+    }
+  }
+
+  // Vérifie l'identité (téléphone + nom + prénom + organisme) et charge SA fiche
+  // pour la pré-remplir, puis bascule en mode modification.
+  const startModify = async () => {
+    setModifyLoading(true)
+    setError('')
+    try {
+      const res = await fetch('/api/beneficiaires', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          telephone: form.telephone,
+          nom: form.nom,
+          prenom: form.prenom,
+          organisme: form.organisme,
+        }),
+      })
+      if (!res.ok) {
+        const j = await res.json().catch(() => ({}))
+        throw new Error(j.error || t('errorGeneric'))
+      }
+      const { beneficiaire: b } = await res.json()
+      setForm((f) => ({
+        ...f,
+        email: b.email || '',
+        adresse: b.adresse || '',
+        num_assure: b.num_assure || '',
+        projet_dedie: b.projet_dedie || f.projet_dedie,
+        situation_familiale: b.situation_familiale || '',
+      }))
+      setMembers(
+        Array.isArray(b.family_members)
+          ? b.family_members.map((m: any) => ({
+              nom: m.nom || '',
+              prenom: m.prenom || '',
+              date_naissance: m.date_naissance || '',
+              lien_parente: m.lien_parente || '',
+            }))
+          : [],
+      )
+      setShowMore(true)
+      setEditMode(true)
+      setDuplicate(null)
+      // On repart à l'étape « coordonnées » ; l'identité est verrouillée.
+      setMinStep(1)
+      setStep(1)
+      goTop()
+    } catch (err: any) {
+      setError(err?.message || t('errorGeneric'))
+    } finally {
+      setModifyLoading(false)
     }
   }
 
@@ -374,14 +447,62 @@ export default function BeneficiaireForm({ organismes, logos = {} }: { organisme
           <CheckCircle2 className="mx-auto mb-6 h-20 w-20 text-emerald-600 drop-shadow-md" />
         </motion.div>
         <h3 className="mb-3 text-3xl font-extrabold tracking-tight text-emerald-800 dark:text-emerald-300">
-          {t('successTitle')}
+          {editMode ? (isRtl ? 'تم تحديث بياناتك' : 'Vos informations ont été mises à jour') : t('successTitle')}
         </h3>
         <p className="mb-8 text-lg font-medium text-emerald-700 dark:text-emerald-400">
-          {t('successMsg')}
+          {editMode
+            ? isRtl
+              ? 'تم حفظ التعديلات بنجاح.'
+              : 'Vos modifications ont bien été enregistrées.'
+            : t('successMsg')}
         </p>
-          <Button onClick={resetForm} size="lg" variant="outline" className="h-12 px-8 text-base font-bold shadow-sm">
-            {t('newSubmission')}
-          </Button>
+          {!editMode && (
+            <Button onClick={resetForm} size="lg" variant="outline" className="h-12 px-8 text-base font-bold shadow-sm">
+              {t('newSubmission')}
+            </Button>
+          )}
+      </motion.div>
+    )
+  }
+
+  // Écran « déjà inscrit(e) » : bloque le doublon et propose la modification.
+  if (duplicate) {
+    return (
+      <motion.div
+        initial={{ opacity: 0, scale: 0.95, y: 20 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        className="rounded-3xl border border-amber-200 bg-amber-50 p-10 text-center shadow-xl shadow-amber-500/10 dark:border-amber-900 dark:bg-amber-950/40"
+      >
+        <AlertCircle className="mx-auto mb-6 h-20 w-20 text-amber-600 drop-shadow-md" />
+        <h3 className="mb-3 text-3xl font-extrabold tracking-tight text-amber-800 dark:text-amber-300">
+          {isRtl ? 'أنت مسجّل بالفعل' : 'Vous êtes déjà inscrit(e)'}
+        </h3>
+        <p className="mb-8 text-lg font-medium text-amber-700 dark:text-amber-400">{duplicate.message}</p>
+        {duplicate.canModify ? (
+          <div className="flex flex-col items-center gap-3">
+            <p className="text-base text-slate-600 dark:text-slate-300">
+              {isRtl ? 'هل تريد تعديل معلوماتك؟' : 'Souhaitez-vous modifier vos informations ?'}
+            </p>
+            <div className="flex flex-wrap justify-center gap-3">
+              <Button onClick={startModify} disabled={modifyLoading} size="lg" className="h-12 bg-emerald-600 px-8 text-base font-bold hover:bg-emerald-700">
+                {modifyLoading ? <Loader2 className="me-2 h-5 w-5 animate-spin" /> : <Pencil className="me-2 h-5 w-5" />}
+                {isRtl ? 'تعديل معلوماتي' : 'Modifier mes informations'}
+              </Button>
+              <Button onClick={() => setDuplicate(null)} size="lg" variant="outline" className="h-12 px-8 text-base font-bold">
+                {isRtl ? 'رجوع' : 'Retour'}
+              </Button>
+            </div>
+          </div>
+        ) : (
+          <div className="flex flex-col items-center gap-3">
+            <p className="text-base text-slate-600 dark:text-slate-300">
+              {isRtl ? 'لتعديل هذا الملف، يرجى الاتصال بالعيادة.' : 'Pour modifier ce dossier, veuillez contacter la clinique.'}
+            </p>
+            <Button onClick={() => setDuplicate(null)} size="lg" variant="outline" className="h-12 px-8 text-base font-bold">
+              {isRtl ? 'رجوع' : 'Retour'}
+            </Button>
+          </div>
+        )}
       </motion.div>
     )
   }
@@ -555,24 +676,40 @@ export default function BeneficiaireForm({ organismes, logos = {} }: { organisme
             transition={{ duration: 0.3 }}
             className="space-y-4"
           >
+            {/* Mode modification : identité verrouillée (clé de la fiche) */}
+            {editMode && (
+              <div className="flex items-start gap-2.5 rounded-xl border border-emerald-300 bg-emerald-50 px-4 py-3 dark:border-emerald-800 dark:bg-emerald-950/40">
+                <Lock className="mt-0.5 h-5 w-5 shrink-0 text-emerald-600" />
+                <div className="text-sm text-emerald-800 dark:text-emerald-300">
+                  <p className="font-semibold">
+                    {isRtl ? 'تعديل بياناتك' : 'Modification de vos informations'}
+                  </p>
+                  <p className="text-emerald-700 dark:text-emerald-400">
+                    {isRtl
+                      ? `${form.prenom} ${form.nom} — ${form.organisme}. الاسم والهاتف والهيئة مقفلة؛ عدّل بقية المعلومات ثم احفظ.`
+                      : `${form.prenom} ${form.nom} — ${form.organisme}. Le nom, le téléphone et l'organisme sont verrouillés ; modifiez le reste puis enregistrez.`}
+                  </p>
+                </div>
+              </div>
+            )}
             <div>
               <label className={labelClass} htmlFor="prenom">
                 {t('prenom')} <span className="text-red-500">*</span>
               </label>
-              <input id="prenom" dir="ltr" lang="fr" className={inputClass} value={form.prenom} onChange={(e) => set('prenom', stripArabic(e.target.value))} />
+              <input id="prenom" dir="ltr" lang="fr" disabled={editMode} className={`${inputClass} ${editMode ? 'cursor-not-allowed opacity-60' : ''}`} value={form.prenom} onChange={(e) => set('prenom', stripArabic(e.target.value))} />
             </div>
             <div>
               <label className={labelClass} htmlFor="nom">
                 {t('nom')} <span className="text-red-500">*</span>
               </label>
-              <input id="nom" dir="ltr" lang="fr" className={inputClass} value={form.nom} onChange={(e) => set('nom', stripArabic(e.target.value))} />
-              <p className="mt-1.5 text-sm text-amber-600 dark:text-amber-400">{t('nameLatinHint')}</p>
+              <input id="nom" dir="ltr" lang="fr" disabled={editMode} className={`${inputClass} ${editMode ? 'cursor-not-allowed opacity-60' : ''}`} value={form.nom} onChange={(e) => set('nom', stripArabic(e.target.value))} />
+              {!editMode && <p className="mt-1.5 text-sm text-amber-600 dark:text-amber-400">{t('nameLatinHint')}</p>}
             </div>
             <div>
               <label className={labelClass} htmlFor="telephone">
                 {t('telephone')} <span className="text-red-500">*</span>
               </label>
-              <input id="telephone" type="tel" inputMode="tel" className={inputClass} value={form.telephone} onChange={(e) => set('telephone', e.target.value)} placeholder="0X XX XX XX XX" />
+              <input id="telephone" type="tel" inputMode="tel" disabled={editMode} className={`${inputClass} ${editMode ? 'cursor-not-allowed opacity-60' : ''}`} value={form.telephone} onChange={(e) => set('telephone', e.target.value)} placeholder="0X XX XX XX XX" />
             </div>
 
             <AnimatePresence mode="wait">
@@ -766,6 +903,33 @@ export default function BeneficiaireForm({ organismes, logos = {} }: { organisme
               />
             </div>
 
+            {/* Justificatif de propriété — uniquement pour les acquéreurs (Dembri) */}
+            {isDembri(form.organisme) && (
+              <div>
+                <p className={labelClass}>
+                  {isRtl
+                    ? 'إثبات الملكية (فاتورة الكهرباء أو الغاز أو الماء)'
+                    : 'Justificatif de propriété (facture électricité, gaz ou eau)'}
+                </p>
+                <MediaPicker
+                  file={justificatif}
+                  setFile={setJustificatif}
+                  capture="environment"
+                  accept="image/*,application/pdf"
+                  takeLabel={isRtl ? 'تصوير الفاتورة' : 'Scanner la facture'}
+                  chooseLabel={t('chooseDoc')}
+                  changeLabel={t('change')}
+                  addedLabel={t('added')}
+                  tip={
+                    isRtl
+                      ? 'فاتورة حديثة باسم المالك لإثبات ملكية السكن.'
+                      : 'Une facture récente au nom du propriétaire pour prouver la propriété du logement.'
+                  }
+                  isRtl={isRtl}
+                />
+              </div>
+            )}
+
             <label className="flex items-start gap-3 rounded-xl bg-slate-50 p-4 text-base text-slate-600 dark:bg-slate-800/50 dark:text-slate-300">
               <input type="checkbox" checked={consent} onChange={(e) => setConsent(e.target.checked)} className="mt-1 h-5 w-5 accent-emerald-600" />
               <span>{t('consent')}</span>
@@ -817,7 +981,7 @@ export default function BeneficiaireForm({ organismes, logos = {} }: { organisme
               ) : (
                 <>
                   <Check className="me-2 h-6 w-6" />
-                  {t('finish')}
+                  {editMode ? (isRtl ? 'حفظ التعديلات' : 'Enregistrer les modifications') : t('finish')}
                 </>
               )}
             </Button>
