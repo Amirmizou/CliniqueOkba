@@ -19,6 +19,7 @@ interface BeneficiaryRow {
   family_members: Array<{ nom?: string; prenom?: string; date_naissance?: string; lien_parente?: string }>
   photo_path: string | null
   document_path: string | null
+  justificatif_path: string | null
   status: string
   traite: boolean
   traite_at: string | null
@@ -113,6 +114,7 @@ export async function GET(request: Request) {
     rows.map(async (r) => {
       let photoUrl: string | null = null
       let documentUrl: string | null = null
+      let justificatifUrl: string | null = null
       if (r.photo_path) {
         const { data: s } = await supabase.storage
           .from(BENEFICIAIRES_BUCKET)
@@ -125,7 +127,13 @@ export async function GET(request: Request) {
           .createSignedUrl(r.document_path, SIGNED_URL_TTL)
         documentUrl = s?.signedUrl ?? null
       }
-      return { ...r, photoUrl, documentUrl }
+      if (r.justificatif_path) {
+        const { data: s } = await supabase.storage
+          .from(BENEFICIAIRES_BUCKET)
+          .createSignedUrl(r.justificatif_path, SIGNED_URL_TTL)
+        justificatifUrl = s?.signedUrl ?? null
+      }
+      return { ...r, photoUrl, documentUrl, justificatifUrl }
     }),
   )
 
@@ -142,8 +150,11 @@ export async function PATCH(request: Request) {
   if (!supabase) return NextResponse.json({ error: 'Supabase non configuré' }, { status: 503 })
 
   try {
-    const { id, status, notes_admin, traite } = await request.json()
-    if (!id) return NextResponse.json({ error: 'ID manquant' }, { status: 400 })
+    const { id, ids, status, notes_admin, traite } = await request.json()
+    const targetIds = id ? [id] : ids
+    if (!targetIds || !Array.isArray(targetIds) || targetIds.length === 0) {
+      return NextResponse.json({ error: 'ID(s) manquant(s)' }, { status: 400 })
+    }
 
     const patch: Record<string, unknown> = {}
     if (status && ['en_attente', 'valide', 'rejete'].includes(status)) patch.status = status
@@ -154,7 +165,7 @@ export async function PATCH(request: Request) {
     }
     if (Object.keys(patch).length === 0) return NextResponse.json({ error: 'Rien à modifier' }, { status: 400 })
 
-    const { error } = await supabase.from('beneficiaries').update(patch).eq('id', id)
+    const { error } = await supabase.from('beneficiaries').update(patch).in('id', targetIds)
     if (error) throw error
     return NextResponse.json({ ok: true })
   } catch (e) {
@@ -175,11 +186,11 @@ export async function DELETE(request: Request) {
     // Récupérer les chemins de fichiers pour les supprimer du stockage
     const { data: row } = await supabase
       .from('beneficiaries')
-      .select('photo_path, document_path')
+      .select('photo_path, document_path, justificatif_path')
       .eq('id', id)
       .single()
 
-    const toRemove = [row?.photo_path, row?.document_path].filter(Boolean) as string[]
+    const toRemove = [row?.photo_path, row?.document_path, row?.justificatif_path].filter(Boolean) as string[]
     if (toRemove.length) {
       await supabase.storage.from(BENEFICIAIRES_BUCKET).remove(toRemove).catch(() => {})
     }

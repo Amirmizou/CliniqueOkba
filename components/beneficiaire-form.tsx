@@ -2,6 +2,8 @@
 
 import { useState, useRef, useEffect, useMemo } from 'react'
 import { useTranslations, useLocale } from 'next-intl'
+import { motion, AnimatePresence } from 'framer-motion'
+import Image from 'next/image'
 import { useRouter, usePathname } from '@/navigation'
 import { Button } from '@/components/ui/button'
 import {
@@ -165,12 +167,42 @@ function MediaPicker({
   )
 }
 
-export default function BeneficiaireForm({ organismes }: { organismes: string[] }) {
+// Logos locaux de secours pour les organismes sans logo dans Sanity
+const LOCAL_LOGOS: Record<string, string> = {
+  bna: '/images/conventions/bna.png',
+  dambri: '/images/conventions/dambri-promo.png',
+  dembri: '/images/conventions/dambri-promo.png',
+  ensb: '/images/conventions/ensb.png',
+  seaco: '/images/conventions/seaco.png',
+}
+
+/** Cherche un logo local par correspondance partielle du nom d'organisme */
+function findLocalLogo(name: string): string | undefined {
+  const n = name.toLowerCase()
+  for (const [key, url] of Object.entries(LOCAL_LOGOS)) {
+    if (n.includes(key)) return url
+  }
+  return undefined
+}
+
+export default function BeneficiaireForm({ organismes, logos = {} }: { organismes: string[], logos?: Record<string, string> }) {
   const t = useTranslations('beneficiaireForm')
   const locale = useLocale()
   const router = useRouter()
   const pathname = usePathname()
   const isRtl = locale === 'ar'
+
+  // Merge logos de Sanity avec fallback local
+  const resolvedLogos = useMemo(() => {
+    const merged: Record<string, string> = { ...logos }
+    for (const name of organismes) {
+      if (!merged[name]) {
+        const local = findLocalLogo(name)
+        if (local) merged[name] = local
+      }
+    }
+    return merged
+  }, [logos, organismes])
 
   const [step, setStep] = useState(0)
   // Étape minimale accessible : passe à 1 quand l'organisme est pré-rempli via
@@ -329,14 +361,28 @@ export default function BeneficiaireForm({ organismes }: { organismes: string[] 
 
   if (success) {
     return (
-      <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-8 text-center dark:border-emerald-900 dark:bg-emerald-950/40">
-        <CheckCircle2 className="mx-auto mb-4 h-16 w-16 text-emerald-600" />
-        <h3 className="mb-2 text-2xl font-bold text-emerald-800 dark:text-emerald-300">{t('successTitle')}</h3>
-        <p className="mb-6 text-lg text-emerald-700 dark:text-emerald-400">{t('successMsg')}</p>
-        <Button onClick={resetForm} size="lg" variant="outline">
-          {t('newSubmission')}
-        </Button>
-      </div>
+      <motion.div 
+        initial={{ opacity: 0, scale: 0.95, y: 20 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        className="rounded-3xl border border-emerald-200 bg-emerald-50 p-10 text-center shadow-xl shadow-emerald-500/10 dark:border-emerald-900 dark:bg-emerald-950/40"
+      >
+        <motion.div
+          initial={{ scale: 0 }}
+          animate={{ scale: 1 }}
+          transition={{ type: 'spring', damping: 12, stiffness: 100, delay: 0.1 }}
+        >
+          <CheckCircle2 className="mx-auto mb-6 h-20 w-20 text-emerald-600 drop-shadow-md" />
+        </motion.div>
+        <h3 className="mb-3 text-3xl font-extrabold tracking-tight text-emerald-800 dark:text-emerald-300">
+          {t('successTitle')}
+        </h3>
+        <p className="mb-8 text-lg font-medium text-emerald-700 dark:text-emerald-400">
+          {t('successMsg')}
+        </p>
+          <Button onClick={resetForm} size="lg" variant="outline" className="h-12 px-8 text-base font-bold shadow-sm">
+            {t('newSubmission')}
+          </Button>
+      </motion.div>
     )
   }
 
@@ -402,46 +448,71 @@ export default function BeneficiaireForm({ organismes }: { organismes: string[] 
           <span>{Math.round(((step - minStep + 1) / (TOTAL_STEPS - minStep)) * 100)}%</span>
         </div>
         <div className="h-2.5 w-full overflow-hidden rounded-full bg-slate-200 dark:bg-slate-800">
-          <div
-            className="h-full rounded-full bg-emerald-600 transition-all duration-300"
-            style={{ width: `${((step - minStep + 1) / (TOTAL_STEPS - minStep)) * 100}%` }}
+          <motion.div
+            className="h-full rounded-full bg-emerald-600"
+            initial={{ width: 0 }}
+            animate={{ width: `${((step - minStep + 1) / (TOTAL_STEPS - minStep)) * 100}%` }}
+            transition={{ duration: 0.5, ease: 'easeOut' }}
           />
         </div>
       </div>
 
       {/* En-tête d'étape */}
-      <div className="mb-6 flex items-start gap-3">
-        <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-emerald-100 text-emerald-600 dark:bg-emerald-950 dark:text-emerald-400">
-          <CurrentIcon className="h-6 w-6" />
-        </div>
-        <div>
-          <h2 className="text-xl font-bold text-slate-800 dark:text-white">{stepMeta[step].title}</h2>
-          <p className="text-slate-500 dark:text-slate-400">{stepMeta[step].help}</p>
+      <div className="mb-8 flex items-start gap-4">
+        <motion.div 
+          key={step}
+          initial={{ scale: 0.8, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ type: 'spring', stiffness: 200, damping: 15 }}
+          className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-emerald-100 text-emerald-600 shadow-inner dark:bg-emerald-950 dark:text-emerald-400"
+        >
+          <CurrentIcon className="h-7 w-7" />
+        </motion.div>
+        <div className="pt-1">
+          <h2 className="text-2xl font-extrabold text-slate-800 dark:text-white">{stepMeta[step].title}</h2>
+          <p className="mt-1 text-base font-medium text-slate-500 dark:text-slate-400">{stepMeta[step].help}</p>
         </div>
       </div>
 
       {/* Contenu de l'étape */}
-      <div className="min-h-[220px]">
-        {/* Étape 1 : Organisme (gros boutons) */}
-        {step === 0 && (
-          <div className="space-y-3">
+      <div className="min-h-[220px] relative">
+        <AnimatePresence mode="wait">
+          {/* Étape 1 : Organisme (gros boutons) */}
+          {step === 0 && (
+            <motion.div
+              key="step0"
+              initial={{ opacity: 0, x: isRtl ? -20 : 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: isRtl ? 20 : -20 }}
+              transition={{ duration: 0.3 }}
+              className="space-y-3"
+            >
             {organismes.length === 0 ? (
               <p className="rounded-xl bg-amber-50 p-4 text-amber-700">{t('noOrganisme')}</p>
             ) : (
               organismes.map((o) => (
-                <button
+                <motion.button
+                  whileHover={{ scale: 1.01 }}
+                  whileTap={{ scale: 0.99 }}
                   key={o}
                   type="button"
                   onClick={() => selectOrganisme(o)}
-                  className={`flex w-full items-center justify-between rounded-2xl border-2 px-5 py-4 text-start text-lg font-semibold transition ${
+                  className={`flex w-full items-center justify-between rounded-2xl border-2 px-5 py-4 text-start text-lg font-semibold transition shadow-sm ${
                     form.organisme === o
-                      ? 'border-emerald-600 bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300'
-                      : 'border-slate-200 bg-white text-slate-700 hover:border-emerald-300 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200'
+                      ? 'border-emerald-600 bg-emerald-50 text-emerald-700 shadow-emerald-500/10 dark:bg-emerald-950/40 dark:text-emerald-300'
+                      : 'border-slate-200 bg-white text-slate-700 hover:border-emerald-300 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 hover:shadow-md'
                   }`}
                 >
-                  {o}
+                  <span className="flex items-center gap-3">
+                    {resolvedLogos[o] ? (
+                      <Image src={resolvedLogos[o]} alt="" width={40} height={40} className="h-10 w-10 shrink-0 rounded-lg object-contain" />
+                    ) : (
+                      <Building2 className="h-6 w-6 shrink-0 text-slate-400" />
+                    )}
+                    <span>{o}</span>
+                  </span>
                   {form.organisme === o && <Check className="h-6 w-6 text-emerald-600" />}
-                </button>
+                </motion.button>
               ))
             )}
             
@@ -471,12 +542,19 @@ export default function BeneficiaireForm({ organismes }: { organismes: string[] 
                 </p>
               </div>
             )}
-          </div>
+          </motion.div>
         )}
 
         {/* Étape 2 : Coordonnées */}
         {step === 1 && (
-          <div className="space-y-4">
+          <motion.div
+            key="step1"
+            initial={{ opacity: 0, x: isRtl ? -20 : 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: isRtl ? 20 : -20 }}
+            transition={{ duration: 0.3 }}
+            className="space-y-4"
+          >
             <div>
               <label className={labelClass} htmlFor="prenom">
                 {t('prenom')} <span className="text-red-500">*</span>
@@ -497,12 +575,25 @@ export default function BeneficiaireForm({ organismes }: { organismes: string[] 
               <input id="telephone" type="tel" inputMode="tel" className={inputClass} value={form.telephone} onChange={(e) => set('telephone', e.target.value)} placeholder="0X XX XX XX XX" />
             </div>
 
-            {!showMore ? (
-              <button type="button" onClick={() => setShowMore(true)} className="text-base font-medium text-emerald-600 hover:underline">
-                + {t('moreInfo')}
-              </button>
-            ) : (
-              <div className="space-y-4 rounded-xl bg-slate-50 p-4 dark:bg-slate-800/50">
+            <AnimatePresence mode="wait">
+              {!showMore ? (
+                <motion.button 
+                  key="btn"
+                  initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+                  type="button" 
+                  onClick={() => setShowMore(true)} 
+                  className="mt-2 text-base font-medium text-emerald-600 hover:underline"
+                >
+                  + {t('moreInfo')}
+                </motion.button>
+              ) : (
+                <motion.div 
+                  key="form"
+                  initial={{ opacity: 0, height: 0 }} 
+                  animate={{ opacity: 1, height: 'auto' }} 
+                  exit={{ opacity: 0, height: 0 }}
+                  className="space-y-4 rounded-xl bg-slate-50 p-4 dark:bg-slate-800/50"
+                >
                 <div>
                   <label className={labelClass} htmlFor="email">
                     {t('email')} <span className="text-slate-400">({t('optional')})</span>
@@ -521,14 +612,22 @@ export default function BeneficiaireForm({ organismes }: { organismes: string[] 
                   </label>
                   <input id="adresse" className={inputClass} value={form.adresse} onChange={(e) => set('adresse', e.target.value)} />
                 </div>
-              </div>
-            )}
-          </div>
-        )}
+              </motion.div>
+              )}
+            </AnimatePresence>
+            </motion.div>
+          )}
 
-        {/* Étape 3 : Situation familiale + ayants droit */}
-        {step === 2 && (
-          <div className="space-y-5">
+          {/* Étape 3 : Situation familiale + ayants droit */}
+          {step === 2 && (
+            <motion.div
+              key="step2"
+              initial={{ opacity: 0, x: isRtl ? -20 : 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: isRtl ? 20 : -20 }}
+              transition={{ duration: 0.3 }}
+              className="space-y-5"
+            >
             {/* Situation familiale (oriente les ayants droit à saisir) */}
             <div>
               <p className={labelClass}>
@@ -539,36 +638,46 @@ export default function BeneficiaireForm({ organismes }: { organismes: string[] 
                   { key: 'celibataire', label: t('situationCelibataire') },
                   { key: 'marie', label: t('situationMarie') },
                 ].map((s) => (
-                  <button
+                  <motion.button
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
                     key={s.key}
                     type="button"
                     onClick={() => {
                       setError('')
                       set('situation_familiale', s.key)
                     }}
-                    className={`rounded-2xl border-2 px-4 py-4 text-base font-semibold transition ${
+                    className={`rounded-2xl border-2 px-4 py-4 text-base font-semibold transition shadow-sm ${
                       form.situation_familiale === s.key
-                        ? 'border-emerald-600 bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300'
-                        : 'border-slate-200 bg-white text-slate-700 hover:border-emerald-300 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200'
+                        ? 'border-emerald-600 bg-emerald-50 text-emerald-700 shadow-emerald-500/10 dark:bg-emerald-950/40 dark:text-emerald-300'
+                        : 'border-slate-200 bg-white text-slate-700 hover:border-emerald-300 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 hover:shadow-md'
                     }`}
                   >
                     {s.label}
-                  </button>
+                  </motion.button>
                 ))}
               </div>
             </div>
 
-            {form.situation_familiale && (
-              <>
-                <p className="rounded-xl bg-emerald-50 px-4 py-3 text-sm text-emerald-800 dark:bg-emerald-950/30 dark:text-emerald-300">
-                  {form.situation_familiale === 'marie' ? t('ayantsDroitMarie') : t('ayantsDroitCelibataire')}
-                </p>
-                {members.length > 0 && (
-                  <p className="text-sm text-amber-600 dark:text-amber-400">{t('nameLatinHint')}</p>
-                )}
+            <AnimatePresence>
+              {form.situation_familiale && (
+                <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-5">
+                  <p className="rounded-xl bg-emerald-50 px-4 py-3 text-sm text-emerald-800 dark:bg-emerald-950/30 dark:text-emerald-300">
+                    {form.situation_familiale === 'marie' ? t('ayantsDroitMarie') : t('ayantsDroitCelibataire')}
+                  </p>
+                  {members.length > 0 && (
+                    <p className="text-sm text-amber-600 dark:text-amber-400">{t('nameLatinHint')}</p>
+                  )}
 
-                {members.map((m, i) => (
-                  <div key={i} className="rounded-2xl border border-slate-200 bg-slate-50 p-4 dark:border-slate-700 dark:bg-slate-800/50">
+                  <AnimatePresence>
+                  {members.map((m, i) => (
+                    <motion.div 
+                      key={i} 
+                      initial={{ opacity: 0, scale: 0.95 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      exit={{ opacity: 0, scale: 0.95, height: 0, overflow: 'hidden', marginTop: 0 }}
+                      className="rounded-2xl border border-slate-200 bg-slate-50 p-4 dark:border-slate-700 dark:bg-slate-800/50"
+                    >
                     <div className="grid gap-3 sm:grid-cols-2">
                       <input placeholder={t('memberPrenom')} dir="ltr" lang="fr" className={inputClass} value={m.prenom} onChange={(e) => updateMember(i, 'prenom', stripArabic(e.target.value))} />
                       <input placeholder={t('memberNom')} dir="ltr" lang="fr" className={inputClass} value={m.nom} onChange={(e) => updateMember(i, 'nom', stripArabic(e.target.value))} />
@@ -581,12 +690,13 @@ export default function BeneficiaireForm({ organismes }: { organismes: string[] 
                         <option value={t('lienAutre')}>{t('lienAutre')}</option>
                       </select>
                     </div>
-                    <button type="button" onClick={() => setMembers((arr) => arr.filter((_, idx) => idx !== i))} className="mt-3 inline-flex items-center gap-1.5 text-sm font-medium text-red-600">
-                      <Trash2 className="h-4 w-4" />
-                      {t('removeMember')}
-                    </button>
-                  </div>
-                ))}
+                      <button type="button" onClick={() => setMembers((arr) => arr.filter((_, idx) => idx !== i))} className="mt-3 inline-flex items-center gap-1.5 text-sm font-medium text-red-600">
+                        <Trash2 className="h-4 w-4" />
+                        {t('removeMember')}
+                      </button>
+                    </motion.div>
+                  ))}
+                  </AnimatePresence>
 
                 {/* Boutons d'ajout ciblés selon la situation */}
                 <div className="grid gap-2 sm:grid-cols-3">
@@ -609,14 +719,22 @@ export default function BeneficiaireForm({ organismes }: { organismes: string[] 
                 </div>
 
                 <p className="text-sm text-slate-500 dark:text-slate-400">{t('ayantsDroitNote')}</p>
-              </>
+              </motion.div>
             )}
-          </div>
+            </AnimatePresence>
+          </motion.div>
         )}
 
         {/* Étape 4 : Photos + consentement */}
         {step === 3 && (
-          <div className="space-y-6">
+          <motion.div
+            key="step3"
+            initial={{ opacity: 0, x: isRtl ? -20 : 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: isRtl ? 20 : -20 }}
+            transition={{ duration: 0.3 }}
+            className="space-y-6"
+          >
             <div>
               <p className={labelClass}>{t('photoLabel')}</p>
               <MediaPicker
@@ -652,8 +770,9 @@ export default function BeneficiaireForm({ organismes }: { organismes: string[] 
               <input type="checkbox" checked={consent} onChange={(e) => setConsent(e.target.checked)} className="mt-1 h-5 w-5 accent-emerald-600" />
               <span>{t('consent')}</span>
             </label>
-          </div>
-        )}
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
 
       {error && (
@@ -705,6 +824,43 @@ export default function BeneficiaireForm({ organismes }: { organismes: string[] 
           )}
         </div>
       </div>
+
+      <AnimatePresence>
+        {submitting && (
+          <motion.div 
+            initial={{ opacity: 0 }} 
+            animate={{ opacity: 1 }} 
+            exit={{ opacity: 0 }} 
+            className="fixed inset-0 z-[100] flex items-center justify-center bg-white/90 backdrop-blur-md dark:bg-slate-950/90"
+          >
+            <div className="flex flex-col items-center justify-center text-emerald-600 dark:text-emerald-400">
+              <motion.div
+                animate={{ scale: [1, 1.2, 1], rotate: [0, 180, 360] }}
+                transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+                className="mb-6 flex h-24 w-24 items-center justify-center rounded-3xl bg-emerald-100 shadow-xl shadow-emerald-500/20 dark:bg-emerald-900/50"
+              >
+                <Loader2 className="h-12 w-12 animate-spin text-emerald-600 dark:text-emerald-300" />
+              </motion.div>
+              <motion.p
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2 }}
+                className="text-2xl font-extrabold tracking-wide text-emerald-800 dark:text-emerald-300"
+              >
+                {t('submitting')}...
+              </motion.p>
+              <motion.p
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.8 }}
+                className="mt-3 text-base font-semibold text-emerald-600/80 dark:text-emerald-400/80"
+              >
+                {isRtl ? 'جاري تأمين بياناتك الطبية...' : 'Sécurisation de vos données médicales...'}
+              </motion.p>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   )
 }

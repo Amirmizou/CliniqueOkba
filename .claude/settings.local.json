@@ -53,7 +53,17 @@
       "Bash(echo \"=== tsc termine \\(exit $?\\) ===\")",
       "Bash(echo \"=== tsc exit: $? ===\")",
       "Bash(powershell -NoProfile -Command \"Get-Process node -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue\")",
-      "Bash(git check-ignore *)"
+      "Bash(git check-ignore *)",
+      "Read(//c/Users/**)",
+      "Bash(find /c -maxdepth 3 -iname \"*facture*\" -type d)",
+      "Bash(node scripts/review-supabase-beneficiaries.js)",
+      "Bash(node scripts/cleanup-supabase-run.js)",
+      "Bash(node scripts/cleanup-supabase-run.js --delete)",
+      "Bash(node *)",
+      "Bash(npm install *)",
+      "Bash(curl -sI \"https://cliniqueokba.com\" -w 'HTTP %{http_code}\\\\n' --max-time 20)",
+      "Bash(curl -sI \"https://www.cliniqueokba.com\" -w 'HTTP %{http_code}\\\\n' --max-time 20)",
+      "Bash(curl -sv \"https://cliniqueokba.com/api/revalidate\" --max-time 20)"
     ]
   }
 }

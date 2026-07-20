@@ -26,11 +26,33 @@ export default async function InscriptionBeneficiairePage({
     const insurance = localizeSanityData(insuranceRaw, locale)
     const siteSettings = localizeSanityData(siteSettingsRaw, locale)
 
-    const organismes: string[] = Array.isArray(insurance?.providers)
-        ? insurance.providers
-              .map((p: { name?: string }) => (p?.name || '').trim())
-              .filter((n: string) => n.length > 0)
+    // Organismes proposés à l'inscription. On exclut « Oncologica » : ce
+    // partenaire reste visible dans la section conventions mais n'ouvre pas
+    // d'inscription bénéficiaire en ligne.
+    const filteredProviders = Array.isArray(insurance?.providers)
+        ? insurance.providers.filter((p: { name?: string }) => {
+              const n = (p?.name || '').trim()
+              return n.length > 0 && !/oncolog/i.test(n)
+          })
         : []
+
+    const organismes: string[] = filteredProviders.map(
+        (p: { name?: string }) => (p?.name || '').trim()
+    )
+
+    // Résoudre les URLs des logos côté serveur pour les passer sérialisés au client
+    const { urlFor: urlForLogo } = await import('@/sanity/lib/image')
+    const logoMap: Record<string, string> = {}
+    for (const p of filteredProviders) {
+        const name = (p?.name || '').trim()
+        if (p?.logo) {
+            try {
+                logoMap[name] = typeof p.logo === 'string'
+                    ? p.logo
+                    : urlForLogo(p.logo).width(200).url()
+            } catch { /* skip if logo can't be resolved */ }
+        }
+    }
 
     return (
         <>
@@ -47,7 +69,7 @@ export default async function InscriptionBeneficiairePage({
                         </ScrollAnimation>
 
                         <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900 sm:p-8 md:p-10">
-                            <BeneficiaireForm organismes={organismes} />
+                            <BeneficiaireForm organismes={organismes} logos={logoMap} />
                         </div>
                     </div>
                 </section>

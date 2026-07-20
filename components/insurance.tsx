@@ -43,19 +43,6 @@ export default function Insurance({ data }: InsuranceProps) {
   const [selectedProvider, setSelectedProvider] = useState<InsuranceProvider | null>(null)
   const [photoIndex, setPhotoIndex] = useState(0)
 
-  // Préparation des cartes pour le cylindre 3D
-  let carouselItems = [...data.providers]
-  if (carouselItems.length > 0) {
-    while (carouselItems.length < 8) {
-      carouselItems = [...carouselItems, ...data.providers]
-    }
-  }
-
-  const total = carouselItems.length
-  const angle = 360 / total
-  const cardWidth = 260
-  const tz = Math.round((cardWidth / 2) / Math.tan(Math.PI / total)) + 30
-
   return (
     <section
       id="prise-en-charge"
@@ -81,85 +68,78 @@ export default function Insurance({ data }: InsuranceProps) {
           </div>
         </AnimatedSection>
 
-        {/* Carrousel 3D Cylindrique */}
-        <div className="relative mx-auto mt-20 h-[280px] w-full max-w-[260px] [perspective:1400px]">
-          <style dangerouslySetInnerHTML={{__html: `
-            @keyframes spin-cylinder {
-              0% { transform: translateZ(-${tz}px) rotateY(0deg); }
-              100% { transform: translateZ(-${tz}px) rotateY(-360deg); }
+        {/* Grille des conventions (remplace le cylindre pour éviter les duplications) */}
+        <div className="mt-16 flex flex-wrap justify-center gap-6">
+          {data.providers.map((provider, i) => {
+            let logoUrl = typeof provider.logo === 'string'
+              ? provider.logo
+              : provider.logo
+                ? urlFor(provider.logo).width(320).url()
+                : ''
+            // Fallback local pour les logos non renseignés dans Sanity
+            if (!logoUrl) {
+              const n = (provider.name || '').toLowerCase()
+              if (n.includes('bna')) logoUrl = '/images/conventions/bna.png'
+              else if (n.includes('dambri') || n.includes('dembri')) logoUrl = '/images/conventions/dambri-promo.png'
+              else if (n.includes('ensb')) logoUrl = '/images/conventions/ensb.png'
+              else if (n.includes('seaco')) logoUrl = '/images/conventions/seaco.png'
+              else if (n.includes('oncolog')) logoUrl = '/images/conventions/oncologica.png'
             }
-            .animate-spin-cylinder {
-              animation: spin-cylinder ${total * 3.5}s linear infinite;
-            }
-            .animate-spin-cylinder:hover,
-            .is-paused .animate-spin-cylinder {
-              animation-play-state: paused;
-            }
-          `}} />
-          
-          <div className={`absolute inset-0 [transform-style:preserve-3d] ${selectedProvider ? 'is-paused' : 'animate-spin-cylinder'}`}>
-            {carouselItems.map((provider, i) => {
-              const logoUrl = typeof provider.logo === 'string'
-                ? provider.logo
-                : provider.logo
-                  ? urlFor(provider.logo).width(320).url()
-                  : ''
-              
-              const hasPhotos = Array.isArray(provider.signaturePhotos) && provider.signaturePhotos.length > 0
-              
-              return (
-                <motion.div
-                  key={`${provider.name}-${i}`}
-                  layoutId={hasPhotos && !selectedProvider ? `provider-${provider.name}` : undefined}
-                  className={`absolute inset-0 flex flex-col items-center justify-center rounded-2xl border bg-card/95 p-6 text-center shadow-lg backdrop-blur-md transition-colors hover:bg-card ${hasPhotos ? 'cursor-pointer hover:border-primary/60 border-primary/20' : 'border-border/80'}`}
-                  style={{
-                    transform: `rotateY(${i * angle}deg) translateZ(${tz}px)`,
-                    backfaceVisibility: 'hidden',
-                  }}
-                  onClick={() => {
-                    if (hasPhotos) {
-                      setSelectedProvider(provider)
-                      setPhotoIndex(0)
-                    }
-                  }}
-                >
-                  {hasPhotos && (
-                    <div className="absolute top-3 right-3 flex h-8 w-8 items-center justify-center rounded-full bg-brand-gold/20 text-brand-gold animate-pulse shadow-sm">
-                      <Camera className="h-4 w-4" />
-                    </div>
-                  )}
-                  
-                  <div className="mb-4 flex h-16 w-full max-w-[160px] items-center justify-center rounded-xl bg-primary/5 p-2 text-primary shadow-inner">
-                    {logoUrl ? (
-                      <Image
-                        src={logoUrl}
-                        alt={provider.name}
-                        width={160}
-                        height={64}
-                        className="h-full w-full object-contain"
-                      />
-                    ) : (
-                      <BadgeCheck className="h-8 w-8" />
-                    )}
+            
+            const hasPhotos = Array.isArray(provider.signaturePhotos) && provider.signaturePhotos.length > 0
+            
+            return (
+              <motion.div
+                key={`${provider.name}-${i}`}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: i * 0.1 }}
+                layoutId={hasPhotos && !selectedProvider ? `provider-${provider.name}` : undefined}
+                className={`relative flex w-full max-w-[280px] flex-col items-center justify-center rounded-2xl border bg-card/95 p-6 text-center shadow-lg backdrop-blur-md transition-all hover:-translate-y-1 hover:shadow-xl ${hasPhotos ? 'cursor-pointer hover:border-primary/60 border-primary/20' : 'border-border/80'}`}
+                onClick={() => {
+                  if (hasPhotos) {
+                    setSelectedProvider(provider)
+                    setPhotoIndex(0)
+                  }
+                }}
+              >
+                {hasPhotos && (
+                  <div className="absolute top-3 right-3 flex h-8 w-8 items-center justify-center rounded-full bg-brand-gold/20 text-brand-gold animate-pulse shadow-sm">
+                    <Camera className="h-4 w-4" />
                   </div>
-                  <h3 className="text-base font-bold text-foreground">
-                    {isAr ? (provider.name_ar || provider.name) : provider.name}
-                  </h3>
-                  {(provider.description || provider.description_ar) && (
-                    <p className="mt-2 text-[13px] leading-relaxed text-muted-foreground line-clamp-3">
-                      {isAr ? (provider.description_ar || provider.description) : provider.description}
-                    </p>
+                )}
+                
+                <div className="mb-4 flex h-20 w-full items-center justify-center rounded-xl bg-primary/5 p-3 text-primary shadow-inner">
+                  {logoUrl ? (
+                    <Image
+                      src={logoUrl}
+                      alt={provider.name}
+                      width={160}
+                      height={80}
+                      className="h-full w-full object-contain mix-blend-multiply dark:mix-blend-normal"
+                    />
+                  ) : (
+                    <BadgeCheck className="h-10 w-10" />
                   )}
-                  
-                  {hasPhotos && (
-                    <div className="mt-4 text-[11px] font-semibold text-primary/80 uppercase tracking-wide">
-                      {isAr ? 'عرض صور التوقيع' : 'Voir les photos'}
-                    </div>
-                  )}
-                </motion.div>
-              )
-            })}
-          </div>
+                </div>
+                <h3 className="text-lg font-bold text-foreground">
+                  {isAr ? (provider.name_ar || provider.name) : provider.name}
+                </h3>
+                {(provider.description || provider.description_ar) && (
+                  <p className="mt-2 text-sm leading-relaxed text-muted-foreground line-clamp-3">
+                    {isAr ? (provider.description_ar || provider.description) : provider.description}
+                  </p>
+                )}
+                
+                {hasPhotos && (
+                  <div className="mt-5 text-[11px] font-semibold text-primary/80 uppercase tracking-wide">
+                    {isAr ? 'عرض صور التوقيع' : 'Voir les photos'}
+                  </div>
+                )}
+              </motion.div>
+            )
+          })}
         </div>
 
         {/* Note + CTA */}

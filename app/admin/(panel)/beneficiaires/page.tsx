@@ -11,6 +11,7 @@ import {
   Trash2,
   Eye,
   FileText,
+  Receipt,
   ImageIcon,
   Users,
   CheckCircle2,
@@ -51,6 +52,7 @@ interface Beneficiary {
   created_at: string
   photoUrl: string | null
   documentUrl: string | null
+  justificatifUrl: string | null
 }
 
 const STATUS: Record<string, { label: string; cls: string; icon: any }> = {
@@ -88,6 +90,7 @@ export default function BeneficiairesPage() {
   const [traiteFilter, setTraiteFilter] = useState('')
   const [search, setSearch] = useState('')
   const [detail, setDetail] = useState<Beneficiary | null>(null)
+  const [selectedIds, setSelectedIds] = useState<string[]>([])
   const { toast, ToastView } = useToast()
 
   // Chargement (debouncé). Ne dépend que des filtres primitifs : c'est ce qui
@@ -109,6 +112,7 @@ export default function BeneficiairesPage() {
         if (cancelled) return
         setList(json.beneficiaries || [])
         setByOrganisme(json.byOrganisme || {})
+        setSelectedIds([])
       } catch {
         if (!cancelled)
           toast({ title: 'Erreur', description: 'Impossible de charger les bénéficiaires.', variant: 'destructive' })
@@ -136,6 +140,22 @@ export default function BeneficiairesPage() {
       toast({ title: 'Statut mis à jour' })
     } catch {
       toast({ title: 'Erreur', description: 'Échec de la mise à jour.', variant: 'destructive' })
+    }
+  }
+
+  const bulkChangeStatus = async (newStatus: string) => {
+    try {
+      const res = await fetch('/api/admin/beneficiaires', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ids: selectedIds, status: newStatus }),
+      })
+      if (!res.ok) throw new Error()
+      setList((l) => l.map((b) => (selectedIds.includes(b.id) ? { ...b, status: newStatus } : b)))
+      toast({ title: 'Statut mis à jour pour la sélection' })
+      setSelectedIds([])
+    } catch {
+      toast({ title: 'Erreur', description: 'Échec de la mise à jour groupée.', variant: 'destructive' })
     }
   }
 
@@ -284,11 +304,37 @@ export default function BeneficiairesPage() {
           </CardContent>
         </Card>
       ) : (
-        <div className="overflow-x-auto rounded-xl border border-slate-200 dark:border-slate-800">
-          <table className="w-full text-sm">
-            <thead className="bg-slate-50 text-left text-slate-500 dark:bg-slate-900 dark:text-slate-400">
-              <tr>
-                <th className="px-4 py-3 font-medium">Bénéficiaire</th>
+        <div className="space-y-4">
+          {/* Actions groupées */}
+          {selectedIds.length > 0 && (
+            <div className="flex flex-wrap items-center gap-3 rounded-xl border border-emerald-100 bg-emerald-50 p-3 dark:border-emerald-800/30 dark:bg-emerald-900/20">
+              <span className="text-sm font-medium text-emerald-800 dark:text-emerald-300">
+                {selectedIds.length} sélectionné(s)
+              </span>
+              <div className="flex items-center gap-2">
+                <Button size="sm" onClick={() => bulkChangeStatus('valide')} className="bg-emerald-600 hover:bg-emerald-700">
+                  <CheckCircle2 className="me-1.5 h-4 w-4" /> Valider la sélection
+                </Button>
+                <Button size="sm" variant="outline" onClick={() => bulkChangeStatus('rejete')} className="text-red-600 hover:bg-red-50 hover:text-red-700 dark:hover:bg-red-950/50">
+                  <XCircle className="me-1.5 h-4 w-4" /> Rejeter la sélection
+                </Button>
+              </div>
+            </div>
+          )}
+
+          <div className="overflow-x-auto rounded-xl border border-slate-200 dark:border-slate-800">
+            <table className="w-full text-sm">
+              <thead className="bg-slate-50 text-left text-slate-500 dark:bg-slate-900 dark:text-slate-400">
+                <tr>
+                  <th className="px-4 py-3 font-medium w-10">
+                    <input
+                      type="checkbox"
+                      checked={list.length > 0 && selectedIds.length === list.length}
+                      onChange={(e) => setSelectedIds(e.target.checked ? list.map((b) => b.id) : [])}
+                      className="h-4 w-4 rounded border-slate-300 text-emerald-600 focus:ring-emerald-600 dark:border-slate-700 dark:bg-slate-800"
+                    />
+                  </th>
+                  <th className="px-4 py-3 font-medium">Bénéficiaire</th>
                 <th className="px-4 py-3 font-medium">Organisme</th>
                 <th className="px-4 py-3 font-medium">Téléphone</th>
                 <th className="px-4 py-3 font-medium">Famille</th>
@@ -307,6 +353,18 @@ export default function BeneficiairesPage() {
                       : 'bg-white hover:bg-slate-50 dark:bg-slate-950 dark:hover:bg-slate-900'
                   }
                 >
+                  <td className="px-4 py-3">
+                    <input
+                      type="checkbox"
+                      checked={selectedIds.includes(b.id)}
+                      onChange={(e) =>
+                        setSelectedIds((prev) =>
+                          e.target.checked ? [...prev, b.id] : prev.filter((id) => id !== b.id),
+                        )
+                      }
+                      className="h-4 w-4 rounded border-slate-300 text-emerald-600 focus:ring-emerald-600 dark:border-slate-700 dark:bg-slate-800"
+                    />
+                  </td>
                   <td className="px-4 py-3 font-medium text-slate-800 dark:text-white">
                     <div className="flex items-center gap-3">
                       {b.photoUrl ? (
@@ -369,7 +427,8 @@ export default function BeneficiairesPage() {
                 </tr>
               ))}
             </tbody>
-          </table>
+            </table>
+          </div>
         </div>
       )}
 
@@ -393,7 +452,14 @@ export default function BeneficiairesPage() {
                     </Dialog.Title>
                     <p className="text-sm text-slate-500">{detail.organisme}</p>
                   </div>
-                  <StatusBadge status={detail.status} />
+                  <div className="flex items-center gap-3">
+                    <StatusBadge status={detail.status} />
+                    <Dialog.Close asChild>
+                      <Button variant="ghost" size="icon-sm" aria-label="Fermer la boîte de dialogue">
+                        <XCircle className="h-6 w-6 text-slate-400 hover:text-slate-600 dark:text-slate-500 dark:hover:text-slate-300" />
+                      </Button>
+                    </Dialog.Close>
+                  </div>
                 </div>
 
                 <div className="grid gap-3 sm:grid-cols-2">
@@ -485,6 +551,17 @@ export default function BeneficiairesPage() {
                     >
                       <FileText className="h-4 w-4" />
                       Voir la fiche familiale
+                    </a>
+                  )}
+                  {detail.justificatifUrl && (
+                    <a
+                      href={detail.justificatifUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="inline-flex items-center gap-2 rounded-lg border border-slate-200 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 dark:border-slate-700 dark:text-slate-200 dark:hover:bg-slate-800"
+                    >
+                      <Receipt className="h-4 w-4" />
+                      Voir le justificatif de propriété
                     </a>
                   )}
                 </div>
