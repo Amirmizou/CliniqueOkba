@@ -464,8 +464,8 @@ export default function Header({ siteSettings, poles }: HeaderProps) {
           </div>
         </div>
 
-        {/* ─── EN-TÊTE MOBILE (xl:hidden) — clair, lisible, identité médicale ─── */}
-        <div className="relative w-full max-w-7xl xl:hidden">
+        {/* ─── EN-TÊTE MOBILE (Désactivé car on utilise le scanner sur mobile) ─── */}
+        <div className="hidden relative w-full max-w-7xl xl:hidden">
           <div className="relative flex items-center gap-2.5 overflow-hidden rounded-2xl border border-gray-100/80 bg-white/97 px-3 py-2.5 shadow-[0_8px_30px_rgb(0,0,0,0.10)] backdrop-blur-md dark:border-white/10 dark:bg-slate-900/97">
             {/* Trame de points subtile (gauche) */}
             <div aria-hidden="true" className="pointer-events-none absolute inset-0 text-[#006633]" style={{
@@ -535,8 +535,8 @@ export default function Header({ siteSettings, poles }: HeaderProps) {
           </div>
         </div>
 
-        {/* ═══ COLONNE DESKTOP — bande claire (logo + recherche) au-dessus du scanner ═══ */}
-        <div className="relative z-10 mx-auto hidden w-full max-w-7xl flex-col xl:flex">
+        {/* ═══ COLONNE DESKTOP & MOBILE — bande claire (logo + recherche) au-dessus du scanner ═══ */}
+        <div className="relative z-10 mx-auto flex w-full max-w-7xl flex-col">
 
         {/* ── Rangée claire : recherche + langue (centrés) ── */}
         <div className="flex items-center justify-center pt-0 pb-0">

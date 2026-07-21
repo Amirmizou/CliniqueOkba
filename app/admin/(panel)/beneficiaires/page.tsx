@@ -90,8 +90,44 @@ export default function BeneficiairesPage() {
   const [traiteFilter, setTraiteFilter] = useState('')
   const [search, setSearch] = useState('')
   const [detail, setDetail] = useState<Beneficiary | null>(null)
+  const [isEditing, setIsEditing] = useState(false)
+  const [editForm, setEditForm] = useState<Partial<Beneficiary>>({})
   const [selectedIds, setSelectedIds] = useState<string[]>([])
   const { toast, ToastView } = useToast()
+
+  const handleEditChange = (field: keyof Beneficiary, value: string) => {
+    setEditForm((prev) => ({ ...prev, [field]: value }))
+  }
+
+  const saveEdit = async () => {
+    if (!detail) return
+    try {
+      const res = await fetch('/api/admin/beneficiaires', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          id: detail.id,
+          nom: editForm.nom,
+          prenom: editForm.prenom,
+          telephone: editForm.telephone,
+          email: editForm.email,
+          num_assure: editForm.num_assure,
+          adresse: editForm.adresse,
+          situation_familiale: editForm.situation_familiale,
+        }),
+      })
+      if (!res.ok) throw new Error()
+      
+      // Update local state
+      const updated = { ...detail, ...editForm } as Beneficiary
+      setDetail(updated)
+      setList((prev) => prev.map((b) => (b.id === updated.id ? updated : b)))
+      setIsEditing(false)
+      toast({ title: 'Succès', description: 'Les informations ont été modifiées.', variant: 'default' })
+    } catch {
+      toast({ title: 'Erreur', description: 'Impossible de sauvegarder.', variant: 'destructive' })
+    }
+  }
 
   // Chargement (debouncé). Ne dépend que des filtres primitifs : c'est ce qui
   // évite la boucle de rafraîchissement (le `toast` de useToast n'est pas stable
@@ -416,7 +452,7 @@ export default function BeneficiairesPage() {
                       >
                         {b.traite ? <RotateCcw className="h-4 w-4" /> : <CheckCheck className="h-4 w-4" />}
                       </Button>
-                      <Button variant="ghost" size="icon-sm" onClick={() => setDetail(b)} aria-label="Détails">
+                      <Button variant="ghost" size="icon-sm" onClick={() => { setDetail(b); setEditForm(b); setIsEditing(false); }} aria-label="Détails">
                         <Eye className="h-4 w-4" />
                       </Button>
                       <Button variant="ghost" size="icon-sm" onClick={() => remove(b.id)} aria-label="Supprimer">
@@ -454,6 +490,9 @@ export default function BeneficiairesPage() {
                   </div>
                   <div className="flex items-center gap-3">
                     <StatusBadge status={detail.status} />
+                    <Button variant="ghost" size="sm" onClick={() => setIsEditing(!isEditing)} aria-label="Modifier">
+                      {isEditing ? 'Annuler' : 'Modifier'}
+                    </Button>
                     <Dialog.Close asChild>
                       <Button variant="ghost" size="icon-sm" aria-label="Fermer la boîte de dialogue">
                         <XCircle className="h-6 w-6 text-slate-400 hover:text-slate-600 dark:text-slate-500 dark:hover:text-slate-300" />
@@ -462,23 +501,63 @@ export default function BeneficiairesPage() {
                   </div>
                 </div>
 
-                <div className="grid gap-3 sm:grid-cols-2">
-                  <Info label="Téléphone" value={detail.telephone} />
-                  <Info label="E-mail" value={detail.email} />
-                  <Info label="N° assuré" value={detail.num_assure} />
-                  <Info label="Adresse" value={detail.adresse} />
-                  <Info
-                    label="Situation familiale"
-                    value={
-                      detail.situation_familiale === 'marie'
-                        ? 'Marié(e)'
-                        : detail.situation_familiale === 'celibataire'
-                          ? 'Célibataire'
-                          : null
-                    }
-                  />
-                  {detail.projet_dedie && <Info label="Projet dédié" value={detail.projet_dedie} />}
-                </div>
+                {isEditing ? (
+                  <div className="grid gap-3 sm:grid-cols-2">
+                    <div>
+                      <label className="text-xs font-semibold text-slate-500">Prénom</label>
+                      <input className={inputCls + ' w-full'} value={editForm.prenom ?? ''} onChange={e => handleEditChange('prenom', e.target.value)} />
+                    </div>
+                    <div>
+                      <label className="text-xs font-semibold text-slate-500">Nom</label>
+                      <input className={inputCls + ' w-full'} value={editForm.nom ?? ''} onChange={e => handleEditChange('nom', e.target.value)} />
+                    </div>
+                    <div>
+                      <label className="text-xs font-semibold text-slate-500">Téléphone</label>
+                      <input className={inputCls + ' w-full'} value={editForm.telephone ?? ''} onChange={e => handleEditChange('telephone', e.target.value)} />
+                    </div>
+                    <div>
+                      <label className="text-xs font-semibold text-slate-500">E-mail</label>
+                      <input type="email" className={inputCls + ' w-full'} value={editForm.email ?? ''} onChange={e => handleEditChange('email', e.target.value)} />
+                    </div>
+                    <div>
+                      <label className="text-xs font-semibold text-slate-500">N° assuré</label>
+                      <input className={inputCls + ' w-full'} value={editForm.num_assure ?? ''} onChange={e => handleEditChange('num_assure', e.target.value)} />
+                    </div>
+                    <div>
+                      <label className="text-xs font-semibold text-slate-500">Adresse</label>
+                      <input className={inputCls + ' w-full'} value={editForm.adresse ?? ''} onChange={e => handleEditChange('adresse', e.target.value)} />
+                    </div>
+                    <div>
+                      <label className="text-xs font-semibold text-slate-500">Situation familiale</label>
+                      <select className={inputCls + ' w-full'} value={editForm.situation_familiale ?? ''} onChange={e => handleEditChange('situation_familiale', e.target.value)}>
+                        <option value="">(Non spécifié)</option>
+                        <option value="celibataire">Célibataire</option>
+                        <option value="marie">Marié(e)</option>
+                      </select>
+                    </div>
+                    <div className="col-span-full mt-2 flex justify-end">
+                      <Button onClick={saveEdit} className="bg-emerald-600 hover:bg-emerald-700">Enregistrer</Button>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="grid gap-3 sm:grid-cols-2">
+                    <Info label="Téléphone" value={detail.telephone} />
+                    <Info label="E-mail" value={detail.email} />
+                    <Info label="N° assuré" value={detail.num_assure} />
+                    <Info label="Adresse" value={detail.adresse} />
+                    <Info
+                      label="Situation familiale"
+                      value={
+                        detail.situation_familiale === 'marie'
+                          ? 'Marié(e)'
+                          : detail.situation_familiale === 'celibataire'
+                            ? 'Célibataire'
+                            : null
+                      }
+                    />
+                    {detail.projet_dedie && <Info label="Projet dédié" value={detail.projet_dedie} />}
+                  </div>
+                )}
 
                 {/* Traitement */}
                 <div className="mt-5 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-slate-200 bg-slate-50 p-4 dark:border-slate-800 dark:bg-slate-800/40">

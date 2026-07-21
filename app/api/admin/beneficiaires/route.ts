@@ -150,7 +150,7 @@ export async function PATCH(request: Request) {
   if (!supabase) return NextResponse.json({ error: 'Supabase non configuré' }, { status: 503 })
 
   try {
-    const { id, ids, status, notes_admin, traite } = await request.json()
+    const { id, ids, status, notes_admin, traite, nom, prenom, email, telephone, adresse, num_assure, situation_familiale } = await request.json()
     const targetIds = id ? [id] : ids
     if (!targetIds || !Array.isArray(targetIds) || targetIds.length === 0) {
       return NextResponse.json({ error: 'ID(s) manquant(s)' }, { status: 400 })
@@ -163,6 +163,15 @@ export async function PATCH(request: Request) {
       patch.traite = traite
       patch.traite_at = traite ? new Date().toISOString() : null
     }
+    // Update personal details if provided
+    if (typeof nom === 'string') patch.nom = nom
+    if (typeof prenom === 'string') patch.prenom = prenom
+    if (typeof email === 'string') patch.email = email
+    if (typeof telephone === 'string') patch.telephone = telephone
+    if (typeof adresse === 'string') patch.adresse = adresse
+    if (typeof num_assure === 'string') patch.num_assure = num_assure
+    if (typeof situation_familiale === 'string') patch.situation_familiale = situation_familiale
+
     if (Object.keys(patch).length === 0) return NextResponse.json({ error: 'Rien à modifier' }, { status: 400 })
 
     const { error } = await supabase.from('beneficiaries').update(patch).in('id', targetIds)
