@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { useToast } from '@/components/admin/ui'
@@ -24,6 +24,8 @@ import {
   Copy,
   Check,
   ChevronDown,
+  Radio,
+  RefreshCw,
 } from 'lucide-react'
 import * as Dialog from '@radix-ui/react-dialog'
 
@@ -93,6 +95,13 @@ export default function BeneficiairesPage() {
   const [isEditing, setIsEditing] = useState(false)
   const [editForm, setEditForm] = useState<Partial<Beneficiary>>({})
   const [selectedIds, setSelectedIds] = useState<string[]>([])
+  // Temps réel
+  const [liveSync, setLiveSync] = useState(true)
+  const [syncing, setSyncing] = useState(false)
+  const [lastSync, setLastSync] = useState<Date | null>(null)
+  const [newIds, setNewIds] = useState<string[]>([])
+  const knownIdsRef = useRef<Set<string>>(new Set())
+  const fingerprintRef = useRef<string | null>(null)
   const { toast, ToastView } = useToast()
 
   const handleEditChange = (field: keyof Beneficiary, value: string) => {
@@ -129,39 +138,118 @@ export default function BeneficiairesPage() {
     }
   }
 
-  // Chargement (debouncé). Ne dépend que des filtres primitifs : c'est ce qui
-  // évite la boucle de rafraîchissement (le `toast` de useToast n'est pas stable
-  // entre les rendus, il ne doit donc PAS figurer dans les dépendances).
+  // Les filtres sont lus via une ref par le poller, pour ne pas le recréer à
+  // chaque frappe dans la recherche.
+  const filtersRef = useRef({ organisme, status, traiteFilter, search })
+  const toastRef = useRef(toast)
+
   useEffect(() => {
-    let cancelled = false
-    const timer = setTimeout(async () => {
-      setLoading(true)
-      try {
-        const qs = new URLSearchParams()
-        if (organisme) qs.set('organisme', organisme)
-        if (status) qs.set('status', status)
-        if (traiteFilter) qs.set('traite', traiteFilter)
-        if (search.trim()) qs.set('search', search.trim())
-        const res = await fetch(`/api/admin/beneficiaires?${qs.toString()}`)
-        if (!res.ok) throw new Error()
-        const json = await res.json()
-        if (cancelled) return
-        setList(json.beneficiaries || [])
-        setByOrganisme(json.byOrganisme || {})
+    filtersRef.current = { organisme, status, traiteFilter, search }
+    toastRef.current = toast
+  })
+
+  /** Charge la liste. `silent` = rafraîchissement temps réel (pas de spinner,
+   *  pas de perte de la sélection en cours). */
+  const load = useCallback(async (silent = false) => {
+    const f = filtersRef.current
+    if (!silent) setLoading(true)
+    else setSyncing(true)
+    try {
+      const qs = new URLSearchParams()
+      if (f.organisme) qs.set('organisme', f.organisme)
+      if (f.status) qs.set('status', f.status)
+      if (f.traiteFilter) qs.set('traite', f.traiteFilter)
+      if (f.search.trim()) qs.set('search', f.search.trim())
+      const res = await fetch(`/api/admin/beneficiaires?${qs.toString()}`)
+      if (!res.ok) throw new Error()
+      const json = await res.json()
+      const next: Beneficiary[] = json.beneficiaries || []
+
+      if (silent) {
+        // Signale visuellement les inscriptions apparues depuis le dernier rendu.
+        const known = knownIdsRef.current
+        const fresh = next.filter((b) => !known.has(b.id)).map((b) => b.id)
+        if (known.size > 0 && fresh.length > 0) {
+          setNewIds((prev) => [...new Set([...prev, ...fresh])])
+          toastRef.current({
+            title: fresh.length > 1 ? `${fresh.length} nouvelles inscriptions` : 'Nouvelle inscription',
+            description: 'La liste vient d’être mise à jour.',
+          })
+          // Le surlignage s'efface tout seul au bout de 30 s.
+          setTimeout(() => setNewIds((prev) => prev.filter((id) => !fresh.includes(id))), 30_000)
+        }
+        // La sélection est conservée, mais purgée des lignes disparues.
+        setSelectedIds((prev) => prev.filter((id) => next.some((b) => b.id === id)))
+      } else {
         setSelectedIds([])
-      } catch {
-        if (!cancelled)
-          toast({ title: 'Erreur', description: 'Impossible de charger les bénéficiaires.', variant: 'destructive' })
-      } finally {
-        if (!cancelled) setLoading(false)
+        setNewIds([])
       }
-    }, 300)
-    return () => {
-      cancelled = true
-      clearTimeout(timer)
+
+      knownIdsRef.current = new Set(next.map((b) => b.id))
+      setList(next)
+      setByOrganisme(json.byOrganisme || {})
+      setLastSync(new Date())
+      return true
+    } catch {
+      if (!silent)
+        toastRef.current({
+          title: 'Erreur',
+          description: 'Impossible de charger les bénéficiaires.',
+          variant: 'destructive',
+        })
+      return false
+    } finally {
+      if (!silent) setLoading(false)
+      else setSyncing(false)
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [organisme, status, traiteFilter, search])
+  }, [])
+
+  // Chargement (debouncé) au changement de filtre.
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      knownIdsRef.current = new Set() // évite de "découvrir" toute la liste filtrée
+      load(false)
+    }, 300)
+    return () => clearTimeout(timer)
+  }, [organisme, status, traiteFilter, search, load])
+
+  // Synchronisation temps réel : on interroge une sonde légère (compteur +
+  // dernières dates) toutes les 10 s et on ne recharge la liste complète que si
+  // l'empreinte a bougé. La sonde est suspendue quand l'onglet est en arrière-plan.
+  useEffect(() => {
+    if (!liveSync) return
+    let stopped = false
+
+    const tick = async () => {
+      if (stopped || document.hidden) return
+      try {
+        const res = await fetch('/api/admin/beneficiaires?probe=1')
+        if (!res.ok) return
+        const fp = await res.json()
+        const key = `${fp.count}|${fp.latest}|${fp.lastTraite}`
+        if (fingerprintRef.current !== null && fingerprintRef.current !== key) {
+          await load(true)
+        }
+        fingerprintRef.current = key
+      } catch {
+        /* réseau indisponible : on réessaiera au prochain tick */
+      }
+    }
+
+    const interval = setInterval(tick, 10_000)
+    // Reprise immédiate quand on revient sur l'onglet.
+    const onVisible = () => {
+      if (!document.hidden) tick()
+    }
+    document.addEventListener('visibilitychange', onVisible)
+    tick()
+
+    return () => {
+      stopped = true
+      clearInterval(interval)
+      document.removeEventListener('visibilitychange', onVisible)
+    }
+  }, [liveSync, load])
 
   const changeStatus = async (id: string, newStatus: string) => {
     try {
@@ -256,10 +344,51 @@ export default function BeneficiairesPage() {
             Inscriptions des organismes conventionnés — {list.length} affiché(s)
           </p>
         </div>
-        <Button onClick={exportCsv} variant="outline">
-          <Download className="me-2 h-4 w-4" />
-          Exporter CSV
-        </Button>
+        <div className="flex flex-wrap items-center gap-2">
+          {/* Indicateur / interrupteur de synchronisation temps réel */}
+          <button
+            onClick={() => setLiveSync((v) => !v)}
+            title={liveSync ? 'Désactiver la synchronisation temps réel' : 'Activer la synchronisation temps réel'}
+            className={`inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-medium transition ${
+              liveSync
+                ? 'border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-800/40 dark:bg-emerald-950/30 dark:text-emerald-400'
+                : 'border-slate-200 bg-slate-50 text-slate-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-400'
+            }`}
+          >
+            {liveSync ? (
+              <span className="relative flex h-2 w-2">
+                {!syncing && (
+                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-500 opacity-75" />
+                )}
+                <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-600" />
+              </span>
+            ) : (
+              <Radio className="h-3.5 w-3.5" />
+            )}
+            {liveSync ? 'Temps réel' : 'Temps réel désactivé'}
+            {lastSync && liveSync && (
+              <span className="text-emerald-600/70 dark:text-emerald-500/70">
+                · {lastSync.toLocaleTimeString('fr-FR')}
+              </span>
+            )}
+          </button>
+
+          <Button
+            onClick={() => load(true)}
+            variant="outline"
+            size="icon-sm"
+            disabled={syncing}
+            aria-label="Actualiser maintenant"
+            title="Actualiser maintenant"
+          >
+            <RefreshCw className={`h-4 w-4 ${syncing ? 'animate-spin' : ''}`} />
+          </Button>
+
+          <Button onClick={exportCsv} variant="outline">
+            <Download className="me-2 h-4 w-4" />
+            Exporter CSV
+          </Button>
+        </div>
       </div>
 
       {/* Liens de partage à destination des responsables d'organisme */}
@@ -384,9 +513,11 @@ export default function BeneficiairesPage() {
                 <tr
                   key={b.id}
                   className={
-                    b.traite
-                      ? 'bg-emerald-50/60 hover:bg-emerald-50 dark:bg-emerald-950/20 dark:hover:bg-emerald-950/30'
-                      : 'bg-white hover:bg-slate-50 dark:bg-slate-950 dark:hover:bg-slate-900'
+                    newIds.includes(b.id)
+                      ? 'bg-amber-50 ring-1 ring-inset ring-amber-300 hover:bg-amber-100/70 dark:bg-amber-950/30 dark:ring-amber-700/50'
+                      : b.traite
+                        ? 'bg-emerald-50/60 hover:bg-emerald-50 dark:bg-emerald-950/20 dark:hover:bg-emerald-950/30'
+                        : 'bg-white hover:bg-slate-50 dark:bg-slate-950 dark:hover:bg-slate-900'
                   }
                 >
                   <td className="px-4 py-3">
@@ -419,6 +550,11 @@ export default function BeneficiairesPage() {
                       )}
                       <div className="min-w-0">
                         <div className="flex items-center gap-2">
+                          {newIds.includes(b.id) && (
+                            <span className="inline-flex items-center rounded-full bg-amber-500 px-1.5 py-0.5 text-[10px] font-semibold uppercase text-white">
+                              Nouveau
+                            </span>
+                          )}
                           {b.traite && (
                             <span className="inline-flex items-center gap-1 rounded-full bg-emerald-600 px-1.5 py-0.5 text-[10px] font-semibold uppercase text-white">
                               <CheckCheck className="h-3 w-3" />
@@ -694,91 +830,108 @@ export default function BeneficiairesPage() {
 /** Génère et copie des liens d'inscription pré-remplis par organisme, à partager
  *  avec les responsables (ex. lien SEACO qui saute l'étape de choix d'organisme). */
 function ShareLinks({ toast }: { toast: (o: any) => void }) {
-  const [open, setOpen] = useState(true)
   const [organismes, setOrganismes] = useState<string[]>([])
   const [loaded, setLoaded] = useState(false)
+  const [selected, setSelected] = useState<string>('')
   const [copied, setCopied] = useState<string | null>(null)
 
   useEffect(() => {
-    if (!open || loaded) return
+    if (loaded) return
     fetch('/api/beneficiaires')
       .then((r) => r.json())
-      .then((j) => setOrganismes(j.organismes || []))
+      .then((j) => {
+        const orgs = j.organismes || []
+        setOrganismes(orgs)
+        if (orgs.length > 0) setSelected(orgs[0])
+      })
       .catch(() => setOrganismes([]))
       .finally(() => setLoaded(true))
-  }, [open, loaded])
+  }, [loaded])
 
   const buildLink = (o: string) =>
     `${window.location.origin}/inscription-beneficiaire?org=${encodeURIComponent(o)}`
 
-  const copy = async (o: string) => {
-    const link = buildLink(o)
+  const copy = async () => {
+    if (!selected) return
+    const link = buildLink(selected)
     try {
       await navigator.clipboard.writeText(link)
-      setCopied(o)
-      toast({ title: 'Lien copié', description: o })
-      setTimeout(() => setCopied((c) => (c === o ? null : c)), 2000)
+      setCopied(selected)
+      toast({ title: 'Lien copié', description: `Lien pour ${selected} copié avec succès.` })
+      setTimeout(() => setCopied((c) => (c === selected ? null : c)), 2500)
     } catch {
       toast({ title: 'Erreur', description: 'Impossible de copier le lien.', variant: 'destructive' })
     }
   }
 
   return (
-    <Card>
-      <CardContent className="p-0">
-        <button
-          onClick={() => setOpen((v) => !v)}
-          className="flex w-full items-center justify-between gap-3 rounded-t-xl bg-emerald-50 px-4 py-3 text-left dark:bg-emerald-950/30"
-        >
-          <span className="flex items-center gap-2 text-base font-semibold text-emerald-800 dark:text-emerald-300">
-            <Link2 className="h-5 w-5 text-emerald-600" />
-            Liens de partage par organisme
-          </span>
-          <ChevronDown className={`h-5 w-5 text-emerald-600 transition-transform ${open ? 'rotate-180' : ''}`} />
-        </button>
-
-        {open && (
-          <div className="border-t border-slate-100 px-4 py-4 dark:border-slate-800">
-            <p className="mb-3 text-sm text-slate-500 dark:text-slate-400">
-              Partagez ces liens avec les responsables d&apos;organisme. Le lien pré-sélectionne
-              l&apos;organisme et saute directement à la saisie des informations.
+    <Card className="border-emerald-100/60 bg-gradient-to-r from-emerald-50/80 to-teal-50/80 shadow-sm dark:border-emerald-900/30 dark:from-emerald-950/20 dark:to-teal-950/20 overflow-hidden relative">
+      {/* Lueur décorative */}
+      <div className="absolute right-0 top-0 bottom-0 w-32 bg-gradient-to-l from-emerald-200/20 to-transparent pointer-events-none dark:from-emerald-800/10" />
+      
+      <CardContent className="p-3 sm:p-4">
+        <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 relative z-10">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white shadow-sm ring-1 ring-emerald-100 dark:bg-emerald-900/40 dark:ring-emerald-800/50">
+            <Link2 className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
+          </div>
+          
+          <div className="flex-1 min-w-0">
+            <h3 className="text-sm font-bold text-emerald-900 dark:text-emerald-300">Liens de partage dédiés</h3>
+            <p className="truncate text-xs text-emerald-700/80 dark:text-emerald-400/70">
+              Générez un lien d'inscription pré-rempli pour un organisme spécifique.
             </p>
+          </div>
+          
+          <div className="flex items-center gap-2 w-full sm:w-auto mt-1 sm:mt-0">
             {!loaded ? (
-              <div className="flex justify-center py-6">
-                <Loader2 className="h-5 w-5 animate-spin text-emerald-600" />
+              <div className="flex h-9 items-center justify-center px-4">
+                <Loader2 className="h-4 w-4 animate-spin text-emerald-600" />
               </div>
             ) : organismes.length === 0 ? (
-              <p className="text-sm text-slate-400">Aucun organisme configuré dans Sanity.</p>
+              <span className="text-xs text-slate-400">Aucun organisme configuré.</span>
             ) : (
-              <ul className="space-y-2">
-                {organismes.map((o) => (
-                  <li
-                    key={o}
-                    className="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 dark:border-slate-700 dark:bg-slate-800/50"
+              <>
+                <div className="relative flex-1 sm:flex-none">
+                  <select
+                    className="h-9 w-full sm:w-[220px] appearance-none rounded-lg border border-emerald-200 bg-white/90 pl-3 pr-8 text-sm font-medium text-emerald-950 shadow-sm outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 dark:border-emerald-800/60 dark:bg-slate-900/80 dark:text-emerald-100"
+                    value={selected}
+                    onChange={(e) => {
+                      setSelected(e.target.value)
+                      setCopied(null)
+                    }}
                   >
-                    <div className="min-w-0">
-                      <p className="font-medium text-slate-700 dark:text-slate-200">{o}</p>
-                      <p className="truncate text-xs text-slate-400">{buildLink(o)}</p>
-                    </div>
-                    <Button size="sm" variant={copied === o ? 'default' : 'outline'} onClick={() => copy(o)}>
-                      {copied === o ? (
-                        <>
-                          <Check className="me-1.5 h-4 w-4" />
-                          Copié
-                        </>
-                      ) : (
-                        <>
-                          <Copy className="me-1.5 h-4 w-4" />
-                          Copier le lien
-                        </>
-                      )}
-                    </Button>
-                  </li>
-                ))}
-              </ul>
+                    {organismes.map((o) => (
+                      <option key={o} value={o}>
+                        {o}
+                      </option>
+                    ))}
+                  </select>
+                  <ChevronDown className="pointer-events-none absolute right-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-emerald-600/60" />
+                </div>
+                
+                <Button
+                  size="sm"
+                  onClick={copy}
+                  disabled={!selected}
+                  className={`h-9 shrink-0 shadow-sm transition-all ${
+                    copied === selected
+                      ? 'bg-emerald-600 text-white hover:bg-emerald-700'
+                      : 'bg-white text-emerald-700 hover:bg-emerald-50 hover:text-emerald-800 dark:bg-slate-800 dark:text-emerald-400 dark:hover:bg-slate-700'
+                  }`}
+                >
+                  {copied === selected ? (
+                    <Check className="h-4 w-4 sm:mr-1.5" />
+                  ) : (
+                    <Copy className="h-4 w-4 sm:mr-1.5" />
+                  )}
+                  <span className="hidden sm:inline-block">
+                    {copied === selected ? 'Copié !' : 'Copier'}
+                  </span>
+                </Button>
+              </>
             )}
           </div>
-        )}
+        </div>
       </CardContent>
     </Card>
   )

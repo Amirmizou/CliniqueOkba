@@ -46,6 +46,41 @@ export async function GET(request: Request) {
   // PostgREST .or() (virgules, parenthèses, %, *) pour éviter de casser le filtre.
   const search = (url.searchParams.get('search') || '').replace(/[,()%*]/g, ' ').trim()
   const format = url.searchParams.get('format') || ''
+  const probe = url.searchParams.get('probe') === '1'
+
+  // Sonde temps réel : empreinte légère de la table (aucune URL signée générée,
+  // aucune donnée personnelle renvoyée). Le client l'interroge en boucle et ne
+  // déclenche un rechargement complet que si l'empreinte a changé.
+  if (probe) {
+    const { count, error: countError } = await supabase
+      .from('beneficiaries')
+      .select('id', { count: 'exact', head: true })
+    if (countError) {
+      console.error('Erreur sonde bénéficiaires:', countError)
+      return NextResponse.json({ error: 'Échec de la sonde' }, { status: 500 })
+    }
+    // `updated_at` n'existe pas : on combine la dernière inscription et le
+    // dernier traitement pour détecter aussi les modifications de statut.
+    const { data: last } = await supabase
+      .from('beneficiaries')
+      .select('created_at, traite_at')
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .maybeSingle()
+    const { data: lastTraite } = await supabase
+      .from('beneficiaries')
+      .select('traite_at')
+      .not('traite_at', 'is', null)
+      .order('traite_at', { ascending: false })
+      .limit(1)
+      .maybeSingle()
+
+    return NextResponse.json({
+      count: count ?? 0,
+      latest: last?.created_at ?? null,
+      lastTraite: lastTraite?.traite_at ?? null,
+    })
+  }
 
   let query = supabase.from('beneficiaries').select('*').order('created_at', { ascending: false })
   if (organisme) query = query.eq('organisme', organisme)
