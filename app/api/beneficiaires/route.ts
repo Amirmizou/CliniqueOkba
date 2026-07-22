@@ -246,11 +246,15 @@ export async function POST(request: Request) {
       )
     }
 
-    // Uploads (optionnels mais fortement recommandés)
+    // Uploads : la photo est obligatoire à l'inscription (le reste est
+    // fortement recommandé mais facultatif).
     let photoPath: string | undefined
     let documentPath: string | undefined
 
     const photo = form.get('photo')
+    if (!(photo instanceof File) || photo.size === 0) {
+      return NextResponse.json({ error: "La photo d'identité est obligatoire." }, { status: 400 })
+    }
     if (photo instanceof File && photo.size > 0) {
       const res = await uploadFile(supabase, photo, `${orgSlug}/photos`, PHOTO_TYPES)
       if (res.error) return NextResponse.json({ error: `Photo : ${res.error}` }, { status: 400 })

@@ -298,7 +298,7 @@ export default function Header({ siteSettings, poles }: HeaderProps) {
       {/* La bande porte le vert de marque (#006633) en voile : assez présent pour
           l'identité, assez léger pour garder le menu et la scène du scanner lisibles.
           La bordure basse est remplacée par le dégradé vert → or (voir plus bas). */}
-      <header className="relative z-[60] flex justify-center px-4 py-3 bg-gradient-to-b from-[#eaf5ee]/95 to-[#d9ebe0]/95 backdrop-blur-md shadow-[0_2px_14px_rgba(0,102,51,0.10)] dark:from-slate-950/90 dark:to-[#04120b]/90">
+      <header className="relative z-[60] flex flex-col items-center gap-2 px-4 py-3 bg-gradient-to-b from-[#eaf5ee]/95 to-[#d9ebe0]/95 backdrop-blur-md shadow-[0_2px_14px_rgba(0,102,51,0.10)] dark:from-slate-950/90 dark:to-[#04120b]/90">
         
         {/* LOGO — Design circulaire premium */}
         <div className="absolute inset-y-0 left-0 w-[calc(50vw-640px)] hidden xl:flex items-center justify-center pointer-events-auto z-[100]">
@@ -464,8 +464,11 @@ export default function Header({ siteSettings, poles }: HeaderProps) {
           </div>
         </div>
 
-        {/* ─── EN-TÊTE MOBILE (Désactivé car on utilise le scanner sur mobile) ─── */}
-        <div className="hidden relative w-full max-w-7xl xl:hidden">
+        {/* ─── EN-TÊTE MOBILE — logo, marque et menu.
+             Le gantry reste affiché en dessous, mais la navigation qu'il porte
+             est réservée au desktop (elle n'a pas la place sous xl) : c'est ce
+             bandeau qui donne accès au menu sur mobile. ─── */}
+        <div className="relative w-full max-w-7xl xl:hidden">
           <div className="relative flex items-center gap-2.5 overflow-hidden rounded-2xl border border-gray-100/80 bg-white/97 px-3 py-2.5 shadow-[0_8px_30px_rgb(0,0,0,0.10)] backdrop-blur-md dark:border-white/10 dark:bg-slate-900/97">
             {/* Trame de points subtile (gauche) */}
             <div aria-hidden="true" className="pointer-events-none absolute inset-0 text-[#006633]" style={{
@@ -745,12 +748,16 @@ export default function Header({ siteSettings, poles }: HeaderProps) {
           {/* ══ NAVIGATION ══ */}
           <div
             className={cn(
-              "absolute z-[34] flex items-center pl-[60px] origin-right",
+              // Adaptation mobile : la navigation devient scrollable horizontalement sur la table du gantry.
+              "absolute z-[34] flex items-center pl-1 sm:pl-[20px] xl:pl-[60px] origin-right overflow-x-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] bottom-[32px] h-[64px] left-[5px] right-[170px] xl:left-[10px] xl:right-[220px]",
               isHidden ? "translate-x-[200px] opacity-0 transition-all duration-[2000ms] ease-in-out" : "translate-x-0 opacity-100 transition-all duration-[1500ms] delay-[400ms] ease-out",
             )}
-            style={{ left:'10px', right:'220px', bottom:'32px', height:'64px' }}
+            style={{ 
+              WebkitMaskImage: 'linear-gradient(90deg, #000 85%, transparent 100%)',
+              maskImage: 'linear-gradient(90deg, #000 85%, transparent 100%)'
+            }}
           >
-            <nav className="flex flex-1 min-w-0 items-center justify-center gap-1 xl:gap-2 2xl:gap-6 pointer-events-auto relative" onMouseLeave={() => setHovered(null)}>
+            <nav className="flex items-center justify-start xl:justify-center gap-2 xl:gap-2 2xl:gap-6 pointer-events-auto relative px-1 w-max xl:w-full xl:flex-1" onMouseLeave={() => setHovered(null)}>
               <NavIconLink id="about" icon={Home} label={t('center')} indicatorKey={indicatorKey} activeTab={activeTab} onClick={() => scrollToSection('#about')} onHover={() => setHovered('about')} />
               <NavIconDropdown id="specialties" icon={Stethoscope} label={t('specialties')} indicatorKey={indicatorKey} activeTab={activeTab} onHover={() => setHovered('specialties')} onClick={() => scrollToSection('#specialties')} poles={navPoles} locale={locale} />
               <NavIconLink id="equipements" icon={Activity} label={t('equipment')} indicatorKey={indicatorKey} activeTab={activeTab} onClick={() => scrollToSection('#equipements')} onHover={() => setHovered('equipements')} />

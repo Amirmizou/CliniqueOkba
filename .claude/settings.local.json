@@ -64,7 +64,8 @@
       "Bash(curl -sI \"https://cliniqueokba.com\" -w 'HTTP %{http_code}\\\\n' --max-time 20)",
       "Bash(curl -sI \"https://www.cliniqueokba.com\" -w 'HTTP %{http_code}\\\\n' --max-time 20)",
       "Bash(curl -sv \"https://cliniqueokba.com/api/revalidate\" --max-time 20)",
-      "Bash(git fetch *)"
+      "Bash(git fetch *)",
+      "Bash(grep -vE \"t\\\\\\('|t\\\\\\(\\\\\"|t\\\\\\(\\\\`\"2)"
     ]
   }
 }

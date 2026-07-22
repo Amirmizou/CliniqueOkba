@@ -22,8 +22,17 @@ function escapeHtml(unsafe: string) {
 
 export async function POST(request: Request) {
   try {
-    const ip = request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || 'unknown';
-    
+    // `x-forwarded-for` est une LISTE ("client, proxy1, proxy2"). En prenant la
+    // chaîne entière, deux visiteurs derrière des chemins de proxy différents
+    // recevaient des clés distinctes, et surtout tous ceux sans en-tête
+    // tombaient dans le même seau 'unknown' : au-delà de 5 messages/minute,
+    // tout le monde était bloqué. D'où des échecs « une fois sur deux ».
+    const forwardedFor = request.headers.get('x-forwarded-for') || '';
+    const ip =
+      forwardedFor.split(',')[0].trim() ||
+      request.headers.get('x-real-ip')?.trim() ||
+      'unknown';
+
     const rateLimitResult = await emailRateLimiter.check(ip, 5);
     
     if (!rateLimitResult.success) {
@@ -72,6 +81,13 @@ export async function POST(request: Request) {
         user: smtpUser,
         pass: smtpPass,
       },
+      // Sans délais explicites, nodemailer attend très longtemps : quand le SMTP
+      // Hostinger ne répond pas, la requête restait suspendue jusqu'au timeout de
+      // la plateforme (le visiteur voit un formulaire figé, aucune trace de
+      // l'erreur). On échoue vite et proprement à la place.
+      connectionTimeout: 10_000,
+      greetingTimeout: 10_000,
+      socketTimeout: 20_000,
     });
 
     // Expéditeur : sur Hostinger l'adresse "from" doit correspondre à la boîte SMTP.
@@ -79,21 +95,47 @@ export async function POST(request: Request) {
     const fromEmail = process.env.MAIL_FROM || `Clinique Okba <${smtpUser}>`;
     const toEmail = process.env.MAIL_TO || process.env.CLINIC_EMAIL || smtpUser;
 
+    const mail = {
+      from: fromEmail,
+      to: toEmail,
+      replyTo: email,
+      subject: 'Nouveau message depuis le formulaire de contact',
+      html: `<p>Vous avez reçu un nouveau message de <strong>${escapeHtml(firstName)} ${escapeHtml(lastName)}</strong>.</p>
+             <p><strong>Email:</strong> ${escapeHtml(email)}</p>
+             <p><strong>Téléphone:</strong> ${escapeHtml(phone || 'Non renseigné')}</p>
+             <p><strong>Message:</strong></p>
+             <p>${escapeHtml(message).replace(/\n/g, '<br/>')}</p>`,
+    };
+
+    // Erreurs réseau transitoires : Hostinger coupe régulièrement une connexion
+    // SMTP au-delà d'un certain rythme. Une seule nouvelle tentative suffit
+    // dans la grande majorité des cas.
+    const TRANSIENT = ['ETIMEDOUT', 'ECONNRESET', 'ECONNECTION', 'ESOCKET', 'EDNS'];
+
     try {
-      await transporter.sendMail({
-        from: fromEmail,
-        to: toEmail,
-        replyTo: email,
-        subject: 'Nouveau message depuis le formulaire de contact',
-        html: `<p>Vous avez reçu un nouveau message de <strong>${escapeHtml(firstName)} ${escapeHtml(lastName)}</strong>.</p>
-               <p><strong>Email:</strong> ${escapeHtml(email)}</p>
-               <p><strong>Téléphone:</strong> ${escapeHtml(phone || 'Non renseigné')}</p>
-               <p><strong>Message:</strong></p>
-               <p>${escapeHtml(message).replace(/\n/g, '<br/>')}</p>`,
-      });
+      try {
+        await transporter.sendMail(mail);
+      } catch (firstError) {
+        const code = (firstError as { code?: string })?.code || '';
+        if (!TRANSIENT.includes(code)) throw firstError;
+        console.warn(`[contact] Échec SMTP transitoire (${code}) — nouvelle tentative`);
+        await new Promise((r) => setTimeout(r, 1_000));
+        await transporter.sendMail(mail);
+      }
     } catch (sendError) {
-      console.error('SMTP email error:', sendError);
       const err = sendError as { message?: string; code?: string; command?: string; response?: string };
+      // Log structuré : sans host/port/secure, impossible de distinguer dans les
+      // logs Hostinger une panne SMTP d'une mauvaise configuration.
+      console.error('[contact] Échec SMTP définitif', {
+        host: smtpHost,
+        port: smtpPort,
+        secure: smtpSecure,
+        user: smtpUser,
+        code: err?.code,
+        command: err?.command,
+        response: err?.response,
+        message: err?.message,
+      });
       return NextResponse.json(
         {
           error: "Échec de l'envoi de l'email",

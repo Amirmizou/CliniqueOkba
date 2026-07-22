@@ -63,6 +63,7 @@
     "errorSituation": "يرجى تحديد حالتك العائلية.",
     "filesTitle": "الوثائق",
     "photoLabel": "صورة شخصية",
+    "errorPhoto": "الصورة الشخصية إلزامية.",
     "photoHint": "JPG أو PNG أو WebP — 8 ميغابايت كحد أقصى.",
     "documentLabel": "البطاقة العائلية (مسح ضوئي)",
     "documentHint": "PDF أو صورة — 8 ميغابايت كحد أقصى.",

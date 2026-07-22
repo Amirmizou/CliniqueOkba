@@ -63,6 +63,7 @@
     "errorSituation": "Veuillez indiquer votre situation familiale.",
     "filesTitle": "Documents",
     "photoLabel": "Photo d'identité",
+    "errorPhoto": "La photo d'identité est obligatoire.",
     "photoHint": "JPG, PNG ou WebP — 8 Mo max.",
     "documentLabel": "Fiche familiale (scan)",
     "documentHint": "PDF ou image — 8 Mo max.",

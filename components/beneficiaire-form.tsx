@@ -340,6 +340,10 @@ export default function BeneficiaireForm({ organismes, logos = {} }: { organisme
 
   const handleSubmit = async () => {
     setError('')
+    // Photo obligatoire à l'inscription. En modification, la photo déjà
+    // enregistrée reste valable : on n'exige un fichier que si l'on crée
+    // une nouvelle fiche.
+    if (!editMode && !photo) return setError(t('errorPhoto'))
     if (!consent) return setError(t('errorConsent'))
     setSubmitting(true)
     try {
@@ -873,7 +877,9 @@ export default function BeneficiaireForm({ organismes, logos = {} }: { organisme
             className="space-y-6"
           >
             <div>
-              <p className={labelClass}>{t('photoLabel')}</p>
+              <p className={labelClass}>
+                {t('photoLabel')} <span className="text-red-500">*</span>
+              </p>
               <MediaPicker
                 file={photo}
                 setFile={setPhoto}
