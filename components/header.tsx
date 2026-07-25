@@ -464,97 +464,50 @@ export default function Header({ siteSettings, poles }: HeaderProps) {
           </div>
         </div>
 
-        {/* ─── EN-TÊTE MOBILE — logo, marque et menu.
-             Le gantry reste affiché en dessous, mais la navigation qu'il porte
-             est réservée au desktop (elle n'a pas la place sous xl) : c'est ce
-             bandeau qui donne accès au menu sur mobile. ─── */}
-        <div className="relative w-full max-w-7xl xl:hidden">
-          <div className="relative flex items-center gap-2.5 overflow-hidden rounded-2xl border border-gray-100/80 bg-white/97 px-3 py-2.5 shadow-[0_8px_30px_rgb(0,0,0,0.10)] backdrop-blur-md dark:border-white/10 dark:bg-slate-900/97">
-            {/* Trame de points subtile (gauche) */}
-            <div aria-hidden="true" className="pointer-events-none absolute inset-0 text-[#006633]" style={{
-              backgroundImage: 'radial-gradient(currentColor 1px, transparent 1px)',
-              backgroundSize: '14px 14px',
-              opacity: 0.04,
-              WebkitMaskImage: 'linear-gradient(90deg, #000 0%, transparent 62%)',
-              maskImage: 'linear-gradient(90deg, #000 0%, transparent 62%)',
-            }} />
-            {/* Barre signature en bas */}
-            <div aria-hidden="true" className="pointer-events-none absolute bottom-0 left-4 right-4 h-[2px] rounded-full" style={{
-              background: 'linear-gradient(90deg, transparent, #006633 18%, #4caf6e 48%, #FDE68A 68%, #006633 88%, transparent)',
-            }} />
-
-            {/* Logo — emblème rond + marque en texte (le lockup complet est illisible à 56px) */}
-            <a href={homeHref} className="group relative z-10 flex min-w-0 flex-1 items-center gap-2.5">
-              <LogoReveal
-                src="/logo-mark.png"
-                alt="Clinique OKBA"
-                sizes="48px"
-                imageClassName="object-contain p-[9%]"
-                className="h-[48px] w-[48px] shrink-0 rounded-full bg-white shadow-[0_2px_10px_rgba(0,102,51,0.18)] ring-1 ring-[#006633]/15 transition-transform duration-300 group-active:scale-95"
-              />
-              <span className="flex min-w-0 flex-col">
-                <span className="truncate text-[15px] font-bold leading-none tracking-tight text-[#00532a] dark:text-white">
-                  {clinicNameFirst && <span className="text-[#00a651]">{clinicNameFirst} </span>}
-                  {clinicNameRest}
-                </span>
-                <span className="mt-[5px] text-[8.5px] font-medium italic leading-tight text-[#006633]/60 dark:text-white/55">
-                  {t('slogan')}
-                </span>
-              </span>
-            </a>
-
-            {/* Contrôles — menu + CTA « RDV » (langue dispo dans le menu) */}
-            <div className="relative z-10 flex shrink-0 items-center gap-1.5">
-              {/* Menu — cible tactile 44px (l'ancien bouton faisait 36px, sous la
-                  norme WCAG/Apple). Style discret : le vert plein est réservé au
-                  CTA « RDV » pour qu'il n'y ait qu'une action primaire visible. */}
-              <button
-                ref={menuButtonRef}
-                aria-label="Ouvrir le menu"
-                aria-expanded={isOpen}
-                aria-controls="mobile-menu"
-                className="flex h-11 w-11 shrink-0 cursor-pointer items-center justify-center rounded-full border border-[#006633]/20 bg-[#006633]/[0.06] text-[#006633] transition-colors active:scale-95 active:bg-[#006633]/15 dark:border-white/15 dark:bg-white/5 dark:text-white"
-                onClick={() => setIsOpen((v) => !v)}
-              >
-                <Menu className="h-5 w-5" strokeWidth={2.2} />
-              </button>
-
-              {/* RDV — CTA lisible. Remplace le mini-gantry CT : celui-ci empilait
-                  ~15 calques (dégradés, masques, ombres internes) et 3 animations
-                  infinies dans un header sticky, pour un libellé de 6px illisible.
-                  Coût de rendu permanent sur mobile, bénéfice nul. */}
-              <button
-                onClick={() => scrollToSection('#contact')}
-                aria-label={t('appointment')}
-                title={t('appointment')}
-                className="group flex h-11 shrink-0 cursor-pointer items-center gap-1.5 rounded-full bg-[#006633] px-3.5 text-white shadow-[0_4px_12px_rgba(0,102,51,0.28)] transition-all active:scale-95 active:bg-[#004d26]"
-              >
-                <CalendarDays className="h-[17px] w-[17px] shrink-0" strokeWidth={2.2} />
-                <span className="text-[12px] font-extrabold uppercase leading-none tracking-[0.08em]">
-                  {locale === 'ar' ? 'موعد' : 'RDV'}
-                </span>
-              </button>
-            </div>
-          </div>
-        </div>
-
         {/* ═══ COLONNE DESKTOP & MOBILE — bande claire (logo + recherche) au-dessus du scanner ═══ */}
         <div className="relative z-10 mx-auto flex w-full max-w-7xl flex-col">
+          {/* ── Rangée claire : recherche + langue (centrés) ── */}
+          <div className="flex items-center justify-between w-full max-w-7xl relative z-20 pointer-events-none mt-1 mb-2 xl:mt-0 xl:mb-0 xl:justify-center">
+          {/* Logo Mobile */}
+          <a href={homeHref} className="xl:hidden pointer-events-auto shrink-0 flex items-center gap-2 mr-2">
+            <LogoReveal
+              src="/logo-mark.png"
+              alt="Clinique OKBA"
+              sizes="44px"
+              imageClassName="object-contain p-[9%]"
+              className="h-[44px] w-[44px] rounded-full bg-white shadow-sm ring-1 ring-[#006633]/15 transition-transform active:scale-95"
+            />
+          </a>
 
-        {/* ── Rangée claire : recherche + langue (centrés) ── */}
-        <div className="flex items-center justify-center pt-0 pb-0">
-          <div className="flex w-full max-w-xl items-center gap-3">
-            <div className="flex-1">
+          <div className="flex flex-1 max-w-xl items-center gap-2 pointer-events-auto">
+            <div className="flex-1 min-w-0">
               <SiteSearch locale={locale} sections={searchSections} className="w-full" />
             </div>
-            <div className="shrink-0 pointer-events-auto">
+            <div className="shrink-0 hidden sm:block">
               <LanguageSwitcher />
             </div>
           </div>
+
+          {/* Hamburger Menu Mobile */}
+          <button
+            ref={menuButtonRef}
+            aria-label="Ouvrir le menu"
+            aria-expanded={isOpen}
+            aria-controls="mobile-menu"
+            className="xl:hidden pointer-events-auto ml-2 flex h-11 w-11 shrink-0 cursor-pointer items-center justify-center rounded-full border border-[#006633]/20 bg-white/80 text-[#006633] shadow-sm backdrop-blur-md transition-colors active:scale-95 dark:border-white/15 dark:bg-slate-800/80 dark:text-white"
+            onClick={() => setIsOpen((v) => !v)}
+          >
+            <Menu className="h-[22px] w-[22px]" strokeWidth={2.2} />
+          </button>
         </div>
 
-        {/* 3D SCANNER DESKTOP — Siemens Symbia Pro.specta */}
-        <div className={cn("pointer-events-auto relative w-full h-[140px] transition-all duration-700 origin-top mt-0", isScrolled ? "scale-95 -translate-y-2 opacity-95" : "scale-100 translate-y-0 opacity-100")}>
+        {/* 3D SCANNER DESKTOP & MOBILE — Siemens Symbia Pro.specta */}
+        <div className="pointer-events-auto relative w-full h-[95px] md:h-[110px] xl:h-[140px] transition-all duration-700">
+          <div className={cn(
+            "absolute top-0 left-0 h-[140px] origin-top-left transition-all duration-700",
+            "w-[142.8%] scale-[0.7] md:w-[125%] md:scale-[0.8] xl:w-full xl:scale-100",
+            isScrolled ? "opacity-95 xl:scale-95 xl:-translate-y-2" : "opacity-100 translate-y-0"
+          )}>
 
           {/* ══ FLOOR MOUNT ══ */}
           <div className="absolute right-[10px] bottom-0 w-[174px] h-[18px] z-0 pointer-events-none" style={{
