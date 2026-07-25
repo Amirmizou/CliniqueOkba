@@ -837,6 +837,7 @@ export default function Header({ siteSettings, poles }: HeaderProps) {
 
         </div>
         </div>
+        </div>
       </header>
 
       {/* MOBILE FULL SCREEN MENU */}
