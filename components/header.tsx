@@ -467,7 +467,7 @@ export default function Header({ siteSettings, poles }: HeaderProps) {
         {/* ═══ COLONNE DESKTOP & MOBILE — bande claire (logo + recherche) au-dessus du scanner ═══ */}
         <div className="relative z-10 mx-auto flex w-full max-w-7xl flex-col">
           {/* ── Rangée claire : recherche + langue (centrés) ── */}
-          <div className="flex items-center justify-between w-full max-w-7xl relative z-20 pointer-events-none mt-1 mb-2 xl:mt-0 xl:mb-0 xl:justify-center">
+          <div className="flex items-center justify-between w-full max-w-7xl relative z-20 pointer-events-none mt-1 mb-2 px-3 xl:px-0 xl:mt-0 xl:mb-0 xl:justify-center">
           {/* Logo Mobile */}
           <a href={homeHref} className="xl:hidden pointer-events-auto shrink-0 flex items-center gap-2 mr-2">
             <LogoReveal
@@ -479,11 +479,11 @@ export default function Header({ siteSettings, poles }: HeaderProps) {
             />
           </a>
 
-          <div className="flex flex-1 max-w-xl items-center gap-2 pointer-events-auto">
+          <div className="hidden sm:flex flex-1 max-w-xl items-center gap-2 pointer-events-auto mx-4 xl:mx-0">
             <div className="flex-1 min-w-0">
               <SiteSearch locale={locale} sections={searchSections} className="w-full" />
             </div>
-            <div className="shrink-0 hidden sm:block">
+            <div className="shrink-0">
               <LanguageSwitcher />
             </div>
           </div>
