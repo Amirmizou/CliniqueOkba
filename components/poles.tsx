@@ -121,31 +121,21 @@ function PoleCard({ pole, index }: { pole: Pole & { imageUrl?: string }; index: 
       whileTap={{ scale: 0.99 }}
       viewport={{ once: true, margin: '-60px' }}
       transition={{ duration: 0.6, delay: index * 0.08, ease: [0.22, 1, 0.36, 1] }}
-      className="group relative h-full"
+      className="group relative flex h-full flex-col"
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
     >
-      {/* Halo coloré au hover */}
       <div
-        className={`absolute -inset-2 rounded-[2rem] blur-2xl transition-opacity duration-500 ${
-          pole.featured ? 'opacity-40 group-hover:opacity-60' : 'opacity-0 group-hover:opacity-50'
-        }`}
-        style={{
-          background: `radial-gradient(60% 60% at 50% 40%, ${pole.accent}55, transparent 70%)`,
-        }}
-      />
-
-      <div
-        className={`relative flex h-full min-h-[420px] flex-col overflow-hidden rounded-3xl border transition-all duration-500 hover:-translate-y-1.5 ${
+        className={`relative flex h-full flex-col overflow-hidden rounded-3xl bg-card border transition-all duration-300 hover:-translate-y-1.5 ${
           pole.urgent
-            ? 'border-red-400/50 shadow-lg shadow-red-500/10 ring-1 ring-red-400/30'
+            ? 'border-red-200 shadow-md hover:shadow-xl hover:shadow-red-500/10'
             : pole.featured
-              ? 'border-white/20 shadow-xl ring-1 ring-white/10'
-              : 'border-white/10 shadow-lg'
+              ? 'border-primary/20 shadow-md hover:shadow-xl hover:shadow-primary/10'
+              : 'border-border shadow-sm hover:shadow-lg'
         }`}
       >
-        {/* ── Photo de fond ── */}
-        <div className="absolute inset-0 z-0">
+        {/* ── Bandeau supérieur (Image) ── */}
+        <div className="relative h-48 w-full shrink-0 overflow-hidden sm:h-56">
           <Image
             src={bgImage}
             alt={title}
@@ -153,62 +143,25 @@ function PoleCard({ pole, index }: { pole: Pole & { imageUrl?: string }; index: 
             sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
             className="object-cover transition-transform duration-700 ease-out group-hover:scale-105"
           />
-          {/* Voile dégradé concentré en bas — la photo reste visible en haut */}
-          <div
-            className="absolute inset-0 transition-opacity duration-500"
-            style={{
-              background: `linear-gradient(
-                to top,
-                ${pole.accent}f2 0%,
-                ${pole.accent}c0 25%,
-                ${pole.accent}5c 48%,
-                transparent 72%
-              )`,
-            }}
-          />
-          {/* Scrim sombre léger, bas uniquement (lisibilité du nom) */}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-black/10 to-transparent" />
-          {/* Fine teinte de marque uniforme (cohésion, n'efface pas la photo) */}
-          <div className="absolute inset-0" style={{ backgroundColor: `${pole.accent}14` }} />
-        </div>
-
-        {/* Bandeau accent haut (fin trait lumineux) */}
-        <div
-          className="absolute inset-x-0 top-0 z-10 h-1"
-          style={{ background: `linear-gradient(90deg, transparent, ${pole.accent}, transparent)` }}
-        />
-
-        {/* Ruban « À la une » pour le pôle vedette */}
-        {pole.featured && !pole.urgent && (
-          <span
-            className="absolute right-0 top-0 z-20 rounded-bl-xl rounded-tr-3xl px-3.5 py-1.5 text-[0.6rem] font-bold uppercase tracking-[0.15em] text-white shadow-lg backdrop-blur-sm"
-            style={{ background: `${pole.accent}cc` }}
-          >
-            {t('featured')}
-          </span>
-        )}
-
-        {/* ── Contenu ── */}
-        <div className="relative z-10 flex h-full flex-col justify-end p-6 sm:p-7">
-
-          {/* Icône flottante (en haut à gauche de la zone de contenu) */}
-          <div className="mb-auto flex items-start justify-between">
-            <motion.div
-              className="flex h-12 w-12 items-center justify-center rounded-2xl text-white backdrop-blur-md"
-              style={{
-                background: `${pole.accent}90`,
-                boxShadow: `0 4px 20px ${pole.accent}40`,
-              }}
-              whileHover={{ scale: 1.08, y: -2 }}
-              transition={{ duration: 0.25, ease: [0.23, 1, 0.32, 1] }}
+          {/* Overlay léger pour adoucir l'image */}
+          <div className="absolute inset-0 bg-black/5 transition-opacity duration-300 group-hover:bg-black/0" />
+          
+          {/* Ruban « À la une » pour le pôle vedette */}
+          {pole.featured && !pole.urgent && (
+            <span
+              className="absolute right-0 top-0 z-20 rounded-bl-xl px-3.5 py-1.5 text-[0.65rem] font-bold uppercase tracking-wider text-white shadow-sm"
+              style={{ backgroundColor: pole.accent }}
             >
-              <Icon className="h-6 w-6 drop-shadow-md" />
-            </motion.div>
+              {t('featured')}
+            </span>
+          )}
 
-            {badge && (
+          {/* Badge additionnel (ex: 24/7) */}
+          {badge && (
+            <div className="absolute left-4 top-4 z-20">
               <span
-                className="inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-[0.65rem] font-bold text-white backdrop-blur-md"
-                style={{ backgroundColor: `${pole.accent}99` }}
+                className="inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-[0.65rem] font-bold text-white shadow-sm"
+                style={{ backgroundColor: pole.urgent ? '#ef4444' : pole.accent }}
               >
                 {pole.urgent && (
                   <span className="relative flex h-2 w-2">
@@ -218,31 +171,41 @@ function PoleCard({ pole, index }: { pole: Pole & { imageUrl?: string }; index: 
                 )}
                 {badge}
               </span>
-            )}
-          </div>
+            </div>
+          )}
 
-          {/* Titre + description */}
-          <h3 className="text-xl font-bold leading-tight text-white drop-shadow-lg sm:text-[1.35rem]">
+          {/* Icône flottante chevauchant l'image et le contenu */}
+          <motion.div
+            className="absolute -bottom-6 right-6 z-30 flex h-14 w-14 items-center justify-center rounded-2xl bg-card shadow-lg ring-1 ring-black/5"
+            whileHover={{ scale: 1.05 }}
+            transition={{ duration: 0.2 }}
+          >
+            <Icon className="h-6 w-6" style={{ color: pole.urgent ? '#ef4444' : pole.accent }} />
+          </motion.div>
+        </div>
+
+        {/* ── Contenu texte ── */}
+        <div className="relative z-10 flex flex-1 flex-col p-6 sm:p-7">
+          <h3 className="pr-12 text-xl font-bold leading-tight text-card-foreground sm:text-[1.35rem]">
             {title}
           </h3>
-          <p className="mt-1.5 text-[0.8rem] leading-relaxed text-white/80 line-clamp-2 drop-shadow">
+          <p className="mt-2 text-[0.85rem] leading-relaxed text-muted-foreground line-clamp-3">
             {description}
           </p>
 
           {/* Accordéon : prestations / actes */}
           {items.length > 0 && (
-            <div className="mt-3">
+            <div className="mt-4">
               <button
                 type="button"
                 onClick={() => setExpanded((v) => !v)}
                 aria-expanded={expanded}
-                className="inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-[0.7rem] font-semibold text-white/90 backdrop-blur-sm transition-colors hover:bg-white/20"
-                style={{ backgroundColor: 'rgba(255,255,255,0.12)' }}
+                className="inline-flex items-center gap-2 rounded-full border border-border bg-muted/50 px-3 py-1.5 text-[0.75rem] font-medium text-foreground transition-colors hover:bg-muted"
               >
-                <Activity className="h-3 w-3" />
+                <Activity className="h-3.5 w-3.5 text-muted-foreground" />
                 {t('prestations', { count: items.length })}
                 <ChevronDown
-                  className={`h-3 w-3 transition-transform duration-300 ${
+                  className={`h-3.5 w-3.5 text-muted-foreground transition-transform duration-300 ${
                     expanded ? 'rotate-180' : ''
                   }`}
                 />
@@ -254,20 +217,20 @@ function PoleCard({ pole, index }: { pole: Pole & { imageUrl?: string }; index: 
                     initial={{ height: 0, opacity: 0 }}
                     animate={{ height: 'auto', opacity: 1 }}
                     exit={{ height: 0, opacity: 0 }}
-                    transition={{ duration: 0.35, ease: [0.32, 0.72, 0, 1] }}
+                    transition={{ duration: 0.3, ease: 'easeInOut' }}
                     className="overflow-hidden"
                   >
-                    <div className="mt-2.5 space-y-1.5 rounded-2xl bg-white/10 p-3 backdrop-blur-md">
+                    <div className="mt-3 space-y-2 rounded-2xl bg-muted/30 p-3.5 ring-1 ring-border/50">
                       {items.map((item, i) => (
                         <motion.li
                           key={item}
-                          initial={{ opacity: 0, x: -8 }}
+                          initial={{ opacity: 0, x: -5 }}
                           animate={{ opacity: 1, x: 0 }}
-                          transition={{ delay: i * 0.04 }}
-                          className="flex items-center gap-2 text-[0.78rem] text-white/90"
+                          transition={{ delay: i * 0.03 }}
+                          className="flex items-start gap-2.5 text-[0.8rem] text-muted-foreground"
                         >
-                          <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-white/70" />
-                          {item}
+                          <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-primary/40" />
+                          <span className="leading-snug">{item}</span>
                         </motion.li>
                       ))}
                     </div>
@@ -277,22 +240,29 @@ function PoleCard({ pole, index }: { pole: Pole & { imageUrl?: string }; index: 
             </div>
           )}
 
-          {/* CTA */}
-          <div className="mt-4 flex items-center gap-2">
+          <div className="mt-auto pt-6" />
+
+          {/* Ligne ECG de séparation subtile */}
+          <div className="-mx-2 mb-4 h-4 opacity-10">
+            <ECGLine color="currentColor" height={16} variant={variant} />
+          </div>
+
+          {/* CTAs */}
+          <div className="flex items-center gap-3">
             <Link
               href={`/poles/${pole.slug}`}
-              className="inline-flex flex-1 items-center justify-center gap-1.5 rounded-full bg-white/15 px-3 py-2.5 text-sm font-semibold text-white backdrop-blur-sm transition-all duration-200 hover:bg-white/25 hover:gap-2.5"
+              className="group inline-flex flex-1 items-center justify-center gap-2 rounded-full border border-border bg-background px-4 py-2.5 text-sm font-semibold text-foreground shadow-sm transition-all hover:bg-accent hover:text-accent-foreground"
             >
               {t('discover')}
               <ArrowRight className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-1" />
             </Link>
+            
             {pole.urgent || pole.phone ? (
-              // Urgences OU service avec ligne directe → bouton d'appel libellé
               <a
                 href={callHref}
                 aria-label={callLabel}
-                className="inline-flex items-center gap-2 rounded-xl bg-white px-4 py-2.5 text-sm font-bold shadow-lg transition-transform duration-200 hover:scale-[1.03] active:scale-95"
-                style={{ color: pole.accent }}
+                className="inline-flex items-center gap-2 rounded-full px-4 py-2.5 text-sm font-bold text-white shadow-md transition-all hover:scale-[1.02] active:scale-95"
+                style={{ backgroundColor: pole.urgent ? '#ef4444' : pole.accent }}
               >
                 <Phone className="h-4 w-4" />
                 {t('call')}
@@ -301,16 +271,11 @@ function PoleCard({ pole, index }: { pole: Pole & { imageUrl?: string }; index: 
               <a
                 href={callHref}
                 aria-label={callLabel}
-                className="inline-flex items-center justify-center rounded-full border border-white/30 bg-white/10 p-2.5 text-white backdrop-blur-sm transition-all duration-200 hover:bg-white/25 touch-target min-w-[40px]"
+                className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-border bg-background text-muted-foreground shadow-sm transition-all hover:bg-accent hover:text-accent-foreground active:scale-95"
               >
                 <Phone className="h-4 w-4" />
               </a>
             )}
-          </div>
-
-          {/* Signal ECG (ligne basse) */}
-          <div className="-mx-6 -mb-6 mt-4 h-6 opacity-50 sm:-mx-7 sm:-mb-7">
-            <ECGLine color="rgba(255,255,255,0.7)" height={24} variant={variant} />
           </div>
         </div>
       </div>

@@ -232,6 +232,11 @@ function resolveDoctors(data: any[] | undefined, locale: string): Doctor[] {
   return locale === 'ar' ? base.map(toArabic) : base
 }
 
+function isDirector(doc: Doctor): boolean {
+  const str = `${doc.name} ${doc.specialty} ${doc.subtitle} ${doc.customBadge}`.toLowerCase()
+  return str.includes('directeur') || str.includes('direction')
+}
+
 /* -------------------------------------------------------------------------- */
 
 function DoctorCard({
@@ -251,9 +256,11 @@ function DoctorCard({
   const locale = useLocale()
 
   const Icon = doctor.icon
+  const director = isDirector(doctor)
   // On utilise la couleur propre au médecin (définie dans Sanity), 
   // sinon on utilise la couleur de section, ou le vert par défaut.
-  const accent = doctor.accent || sectionAccent || '#006633'
+  // Si c'est le directeur, on force souvent une couleur plus "or" ou on garde son accent.
+  const accent = director ? '#D97706' : (doctor.accent || sectionAccent || '#006633')
   const hasVideos = Array.isArray(doctor.videos) && doctor.videos.length > 0
   // Dr Aissaoui ne souhaite pas que sa photo soit partagée : on remplace
   // l'affiche par une couverture thématique « laboratoire » (et pas de zoom).
@@ -273,9 +280,22 @@ function DoctorCard({
       className="group relative h-full"
     >
       <div
-        className="relative flex h-full flex-col overflow-hidden rounded-[1.75rem] border border-border/40 bg-white shadow-soft ring-1 ring-black/5 transition-all duration-300 hover:-translate-y-1 hover:shadow-elevated dark:border-white/10 dark:bg-slate-900"
-        style={{ '--tw-ring-color': `${accent}1A` } as React.CSSProperties}
+        className={cn(
+          "relative flex h-full flex-col overflow-hidden rounded-[1.75rem] border bg-white transition-all duration-300 hover:-translate-y-1 dark:bg-slate-900",
+          director 
+            ? "border-amber-400 shadow-[0_8px_30px_rgba(245,158,11,0.2)] ring-2 ring-amber-400/50 hover:shadow-[0_8px_40px_rgba(245,158,11,0.3)]" 
+            : "border-border/40 shadow-soft ring-1 ring-black/5 hover:shadow-elevated dark:border-white/10"
+        )}
+        style={!director ? { '--tw-ring-color': `${accent}1A` } as React.CSSProperties : {}}
       >
+        {director && (
+          <div className="absolute -right-12 top-6 z-30 rotate-45 bg-gradient-to-r from-amber-500 via-yellow-400 to-amber-500 py-1.5 text-center shadow-lg w-48">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-white drop-shadow-sm">
+              {locale === 'ar' ? 'الإدارة' : 'Direction'}
+            </span>
+          </div>
+        )}
+
         {/* ----- Affiche ----- */}
         <button
           type="button"
@@ -593,7 +613,12 @@ export default function DoctorsShowcase({ data, sectionContent }: { data?: any[]
   const isAr = locale === 'ar'
   const [active, setActive] = useState<Doctor | null>(null)
   const [activeVideo, setActiveVideo] = useState<Doctor | null>(null)
-  const list = resolveDoctors(data, locale)
+  
+  const list = resolveDoctors(data, locale).sort((a, b) => {
+    const aDir = isDirector(a) ? 1 : 0
+    const bDir = isDirector(b) ? 1 : 0
+    return bDir - aDir // Director comes first
+  })
   
   const handlePlayVideo = (doctor: Doctor) => {
     setActiveVideo(doctor)

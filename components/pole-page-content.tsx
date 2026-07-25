@@ -83,6 +83,21 @@ export interface PolePageData {
   phone?: string
 }
 
+const DEFAULT_IMAGES: Record<string, string> = {
+  ScanLine: 'https://cdn.sanity.io/images/ox121huo/production/2131088c8ef7bbe9fbea5fbb8138e0141afeb108-960x720.webp',
+  Radiation: 'https://cdn.sanity.io/images/ox121huo/production/88b2db71d90062f73179411ac73c94020ddbeab1-472x476.png',
+  Smile: 'https://cdn.sanity.io/images/ox121huo/production/e090e3347d9554481b0c27c9c7c5d13b44038c0a-2752x1536.png',
+  Stethoscope: 'https://cdn.sanity.io/images/ox121huo/production/f2462ecffc66194467fa60cb31da515094f6a834-1264x848.jpg',
+  Siren: 'https://cdn.sanity.io/images/ox121huo/production/92e468456b67480ffcf824c16d77c5d064a5ad3b-1201x1600.jpg',
+  FlaskConical: 'https://cdn.sanity.io/images/ox121huo/production/757b4e28bcfaa11d23804e928e749064562fc631-1600x744.jpg',
+  Eye: 'https://cdn.sanity.io/images/ox121huo/production/3ff593e8d95b85af2f1658c2e405523f45162149-1600x809.jpg',
+  Heart: 'https://cdn.sanity.io/images/ox121huo/production/790004232ac8c08fc220ade3534c6e0b5d7a8a2b-1234x823.jpg',
+  Baby: 'https://cdn.sanity.io/images/ox121huo/production/f2462ecffc66194467fa60cb31da515094f6a834-1264x848.jpg',
+  ScanEye: 'https://cdn.sanity.io/images/ox121huo/production/3ff593e8d95b85af2f1658c2e405523f45162149-1600x809.jpg',
+  Pill: 'https://cdn.sanity.io/images/ox121huo/production/cbb7cd26b49f2157bf8bc9738f1527fad86539ca-1280x720.jpg',
+  Activity: 'https://cdn.sanity.io/images/ox121huo/production/cbb7cd26b49f2157bf8bc9738f1527fad86539ca-1280x720.jpg',
+}
+
 export default function PolePageContent({
   pole,
   photos,
@@ -104,7 +119,6 @@ export default function PolePageContent({
 
   const Icon = ICONS[pole.iconName] || Stethoscope
   const ecgVariant = ecgVariantForIcon(pole.iconName)
-  const motif = motifVariantForIcon(pole.iconName)
 
   const videos = (pole.videos || []).filter((v) => v.videoUrl)
   const [activeVideo, setActiveVideo] = useState(0)
@@ -142,193 +156,140 @@ export default function PolePageContent({
       : `Bonjour, je souhaite prendre rendez-vous au ${pole.title} à la Clinique OKBA.`,
   )
 
-  const hasMedia = !!pole.imageUrl || photos.length > 0 || videos.length > 0
+  // Fallback image logic
+  const bgImage = pole.imageUrl || (photos.length > 0 ? photos[0].src : null) || posterUrlOf(videos[0]) || DEFAULT_IMAGES[pole.iconName] || '/images/specialties/internal-medicine.png'
+  const hasMedia = true // We always have a fallback image now
 
   return (
     <>
-      {/* ══════════════════════════════════ HERO ══════════════════════════════════ */}
-      <section className="relative overflow-hidden bg-background">
-        {/* Accent edge stripe */}
+      {/* ══════════════════════════════════ HERO (Full Bleed) ══════════════════════════════════ */}
+      <section className="relative flex min-h-[60vh] sm:min-h-[70vh] flex-col justify-end overflow-hidden bg-black pb-16 pt-32 sm:pb-24">
+        {/* Background Image */}
+        <div className="absolute inset-0 z-0">
+          <Image
+            src={bgImage}
+            alt={pole.title}
+            fill
+            sizes="100vw"
+            className="object-cover opacity-60"
+            priority
+          />
+          {/* Overlay gradient for text legibility */}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent" />
+          <div className="absolute inset-0 bg-black/20" />
+        </div>
+
+        {/* Accent edge stripe (top) */}
         <div
-          className={`absolute inset-y-0 z-20 w-1.5 ${isAr ? 'right-0' : 'left-0'}`}
+          className="absolute inset-x-0 top-0 z-20 h-1.5"
           style={{ background: pole.accent }}
         />
 
-        <PoleMotif variant={motif} color={pole.accent} />
-
-        <div className="relative z-10 mx-auto max-w-7xl px-6 pb-16 pt-10 sm:pb-24 sm:pt-14 lg:px-8">
+        <div className="relative z-10 mx-auto w-full max-w-7xl px-6 lg:px-8">
           <Link
-            href="/"
-            className="mb-10 inline-flex items-center gap-1.5 text-sm font-medium text-muted-foreground transition-colors duration-200 hover:text-foreground"
+            href="/#specialties"
+            className="mb-8 inline-flex items-center gap-1.5 rounded-full bg-white/10 px-4 py-2 text-sm font-medium text-white backdrop-blur-md transition-colors duration-200 hover:bg-white/20"
           >
             <ArrowLeft className={`h-4 w-4 ${isAr ? 'rotate-180' : ''}`} />
             {t('backHome')}
           </Link>
 
-          <div className="grid grid-cols-1 items-center gap-12 lg:grid-cols-2 lg:gap-16">
-            {/* ── Left: Content ── */}
-            <motion.div
-              initial={{ opacity: 0, x: isAr ? 24 : -24 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-              className="flex flex-col items-start"
+          <div className="flex flex-col items-start max-w-3xl">
+            {/* "Pôle actif" status chip */}
+            <div
+              className="mb-6 inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-xs font-bold uppercase tracking-widest text-white backdrop-blur-md"
+              style={{ backgroundColor: `${pole.accent}e6` }}
             >
-              {/* "Pôle actif" status chip */}
+              {!prefersReducedMotion && (
+                <span className="relative flex h-2 w-2">
+                  <span
+                    className="absolute inline-flex h-full w-full animate-ping rounded-full bg-white opacity-75"
+                    style={{ animationDuration: '2s' }}
+                  />
+                  <span className="relative inline-flex h-2 w-2 rounded-full bg-white" />
+                </span>
+              )}
+              {t('poleActive')}
+            </div>
+
+            {/* Icon & Title Row */}
+            <div className="flex items-center gap-4 sm:gap-6 mb-4">
               <div
-                className="mb-6 inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-xs font-bold uppercase tracking-widest text-white"
-                style={{ backgroundColor: pole.accent }}
+                className="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl text-white shadow-xl backdrop-blur-md"
+                style={{
+                  background: `linear-gradient(140deg, ${pole.accent}e6 0%, ${pole.accent} 100%)`,
+                }}
               >
-                {!prefersReducedMotion && (
-                  <span className="relative flex h-2 w-2">
-                    <span
-                      className="absolute inline-flex h-full w-full animate-ping rounded-full bg-white opacity-75"
-                      style={{ animationDuration: '2s' }}
-                    />
-                    <span className="relative inline-flex h-2 w-2 rounded-full bg-white" />
-                  </span>
-                )}
-                {t('poleActive')}
+                <Icon className="h-8 w-8 drop-shadow-sm" />
               </div>
-
-              {/* Large layered icon badge */}
-              <div className="relative mb-6 h-20 w-20">
-                <div
-                  aria-hidden="true"
-                  className="absolute -inset-2 rounded-[1.5rem] opacity-30 blur-2xl"
-                  style={{ background: pole.accent }}
-                />
-                <div
-                  className="relative flex h-full w-full items-center justify-center rounded-[1.375rem] text-white"
-                  style={{
-                    background: `linear-gradient(140deg, ${pole.accent}d0 0%, ${pole.accent} 100%)`,
-                    boxShadow: `0 8px 32px ${pole.accent}50, inset 0 1.5px 0 rgba(255,255,255,0.22), inset 0 -1px 0 rgba(0,0,0,0.12)`,
-                  }}
-                >
-                  <Icon className="h-10 w-10 drop-shadow-sm" />
-                </div>
-              </div>
-
-              {/* Title */}
-              <h1 className="mb-4 text-4xl font-black leading-tight text-foreground sm:text-5xl lg:text-6xl">
+              <h1 className="text-3xl font-black leading-tight text-white sm:text-5xl lg:text-6xl drop-shadow-lg">
                 {pole.title}
               </h1>
+            </div>
 
-              {/* ECG signal */}
-              <div className="mb-5 h-9 w-full max-w-xs">
-                <ECGLine color={pole.accent} height={36} variant={ecgVariant} />
-              </div>
-
-              {/* Badge */}
-              {pole.badge && (
-                <div className="mb-5">
-                  <span
-                    className="inline-flex items-center gap-1.5 rounded-full px-4 py-1.5 text-sm font-bold"
-                    style={{ backgroundColor: `${pole.accent}18`, color: pole.accent }}
-                  >
-                    {pole.urgent && (
-                      <span className="relative flex h-2 w-2">
-                        <span
-                          className="absolute inline-flex h-full w-full animate-ping rounded-full opacity-75"
-                          style={{ backgroundColor: pole.accent, animationDuration: '1.4s' }}
-                        />
-                        <span
-                          className="relative inline-flex h-2 w-2 rounded-full"
-                          style={{ backgroundColor: pole.accent }}
-                        />
-                      </span>
-                    )}
-                    {pole.badge}
-                  </span>
-                </div>
-              )}
-
-              {/* Intro */}
-              <p className="mb-8 max-w-xl text-base leading-relaxed text-muted-foreground sm:text-lg">
-                {pole.intro || pole.description}
-              </p>
-
-              {/* CTAs */}
-              <div className="flex flex-wrap gap-3">
-                <a
-                  href={`tel:${phone.replace(/[^+\d]/g, '')}`}
-                  className="inline-flex items-center gap-2 rounded-xl px-5 py-3 text-sm font-bold text-white shadow-lg transition-all duration-200 hover:brightness-110 active:scale-[0.97]"
-                  style={{ backgroundColor: pole.accent }}
+            {/* Badge */}
+            {pole.badge && (
+              <div className="mb-6 mt-2">
+                <span
+                  className="inline-flex items-center gap-1.5 rounded-full px-4 py-1.5 text-sm font-bold text-white backdrop-blur-md"
+                  style={{ backgroundColor: `${pole.accent}99` }}
                 >
-                  <Phone className="h-4 w-4" />
-                  {t('bookAppointment')}
-                </a>
-                <a
-                  href={`https://wa.me/${CLINIC_WHATSAPP}?text=${waMessage}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 rounded-xl bg-[#25D366] px-5 py-3 text-sm font-bold text-white shadow-lg transition-all duration-200 hover:bg-[#22c55e] active:scale-[0.97]"
-                >
-                  <WhatsAppIcon className="h-4 w-4" />
-                  WhatsApp
-                </a>
-                <Link
-                  href="/#contact"
-                  className="inline-flex items-center gap-2 rounded-xl border border-border px-5 py-3 text-sm font-semibold text-foreground/80 transition-colors duration-200 hover:bg-foreground/5 active:scale-[0.97]"
-                >
-                  {t('locate')}
-                </Link>
-              </div>
-
-              {/* Ligne directe du service (numéro affiché et cliquable) */}
-              {phone && (
-                <a
-                  href={`tel:${phone.replace(/[^+\d]/g, '')}`}
-                  className="mt-4 inline-flex items-center gap-2 text-sm font-semibold transition-opacity hover:opacity-80"
-                  style={{ color: pole.accent }}
-                >
-                  <Phone className="h-4 w-4 shrink-0" />
-                  <span>{isAr ? 'الخط المباشر' : 'Ligne directe'} :</span>
-                  <span dir="ltr" className="font-bold tracking-wide">{phone}</span>
-                </a>
-              )}
-            </motion.div>
-
-            {/* ── Right: Featured photo with scan beam ── */}
-            {hasMedia && (
-              <motion.div
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.65, delay: 0.12, ease: [0.22, 1, 0.36, 1] }}
-                className="relative mx-auto w-full max-w-lg lg:max-w-none"
-              >
-                <div className="relative aspect-[4/3] w-full overflow-hidden rounded-3xl shadow-2xl ring-1 ring-border/50">
-                  <div className="absolute inset-0 z-10 bg-gradient-to-tr from-black/20 via-transparent to-transparent" />
-                  <Image
-                    loader={sanityImageLoader}
-                    src={pole.imageUrl || (photos.length > 0 ? photos[0].src : '') || posterUrlOf(videos[0]) || ''}
-                    alt={pole.title}
-                    fill
-                    sizes="(max-width: 1024px) 100vw, 50vw"
-                    className="bg-muted/30 object-cover"
-                    priority
-                  />
-                  {/* Scan beam — one-shot on page load, evoking medical imaging */}
-                  {!prefersReducedMotion && (
-                    <motion.div
-                      className="absolute inset-x-0 z-20 h-px"
-                      style={{
-                        background: `linear-gradient(90deg, transparent 0%, ${pole.accent}bb 40%, ${pole.accent} 50%, ${pole.accent}bb 60%, transparent 100%)`,
-                        boxShadow: `0 0 8px 2px ${pole.accent}50`,
-                      }}
-                      initial={{ top: '0%', opacity: 0 }}
-                      animate={{ top: ['0%', '100%'], opacity: [0, 1, 1, 0] }}
-                      transition={{ duration: 2.8, delay: 0.9, ease: 'linear' }}
-                    />
+                  {pole.urgent && (
+                    <span className="relative flex h-2 w-2">
+                      <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-white opacity-75" />
+                      <span className="relative inline-flex h-2 w-2 rounded-full bg-white" />
+                    </span>
                   )}
+                  {pole.badge}
+                </span>
+              </div>
+            )}
+
+            {/* Intro */}
+            <p className="mb-8 text-base leading-relaxed text-white/90 sm:text-lg drop-shadow-md">
+              {pole.intro || pole.description}
+            </p>
+
+            {/* CTAs */}
+            <div className="flex flex-wrap gap-3">
+              <a
+                href={`tel:${phone.replace(/[^+\d]/g, '')}`}
+                className="inline-flex items-center gap-2 rounded-xl px-5 py-3.5 text-sm font-bold text-white shadow-lg transition-all duration-200 hover:brightness-110 active:scale-[0.97]"
+                style={{ backgroundColor: pole.accent }}
+              >
+                <Phone className="h-5 w-5" />
+                {t('bookAppointment')}
+              </a>
+              <a
+                href={`https://wa.me/${CLINIC_WHATSAPP}?text=${waMessage}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 rounded-xl bg-[#25D366] px-5 py-3.5 text-sm font-bold text-white shadow-lg transition-all duration-200 hover:bg-[#22c55e] active:scale-[0.97]"
+              >
+                <WhatsAppIcon className="h-5 w-5" />
+                WhatsApp
+              </a>
+            </div>
+
+            {/* Ligne directe du service */}
+            {phone && (
+              <a
+                href={`tel:${phone.replace(/[^+\d]/g, '')}`}
+                className="mt-6 inline-flex items-center gap-2 text-sm font-semibold text-white/90 transition-opacity hover:opacity-100"
+              >
+                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-white/20 backdrop-blur-sm">
+                  <Phone className="h-4 w-4" style={{ color: pole.accent }} />
                 </div>
-                {/* Decorative offset frame */}
-                <div
-                  className={`absolute -bottom-3 ${isAr ? '-left-3' : '-right-3'} -z-10 h-full w-full rounded-3xl border-2 opacity-40`}
-                  style={{ borderColor: pole.accent }}
-                />
-              </motion.div>
+                <span>{isAr ? 'الخط المباشر' : 'Ligne directe'} :</span>
+                <span dir="ltr" className="font-bold tracking-wide">{phone}</span>
+              </a>
             )}
           </div>
+        </div>
+        
+        {/* Decorative ECG line at the very bottom edge of the hero */}
+        <div className="absolute inset-x-0 bottom-0 opacity-40">
+          <ECGLine color="rgba(255,255,255,0.7)" height={32} variant={ecgVariant} />
         </div>
       </section>
 

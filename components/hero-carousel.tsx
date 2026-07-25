@@ -238,29 +238,10 @@ export default function HeroCarousel({ slides: rawSlides = [], siteSettings, sec
                     </motion.div>
                 </AnimatePresence>
 
-                {/* Scrim de lisibilité — gradient latéral côté contenu, vignette basse.
-                    Plus marqué sur mobile (contenu pleine largeur sur ciel clair). */}
-                <div className="absolute inset-0 bg-gradient-to-r from-slate-900/70 via-slate-900/35 to-slate-900/10 sm:from-slate-900/55 sm:via-slate-900/20 sm:to-transparent" />
-                <div className="absolute inset-0 bg-gradient-to-t from-slate-900/45 via-transparent to-slate-900/20 sm:from-slate-900/35 sm:to-transparent" />
-                {/* Fondu bas vers le fond (transition vers la vague) */}
-                <div className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-background to-transparent" />
-
-
-
-                {/* Texture grille de points (subtile, masquée vers la zone de texte) */}
-                <div
-                    className="absolute inset-0 opacity-[0.12]"
-                    style={{
-                        backgroundImage:
-                            'radial-gradient(currentColor 1px, transparent 1px)',
-                        backgroundSize: '26px 26px',
-                        color: 'white',
-                        maskImage:
-                            'radial-gradient(ellipse 75% 60% at 28% 42%, black, transparent 72%)',
-                        WebkitMaskImage:
-                            'radial-gradient(ellipse 75% 60% at 28% 42%, black, transparent 72%)',
-                    }}
-                />
+                {/* Simple overlay sombre uni pour garantir la lisibilité absolue des textes */}
+                <div className="absolute inset-0 bg-black/45" />
+                {/* Léger gradient bas vers le fond pour adoucir la transition vers la section suivante */}
+                <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-background to-transparent" />
             </motion.div>
 
             {/* ---------------------------------------------------------- */}
