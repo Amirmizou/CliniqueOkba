@@ -96,7 +96,7 @@ export default function Insurance({ data }: InsuranceProps) {
                 viewport={{ once: true }}
                 transition={{ duration: 0.5, delay: i * 0.1 }}
                 layoutId={hasPhotos && !selectedProvider ? `provider-${provider.name}` : undefined}
-                className={`relative flex w-full max-w-[280px] flex-col items-center justify-center rounded-2xl border bg-card/95 p-6 text-center shadow-lg backdrop-blur-md transition-all hover:-translate-y-1 hover:shadow-xl ${hasPhotos ? 'cursor-pointer hover:border-primary/60 border-primary/20' : 'border-border/80'}`}
+                className={`group relative flex w-full sm:w-[calc(50%-12px)] lg:max-w-[320px] flex-col items-center justify-start rounded-2xl border bg-card/95 p-6 text-center shadow-lg backdrop-blur-md transition-all hover:-translate-y-1 hover:shadow-xl ${hasPhotos ? 'cursor-pointer hover:border-primary/60 border-primary/20' : 'border-border/80'}`}
                 onClick={() => {
                   if (hasPhotos) {
                     setSelectedProvider(provider)
@@ -105,35 +105,37 @@ export default function Insurance({ data }: InsuranceProps) {
                 }}
               >
                 {hasPhotos && (
-                  <div className="absolute top-3 right-3 flex h-8 w-8 items-center justify-center rounded-full bg-brand-gold/20 text-brand-gold animate-pulse shadow-sm">
+                  <div className="absolute top-3 right-3 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-brand-gold/20 text-brand-gold animate-pulse shadow-sm">
                     <Camera className="h-4 w-4" />
                   </div>
                 )}
                 
-                <div className="mb-4 flex h-20 w-full items-center justify-center rounded-xl bg-primary/5 p-3 text-primary shadow-inner">
+                <div className="mb-5 relative flex h-28 md:h-32 w-full items-center justify-center rounded-xl bg-white p-4 shadow-sm border border-primary/10 dark:bg-white/5 dark:border-white/10 transition-colors group-hover:border-primary/30">
                   {logoUrl ? (
-                    <Image
-                      src={logoUrl}
-                      alt={provider.name}
-                      width={160}
-                      height={80}
-                      className="h-full w-full object-contain mix-blend-multiply dark:mix-blend-normal"
-                    />
+                    <div className="relative h-full w-full">
+                      <Image
+                        src={logoUrl}
+                        alt={provider.name}
+                        fill
+                        className="object-contain mix-blend-multiply dark:mix-blend-normal"
+                        sizes="(max-width: 768px) 100vw, 320px"
+                      />
+                    </div>
                   ) : (
-                    <BadgeCheck className="h-10 w-10" />
+                    <BadgeCheck className="h-12 w-12 text-primary/40" />
                   )}
                 </div>
-                <h3 className="text-lg font-bold text-foreground">
+                <h3 className="mb-2 text-lg font-bold text-foreground">
                   {isAr ? (provider.name_ar || provider.name) : provider.name}
                 </h3>
                 {(provider.description || provider.description_ar) && (
-                  <p className="mt-2 text-sm leading-relaxed text-muted-foreground line-clamp-3">
+                  <p className="mt-1 text-sm leading-relaxed text-muted-foreground line-clamp-3">
                     {isAr ? (provider.description_ar || provider.description) : provider.description}
                   </p>
                 )}
                 
                 {hasPhotos && (
-                  <div className="mt-5 text-[11px] font-semibold text-primary/80 uppercase tracking-wide">
+                  <div className="mt-auto pt-5 text-[11px] font-semibold text-primary/80 uppercase tracking-wide">
                     {isAr ? 'عرض صور التوقيع' : 'Voir les photos'}
                   </div>
                 )}
