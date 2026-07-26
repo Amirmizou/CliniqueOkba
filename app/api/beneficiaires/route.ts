@@ -1,11 +1,36 @@
 import { NextResponse } from 'next/server'
 import { z } from 'zod'
 import { Resend } from 'resend'
-import { RateLimiter } from '@/lib/rate-limit'
+import { RateLimiter, lookupRateLimiter } from '@/lib/rate-limit'
+import {
+  checkHumanSignals,
+  getClientIp,
+  isAttackToolUserAgent,
+  isBotUserAgent,
+  isSameOriginRequest,
+  looksLikeSpamContent,
+  NO_STORE_HEADERS,
+} from '@/lib/security'
 import { getSupabaseAdmin, BENEFICIAIRES_BUCKET } from '@/lib/supabase'
 import { getInsuranceSection } from '@/sanity/lib/fetch'
 
 export const dynamic = 'force-dynamic'
+
+/**
+ * Garde commune aux écritures et aux recherches : ces endpoints manipulent des
+ * données personnelles (identité, adresse, numéro d'assuré, ayants droit) et
+ * ne doivent être appelés que depuis le formulaire du site.
+ */
+function botGuard(request: Request) {
+  const ua = request.headers.get('user-agent')
+  if (isAttackToolUserAgent(ua) || isBotUserAgent(ua) || !isSameOriginRequest(request)) {
+    return NextResponse.json(
+      { error: 'Requête refusée.' },
+      { status: 403, headers: NO_STORE_HEADERS },
+    )
+  }
+  return null
+}
 
 // Liste des organismes conventionnés (info publique, déjà visible sur la page
 // d'inscription). Sert à générer les liens de partage côté admin.
@@ -124,6 +149,32 @@ async function findOwnRecord(supabase: Supa, ident: Identity) {
   return match || null
 }
 
+/** Extension canonique déduite du type réel : jamais du nom fourni par le client. */
+const EXT_BY_TYPE: Record<string, string> = {
+  'image/jpeg': 'jpg',
+  'image/png': 'png',
+  'image/webp': 'webp',
+  'application/pdf': 'pdf',
+}
+
+/**
+ * Vérifie la signature binaire (magic bytes) du fichier.
+ *
+ * Le `Content-Type` d'un fichier multipart est déclaré par le CLIENT : un robot
+ * peut envoyer n'importe quelle charge en l'annonçant `image/png`. Sans contrôle
+ * du contenu réel, le stockage devient un hébergeur de fichiers arbitraires.
+ */
+function sniffType(buf: Buffer): string | null {
+  if (buf.length < 12) return null
+  if (buf[0] === 0xff && buf[1] === 0xd8 && buf[2] === 0xff) return 'image/jpeg'
+  if (buf.subarray(0, 8).equals(Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a])))
+    return 'image/png'
+  if (buf.subarray(0, 4).toString('ascii') === 'RIFF' && buf.subarray(8, 12).toString('ascii') === 'WEBP')
+    return 'image/webp'
+  if (buf.subarray(0, 5).toString('ascii') === '%PDF-') return 'application/pdf'
+  return null
+}
+
 async function uploadFile(
   supabase: Supa,
   file: File,
@@ -136,26 +187,64 @@ async function uploadFile(
   if (file.size > MAX_FILE_BYTES) {
     return { error: 'Fichier trop volumineux (max 8 Mo).' }
   }
-  const ext = (file.name.split('.').pop() || 'bin').toLowerCase().replace(/[^a-z0-9]/g, '').slice(0, 5)
-  const path = `${prefix}/${Date.now()}-${crypto.randomUUID()}.${ext}`
   const buffer = Buffer.from(await file.arrayBuffer())
+  // Le contenu réel doit correspondre à un format autorisé, indépendamment de
+  // ce que le client a annoncé.
+  const realType = sniffType(buffer)
+  if (!realType || !allowedTypes.includes(realType)) {
+    return { error: 'Fichier illisible ou format non autorisé.' }
+  }
+  // Taille réelle (le champ `size` est aussi fourni par le client).
+  if (buffer.byteLength > MAX_FILE_BYTES) {
+    return { error: 'Fichier trop volumineux (max 8 Mo).' }
+  }
+
+  const ext = EXT_BY_TYPE[realType] || 'bin'
+  const path = `${prefix}/${Date.now()}-${crypto.randomUUID()}.${ext}`
   const { error } = await supabase.storage
     .from(BENEFICIAIRES_BUCKET)
-    .upload(path, buffer, { contentType: file.type, upsert: false })
+    // contentType = type RÉEL détecté, pas celui annoncé par le client : évite
+    // qu'un fichier soit servi plus tard avec un type interprétable (HTML/JS).
+    .upload(path, buffer, { contentType: realType, upsert: false })
   if (error) return { error: error.message }
   return { path }
 }
 
 async function checkRateLimit(request: Request) {
-  const ip =
-    request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ||
-    request.headers.get('x-real-ip') ||
-    'unknown'
-  return rateLimiter.check(ip, 3)
+  // getClientIp ignore la partie falsifiable de `x-forwarded-for` : sinon un
+  // robot renouvelle sa clé de débit à chaque requête via un en-tête forgé.
+  return rateLimiter.check(getClientIp(request.headers), 3)
 }
+
+/**
+ * Débit dédié aux RECHERCHES de fiche (PUT/PATCH). L'endpoint renvoie des
+ * données personnelles à qui connaît téléphone + nom + prénom + organisme :
+ * c'est énumérable (les numéros algériens suivent des préfixes connus). On
+ * plafonne donc les tentatives sur une fenêtre longue.
+ */
+async function checkLookupLimit(request: Request) {
+  return lookupRateLimiter.check(getClientIp(request.headers), 12)
+}
+
+const tooManyLookups = () =>
+  NextResponse.json(
+    { error: 'Trop de tentatives. Veuillez réessayer plus tard.' },
+    { status: 429, headers: { ...NO_STORE_HEADERS, 'Retry-After': '600' } },
+  )
 
 /** Parse et valide le corps multipart commun à la création et à la modification. */
 async function parseForm(form: FormData) {
+  // Champ piège + délai de remplissage, vérifiés côté SERVEUR (un contrôle
+  // uniquement client est contourné par un POST direct sur l'API).
+  const human = checkHumanSignals({
+    honeypot: form.get('honeypot') ?? undefined,
+    startedAt: form.get('startedAt') ?? undefined,
+  })
+  if (!human.ok) {
+    console.warn(`[beneficiaires] Soumission automatisée rejetée (${human.reason})`)
+    return { error: 'Formulaire invalide. Veuillez recharger la page et réessayer.' as const }
+  }
+
   let familyMembers: unknown = []
   const rawMembers = form.get('family_members')
   if (typeof rawMembers === 'string' && rawMembers.trim()) {
@@ -194,11 +283,18 @@ async function parseForm(form: FormData) {
   if (!data.nom || !data.prenom) {
     return { error: 'Nom et prénom requis en caractères latins.' as const }
   }
+  // Charges de spam SEO (liens, mots-clés) injectées dans une fiche patient.
+  if (looksLikeSpamContent(data.nom, data.prenom, data.adresse, data.num_assure)) {
+    return { error: 'Données invalides.' as const }
+  }
   return { data }
 }
 
 export async function POST(request: Request) {
   try {
+    const blocked = botGuard(request)
+    if (blocked) return blocked
+
     const rl = await checkRateLimit(request)
     if (!rl.success) {
       return NextResponse.json(
@@ -342,6 +438,9 @@ export async function POST(request: Request) {
  */
 export async function PUT(request: Request) {
   try {
+    const blocked = botGuard(request)
+    if (blocked) return blocked
+
     const rl = await checkRateLimit(request)
     if (!rl.success) {
       return NextResponse.json(
@@ -349,6 +448,9 @@ export async function PUT(request: Request) {
         { status: 429, headers: { 'Retry-After': '60' } },
       )
     }
+    const lookup = await checkLookupLimit(request)
+    if (!lookup.success) return tooManyLookups()
+
     const supabase = getSupabaseAdmin()
     if (!supabase) return NextResponse.json({ error: 'Service indisponible pour le moment.' }, { status: 503 })
 
@@ -402,6 +504,9 @@ export async function PUT(request: Request) {
  */
 export async function PATCH(request: Request) {
   try {
+    const blocked = botGuard(request)
+    if (blocked) return blocked
+
     const rl = await checkRateLimit(request)
     if (!rl.success) {
       return NextResponse.json(
@@ -409,6 +514,9 @@ export async function PATCH(request: Request) {
         { status: 429, headers: { 'Retry-After': '60' } },
       )
     }
+    const lookup = await checkLookupLimit(request)
+    if (!lookup.success) return tooManyLookups()
+
     const supabase = getSupabaseAdmin()
     if (!supabase) return NextResponse.json({ error: 'Service indisponible pour le moment.' }, { status: 503 })
 

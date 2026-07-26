@@ -30,7 +30,13 @@ function SignInForm() {
             })
 
             if (result?.error) {
-                setError('Mot de passe incorrect')
+                // Le serveur plafonne les tentatives (anti-brute-force) : on
+                // l'indique clairement pour ne pas laisser croire à une panne.
+                setError(
+                    /RateLimited/i.test(result.error)
+                        ? 'Trop de tentatives de connexion. Réessayez dans 15 minutes.'
+                        : 'Mot de passe incorrect',
+                )
             } else if (result?.ok) {
                 router.push(callbackUrl)
                 router.refresh()

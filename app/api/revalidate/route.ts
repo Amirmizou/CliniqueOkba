@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { revalidatePath } from 'next/cache'
+import { revalidateRateLimiter } from '@/lib/rate-limit'
+import { getClientIp, safeEqual, NO_STORE_HEADERS } from '@/lib/security'
 
 /**
  * Revalidation à la demande (ISR) déclenchée par un webhook Sanity.
@@ -32,12 +34,36 @@ function isAuthorized(req: NextRequest): boolean {
   const provided =
     req.nextUrl.searchParams.get('secret') ||
     req.headers.get('x-revalidate-secret')
-  return provided === secret
+  // Comparaison à temps constant : `===` s'arrête au premier caractère
+  // différent, ce qui laisse mesurer le préfixe correct et reconstruire le
+  // secret par requêtes automatisées répétées.
+  return safeEqual(provided, secret)
+}
+
+/**
+ * Cet endpoint invalide TOUT le cache ISR du site. Rejoué en boucle par un
+ * robot (même sans le secret, pour tester des valeurs), il force la
+ * régénération de chaque page à chaque visite : c'est un déni de service par
+ * épuisement CPU. On limite donc le débit avant même de vérifier le secret.
+ */
+async function tooManyRequests(req: NextRequest) {
+  const rl = await revalidateRateLimiter.check(getClientIp(req.headers), 10)
+  if (rl.success) return null
+  return NextResponse.json(
+    { revalidated: false, error: 'Trop de requêtes.' },
+    { status: 429, headers: { ...NO_STORE_HEADERS, 'Retry-After': '60' } },
+  )
 }
 
 export async function POST(req: NextRequest) {
+  const limited = await tooManyRequests(req)
+  if (limited) return limited
+
   if (!isAuthorized(req)) {
-    return NextResponse.json({ revalidated: false, error: 'Secret invalide' }, { status: 401 })
+    return NextResponse.json(
+      { revalidated: false, error: 'Secret invalide' },
+      { status: 401, headers: NO_STORE_HEADERS },
+    )
   }
 
   try {
@@ -62,11 +88,22 @@ export async function POST(req: NextRequest) {
   }
 }
 
-// Permet un test rapide dans le navigateur (GET) — ne revalide pas, informe.
+/**
+ * Test de disponibilité (GET) — ne revalide pas.
+ *
+ * L'ancienne version renvoyait `authorized: true/false` : c'était un oracle de
+ * validation du secret, testable en masse sans aucun effet de bord (donc sans
+ * trace visible). Le GET ne révèle plus rien sur le secret.
+ */
 export async function GET(req: NextRequest) {
-  return NextResponse.json({
-    ok: true,
-    authorized: isAuthorized(req),
-    hint: 'Utilisez POST avec ?secret=... pour revalider. Configurez un webhook Sanity.',
-  })
+  const limited = await tooManyRequests(req)
+  if (limited) return limited
+
+  return NextResponse.json(
+    {
+      ok: true,
+      hint: 'POST avec l’en-tête x-revalidate-secret pour revalider (webhook Sanity).',
+    },
+    { headers: NO_STORE_HEADERS },
+  )
 }

@@ -69,6 +69,23 @@ const nextConfig: NextConfig = {
       ],
     },
     {
+      // Zones privées : jamais indexées, jamais mises en cache par un
+      // intermédiaire (un cache partagé pourrait resservir une page admin).
+      source: '/(admin|studio|auth)/:path*',
+      headers: [
+        { key: 'X-Robots-Tag', value: 'noindex, nofollow, noarchive' },
+        { key: 'Cache-Control', value: 'no-store, max-age=0, must-revalidate' },
+      ],
+    },
+    {
+      // Les routes API ne doivent jamais être indexées ni mises en cache.
+      source: '/api/:path*',
+      headers: [
+        { key: 'X-Robots-Tag', value: 'noindex, nofollow' },
+        { key: 'Referrer-Policy', value: 'no-referrer' },
+      ],
+    },
+    {
       source: '/images/(.*)',
       headers: [
         {

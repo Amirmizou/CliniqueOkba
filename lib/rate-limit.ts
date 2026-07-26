@@ -91,7 +91,13 @@ export class RateLimiter {
     return { success: true, remaining: Math.max(0, limit - count), reset }
   }
 
-  private checkMemory(identifier: string, limit: number): RateLimitResult {
+  private checkMemory(rawIdentifier: string, limit: number): RateLimitResult {
+    // Le préfixe DOIT faire partie de la clé mémoire : sans lui, tous les
+    // limiteurs (contact, login, bénéficiaires…) partageaient le même compteur
+    // pour une IP donnée. Envoyer un message de contact consommait alors le
+    // quota d'inscription, et un endpoint permissif « rechargeait » celui d'un
+    // endpoint strict.
+    const identifier = `${this.prefix}:${rawIdentifier}`
     const now = Date.now()
     const tokenData = store.get(identifier)
 
@@ -149,4 +155,57 @@ export const emailRateLimiter = new RateLimiter({
   interval: 60 * 1000,
   uniqueTokenPerInterval: 500,
   prefix: 'rl:email',
+})
+
+/** Plafond journalier du formulaire de contact, par IP (anti-spam soutenu). */
+export const emailDailyLimiter = new RateLimiter({
+  interval: 24 * 60 * 60 * 1000,
+  uniqueTokenPerInterval: 5_000,
+  prefix: 'rl:email:day',
+})
+
+/**
+ * Tentatives de connexion admin. L'authentification est par mot de passe SEUL
+ * (pas d'identifiant) : sans limite, un robot peut essayer des milliers de mots
+ * de passe. Fenêtre longue et volontairement stricte.
+ */
+export const loginRateLimiter = new RateLimiter({
+  interval: 15 * 60 * 1000,
+  uniqueTokenPerInterval: 5_000,
+  prefix: 'rl:login',
+})
+
+/**
+ * Garde-fou global : quel que soit le nombre d'IP utilisées (botnet, proxys
+ * tournants), le nombre total d'échecs de connexion reste plafonné.
+ */
+export const loginGlobalLimiter = new RateLimiter({
+  interval: 15 * 60 * 1000,
+  uniqueTokenPerInterval: 10,
+  prefix: 'rl:login:global',
+})
+
+/** Compteur de visites : évite le gonflage artificiel des statistiques. */
+export const trackRateLimiter = new RateLimiter({
+  interval: 60 * 1000,
+  uniqueTokenPerInterval: 20_000,
+  prefix: 'rl:track',
+})
+
+/**
+ * Recherche de fiche bénéficiaire (téléphone + nom + prénom + organisme).
+ * Endpoint énumérable : il renvoie des données personnelles. On limite très
+ * strictement les tentatives INFRUCTUEUSES.
+ */
+export const lookupRateLimiter = new RateLimiter({
+  interval: 10 * 60 * 1000,
+  uniqueTokenPerInterval: 5_000,
+  prefix: 'rl:lookup',
+})
+
+/** Webhook de revalidation : empêche le brute-force du secret et le cache-busting. */
+export const revalidateRateLimiter = new RateLimiter({
+  interval: 60 * 1000,
+  uniqueTokenPerInterval: 1_000,
+  prefix: 'rl:revalidate',
 })

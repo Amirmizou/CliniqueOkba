@@ -4,6 +4,29 @@ import path from 'path'
 import { getServerSession } from "next-auth/next"
 import { authOptions } from "@/lib/auth"
 
+/** Extension canonique par type d'image réellement détecté. */
+const EXT_BY_TYPE: Record<string, string> = {
+    'image/jpeg': 'jpg',
+    'image/png': 'png',
+    'image/webp': 'webp',
+    'image/gif': 'gif',
+}
+
+/** Détection du format par signature binaire (magic bytes). */
+function sniffImageType(buf: Buffer): string | null {
+    if (buf.length < 12) return null
+    if (buf[0] === 0xff && buf[1] === 0xd8 && buf[2] === 0xff) return 'image/jpeg'
+    if (buf.subarray(0, 8).equals(Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a])))
+        return 'image/png'
+    if (buf.subarray(0, 6).toString('ascii').startsWith('GIF8')) return 'image/gif'
+    if (
+        buf.subarray(0, 4).toString('ascii') === 'RIFF' &&
+        buf.subarray(8, 12).toString('ascii') === 'WEBP'
+    )
+        return 'image/webp'
+    return null
+}
+
 export async function POST(request: Request) {
     try {
         // 1. Check Authentication
@@ -36,17 +59,27 @@ export async function POST(request: Request) {
         const bytes = await file.arrayBuffer()
         const buffer = Buffer.from(bytes)
 
+        // 3bis. Le `Content-Type` d'un envoi multipart est déclaré par le client.
+        // On valide la signature binaire réelle : sinon un fichier arbitraire
+        // (HTML/JS/PHP) est écrit dans /public et servi par le site.
+        const realType = sniffImageType(buffer)
+        if (!realType || !allowedTypes.includes(realType)) {
+            return NextResponse.json({ error: 'File content is not a valid image.' }, { status: 400 })
+        }
+
         // 4. Sanitize Category (prevent path traversal)
-        const safeCategory = category.replace(/[^a-zA-Z0-9-_]/g, '')
+        const safeCategory = category.replace(/[^a-zA-Z0-9-_]/g, '') || 'general'
 
         // Create upload directory if it doesn't exist
         const uploadDir = path.join(process.cwd(), 'public', 'uploads', safeCategory)
         await mkdir(uploadDir, { recursive: true })
 
         // 5. Generate Safe Filename
-        const timestamp = Date.now()
-        const originalName = file.name.replace(/[^a-zA-Z0-9.-]/g, '') // Remove unsafe chars
-        const filename = `${timestamp}-${originalName}`
+        // L'extension provient du type RÉEL, jamais du nom fourni : un nom comme
+        // « photo.html » (déclaré image/png) aurait produit un fichier servi en
+        // HTML depuis notre domaine, donc un XSS stocké.
+        const base = path.basename(file.name).replace(/[^a-zA-Z0-9-]/g, '').slice(0, 60) || 'image'
+        const filename = `${Date.now()}-${base}.${EXT_BY_TYPE[realType]}`
         const filepath = path.join(uploadDir, filename)
 
         // Write file

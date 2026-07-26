@@ -74,6 +74,9 @@ export default function Contact({ siteSettings, sectionContent }: ContactProps) 
     message: '',
     honeypot: '', // Champ anti-spam caché
   })
+  // Horodatage d'affichage du formulaire : le serveur rejette les envois
+  // instantanés (un humain ne remplit pas cinq champs en moins de 3 secondes).
+  const [formStartedAt] = useState(() => Date.now())
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [submitStatus, setSubmitStatus] = useState<
     'idle' | 'success' | 'error'
@@ -205,6 +208,10 @@ export default function Contact({ siteSettings, sectionContent }: ContactProps) 
           email: formData.email,
           phone: formData.phone,
           message: formData.message,
+          // Contrôles anti-robot revérifiés côté serveur : la vérification
+          // client seule est contournée par un simple POST direct sur l'API.
+          honeypot: formData.honeypot,
+          startedAt: formStartedAt,
         }),
       })
 

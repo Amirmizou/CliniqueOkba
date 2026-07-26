@@ -238,8 +238,12 @@ export default function BeneficiaireForm({ organismes, logos = {} }: { organisme
   const [editMode, setEditMode] = useState(false)
   const [duplicate, setDuplicate] = useState<{ canModify: boolean; message: string } | null>(null)
   const [modifyLoading, setModifyLoading] = useState(false)
+  // Anti-robot : champ piège masqué + instant d'ouverture du formulaire.
+  // Les deux sont revérifiés côté serveur (app/api/beneficiaires/route.ts).
+  const [honeypot, setHoneypot] = useState('')
+  const [formStartedAt] = useState(() => Date.now())
 
-  const set = (k: keyof typeof form, v: string) => setForm((f) => ({ ...f, [k]: v }))
+  const set =(k: keyof typeof form, v: string) => setForm((f) => ({ ...f, [k]: v }))
   const updateMember = (i: number, k: keyof FamilyMember, v: string) =>
     setMembers((m) => m.map((mem, idx) => (idx === i ? { ...mem, [k]: v } : mem)))
 
@@ -359,6 +363,11 @@ export default function BeneficiaireForm({ organismes, logos = {} }: { organisme
       if (form.projet_dedie) fd.append('projet_dedie', form.projet_dedie)
       if (form.situation_familiale) fd.append('situation_familiale', form.situation_familiale)
       fd.append('family_members', JSON.stringify(members.filter((m) => m.nom.trim() && m.prenom.trim())))
+      // Signaux anti-robot vérifiés par le serveur : champ piège (toujours vide
+      // chez un humain, le champ est masqué) et instant d'ouverture du
+      // formulaire (un envoi en moins de 3 s n'est pas humain).
+      fd.append('honeypot', honeypot)
+      fd.append('startedAt', String(formStartedAt))
       if (photo) fd.append('photo', photo)
       if (document) fd.append('document', document)
       if (justificatif && isDembri(form.organisme)) fd.append('justificatif', justificatif)
@@ -936,6 +945,21 @@ export default function BeneficiaireForm({ organismes, logos = {} }: { organisme
                 />
               </div>
             )}
+
+            {/* Champ piège anti-robot : invisible et hors tabulation, un
+                humain ne le remplit jamais. Rempli => soumission rejetée. */}
+            <div className="hidden" aria-hidden="true">
+              <label htmlFor="beneficiaire-hp">Ne pas remplir</label>
+              <input
+                type="text"
+                id="beneficiaire-hp"
+                name="honeypot"
+                value={honeypot}
+                onChange={(e) => setHoneypot(e.target.value)}
+                tabIndex={-1}
+                autoComplete="off"
+              />
+            </div>
 
             <label className="flex items-start gap-3 rounded-xl bg-slate-50 p-4 text-base text-slate-600 dark:bg-slate-800/50 dark:text-slate-300">
               <input type="checkbox" checked={consent} onChange={(e) => setConsent(e.target.checked)} className="mt-1 h-5 w-5 accent-emerald-600" />
