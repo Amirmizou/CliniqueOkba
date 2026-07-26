@@ -96,7 +96,7 @@ export default function Insurance({ data }: InsuranceProps) {
                 viewport={{ once: true }}
                 transition={{ duration: 0.5, delay: i * 0.1 }}
                 layoutId={hasPhotos && !selectedProvider ? `provider-${provider.name}` : undefined}
-                className={`group relative flex w-full sm:w-[calc(50%-12px)] lg:max-w-[320px] flex-col items-center justify-start rounded-2xl border bg-card/95 p-6 text-center shadow-lg backdrop-blur-md transition-all hover:-translate-y-1 hover:shadow-xl ${hasPhotos ? 'cursor-pointer hover:border-primary/60 border-primary/20' : 'border-border/80'}`}
+                className={`group relative flex w-full max-w-[280px] sm:max-w-[300px] flex-col items-center justify-start rounded-2xl border bg-card/95 p-6 text-center shadow-lg backdrop-blur-md transition-all hover:-translate-y-1 hover:shadow-xl ${hasPhotos ? 'cursor-pointer hover:border-primary/60 border-primary/20' : 'border-border/80'}`}
                 onClick={() => {
                   if (hasPhotos) {
                     setSelectedProvider(provider)
@@ -110,15 +110,15 @@ export default function Insurance({ data }: InsuranceProps) {
                   </div>
                 )}
                 
-                <div className="mb-5 relative flex h-28 md:h-32 w-full items-center justify-center rounded-xl bg-white p-4 shadow-sm border border-primary/10 dark:bg-white/5 dark:border-white/10 transition-colors group-hover:border-primary/30">
+                <div className="mb-5 relative flex h-28 w-full items-center justify-center rounded-xl bg-white p-3 shadow-sm border border-primary/10 dark:bg-white/5 dark:border-white/10 transition-colors group-hover:border-primary/30">
                   {logoUrl ? (
                     <div className="relative h-full w-full">
                       <Image
                         src={logoUrl}
                         alt={provider.name}
                         fill
-                        className="object-contain mix-blend-multiply dark:mix-blend-normal"
-                        sizes="(max-width: 768px) 100vw, 320px"
+                        className="object-contain mix-blend-multiply dark:mix-blend-normal p-1"
+                        sizes="(max-width: 768px) 280px, 300px"
                       />
                     </div>
                   ) : (
