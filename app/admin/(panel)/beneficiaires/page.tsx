@@ -54,6 +54,7 @@ interface Beneficiary {
   created_at: string
   photoUrl: string | null
   documentUrl: string | null
+  documentVersoUrl: string | null
   justificatifUrl: string | null
 }
 
@@ -765,7 +766,18 @@ export default function BeneficiairesPage() {
                       className="inline-flex items-center gap-2 rounded-lg border border-slate-200 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 dark:border-slate-700 dark:text-slate-200 dark:hover:bg-slate-800"
                     >
                       <FileText className="h-4 w-4" />
-                      Voir la fiche familiale
+                      Voir la fiche familiale {detail.documentVersoUrl ? '(Recto)' : ''}
+                    </a>
+                  )}
+                  {detail.documentVersoUrl && (
+                    <a
+                      href={detail.documentVersoUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="inline-flex items-center gap-2 rounded-lg border border-slate-200 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 dark:border-slate-700 dark:text-slate-200 dark:hover:bg-slate-800"
+                    >
+                      <FileText className="h-4 w-4" />
+                      Voir la fiche familiale (Verso)
                     </a>
                   )}
                   {detail.justificatifUrl && (

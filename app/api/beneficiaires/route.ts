@@ -364,6 +364,14 @@ export async function POST(request: Request) {
       documentPath = res.path
     }
 
+    let documentVersoPath: string | undefined
+    const documentVerso = form.get('document_verso')
+    if (documentVerso instanceof File && documentVerso.size > 0) {
+      const res = await uploadFile(supabase, documentVerso, `${orgSlug}/documents`, DOC_TYPES)
+      if (res.error) return NextResponse.json({ error: `Document Verso : ${res.error}` }, { status: 400 })
+      documentVersoPath = res.path
+    }
+
     // Justificatif de propriété : uniquement pour les acquéreurs (Dembri).
     let justificatifPath: string | undefined
     const justificatif = form.get('justificatif')
@@ -388,6 +396,7 @@ export async function POST(request: Request) {
         family_members: data.family_members,
         photo_path: photoPath ?? null,
         document_path: documentPath ?? null,
+        document_verso_path: documentVersoPath ?? null,
         justificatif_path: justificatifPath ?? null,
         status: 'en_attente',
       })
@@ -396,7 +405,7 @@ export async function POST(request: Request) {
 
     if (dbError) {
       console.error('Erreur insertion bénéficiaire:', dbError)
-      const toRemove = [photoPath, documentPath, justificatifPath].filter(Boolean) as string[]
+      const toRemove = [photoPath, documentPath, documentVersoPath, justificatifPath].filter(Boolean) as string[]
       if (toRemove.length) {
         await supabase.storage.from(BENEFICIAIRES_BUCKET).remove(toRemove).catch(() => {})
       }
@@ -487,6 +496,7 @@ export async function PUT(request: Request) {
         family_members: Array.isArray(rec.family_members) ? rec.family_members : [],
         hasPhoto: !!rec.photo_path,
         hasDocument: !!rec.document_path,
+        hasDocumentVerso: !!rec.document_verso_path,
         hasJustificatif: !!rec.justificatif_path,
         status: rec.status,
       },
@@ -552,6 +562,13 @@ export async function PATCH(request: Request) {
       if (res.error) return NextResponse.json({ error: `Document : ${res.error}` }, { status: 400 })
       documentPath = res.path
     }
+    let documentVersoPath: string | undefined
+    const documentVerso = form.get('document_verso')
+    if (documentVerso instanceof File && documentVerso.size > 0) {
+      const res = await uploadFile(supabase, documentVerso, `${orgSlug}/documents`, DOC_TYPES)
+      if (res.error) return NextResponse.json({ error: `Document Verso : ${res.error}` }, { status: 400 })
+      documentVersoPath = res.path
+    }
     let justificatifPath: string | undefined
     const justificatif = form.get('justificatif')
     if (isDembri(data.organisme) && justificatif instanceof File && justificatif.size > 0) {
@@ -574,12 +591,13 @@ export async function PATCH(request: Request) {
     }
     if (photoPath) patch.photo_path = photoPath
     if (documentPath) patch.document_path = documentPath
+    if (documentVersoPath) patch.document_verso_path = documentVersoPath
     if (justificatifPath) patch.justificatif_path = justificatifPath
 
     const { error: upErr } = await supabase.from('beneficiaries').update(patch).eq('id', rec.id)
     if (upErr) {
       console.error('Erreur mise à jour bénéficiaire:', upErr)
-      const toRemove = [photoPath, documentPath, justificatifPath].filter(Boolean) as string[]
+      const toRemove = [photoPath, documentPath, documentVersoPath, justificatifPath].filter(Boolean) as string[]
       if (toRemove.length) {
         await supabase.storage.from(BENEFICIAIRES_BUCKET).remove(toRemove).catch(() => {})
       }
@@ -590,6 +608,7 @@ export async function PATCH(request: Request) {
     const oldFiles = [
       photoPath ? rec.photo_path : null,
       documentPath ? rec.document_path : null,
+      documentVersoPath ? rec.document_verso_path : null,
       justificatifPath ? rec.justificatif_path : null,
     ].filter(Boolean) as string[]
     if (oldFiles.length) {

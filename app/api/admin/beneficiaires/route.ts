@@ -5,6 +5,8 @@ import { getSupabaseAdmin, BENEFICIAIRES_BUCKET } from '@/lib/supabase'
 export const dynamic = 'force-dynamic'
 
 const SIGNED_URL_TTL = 60 * 60 // 1h
+// Nombre de chemins signés par requête groupée (garde-fou sur la taille du corps)
+const SIGN_BATCH_SIZE = 200
 
 interface BeneficiaryRow {
   id: string
@@ -19,6 +21,7 @@ interface BeneficiaryRow {
   family_members: Array<{ nom?: string; prenom?: string; date_naissance?: string; lien_parente?: string }>
   photo_path: string | null
   document_path: string | null
+  document_verso_path: string | null
   justificatif_path: string | null
   status: string
   traite: boolean
@@ -144,33 +147,46 @@ export async function GET(request: Request) {
     })
   }
 
-  // Générer les URLs signées pour photo + document
-  const beneficiaries = await Promise.all(
-    rows.map(async (r) => {
-      let photoUrl: string | null = null
-      let documentUrl: string | null = null
-      let justificatifUrl: string | null = null
-      if (r.photo_path) {
-        const { data: s } = await supabase.storage
-          .from(BENEFICIAIRES_BUCKET)
-          .createSignedUrl(r.photo_path, SIGNED_URL_TTL)
-        photoUrl = s?.signedUrl ?? null
-      }
-      if (r.document_path) {
-        const { data: s } = await supabase.storage
-          .from(BENEFICIAIRES_BUCKET)
-          .createSignedUrl(r.document_path, SIGNED_URL_TTL)
-        documentUrl = s?.signedUrl ?? null
-      }
-      if (r.justificatif_path) {
-        const { data: s } = await supabase.storage
-          .from(BENEFICIAIRES_BUCKET)
-          .createSignedUrl(r.justificatif_path, SIGNED_URL_TTL)
-        justificatifUrl = s?.signedUrl ?? null
-      }
-      return { ...r, photoUrl, documentUrl, justificatifUrl }
-    }),
-  )
+  // Générer les URLs signées pour photo + documents.
+  // On signe TOUS les chemins en une seule requête par lot (`createSignedUrls`)
+  // au lieu d'un appel HTTP par fichier : avec ~150 bénéficiaires cela faisait
+  // plus de 200 connexions simultanées vers le Storage, ce qui saturait
+  // l'origine et provoquait un timeout (Cloudflare 522).
+  const signedUrls = new Map<string, string>()
+  const allPaths = [
+    ...new Set(
+      rows.flatMap((r) =>
+        [r.photo_path, r.document_path, r.document_verso_path, r.justificatif_path].filter(
+          Boolean,
+        ) as string[],
+      ),
+    ),
+  ]
+  for (let i = 0; i < allPaths.length; i += SIGN_BATCH_SIZE) {
+    const chunk = allPaths.slice(i, i + SIGN_BATCH_SIZE)
+    const { data: signed, error: signError } = await supabase.storage
+      .from(BENEFICIAIRES_BUCKET)
+      .createSignedUrls(chunk, SIGNED_URL_TTL)
+    if (signError) {
+      // Un échec de signature ne doit pas faire tomber toute la liste : les
+      // fichiers concernés seront simplement affichés comme indisponibles.
+      console.error('Erreur signature fichiers bénéficiaires:', signError)
+      continue
+    }
+    for (const s of signed || []) {
+      // Les objets absents du bucket renvoient une erreur par entrée.
+      if (s.path && s.signedUrl) signedUrls.set(s.path, s.signedUrl)
+    }
+  }
+
+  const signOf = (p: string | null) => (p ? signedUrls.get(p) ?? null : null)
+  const beneficiaries = rows.map((r) => ({
+    ...r,
+    photoUrl: signOf(r.photo_path),
+    documentUrl: signOf(r.document_path),
+    documentVersoUrl: signOf(r.document_verso_path),
+    justificatifUrl: signOf(r.justificatif_path),
+  }))
 
   // Comptage par organisme (pour les filtres + résumé)
   const byOrganisme: Record<string, number> = {}
@@ -230,11 +246,11 @@ export async function DELETE(request: Request) {
     // Récupérer les chemins de fichiers pour les supprimer du stockage
     const { data: row } = await supabase
       .from('beneficiaries')
-      .select('photo_path, document_path, justificatif_path')
+      .select('photo_path, document_path, document_verso_path, justificatif_path')
       .eq('id', id)
       .single()
 
-    const toRemove = [row?.photo_path, row?.document_path, row?.justificatif_path].filter(Boolean) as string[]
+    const toRemove = [row?.photo_path, row?.document_path, row?.document_verso_path, row?.justificatif_path].filter(Boolean) as string[]
     if (toRemove.length) {
       await supabase.storage.from(BENEFICIAIRES_BUCKET).remove(toRemove).catch(() => {})
     }

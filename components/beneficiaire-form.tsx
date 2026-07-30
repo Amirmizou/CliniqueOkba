@@ -227,7 +227,9 @@ export default function BeneficiaireForm({ organismes, logos = {} }: { organisme
   const [showMore, setShowMore] = useState(false)
   const [members, setMembers] = useState<FamilyMember[]>([])
   const [photo, setPhoto] = useState<File | null>(null)
+  const [documentType, setDocumentType] = useState<'pdf' | 'photo'>('photo')
   const [document, setDocument] = useState<File | null>(null)
+  const [documentVerso, setDocumentVerso] = useState<File | null>(null)
   // Justificatif de propriété (facture élec/gaz/eau) — acquéreurs Dembri.
   const [justificatif, setJustificatif] = useState<File | null>(null)
   const [consent, setConsent] = useState(false)
@@ -333,7 +335,9 @@ export default function BeneficiaireForm({ organismes, logos = {} }: { organisme
     }))
     setMembers([])
     setPhoto(null)
+    setDocumentType('photo')
     setDocument(null)
+    setDocumentVerso(null)
     setJustificatif(null)
     setConsent(false)
     setSuccess(false)
@@ -370,6 +374,7 @@ export default function BeneficiaireForm({ organismes, logos = {} }: { organisme
       fd.append('startedAt', String(formStartedAt))
       if (photo) fd.append('photo', photo)
       if (document) fd.append('document', document)
+      if (documentType === 'photo' && documentVerso) fd.append('document_verso', documentVerso)
       if (justificatif && isDembri(form.organisme)) fd.append('justificatif', justificatif)
 
       const res = await fetch('/api/beneficiaires', { method: editMode ? 'PATCH' : 'POST', body: fd })
@@ -904,19 +909,82 @@ export default function BeneficiaireForm({ organismes, logos = {} }: { organisme
               />
             </div>
             <div>
-              <p className={labelClass}>{t('documentLabel')}</p>
-              <MediaPicker
-                file={document}
-                setFile={setDocument}
-                capture="environment"
-                accept="image/*,application/pdf"
-                takeLabel={t('scanDoc')}
-                chooseLabel={t('chooseDoc')}
-                changeLabel={t('change')}
-                addedLabel={t('added')}
-                tip={t('docTip')}
-                isRtl={isRtl}
-              />
+              <p className={labelClass}>{t('documentTypeLabel')}</p>
+              <div className="mb-4 flex gap-3">
+                <button
+                  type="button"
+                  onClick={() => setDocumentType('photo')}
+                  className={`flex-1 rounded-xl border-2 px-4 py-2.5 text-sm font-semibold transition ${
+                    documentType === 'photo'
+                      ? 'border-emerald-600 bg-emerald-50 text-emerald-700 dark:border-emerald-500 dark:bg-emerald-950/40 dark:text-emerald-300'
+                      : 'border-slate-200 bg-white text-slate-600 hover:border-emerald-300 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300'
+                  }`}
+                >
+                  {t('documentTypePhoto')}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setDocumentType('pdf')}
+                  className={`flex-1 rounded-xl border-2 px-4 py-2.5 text-sm font-semibold transition ${
+                    documentType === 'pdf'
+                      ? 'border-emerald-600 bg-emerald-50 text-emerald-700 dark:border-emerald-500 dark:bg-emerald-950/40 dark:text-emerald-300'
+                      : 'border-slate-200 bg-white text-slate-600 hover:border-emerald-300 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300'
+                  }`}
+                >
+                  {t('documentTypePdf')}
+                </button>
+              </div>
+
+              {documentType === 'pdf' ? (
+                <div>
+                  <p className={labelClass}>{t('documentPdfLabel')}</p>
+                  <MediaPicker
+                    file={document}
+                    setFile={setDocument}
+                    capture="environment"
+                    accept="application/pdf"
+                    takeLabel={t('scanDoc')}
+                    chooseLabel={t('chooseDoc')}
+                    changeLabel={t('change')}
+                    addedLabel={t('added')}
+                    tip={t('documentHint')}
+                    isRtl={isRtl}
+                  />
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  <div>
+                    <p className={labelClass}>{t('documentRectoLabel')}</p>
+                    <MediaPicker
+                      file={document}
+                      setFile={setDocument}
+                      capture="environment"
+                      accept="image/*"
+                      takeLabel={t('scanDoc')}
+                      chooseLabel={t('chooseDoc')}
+                      changeLabel={t('change')}
+                      addedLabel={t('added')}
+                      tip={t('docTip')}
+                      isRtl={isRtl}
+                    />
+                  </div>
+                  <div>
+                    <p className={labelClass}>{t('documentVersoLabel')}</p>
+                    <MediaPicker
+                      file={documentVerso}
+                      setFile={setDocumentVerso}
+                      capture="environment"
+                      accept="image/*"
+                      takeLabel={t('scanDoc')}
+                      chooseLabel={t('chooseDoc')}
+                      changeLabel={t('change')}
+                      addedLabel={t('added')}
+                      tip={t('docTip')}
+                      isRtl={isRtl}
+                    />
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Justificatif de propriété — uniquement pour les acquéreurs (Dembri) */}

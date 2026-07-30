@@ -31,7 +31,8 @@ create table if not exists public.beneficiaries (
   -- [{ nom, prenom, date_naissance, lien_parente }]
   family_members jsonb       not null default '[]'::jsonb,
   photo_path     text,                            -- chemin dans le bucket "beneficiaires"
-  document_path  text,                            -- chemin dans le bucket "beneficiaires"
+  document_path  text,                            -- chemin dans le bucket "beneficiaires" (ou recto)
+  document_verso_path text,                       -- chemin dans le bucket "beneficiaires" (verso, si photo)
   status         text        not null default 'en_attente'
                  check (status in ('en_attente', 'valide', 'rejete')),
   -- "Traité" : les coordonnées ont été utilisées pour compléter/créer le
