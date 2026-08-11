@@ -1,6 +1,7 @@
 import { withAuth } from "next-auth/middleware"
 import createMiddleware from 'next-intl/middleware'
 import { locales } from './i18n'
+import { SESSION_COOKIE } from './lib/auth-cookies'
 import { NextRequest, NextResponse } from 'next/server'
 import {
   ATTACK_UA_RE,
@@ -25,6 +26,13 @@ const authMiddleware = withAuth(
     return intlMiddleware(req)
   },
   {
+    // Indispensable : sans ce bloc, `getToken()` devine le nom du cookie à
+    // partir de NEXTAUTH_URL. Derrière le proxy Hostinger cette déduction ne
+    // correspond pas toujours au cookie réellement écrit par lib/auth.ts, et
+    // /admin renvoie alors indéfiniment vers /auth/signin.
+    cookies: {
+      sessionToken: SESSION_COOKIE,
+    },
     callbacks: {
       authorized: ({ token }) => token != null
     },

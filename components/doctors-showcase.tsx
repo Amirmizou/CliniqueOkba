@@ -477,7 +477,7 @@ function DoctorCard({
             </a>
             <a
               href={`tel:${doctor.phone || CLINIC_PHONE}`}
-              aria-label={t('callFor', { name: doctor.name })}
+              aria-label={t('callFor', { name: String(doctor.name ?? '') })}
               className="inline-flex items-center justify-center rounded-xl border px-3 py-2.5 text-foreground/80 transition-colors hover:bg-foreground/5 touch-target min-w-[48px]"
               style={{ borderColor: `${accent}55` }}
             >

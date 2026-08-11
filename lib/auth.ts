@@ -3,6 +3,7 @@ import CredentialsProvider from "next-auth/providers/credentials"
 import bcrypt from "bcryptjs"
 import { loginGlobalLimiter, loginRateLimiter } from "@/lib/rate-limit"
 import { getClientIp, safeEqual } from "@/lib/security"
+import { SESSION_COOKIE, USE_SECURE_COOKIES } from "@/lib/auth-cookies"
 
 const ADMIN_USER = { id: "1", name: "Admin", email: "admin@cliniqueokba.com" }
 
@@ -98,19 +99,12 @@ export const authOptions: NextAuthOptions = {
     // Cookies verrouillés : httpOnly (inaccessible en JS), sameSite=lax (le
     // cookie n'accompagne pas les requêtes cross-site déclenchées par un tiers),
     // secure en production.
-    useSecureCookies: process.env.NODE_ENV === 'production',
+    useSecureCookies: USE_SECURE_COOKIES,
     cookies: {
-        sessionToken: {
-            name: process.env.NODE_ENV === 'production'
-                ? '__Secure-next-auth.session-token'
-                : 'next-auth.session-token',
-            options: {
-                httpOnly: true,
-                sameSite: 'lax',
-                path: '/',
-                secure: process.env.NODE_ENV === 'production',
-            },
-        },
+        // Nom partagé avec le middleware (lib/auth-cookies.ts) : sans cela, la
+        // session posée ici est invisible pour `withAuth` et /admin boucle sur
+        // la page de connexion.
+        sessionToken: SESSION_COOKIE,
     },
     callbacks: {
         async jwt({ token, user }) {
