@@ -304,7 +304,7 @@ export default function HeroCarousel({ slides: rawSlides = [], siteSettings, sec
                             initial={{ opacity: 0, y: 16 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: 0.5 }}
-                            className="mt-6 flex flex-wrap gap-2"
+                            className="mt-6 flex flex-wrap gap-2 max-w-[320px] sm:max-w-none"
                         >
                             {trustChips.map((c, i) => (
                                 <motion.li
@@ -312,12 +312,12 @@ export default function HeroCarousel({ slides: rawSlides = [], siteSettings, sec
                                     initial={{ opacity: 0, scale: 0.9 }}
                                     animate={{ opacity: 1, scale: 1 }}
                                     transition={{ delay: 0.5 + i * 0.07, duration: 0.28 }}
-                                    className="inline-flex items-center gap-2 rounded-full border border-white/25 px-3.5 py-2 backdrop-blur-md"
+                                    className="inline-flex items-center gap-1.5 sm:gap-2 rounded-full border border-white/25 px-2.5 py-1.5 sm:px-3.5 sm:py-2 backdrop-blur-md"
                                     style={{ background: 'rgba(255,255,255,0.12)' }}
                                 >
-                                    <span className="text-sm font-extrabold tabular-nums text-[#FDE68A] leading-none">{c.value}</span>
+                                    <span className="text-xs sm:text-sm font-extrabold tabular-nums text-[#FDE68A] leading-none">{c.value}</span>
                                     <span className="h-3 w-px bg-white/25" aria-hidden="true" />
-                                    <span className="text-[11px] font-medium text-white/90 leading-none">{c.label}</span>
+                                    <span className="text-[10px] sm:text-[11px] font-medium text-white/90 leading-none">{c.label}</span>
                                 </motion.li>
                             ))}
                         </motion.ul>
@@ -327,12 +327,12 @@ export default function HeroCarousel({ slides: rawSlides = [], siteSettings, sec
                             initial={{ opacity: 0, y: 16 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: 0.6 }}
-                            className="mt-8 flex w-full flex-col gap-4 sm:w-auto sm:flex-row sm:items-center"
+                            className="mt-8 flex w-full flex-col gap-3 sm:w-auto sm:flex-row sm:items-center"
                         >
                             <Magnetic className="w-full sm:w-fit">
                                 <button
                                     onClick={handleBooking}
-                                    className="group relative inline-flex w-full cursor-pointer items-center justify-center gap-2 overflow-hidden rounded-full bg-white px-7 py-4 text-sm font-semibold text-[#006633] shadow-lg transition duration-300 hover:bg-gray-50 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-white/60 active:scale-[0.98] sm:w-auto sm:text-base touch-target"
+                                    className="group relative inline-flex w-full cursor-pointer items-center justify-center gap-2 overflow-hidden rounded-full bg-[#006633] px-7 py-3.5 text-sm font-semibold text-white shadow-lg transition duration-300 hover:bg-[#004d26] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#006633]/60 active:scale-[0.98] sm:w-auto sm:text-base touch-target"
                                 >
                                     <CalendarHeart className="h-5 w-5" />
                                     {t('cta.appointment')}
@@ -344,9 +344,9 @@ export default function HeroCarousel({ slides: rawSlides = [], siteSettings, sec
                                 type="button"
                                 onClick={() => setCallOpen(true)}
                                 aria-haspopup="dialog"
-                                className="group inline-flex w-full cursor-pointer items-center justify-center gap-2 rounded-full border border-white/25 bg-white/10 px-7 py-4 text-sm font-semibold text-white backdrop-blur-md transition duration-300 hover:border-white/50 hover:bg-white/20 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-white/30 active:scale-[0.97] sm:w-auto sm:text-base touch-target"
+                                className="group inline-flex w-full cursor-pointer items-center justify-center gap-2 rounded-full border-2 border-white bg-white/10 px-7 py-3 text-sm font-semibold text-white backdrop-blur-md transition duration-300 hover:bg-white hover:text-[#006633] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-white/30 active:scale-[0.97] sm:w-auto sm:text-base touch-target"
                             >
-                                <Phone className="h-5 w-5 text-emerald-300" />
+                                <Phone className="h-5 w-5 group-hover:text-[#006633] transition-colors" />
                                 {t('cta.call')}
                             </button>
                         </motion.div>
@@ -409,31 +409,20 @@ export default function HeroCarousel({ slides: rawSlides = [], siteSettings, sec
 
             {/* Indicateurs mobiles (en bas) */}
             {slides.length > 1 && (
-                <div className="absolute bottom-10 left-1/2 z-30 -translate-x-1/2 md:hidden">
-                    <div className="flex items-center gap-1 rounded-full border border-white/10 bg-black/30 px-3 py-2 backdrop-blur-md">
-                        {/* Bouton pause/play (WCAG 2.2.2) */}
-                        <button
-                            onClick={toggleAutoPlay}
-                            aria-label={isAutoPlaying ? 'Mettre en pause le diaporama' : 'Reprendre le diaporama'}
-                            className="me-1 flex h-8 w-8 items-center justify-center rounded-full text-white/70 transition-colors hover:bg-white/10 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/50"
-                        >
-                            {isAutoPlaying
-                                ? <Pause className="h-3 w-3" />
-                                : <Play className="h-3 w-3 ms-0.5" />
-                            }
-                        </button>
+                <div className="absolute bottom-6 left-1/2 z-30 -translate-x-1/2 md:hidden">
+                    <div className="flex items-center gap-1 rounded-full border border-white/10 bg-black/20 px-2 py-1 backdrop-blur-md">
                         {slides.map((_, index) => (
                             <button
                                 key={index}
                                 onClick={() => goTo(index)}
                                 aria-label={`Aller à la slide ${index + 1}`}
                                 aria-current={index === currentIndex ? 'true' : undefined}
-                                className="flex h-8 min-w-[20px] items-center justify-center px-1"
+                                className="flex h-6 min-w-[16px] items-center justify-center px-1"
                             >
-                                <span className={`block h-1.5 rounded-full transition-all duration-300 ${
+                                <span className={`block h-1 rounded-full transition-all duration-300 ${
                                     index === currentIndex
-                                        ? 'w-8 bg-gradient-to-r from-[#006633] to-[#FDE68A]'
-                                        : 'w-3 bg-white/30'
+                                        ? 'w-6 bg-gradient-to-r from-[#006633] to-[#FDE68A]'
+                                        : 'w-2 bg-white/30'
                                 }`} />
                             </button>
                         ))}

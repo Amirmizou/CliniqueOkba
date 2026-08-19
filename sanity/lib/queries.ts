@@ -484,7 +484,8 @@ export const insuranceSectionQuery = groq`
       description,
     description_ar,
       logo,
-      signaturePhotos
+      signaturePhotos,
+      registrationLink
     },
     note,
     note_ar,

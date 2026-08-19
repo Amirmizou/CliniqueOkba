@@ -67,8 +67,9 @@ export default function LatestNews({ articles }: LatestNewsProps) {
         </div>
 
         {/* Articles Grid */}
-        <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-6 lg:grid-cols-3">
           {latestArticles.map((article, idx) => {
+            const isMain = idx === 0
             const dateStr = article.publishedAt
               ? new Date(article.publishedAt).toLocaleDateString(dateLocale, {
                   day: 'numeric',
@@ -94,17 +95,21 @@ export default function LatestNews({ articles }: LatestNewsProps) {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.5, delay: idx * 0.1 }}
-                className="group flex h-full flex-col overflow-hidden rounded-3xl border border-border/50 bg-card shadow-sm transition-all hover:shadow-xl hover:shadow-[#006633]/5"
+                className={`group flex overflow-hidden rounded-2xl border border-border/50 bg-card shadow-sm transition-all hover:shadow-xl hover:shadow-[#006633]/5 ${
+                  isMain 
+                    ? 'flex-col md:flex-row lg:col-span-2 lg:row-span-2' 
+                    : 'flex-col sm:col-span-1'
+                }`}
               >
                 {/* Image Wrapper */}
-                <div className="relative aspect-[4/3] w-full overflow-hidden">
+                <div className={`relative overflow-hidden ${isMain ? 'w-full md:w-1/2 aspect-video md:aspect-auto' : 'w-full aspect-[4/3]'}`}>
                   {article.image ? (
                     <Image
-                      src={urlFor(article.image).width(600).height(450).url()}
+                      src={urlFor(article.image).width(isMain ? 800 : 600).height(isMain ? 600 : 450).url()}
                       alt={article.title || ''}
                       fill
                       className="object-cover transition-transform duration-700 group-hover:scale-105"
-                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                      sizes={isMain ? "(max-width: 768px) 100vw, 66vw" : "(max-width: 768px) 100vw, 33vw"}
                     />
                   ) : (
                     <div className="absolute inset-0 bg-gradient-to-br from-muted to-muted/50" />
@@ -118,15 +123,17 @@ export default function LatestNews({ articles }: LatestNewsProps) {
                 </div>
 
                 {/* Content */}
-                <div className="flex flex-1 flex-col p-6">
+                <div className={`flex flex-1 flex-col ${isMain ? 'p-6 md:p-8 lg:p-10 justify-center' : 'p-5'}`}>
                   <div className="mb-3 flex items-center gap-2 text-xs font-medium text-muted-foreground">
                     <CalendarDays className="h-4 w-4" />
                     <span>{dateStr}</span>
                   </div>
-                  <h3 className="mb-3 line-clamp-2 text-xl font-bold leading-tight group-hover:text-[#006633] transition-colors">
+                  <h3 className={`mb-3 font-bold leading-tight group-hover:text-[#006633] transition-colors ${
+                    isMain ? 'text-2xl md:text-3xl lg:text-4xl line-clamp-3' : 'text-lg md:text-xl line-clamp-2'
+                  }`}>
                     {article.title}
                   </h3>
-                  <p className="mb-6 line-clamp-3 flex-1 text-sm text-muted-foreground">
+                  <p className={`mb-6 flex-1 text-muted-foreground ${isMain ? 'text-base line-clamp-4' : 'text-sm line-clamp-3'}`}>
                     {article.excerpt}
                   </p>
                   

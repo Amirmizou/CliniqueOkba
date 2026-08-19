@@ -130,45 +130,62 @@ export default async function Home(props: { params: Promise<{ locale: string }> 
       <SkipLink />
       <ScrollProgress />
       <SiteHeader siteSettings={localizedData.siteSettings} />
-      <main id='main-content' className='min-h-screen'>
+      <main id='main-content' className='min-h-screen pb-24 md:pb-0'>
         <HeroCarousel slides={localizedData.heroSlides} siteSettings={localizedData.siteSettings} sectionContent={sectionContentMap['hero']} />
-        <LatestNews articles={localizedData.articles} />
+        
+        {/* Bande confiance immediately after hero */}
         <TrustBand siteSettings={localizedData.siteSettings} />
-{/* Services first — visitors want to know WHAT we treat before WHO we are */}
+        
+        {/* Services first — visitors want to know WHAT we treat before WHO we are */}
         <Poles data={localizedData.poles} />
         <SectionDivider variant="ecg" />
-        {/* Social proof right after services */}
+        
+        {/* Team credibility */}
+        <DoctorsShowcase data={localizedData.doctors} sectionContent={sectionContentMap['doctors']} />
+        <SectionDivider variant="ecg" />
+        
+        {/* Equipment / Imaging */}
+        <LazyEquipementsGallery data={localizedData.facilityPhotos} />
+        <SectionDivider variant="ecg" />
+
+        {/* Social proof */}
         <LazyTestimonials
           data={localizedData.testimonials}
           sectionContent={sectionContentMap['testimonials']}
         />
         <SectionDivider variant="ecg" />
-        {/* Team credibility after social proof */}
-        <DoctorsShowcase data={localizedData.doctors} sectionContent={sectionContentMap['doctors']} />
-        <SectionDivider variant="ecg" />
-        {/* About / story after trust is established */}
+        
+        {/* News & Updates */}
+        <LatestNews articles={localizedData.articles} />
+
+        {/* About / story */}
         <About
           data={localizedData.aboutSection}
           sectionContent={sectionContentMap['about']}
         />
+        
         <VideosGallery data={localizedData.videos} />
         <SectionDivider variant="ecg" />
+        
         {featuredEvent && (
           <>
             <FeaturedEvent event={featuredEvent} />
             <SectionDivider variant="ecg" />
           </>
         )}
-        <LazyEquipementsGallery data={localizedData.facilityPhotos} />
+        
         <LazyHomeCare
           data={localizedData.homeCare}
           sectionContent={sectionContentMap['homecare']}
         />
         <SectionDivider variant="gradient" />
+        
         <Insurance data={localizedData.insurance} />
         <SectionDivider variant="ecg" />
+        
         <FaqTeaser data={localizedData.faqs} sectionContent={sectionContentMap['faq']} />
         <SectionDivider />
+        
         <Contact siteSettings={localizedData.siteSettings} sectionContent={sectionContentMap['contact']} />
       </main>
       <SiteFooter siteSettings={localizedData.siteSettings} footerContent={localizedData.footerContent} poles={localizedData.poles} />

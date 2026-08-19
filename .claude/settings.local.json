@@ -66,7 +66,13 @@
       "Bash(curl -sv \"https://cliniqueokba.com/api/revalidate\" --max-time 20)",
       "Bash(git fetch *)",
       "Bash(grep -vE \"t\\\\\\('|t\\\\\\(\\\\\"|t\\\\\\(\\\\`\"2)",
-      "Bash(ADMIN_PASSWORD_HASH=SHELLVALUE node -e \"require\\('@next/env'\\).loadEnvConfig\\(process.cwd\\(\\), false\\); console.log\\('vu par next:', process.env.ADMIN_PASSWORD_HASH.slice\\(0,12\\)\\)\")"
+      "Bash(ADMIN_PASSWORD_HASH=SHELLVALUE node -e \"require\\('@next/env'\\).loadEnvConfig\\(process.cwd\\(\\), false\\); console.log\\('vu par next:', process.env.ADMIN_PASSWORD_HASH.slice\\(0,12\\)\\)\")",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\\\\n\" https://snmtcytdrjzmxxrqvvqg.supabase.co/rest/v1/)",
+      "Bash(curl -s -w '\\\\nHTTP %{http_code}\\\\n' 'https://snmtcytdrjzmxxrqvvqg.supabase.co/rest/v1/beneficiaries?select=id&limit=1' -H 'apikey: __CMDSUB_OUTPUT__' -H 'Authorization: Bearer __CMDSUB_OUTPUT__')",
+      "Bash(curl -s 'https://snmtcytdrjzmxxrqvvqg.supabase.co/rest/v1/beneficiaries?select=document_verso_path&limit=1' -H 'apikey: __CMDSUB_OUTPUT__' -H 'Authorization: Bearer __CMDSUB_OUTPUT__')",
+      "Bash(curl -s -o /dev/null -w \"admin:%{http_code} loc:%header{location}\\\\n\" -A \"Mozilla/5.0\" http://localhost:3111/admin)",
+      "Bash(curl -s -o /dev/null -w \"signin:%{http_code}\\\\n\" -A \"Mozilla/5.0\" http://localhost:3111/auth/signin)",
+      "Bash(curl -s -o /dev/null -w \"home:%{http_code}\\\\n\" -A \"Mozilla/5.0\" http://localhost:3111/)"
     ]
   }
 }

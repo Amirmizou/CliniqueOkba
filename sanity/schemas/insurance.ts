@@ -75,6 +75,12 @@ export default defineType({
                             rows: 2,
                         }),
                         defineField({
+                            name: 'registrationLink',
+                            title: 'Lien d\'inscription',
+                            type: 'url',
+                            description: 'Lien externe pour l\'inscription des bénéficiaires (ex: Google Form) - optionnel',
+                        }),
+                        defineField({
                             name: 'logo',
                             title: 'Logo (optionnel)',
                             type: 'image',

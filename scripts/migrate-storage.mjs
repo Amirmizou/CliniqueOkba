@@ -1,157 +1,125 @@
-/**
- * Migration des fichiers du bucket "beneficiaires" entre deux projets Supabase.
- *
- * La liste des fichiers à copier est lue DANS LA BASE du nouveau projet
- * (colonnes photo_path / document_path / document_verso_path / justificatif_path) :
- * on ne copie donc que les objets réellement référencés par un bénéficiaire,
- * en conservant exactement le même chemin des deux côtés.
- *
- * Usage :
- *   node scripts/migrate-storage.mjs            # copie
- *   node scripts/migrate-storage.mjs --dry-run  # simulation, n'écrit rien
- *
- * Variables requises (dans .env) :
- *   NEXT_PUBLIC_SUPABASE_URL        -> projet DESTINATION (le nouveau)
- *   SUPABASE_SERVICE_ROLE_KEY       -> clé service_role du nouveau projet
- *   OLD_SUPABASE_URL                -> projet SOURCE (l'ancien)
- *   OLD_SUPABASE_SERVICE_ROLE_KEY   -> clé service_role de l'ancien projet
- */
-import fs from 'node:fs'
-import path from 'node:path'
 import { createClient } from '@supabase/supabase-js'
+import dotenv from 'dotenv'
 
-const BUCKET = 'beneficiaires'
-const CONCURRENCY = 5 // volontairement bas : au-delà, le Storage renvoie des 522
-const DRY_RUN = process.argv.includes('--dry-run')
+// Charger le .env local (qui contient les clés de la NOUVELLE base)
+dotenv.config()
 
-// --- Chargement du .env -----------------------------------------------------
-const envPath = path.join(process.cwd(), '.env')
-if (!fs.existsSync(envPath)) {
-  console.error('.env introuvable. Lance le script depuis la racine du projet.')
-  process.exit(1)
-}
-const env = Object.fromEntries(
-  fs
-    .readFileSync(envPath, 'utf8')
-    .split(/\r?\n/)
-    .filter((l) => l.trim() && !l.trim().startsWith('#') && l.includes('='))
-    .map((l) => {
-      const i = l.indexOf('=')
-      return [l.slice(0, i).trim(), l.slice(i + 1).trim().replace(/^["']|["']$/g, '')]
-    }),
-)
+// =========================================================================
+// ⚠️ À REMPLIR : Remplacez par les clés de l'ANCIEN projet Supabase ⚠️
+// =========================================================================
+const OLD_SUPABASE_URL = process.env.OLD_SUPABASE_URL
+const OLD_SUPABASE_SERVICE_KEY = process.env.OLD_SUPABASE_SERVICE_ROLE_KEY
 
-const missing = [
-  'NEXT_PUBLIC_SUPABASE_URL',
-  'SUPABASE_SERVICE_ROLE_KEY',
-  'OLD_SUPABASE_URL',
-  'OLD_SUPABASE_SERVICE_ROLE_KEY',
-].filter((k) => !env[k])
-if (missing.length) {
-  console.error('Variables manquantes dans .env :\n  ' + missing.join('\n  '))
+// =========================================================================
+// Clés du NOUVEAU projet (récupérées du fichier .env automatiquement)
+// =========================================================================
+const NEW_SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL
+const NEW_SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY
+
+const BUCKET_NAME = 'beneficiaires'
+
+if (!NEW_SUPABASE_URL || !NEW_SUPABASE_SERVICE_KEY) {
+  console.error("❌ Erreur : Les variables du nouveau Supabase sont absentes du fichier .env")
   process.exit(1)
 }
 
-const opts = { auth: { persistSession: false, autoRefreshToken: false } }
-const source = createClient(env.OLD_SUPABASE_URL, env.OLD_SUPABASE_SERVICE_ROLE_KEY, opts)
-const dest = createClient(env.NEXT_PUBLIC_SUPABASE_URL, env.SUPABASE_SERVICE_ROLE_KEY, opts)
+const oldSupabase = createClient(OLD_SUPABASE_URL, OLD_SUPABASE_SERVICE_KEY)
+const newSupabase = createClient(NEW_SUPABASE_URL, NEW_SUPABASE_SERVICE_KEY)
 
-console.log(`Source      : ${env.OLD_SUPABASE_URL}`)
-console.log(`Destination : ${env.NEXT_PUBLIC_SUPABASE_URL}`)
-if (DRY_RUN) console.log('MODE SIMULATION — aucun fichier ne sera écrit\n')
-
-// --- Liste des fichiers à copier --------------------------------------------
-const { data: rows, error: dbError } = await dest
-  .from('beneficiaries')
-  .select('photo_path, document_path, document_verso_path, justificatif_path')
-if (dbError) {
-  // document_verso_path peut ne pas exister si la migration SQL n'a pas été jouée
-  console.error('Lecture de la table impossible :', dbError.message)
-  console.error("Si l'erreur porte sur document_verso_path, joue d'abord :")
-  console.error('  alter table public.beneficiaries add column if not exists document_verso_path text;')
-  process.exit(1)
-}
-
-const paths = [
-  ...new Set(
-    rows.flatMap((r) =>
-      [r.photo_path, r.document_path, r.document_verso_path, r.justificatif_path].filter(Boolean),
-    ),
-  ),
-]
-console.log(`${rows.length} bénéficiaires -> ${paths.length} fichiers à traiter\n`)
-
-// --- Copie ------------------------------------------------------------------
-const stats = { copied: 0, skipped: 0, missing: 0, failed: 0 }
-const problems = []
-let done = 0
-
-async function migrate(p) {
-  // Déjà présent côté destination ? (permet de relancer le script sans tout refaire)
-  const dir = p.includes('/') ? p.slice(0, p.lastIndexOf('/')) : ''
-  const name = p.slice(p.lastIndexOf('/') + 1)
-  const { data: existing } = await dest.storage.from(BUCKET).list(dir, { search: name, limit: 1 })
-  if (existing?.some((o) => o.name === name)) {
-    stats.skipped++
-    return
-  }
-
-  const { data: blob, error: dlError } = await source.storage.from(BUCKET).download(p)
-  if (dlError || !blob) {
-    const msg = dlError?.message || 'téléchargement vide'
-    if (/not found|does not exist/i.test(msg)) stats.missing++
-    else stats.failed++
-    problems.push(`${p} -> source: ${msg}`)
-    return
-  }
-
-  if (DRY_RUN) {
-    stats.copied++
-    return
-  }
-
-  const { error: upError } = await dest.storage.from(BUCKET).upload(p, blob, {
-    contentType: blob.type || 'application/octet-stream',
-    upsert: true,
+/**
+ * Fonction pour lister tous les fichiers d'un bucket récursivement
+ */
+async function listAllFiles(supabase, bucket, path = '') {
+  console.log(`Exploration du dossier: /${path}`)
+  const { data, error } = await supabase.storage.from(bucket).list(path, {
+    limit: 100,
+    offset: 0,
+    sortBy: { column: 'name', order: 'asc' },
   })
-  if (upError) {
-    stats.failed++
-    problems.push(`${p} -> destination: ${upError.message}`)
+
+  if (error) {
+    console.error(`Erreur listage /${path}:`, error.message)
+    return []
+  }
+
+  let files = []
+  for (const item of data) {
+    // Dans Supabase, un dossier est retourné sans ID ou sans métadonnées
+    if (!item.id || item.metadata === null || item.name === '.emptyFolderPlaceholder') {
+      if (item.name !== '.emptyFolderPlaceholder') {
+        const folderPath = path ? `${path}/${item.name}` : item.name
+        const subFiles = await listAllFiles(supabase, bucket, folderPath)
+        files = files.concat(subFiles)
+      }
+    } else {
+      files.push(path ? `${path}/${item.name}` : item.name)
+    }
+  }
+  return files
+}
+
+async function migrate() {
+  console.log('🚀 Démarrage de la migration du bucket :', BUCKET_NAME)
+
+  // 1. Lister tous les fichiers de l'ancien bucket
+  console.log('\nÉtape 1 : Récupération de la liste des fichiers...')
+  const allFiles = await listAllFiles(oldSupabase, BUCKET_NAME)
+  
+  if (allFiles.length === 0) {
+    console.log('Aucun fichier trouvé dans l\'ancien bucket.')
     return
   }
-  stats.copied++
-}
+  
+  console.log(`\n✅ ${allFiles.length} fichiers trouvés. Début du transfert...`)
 
-const queue = [...paths]
-await Promise.all(
-  Array.from({ length: CONCURRENCY }, async () => {
-    while (queue.length) {
-      const p = queue.shift()
-      try {
-        await migrate(p)
-      } catch (e) {
-        stats.failed++
-        problems.push(`${p} -> ${String(e).slice(0, 120)}`)
+  // 2. Transférer chaque fichier
+  let successCount = 0
+  let errorCount = 0
+
+  for (const filePath of allFiles) {
+    try {
+      console.log(`\n⏳ Copie en cours : ${filePath}...`)
+      
+      // Télécharger depuis l'ancien
+      const { data: fileData, error: downloadError } = await oldSupabase.storage
+        .from(BUCKET_NAME)
+        .download(filePath)
+
+      if (downloadError) {
+        throw new Error(`Erreur téléchargement: ${downloadError.message}`)
       }
-      done++
-      if (done % 20 === 0 || done === paths.length) {
-        process.stdout.write(`\r  ${done}/${paths.length} traités...`)
+
+      // Convertir le Blob en Buffer/ArrayBuffer pour l'upload
+      const arrayBuffer = await fileData.arrayBuffer()
+
+      // Détecter le type (ex: image/jpeg)
+      const contentType = fileData.type
+
+      // Uploader vers le nouveau
+      const { error: uploadError } = await newSupabase.storage
+        .from(BUCKET_NAME)
+        .upload(filePath, arrayBuffer, {
+          contentType,
+          upsert: true // Écrase si existe déjà
+        })
+
+      if (uploadError) {
+        throw new Error(`Erreur upload: ${uploadError.message}`)
       }
+
+      console.log(`✅ Fichier copié avec succès !`)
+      successCount++
+    } catch (err) {
+      console.error(`❌ Échec pour ${filePath}:`, err.message)
+      errorCount++
     }
-  }),
-)
+  }
 
-// --- Rapport ----------------------------------------------------------------
-console.log('\n\n--- Résultat ---')
-console.log(`Copiés            : ${stats.copied}${DRY_RUN ? ' (simulés)' : ''}`)
-console.log(`Déjà présents     : ${stats.skipped}`)
-console.log(`Absents de la source : ${stats.missing}`)
-console.log(`Échecs            : ${stats.failed}`)
-
-if (problems.length) {
-  const report = path.join(process.cwd(), 'migration-storage-problemes.txt')
-  fs.writeFileSync(report, problems.join('\n'), 'utf8')
-  console.log(`\nDétail des ${problems.length} problème(s) : ${report}`)
+  console.log('\n=============================================')
+  console.log('🎉 Migration terminée !')
+  console.log(`✅ Réussis : ${successCount}`)
+  console.log(`❌ Échecs : ${errorCount}`)
+  console.log('=============================================')
 }
 
-if (stats.failed) process.exitCode = 1
+migrate()

@@ -34,7 +34,7 @@ export default function LogoIntro() {
     } catch {}
 
     document.body.style.overflow = 'hidden'
-    const duration = prefersReducedMotion ? 400 : 1600
+    const duration = prefersReducedMotion ? 200 : 800
     const timer = setTimeout(() => setVisible(false), duration)
     return () => {
       clearTimeout(timer)
@@ -58,7 +58,7 @@ export default function LogoIntro() {
               ? { opacity: 0 }
               : { opacity: 0, scale: 1.05, filter: 'blur(10px)' }
           }
-          transition={{ duration: prefersReducedMotion ? 0.4 : 0.85, ease: 'easeInOut' }}
+          transition={{ duration: prefersReducedMotion ? 0.2 : 0.45, ease: 'easeInOut' }}
           className="fixed inset-0 z-[200] flex flex-col items-center justify-center overflow-hidden"
           style={{
             background:
@@ -88,7 +88,7 @@ export default function LogoIntro() {
               }}
               initial={{ top: '-35%' }}
               animate={{ top: '115%' }}
-              transition={{ duration: 1.3, delay: 0.1, ease: 'easeInOut' }}
+              transition={{ duration: 0.6, delay: 0.05, ease: 'easeInOut' }}
             />
           )}
 
@@ -115,8 +115,8 @@ export default function LogoIntro() {
                       : { opacity: 1, y: 0, rotateX: 0 }
                   }
                   transition={{
-                    delay: 0.45 + i * 0.038,
-                    duration: 0.42,
+                    delay: 0.2 + i * 0.015,
+                    duration: 0.25,
                     ease: EASE,
                   }}
                   style={{ display: 'inline-block', transformOrigin: 'bottom center' }}
@@ -131,7 +131,7 @@ export default function LogoIntro() {
           <motion.div
             initial={{ scaleX: 0 }}
             animate={{ scaleX: 1 }}
-            transition={{ delay: 0.85, duration: 0.9, ease: 'easeOut' }}
+            transition={{ delay: 0.4, duration: 0.4, ease: 'easeOut' }}
             className="mt-5 h-[2px] w-44 origin-center rounded-full"
             style={{
               background:
@@ -146,7 +146,7 @@ export default function LogoIntro() {
                 key={word}
                 initial={{ opacity: 0, y: 8 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 1.05 + i * 0.12, duration: 0.4, ease: EASE }}
+                transition={{ delay: 0.5 + i * 0.06, duration: 0.2, ease: EASE }}
               >
                 {word}
               </motion.span>
