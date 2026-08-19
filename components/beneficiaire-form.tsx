@@ -261,13 +261,16 @@ export default function BeneficiaireForm({ organismes, logos = {} }: { organisme
     const match =
       organismes.find((o) => norm(o) === norm(orgParam)) ??
       organismes.find((o) => norm(o).includes(norm(orgParam)))
-    if (!match) return
+      
+    // Si l'organisme n'est pas dans la liste publique, on le considère comme un organisme interne caché
+    const finalOrg = match || orgParam
+    
     const projetParam = (params.get('projet') || '').trim()
-    setForm((f) => ({ ...f, organisme: match, projet_dedie: projetParam || f.projet_dedie }))
-    setLockedOrganisme(match)
+    setForm((f) => ({ ...f, organisme: finalOrg, projet_dedie: projetParam || f.projet_dedie }))
+    setLockedOrganisme(finalOrg)
     // On ne saute l'étape organisme que si le dossier est complet : DAMBRI
     // exige un projet dédié, donc on ne saute pas si le projet manque.
-    const needsProjet = isDembri(match)
+    const needsProjet = isDembri(finalOrg)
     if (!needsProjet || projetParam) {
       setStep(1)
       setMinStep(1)
