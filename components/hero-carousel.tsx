@@ -76,7 +76,7 @@ export default function HeroCarousel({ slides: rawSlides = [], siteSettings, sec
 
     /* Parallax doux au scroll (Framer) */
     const { scrollY } = useScroll()
-    const yImage = useTransform(scrollY, [0, 800], [0, 140])
+    const yImage = useTransform(scrollY, [0, 800], [0, 70])
     const yContent = useTransform(scrollY, [0, 600], [0, 90])
     const contentOpacity = useTransform(scrollY, [0, 480], [1, 0])
 
@@ -178,7 +178,7 @@ export default function HeroCarousel({ slides: rawSlides = [], siteSettings, sec
         <section
             ref={heroRef}
             id="home"
-            className="relative flex min-h-[78dvh] sm:min-h-[58dvh] lg:min-h-[62dvh] flex-col overflow-hidden"
+            className="relative flex min-h-[86dvh] sm:min-h-[72dvh] lg:min-h-[80dvh] flex-col overflow-hidden"
             onMouseEnter={() => setIsAutoPlaying(false)}
             onMouseLeave={() => setIsAutoPlaying(true)}
             // Accessibilité clavier : suspendre le défilement auto quand un
@@ -207,9 +207,9 @@ export default function HeroCarousel({ slides: rawSlides = [], siteSettings, sec
                         className="absolute inset-0"
                     >
                         <motion.div
-                            initial={prefersReducedMotion || !!currentSlide.videoUrl ? undefined : { scale: 1.04 }}
+                            initial={prefersReducedMotion || !!currentSlide.videoUrl ? undefined : { scale: 1.015 }}
                             animate={prefersReducedMotion || !!currentSlide.videoUrl ? undefined : { scale: 1 }}
-                            transition={{ duration: 10, ease: 'easeOut' }}
+                            transition={{ duration: 12, ease: 'easeOut' }}
                             className="relative h-full w-full"
                         >
                             {currentSlide.videoUrl ? (
@@ -227,7 +227,7 @@ export default function HeroCarousel({ slides: rawSlides = [], siteSettings, sec
                                     src={currentSlide.image}
                                     alt={currentSlide.title || 'Clinique OKBA'}
                                     fill
-                                    className="object-cover object-center"
+                                    className="object-cover object-[center_35%]"
                                     priority
                                     quality={82}
                                     sizes="100vw"
