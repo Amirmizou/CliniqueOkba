@@ -10,6 +10,7 @@ import { useReducedMotion } from '@/hooks/use-reduced-motion'
 import { AnimatedSection } from '@/components/ui/animated-section'
 import { LineReveal } from '@/components/ui/reveal-text'
 import { UniversalPlayer } from '@/components/ui/universal-player'
+import SectionGlow from '@/components/ui/section-glow'
 
 const EASE = [0.22, 1, 0.36, 1] as const
 
@@ -108,8 +109,12 @@ export default function VideosGallery({ data }: { data?: VideoItem[] }) {
   return (
     <section id="videos" className="relative overflow-hidden bg-background py-16 sm:py-20 md:py-24">
       {/* Décor d'ambiance */}
-      <div className="pointer-events-none absolute -top-32 left-0 h-96 w-96 rounded-full bg-brand-green/12 blur-[130px]" />
-      <div className="pointer-events-none absolute -bottom-32 right-0 h-96 w-96 rounded-full bg-brand-gold/15 blur-[130px]" />
+      <SectionGlow
+        glows={[
+          { at: '0% 0%', size: 384, color: 'var(--color-brand-green)', opacity: 0.12 },
+          { at: '100% 100%', size: 384, color: 'var(--color-brand-gold)', opacity: 0.15 },
+        ]}
+      />
 
       <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* En-tête */}

@@ -52,6 +52,7 @@ import { AnimatedSection } from '@/components/ui/animated-section'
 import { LineReveal } from '@/components/ui/reveal-text'
 import { UniversalPlayer } from '@/components/ui/universal-player'
 import { cn } from '@/lib/utils'
+import SectionGlow from '@/components/ui/section-glow'
 
 /* Couverture thématique « laboratoire » — utilisée quand un médecin ne
    souhaite pas que sa photo soit partagée. Remplace l'affiche par un visuel
@@ -631,14 +632,12 @@ export default function DoctorsShowcase({ data, sectionContent }: { data?: any[]
       id="medecins"
       className="relative overflow-hidden bg-background py-16 sm:py-20 md:py-24"
     >
-      {/* Décor d'ambiance dynamique */}
-      <div 
-        className="pointer-events-none absolute -top-32 right-0 h-96 w-96 rounded-full blur-[130px]" 
-        style={{ backgroundColor: `${sectionAccent}26` }}
-      />
-      <div 
-        className="pointer-events-none absolute -bottom-32 left-0 h-96 w-96 rounded-full blur-[130px]" 
-        style={{ backgroundColor: `${sectionAccent}1A` }}
+      {/* Décor d'ambiance dynamique — teinte pilotée par le pôle affiché */}
+      <SectionGlow
+        glows={[
+          { at: '100% 0%', size: 384, color: sectionAccent, opacity: 0.15 },
+          { at: '0% 100%', size: 384, color: sectionAccent, opacity: 0.1 },
+        ]}
       />
 
       <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">

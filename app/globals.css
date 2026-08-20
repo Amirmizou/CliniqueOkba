@@ -118,6 +118,13 @@
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
+
+  /* Couleurs de marque littérales, utilisées telles quelles dans les décors
+     (halos, accents) indépendamment du thème clair/sombre. Elles étaient
+     référencées via bg-brand-green / bg-brand-gold sans jamais être définies :
+     les utilitaires ne produisaient donc aucune règle CSS. */
+  --color-brand-green: #006633;
+  --color-brand-gold: #fde68a;
 }
 
 @layer base {

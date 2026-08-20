@@ -135,7 +135,7 @@ export default function HeroCarousel({ slides: rawSlides = [], siteSettings, sec
     /* Fallback si aucune slide */
     if (slides.length === 0) {
         return (
-            <section className="relative flex min-h-screen items-center justify-center bg-gradient-to-br from-primary/10 via-background to-primary/5">
+            <section className="relative flex min-h-dvh items-center justify-center bg-gradient-to-br from-primary/10 via-background to-primary/5">
                 <div className="px-4 text-center">
                     <h1 className="mb-4 text-4xl font-bold md:text-6xl">
                         {isAr ? (siteSettings?.clinicName_ar || siteSettings?.clinicName || 'المصحة الطبية عقبة') : (siteSettings?.clinicName || 'Clinique OKBA')}

@@ -8,6 +8,7 @@ import { Link } from '@/navigation'
 import { urlFor } from '@/sanity/lib/image'
 import { AnimatedSection } from '@/components/ui/animated-section'
 import { useLocale, useTranslations } from 'next-intl'
+import SectionGlow from '@/components/ui/section-glow'
 
 interface InsuranceProvider {
   name: string
@@ -50,8 +51,12 @@ export default function Insurance({ data }: InsuranceProps) {
       className="relative overflow-hidden bg-background py-16 sm:py-20 md:py-24"
     >
       {/* Décor d'ambiance */}
-      <div className="pointer-events-none absolute -top-24 right-0 h-80 w-80 rounded-full bg-brand-green/10 blur-[120px]" />
-      <div className="pointer-events-none absolute -bottom-24 left-0 h-80 w-80 rounded-full bg-brand-gold/15 blur-[120px]" />
+      <SectionGlow
+        glows={[
+          { at: '100% 0%', size: 320, color: 'var(--color-brand-green)', opacity: 0.1 },
+          { at: '0% 100%', size: 320, color: 'var(--color-brand-gold)', opacity: 0.15 },
+        ]}
+      />
 
       <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <AnimatedSection animation="fade" className="mb-12 text-center">

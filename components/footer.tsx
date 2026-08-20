@@ -99,19 +99,18 @@ export default function Footer({ siteSettings, footerContent, sanityPoles }: Foo
         </svg>
       </div>
 
-      {/* Cinematic Glowing Meshes */}
-      <div className='absolute inset-0 pointer-events-none overflow-hidden'>
-        <motion.div
-          animate={{ scale: [1, 1.1, 1], opacity: [0.03, 0.08, 0.03], rotate: [0, 45, 0] }}
-          transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
-          className='absolute -top-[20%] -right-[10%] w-[800px] h-[800px] bg-primary rounded-full blur-[150px]'
-        />
-        <motion.div
-          animate={{ scale: [1, 1.2, 1], opacity: [0.02, 0.06, 0.02] }}
-          transition={{ duration: 20, repeat: Infinity, ease: "easeInOut", delay: 2 }}
-          className='absolute bottom-0 -left-[10%] w-[600px] h-[600px] bg-secondary rounded-full blur-[150px]'
-        />
-      </div>
+      {/* Halos de marque — dégradés radiaux plutôt que divs floutées : animer
+          scale/rotate sur un blur(150px) refiltre la couche à chaque frame,
+          en boucle infinie, pour une nuance à peine perceptible. */}
+      <div
+        className='absolute inset-0 pointer-events-none'
+        style={{
+          backgroundImage: [
+            'radial-gradient(800px 800px at 92% -12%, color-mix(in oklab, var(--primary) 10%, transparent) 0%, transparent 60%)',
+            'radial-gradient(600px 600px at 4% 104%, color-mix(in oklab, var(--secondary) 9%, transparent) 0%, transparent 62%)',
+          ].join(', '),
+        }}
+      />
 
       <div className='relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pb-28 md:pb-12'>
         <motion.div

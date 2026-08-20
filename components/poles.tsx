@@ -26,6 +26,7 @@ import { Link } from '@/navigation'
 import { AnimatedSection } from '@/components/ui/animated-section'
 import { ECGLine, ecgVariantForIcon } from '@/components/ui/ecg-line'
 import { LineReveal } from '@/components/ui/reveal-text'
+import SectionGlow from '@/components/ui/section-glow'
 
 import {
   ImagerieIcon,
@@ -299,8 +300,12 @@ export default function Poles({ data }: { data?: any[] }) {
       className="relative overflow-hidden bg-background py-16 sm:py-20 md:py-24"
     >
       {/* Décor */}
-      <div className="pointer-events-none absolute -top-32 left-0 h-96 w-96 rounded-full bg-brand-green/12 blur-[130px]" />
-      <div className="pointer-events-none absolute -bottom-32 right-0 h-96 w-96 rounded-full bg-brand-gold/20 blur-[130px]" />
+      <SectionGlow
+        glows={[
+          { at: '0% 0%', size: 384, color: 'var(--color-brand-green)', opacity: 0.12 },
+          { at: '100% 100%', size: 384, color: 'var(--color-brand-gold)', opacity: 0.2 },
+        ]}
+      />
 
       <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <AnimatedSection animation="fade" className="mb-12 text-center">

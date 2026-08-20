@@ -6,6 +6,7 @@ import { Link } from '@/navigation'
 import { CalendarDays, ArrowRight, Sparkles } from 'lucide-react'
 import { urlFor } from '@/sanity/lib/image'
 import { useTranslations, useLocale } from 'next-intl'
+import SectionGlow from '@/components/ui/section-glow'
 
 interface LatestNewsProps {
   articles: any[]
@@ -25,8 +26,12 @@ export default function LatestNews({ articles }: LatestNewsProps) {
   return (
     <section className="relative overflow-hidden bg-background py-16 sm:py-24">
       {/* Premium Background Decor */}
-      <div className="pointer-events-none absolute left-0 top-0 h-[500px] w-[500px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#006633]/5 blur-[120px]" />
-      <div className="pointer-events-none absolute bottom-0 right-0 h-[400px] w-[400px] translate-x-1/3 translate-y-1/3 rounded-full bg-[#FDE68A]/10 blur-[100px]" />
+      <SectionGlow
+        glows={[
+          { at: '0% 0%', size: 500, color: '#006633', opacity: 0.05 },
+          { at: '100% 100%', size: 400, color: '#FDE68A', opacity: 0.1 },
+        ]}
+      />
 
       <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         

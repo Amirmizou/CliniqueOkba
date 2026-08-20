@@ -21,6 +21,7 @@ import {
 } from '@/data/equipements'
 import { urlFor, hiResImage } from '@/sanity/lib/image'
 import { AnimatedSection } from '@/components/ui/animated-section'
+import SectionGlow from '@/components/ui/section-glow'
 
 type Filter = 'all' | EquipementCategoryId
 
@@ -311,8 +312,12 @@ export default function EquipementsGallery({ data }: { data?: any[] }) {
       className="relative overflow-hidden bg-gradient-to-b from-background via-background to-primary/5 py-16 sm:py-20 md:py-24"
     >
       {/* Décor */}
-      <div className="pointer-events-none absolute -top-24 left-1/4 h-96 w-96 rounded-full bg-brand-gold/10 blur-[130px]" />
-      <div className="pointer-events-none absolute -bottom-24 right-1/4 h-96 w-96 rounded-full bg-brand-green/15 blur-[130px]" />
+      <SectionGlow
+        glows={[
+          { at: '25% 0%', size: 384, color: 'var(--color-brand-gold)', opacity: 0.1 },
+          { at: '75% 100%', size: 384, color: 'var(--color-brand-green)', opacity: 0.15 },
+        ]}
+      />
 
       <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* En-tête */}

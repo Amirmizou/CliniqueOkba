@@ -16,6 +16,7 @@ import {
 } from 'lucide-react'
 import { urlFor } from '@/sanity/lib/image'
 import { ECGLine } from '@/components/ui/ecg-line'
+import SectionGlow from '@/components/ui/section-glow'
 
 const ICONS_MAP: Record<string, any> = {
   Microscope,
@@ -116,8 +117,12 @@ export default function LabResults({ locale = 'fr', data }: LabResultsProps) {
     <section className="relative overflow-hidden bg-gradient-to-br from-[#0a0a20] via-[#0d1a2d] to-[#0a1628] py-20 sm:py-28">
       {/* Background decorations */}
       <div className="pointer-events-none absolute inset-0">
-        <div className="absolute -top-40 left-1/4 h-[500px] w-[500px] rounded-full bg-[#8B5CF6]/8 blur-[140px]" />
-        <div className="absolute -bottom-40 right-1/4 h-[500px] w-[500px] rounded-full bg-[#006633]/10 blur-[140px]" />
+        <SectionGlow
+          glows={[
+            { at: '25% 0%', size: 500, color: '#8B5CF6', opacity: 0.08 },
+            { at: '75% 100%', size: 500, color: '#006633', opacity: 0.1 },
+          ]}
+        />
         <div
           className="absolute inset-0 opacity-[0.03]"
           style={{ backgroundImage: 'radial-gradient(circle, rgba(139,92,246,0.3) 1px, transparent 1px)', backgroundSize: '40px 40px' }}

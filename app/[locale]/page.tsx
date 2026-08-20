@@ -2,7 +2,6 @@ import SiteHeader from '@/components/site-header'
 import HeroCarousel from '@/components/hero-carousel'
 import About from '@/components/about'
 import VideosGallery from '@/components/videos-gallery'
-import LogoLoader from '@/components/logo-loader'
 import TrustBand from '@/components/trust-band'
 import LatestNews from '@/components/latest-news'
 import Poles from '@/components/poles'
@@ -17,6 +16,7 @@ import BackToTop from '@/components/back-to-top'
 import MobileActionBar from '@/components/mobile-action-bar'
 import ScrollProgress from '@/components/ui/scroll-progress'
 import SectionDivider from '@/components/ui/section-divider'
+import BioDivider from '@/components/ui/bio-divider'
 import { setRequestLocale } from 'next-intl/server'
 // Lazy load des composants lourds (below the fold)
 import {
@@ -126,7 +126,6 @@ export default async function Home(props: { params: Promise<{ locale: string }> 
 
   return (
     <>
-      <LogoLoader />
       <SkipLink />
       <ScrollProgress />
       <SiteHeader siteSettings={localizedData.siteSettings} />
@@ -138,22 +137,25 @@ export default async function Home(props: { params: Promise<{ locale: string }> 
         
         {/* Services first — visitors want to know WHAT we treat before WHO we are */}
         <Poles data={localizedData.poles} />
-        <SectionDivider variant="ecg" />
+        {/* Vers l'equipe : l'helice, le vivant derriere la specialite */}
+        <BioDivider variant="helix" />
         
         {/* Team credibility */}
         <DoctorsShowcase data={localizedData.doctors} sectionContent={sectionContentMap['doctors']} />
-        <SectionDivider variant="ecg" />
+        {/* Vers le plateau technique : arcs du portique et coupe axiale */}
+        <BioDivider variant="tomography" />
         
         {/* Equipment / Imaging */}
         <LazyEquipementsGallery data={localizedData.facilityPhotos} />
-        <SectionDivider variant="ecg" />
+        {/* Vers les temoignages : la goutte, le geste precis */}
+        <BioDivider variant="titration" />
 
         {/* Social proof */}
         <LazyTestimonials
           data={localizedData.testimonials}
           sectionContent={sectionContentMap['testimonials']}
         />
-        <SectionDivider variant="ecg" />
+        <BioDivider variant="mitosis" />
         
         {/* News & Updates */}
         <LatestNews articles={localizedData.articles} />
@@ -165,12 +167,13 @@ export default async function Home(props: { params: Promise<{ locale: string }> 
         />
         
         <VideosGallery data={localizedData.videos} />
-        <SectionDivider variant="ecg" />
+        {/* Vers l'evenement : le spectre, un signal qui se detache */}
+        <BioDivider variant="spectrum" />
         
         {featuredEvent && (
           <>
             <FeaturedEvent event={featuredEvent} />
-            <SectionDivider variant="ecg" />
+            <BioDivider variant="molecule" />
           </>
         )}
         
@@ -181,7 +184,8 @@ export default async function Home(props: { params: Promise<{ locale: string }> 
         <SectionDivider variant="gradient" />
         
         <Insurance data={localizedData.insurance} />
-        <SectionDivider variant="ecg" />
+        {/* Vers la FAQ : le gel, des reponses qui se separent lisiblement */}
+        <BioDivider variant="gel" />
         
         <FaqTeaser data={localizedData.faqs} sectionContent={sectionContentMap['faq']} />
         <SectionDivider />

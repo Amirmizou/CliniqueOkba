@@ -14,6 +14,7 @@ import {
 } from 'lucide-react'
 import { urlFor } from '@/sanity/lib/image'
 import { type ClinicEvent } from '@/lib/events'
+import SectionGlow from '@/components/ui/section-glow'
 
 function formatDateTime(value: string, dateLocale: string) {
   return new Date(value).toLocaleString(dateLocale, {
@@ -50,8 +51,12 @@ export default function FeaturedEvent({ event }: { event: ClinicEvent }) {
       className="relative overflow-hidden bg-background py-16 sm:py-20 md:py-24"
     >
       {/* Décor */}
-      <div className="pointer-events-none absolute -top-24 right-0 h-96 w-96 rounded-full bg-brand-green/10 blur-[130px]" />
-      <div className="pointer-events-none absolute -bottom-24 left-0 h-96 w-96 rounded-full bg-brand-gold/20 blur-[130px]" />
+      <SectionGlow
+        glows={[
+          { at: '100% 0%', size: 384, color: 'var(--color-brand-green)', opacity: 0.1 },
+          { at: '0% 100%', size: 384, color: 'var(--color-brand-gold)', opacity: 0.2 },
+        ]}
+      />
 
       <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* En-tête */}

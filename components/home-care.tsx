@@ -73,8 +73,15 @@ export default function HomeCare({ data, sectionContent }: HomeCareProps) {
       
       {/* ── Décor de fond Premium ── */}
       <div className="pointer-events-none absolute inset-0">
-        <div className="absolute top-0 right-0 h-[800px] w-[800px] -translate-y-1/3 translate-x-1/3 rounded-full bg-[#4caf6e]/20 blur-[150px]" />
-        <div className="absolute bottom-0 left-0 h-[600px] w-[600px] translate-y-1/3 -translate-x-1/3 rounded-full bg-[#FDE68A]/10 blur-[120px]" />
+        <div
+          className="absolute inset-0"
+          style={{
+            backgroundImage: [
+              'radial-gradient(800px 800px at 100% 0%, rgba(76,175,110,0.20) 0%, transparent 60%)',
+              'radial-gradient(600px 600px at 0% 100%, rgba(253,230,138,0.10) 0%, transparent 62%)',
+            ].join(', '),
+          }}
+        />
         {/* Bruit de fond subtil pour la texture */}
         <div 
           className="absolute inset-0 opacity-[0.05] mix-blend-overlay"

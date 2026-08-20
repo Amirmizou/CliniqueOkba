@@ -3,6 +3,7 @@ import { HelpCircle, ArrowRight } from 'lucide-react'
 import { Link } from '@/navigation'
 import ScrollAnimation from '@/components/ui/scroll-animation'
 import { type FaqItem } from '@/data/faq'
+import SectionGlow from '@/components/ui/section-glow'
 
 interface FaqTeaserProps {
   data?: FaqItem[]
@@ -62,7 +63,9 @@ export default function FaqTeaser({ data, sectionContent, limit = 5 }: FaqTeaser
       />
 
       {/* Décor d'ambiance */}
-      <div className="pointer-events-none absolute -top-24 left-0 h-80 w-80 rounded-full bg-brand-green/10 blur-[120px]" />
+      <SectionGlow
+        glows={[{ at: '0% 0%', size: 320, color: 'var(--color-brand-green)', opacity: 0.1 }]}
+      />
 
       <div className="relative z-10 mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
         <ScrollAnimation variant="fadeUp" className="mb-12 text-center">

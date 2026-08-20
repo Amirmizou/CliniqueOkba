@@ -4,16 +4,18 @@ import { useEffect, useState, useRef } from 'react'
 import Image from 'next/image'
 import { motion, AnimatePresence } from 'framer-motion'
 
-// Durées (ms) qui reproduisent la chorégraphie Remotion
-const T_STEM_END      = 400   // la tige finit de monter
-const T_PLANT_START   = 300   // début du wipe plante (chevauchement voulu)
-const T_PLANT_END     = 1200  // wipe plante terminé
-const T_CLINIQUE_START= 950   // début wipe CLINIQUE
-const T_CLINIQUE_END  = 2050  // wipe CLINIQUE terminé
-const T_SHINE_START   = 2000  // reflet démarre
-const T_SHINE_END     = 2500  // reflet terminé
-const T_HOLD_END      = 2900  // durée totale avant sortie
-const T_EXIT_END      = 3400  // fondu sortant terminé → démontage
+// Durées (ms) de la chorégraphie Remotion, resserrées : le rideau d'ouverture
+// se paie en First Contentful Paint perçu, donc chaque phase garde sa lecture
+// mais l'ensemble tient sous 1,8 s au lieu de 3,4 s.
+const T_STEM_END      = 220   // la tige finit de monter
+const T_PLANT_START   = 160   // début du wipe plante (chevauchement voulu)
+const T_PLANT_END     = 620   // wipe plante terminé
+const T_CLINIQUE_START= 480   // début wipe CLINIQUE
+const T_CLINIQUE_END  = 1000  // wipe CLINIQUE terminé
+const T_SHINE_START   = 980   // reflet démarre
+const T_SHINE_END     = 1280  // reflet terminé
+const T_HOLD_END      = 1450  // durée totale avant sortie
+const T_EXIT_END      = 1750  // fondu sortant terminé → démontage
 
 const EASE_EXPO  = [0.16, 1, 0.3, 1] as const
 const EASE_SMOOTH= [0.4,  0, 0.2, 1] as const
@@ -204,16 +206,6 @@ function LogoAnimation({ onComplete }: { onComplete: () => void }) {
         />
       </motion.div>
 
-      {/* ── Respiration douce quand tout est visible ───────────────────── */}
-      {(phase === 'shine' || phase === 'done') && (
-        <motion.div
-          style={{ position: 'absolute', inset: 0 }}
-          animate={{ y: [0, -3, 0], scale: [1, 1.004, 1] }}
-          transition={{ duration: 3.2, repeat: Infinity, ease: 'easeInOut' }}
-        >
-          {/* invisible — applique le mouvement aux enfants via transform hérité */}
-        </motion.div>
-      )}
     </div>
   )
 }
@@ -226,6 +218,10 @@ export function LogoIntro() {
 
   useEffect(() => {
     setMounted(true)
+
+    // Mouvement réduit demandé (vestibulaire, épilepsie) : pas de rideau du tout.
+    if (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) return
+
     // Ne s'affiche qu'une seule fois par session
     if (typeof sessionStorage !== 'undefined') {
       if (sessionStorage.getItem('okba-intro')) return
@@ -236,7 +232,7 @@ export function LogoIntro() {
 
   const handleComplete = () => {
     setLeaving(true)
-    setTimeout(() => setVisible(false), 600)
+    setTimeout(() => setVisible(false), 350)
   }
 
   if (!mounted || !visible) return null
@@ -248,7 +244,7 @@ export function LogoIntro() {
           key="okba-intro"
           initial={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          transition={{ duration: 0.6, ease: [0.4, 0, 1, 1] }}
+          transition={{ duration: 0.35, ease: [0.4, 0, 1, 1] }}
           style={{
             position: 'fixed',
             inset: 0,

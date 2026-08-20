@@ -1,6 +1,13 @@
 import { createImageUrlBuilder } from '@sanity/image-url'
 import { dataset, projectId } from '../env'
 
+/**
+ * Qualité de compression par défaut des images Sanity.
+ * En AVIF/WebP, 82 est visuellement indiscernable de 100 sur des photos
+ * médicales, pour environ 2,5x moins de poids transféré.
+ */
+export const IMAGE_QUALITY = 82
+
 const imageBuilder = createImageUrlBuilder({
     projectId: projectId || '',
     dataset: dataset || '',
@@ -8,7 +15,7 @@ const imageBuilder = createImageUrlBuilder({
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const urlFor = (source: any) => {
-    return imageBuilder?.image(source).auto('format').fit('max').quality(100)
+    return imageBuilder?.image(source).auto('format').fit('max').quality(IMAGE_QUALITY)
 }
 
 /**
@@ -42,8 +49,9 @@ export const sanityImageLoader = ({ src, width, quality }: { src: string, width:
     // Ajoute les paramètres de largeur et qualité à l'URL existante
     const url = new URL(src)
     url.searchParams.set('w', width.toString())
-    // Next.js passes 75 by default. We override this to 100 for pristine medical photos.
-    const finalQuality = quality && quality > 75 ? quality : 100;
+    // Next.js envoie 75 par defaut ; on remonte a IMAGE_QUALITY, et on respecte
+    // une valeur explicite plus haute (lightbox, planches d'imagerie).
+    const finalQuality = quality && quality > IMAGE_QUALITY ? quality : IMAGE_QUALITY
     url.searchParams.set('q', finalQuality.toString())
     url.searchParams.set('auto', 'format')
     return url.href
