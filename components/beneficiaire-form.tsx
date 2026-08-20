@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useRef, useEffect, useMemo } from 'react'
+import { useState, useRef, useEffect, useMemo, Fragment } from 'react'
 import { useTranslations, useLocale } from 'next-intl'
 import { motion, AnimatePresence } from 'framer-motion'
 import Image from 'next/image'
@@ -24,6 +24,11 @@ import {
   AlertCircle,
   Pencil,
   Lock,
+  Phone,
+  Mail,
+  MapPin,
+  CreditCard,
+  PartyPopper,
 } from 'lucide-react'
 
 interface FamilyMember {
@@ -39,6 +44,28 @@ const emptyMember = (): FamilyMember => ({ nom: '', prenom: '', date_naissance: 
 // métier : on retire toute lettre arabe saisie, y compris en formulaire arabe.
 const ARABIC_RE = /[؀-ۿݐ-ݿࢠ-ࣿﭐ-﷿ﹰ-﻿]/g
 const stripArabic = (v: string) => v.replace(ARABIC_RE, '')
+
+// Téléphone : on n'accepte que des chiffres et on les regroupe par deux
+// (0X XX XX XX XX) pendant la frappe. Le serveur renormalise de toute façon
+// (normPhone retire tout ce qui n'est pas un chiffre), les espaces sont sûrs.
+const onlyDigits = (v: string) => v.replace(/\D/g, '')
+const formatPhone = (v: string) => {
+  const d = onlyDigits(v).slice(0, 10)
+  return d.match(/.{1,2}/g)?.join(' ') ?? d
+}
+const isPhoneValid = (v: string) => {
+  const d = onlyDigits(v)
+  return d.length >= 9 && d.length <= 10 && d.startsWith('0')
+}
+
+// Petit retour haptique sur mobile à chaque choix : le formulaire répond.
+const buzz = (ms = 12) => {
+  try {
+    navigator.vibrate?.(ms)
+  } catch {
+    /* non supporté : sans effet */
+  }
+}
 
 // La convention « Promotion Dembri » (parfois orthographiée Dambri) regroupe les
 // acquéreurs ; la résidence/îlot est une sous-catégorie choisie ensuite.
@@ -66,6 +93,84 @@ const DEMBRI_RESIDENCES = [
 const inputClass =
   'w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-base text-slate-800 outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 dark:border-slate-700 dark:bg-slate-800 dark:text-white'
 const labelClass = 'mb-1.5 block text-base font-medium text-slate-700 dark:text-slate-200'
+// Réserve pour les icônes dans les champs. En style inline plutôt qu'en
+// classes : px-4 d'inputClass a la même spécificité qu'un ps-*, et l'ordre
+// des règles Tailwind trancherait à notre place.
+const PAD_START = { paddingInlineStart: '2.75rem' } as const
+// Champs forcés en dir="ltr" : padding physique, pas logique.
+const PAD_RIGHT = { paddingRight: '2.75rem' } as const
+const PAD_LEFT_RIGHT = { paddingLeft: '2.75rem', paddingRight: '2.75rem' } as const
+const inputErrorClass =
+  'border-red-400 focus:border-red-500 focus:ring-red-500/20 dark:border-red-500/70'
+
+/** Coche verte animée affichée dans un champ correctement rempli.
+ *  Toujours à droite : les champs concernés sont en dir="ltr". */
+function ValidMark({ show }: { show: boolean }) {
+  return (
+    <AnimatePresence>
+      {show && (
+        <motion.span
+          initial={{ scale: 0, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          exit={{ scale: 0, opacity: 0 }}
+          transition={{ type: 'spring', stiffness: 500, damping: 22 }}
+          aria-hidden="true"
+          className="pointer-events-none absolute top-1/2 right-3 -translate-y-1/2 text-emerald-500"
+        >
+          <CheckCircle2 className="h-5 w-5" />
+        </motion.span>
+      )}
+    </AnimatePresence>
+  )
+}
+
+/** Message d'erreur sous un champ, monté/démonté en douceur. */
+function FieldError({ message }: { message: string }) {
+  return (
+    <AnimatePresence>
+      {message && (
+        <motion.p
+          initial={{ opacity: 0, y: -4 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -4 }}
+          className="mt-1.5 flex items-center gap-1.5 text-sm font-medium text-red-600 dark:text-red-400"
+        >
+          <AlertCircle className="h-4 w-4 shrink-0" />
+          {message}
+        </motion.p>
+      )}
+    </AnimatePresence>
+  )
+}
+
+/** Confettis de fin — quelques pastilles, sans dépendance externe. */
+function Confetti({ isRtl }: { isRtl: boolean }) {
+  const pieces = useMemo(
+    () =>
+      Array.from({ length: 18 }, (_, i) => ({
+        id: i,
+        x: (i % 9) * 12 - 48 + (i % 3) * 4,
+        delay: (i % 6) * 0.06,
+        rotate: (i % 2 ? 1 : -1) * (120 + i * 15),
+        color: ['#059669', '#FDE68A', '#10b981', '#34d399'][i % 4],
+      })),
+    [],
+  )
+  return (
+    <div aria-hidden="true" className="pointer-events-none absolute inset-x-0 top-0 h-40 overflow-hidden">
+      {pieces.map((p) => (
+        <motion.span
+          key={p.id}
+          initial={{ opacity: 0, y: -10, x: `${p.x}%`, rotate: 0 }}
+          animate={{ opacity: [0, 1, 1, 0], y: 160, rotate: p.rotate }}
+          transition={{ duration: 1.8, delay: p.delay, ease: 'easeOut' }}
+          style={{ backgroundColor: p.color, [isRtl ? 'right' : 'left']: '50%' }}
+          className="absolute top-0 h-2.5 w-2 rounded-[2px]"
+        />
+      ))}
+    </div>
+  )
+}
 
 const TOTAL_STEPS = 4
 
@@ -115,37 +220,54 @@ function MediaPicker({
         accept={accept}
         capture={capture}
         className="hidden"
-        onChange={(e) => setFile(e.target.files?.[0] ?? null)}
+        onChange={(e) => {
+          const f = e.target.files?.[0] ?? null
+          if (f) buzz()
+          setFile(f)
+        }}
       />
       <input
         ref={galRef}
         type="file"
         accept={accept}
         className="hidden"
-        onChange={(e) => setFile(e.target.files?.[0] ?? null)}
+        onChange={(e) => {
+          const f = e.target.files?.[0] ?? null
+          if (f) buzz()
+          setFile(f)
+        }}
       />
 
       {!file ? (
         <div className="grid gap-3 sm:grid-cols-2">
-          <button
+          <motion.button
+            whileHover={{ scale: 1.02, y: -2 }}
+            whileTap={{ scale: 0.97 }}
             type="button"
             onClick={() => camRef.current?.click()}
-            className="flex flex-col items-center justify-center gap-2 rounded-2xl border-2 border-dashed border-emerald-300 bg-emerald-50 px-4 py-6 text-emerald-700 transition hover:bg-emerald-100 dark:border-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-300"
+            className="group flex flex-col items-center justify-center gap-2 rounded-2xl border-2 border-dashed border-emerald-300 bg-emerald-50 px-4 py-6 text-emerald-700 transition hover:bg-emerald-100 dark:border-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-300"
           >
-            <Camera className="h-8 w-8" />
+            <Camera className="h-8 w-8 transition-transform group-hover:scale-110" />
             <span className="text-center text-base font-semibold">{takeLabel}</span>
-          </button>
-          <button
+          </motion.button>
+          <motion.button
+            whileHover={{ scale: 1.02, y: -2 }}
+            whileTap={{ scale: 0.97 }}
             type="button"
             onClick={() => galRef.current?.click()}
-            className="flex flex-col items-center justify-center gap-2 rounded-2xl border-2 border-dashed border-slate-300 bg-slate-50 px-4 py-6 text-slate-600 transition hover:bg-slate-100 dark:border-slate-700 dark:bg-slate-800/50 dark:text-slate-300"
+            className="group flex flex-col items-center justify-center gap-2 rounded-2xl border-2 border-dashed border-slate-300 bg-slate-50 px-4 py-6 text-slate-600 transition hover:bg-slate-100 dark:border-slate-700 dark:bg-slate-800/50 dark:text-slate-300"
           >
-            <ImageUp className="h-8 w-8" />
+            <ImageUp className="h-8 w-8 transition-transform group-hover:scale-110" />
             <span className="text-center text-base font-semibold">{chooseLabel}</span>
-          </button>
+          </motion.button>
         </div>
       ) : (
-        <div className="flex items-center gap-4 rounded-2xl border border-emerald-200 bg-emerald-50 p-3 dark:border-emerald-900 dark:bg-emerald-950/40">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.96 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ type: 'spring', stiffness: 320, damping: 24 }}
+          className="flex items-center gap-4 rounded-2xl border border-emerald-200 bg-emerald-50 p-3 dark:border-emerald-900 dark:bg-emerald-950/40"
+        >
           {preview ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img src={preview} alt="" className="h-20 w-20 shrink-0 rounded-xl object-cover" />
@@ -164,7 +286,7 @@ function MediaPicker({
           <Button type="button" variant="outline" size="sm" onClick={() => setFile(null)}>
             {changeLabel}
           </Button>
-        </div>
+        </motion.div>
       )}
       <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">{tip}</p>
     </div>
@@ -243,9 +365,25 @@ export default function BeneficiaireForm({ organismes, logos = {} }: { organisme
   // Anti-robot : champ piège masqué + instant d'ouverture du formulaire.
   // Les deux sont revérifiés côté serveur (app/api/beneficiaires/route.ts).
   const [honeypot, setHoneypot] = useState('')
+  // Champs déjà quittés par l'utilisateur : on n'affiche une erreur sous un
+  // champ qu'après son premier blur (ou après un clic sur « Suivant »).
+  const [touched, setTouched] = useState<Record<string, boolean>>({})
+  const touch = (k: string) => setTouched((t) => ({ ...t, [k]: true }))
   const [formStartedAt] = useState(() => Date.now())
 
   const set =(k: keyof typeof form, v: string) => setForm((f) => ({ ...f, [k]: v }))
+
+  // Validation par champ, réutilisée pour la coche verte et le message inline.
+  const fieldError = (k: 'prenom' | 'nom' | 'telephone'): string => {
+    const v = form[k].trim()
+    if (!v) return isRtl ? 'هذا الحقل مطلوب' : 'Ce champ est obligatoire'
+    if (k === 'telephone' && !isPhoneValid(v))
+      return isRtl ? 'رقم هاتف غير صالح (مثال: 05 55 55 55 55)' : 'Numéro invalide (ex. 05 55 55 55 55)'
+    if (k !== 'telephone' && v.length < 2)
+      return isRtl ? 'قصير جدًا' : 'Trop court'
+    return ''
+  }
+  const fieldOk = (k: 'prenom' | 'nom' | 'telephone') => !fieldError(k)
   const updateMember = (i: number, k: keyof FamilyMember, v: string) =>
     setMembers((m) => m.map((mem, idx) => (idx === i ? { ...mem, [k]: v } : mem)))
 
@@ -287,7 +425,11 @@ export default function BeneficiaireForm({ organismes, logos = {} }: { organisme
     if (step === 0 && isDembri(form.organisme) && !form.projet_dedie) {
       return setError(isRtl ? 'يرجى اختيار الإقامة' : 'Veuillez sélectionner votre résidence')
     }
-    if (step === 1 && (!form.prenom || !form.nom || !form.telephone)) return setError(t('errorRequired'))
+    if (step === 1) {
+      setTouched((tt) => ({ ...tt, prenom: true, nom: true, telephone: true }))
+      const first = (['prenom', 'nom', 'telephone'] as const).find((k) => fieldError(k))
+      if (first) return setError(fieldError(first))
+    }
     if (step === 2 && !form.situation_familiale) return setError(t('errorSituation'))
     setStep((s) => Math.min(s + 1, TOTAL_STEPS - 1))
     goTop()
@@ -303,6 +445,7 @@ export default function BeneficiaireForm({ organismes, logos = {} }: { organisme
   // du projet dédié : on attend alors le choix du projet pour avancer.
   const selectOrganisme = (o: string) => {
     setError('')
+    buzz()
     set('organisme', o)
     if (!isDembri(o)) {
       setStep(1)
@@ -347,6 +490,7 @@ export default function BeneficiaireForm({ organismes, logos = {} }: { organisme
     setError('')
     setEditMode(false)
     setDuplicate(null)
+    setTouched({})
     setStep(minStep)
   }
 
@@ -459,16 +603,19 @@ export default function BeneficiaireForm({ organismes, logos = {} }: { organisme
       <motion.div 
         initial={{ opacity: 0, scale: 0.95, y: 20 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
-        className="rounded-3xl border border-emerald-200 bg-emerald-50 p-10 text-center shadow-xl shadow-emerald-500/10 dark:border-emerald-900 dark:bg-emerald-950/40"
+        className="relative overflow-hidden rounded-3xl border border-emerald-200 bg-emerald-50 p-10 text-center shadow-xl shadow-emerald-500/10 dark:border-emerald-900 dark:bg-emerald-950/40"
       >
+        <Confetti isRtl={isRtl} />
         <motion.div
           initial={{ scale: 0 }}
           animate={{ scale: 1 }}
           transition={{ type: 'spring', damping: 12, stiffness: 100, delay: 0.1 }}
+          className="relative"
         >
           <CheckCircle2 className="mx-auto mb-6 h-20 w-20 text-emerald-600 drop-shadow-md" />
         </motion.div>
-        <h3 className="mb-3 text-3xl font-extrabold tracking-tight text-emerald-800 dark:text-emerald-300">
+        <h3 className="relative mb-3 flex items-center justify-center gap-2 text-3xl font-extrabold tracking-tight text-emerald-800 dark:text-emerald-300">
+          <PartyPopper className="h-7 w-7 shrink-0 text-emerald-600" aria-hidden="true" />
           {editMode ? (isRtl ? 'تم تحديث بياناتك' : 'Vos informations ont été mises à jour') : t('successTitle')}
         </h3>
         <p className="mb-8 text-lg font-medium text-emerald-700 dark:text-emerald-400">
@@ -535,6 +682,18 @@ export default function BeneficiaireForm({ organismes, logos = {} }: { organisme
     { icon: Users, title: t('step3Title'), help: t('step3Help') },
     { icon: ImageIcon, title: t('step4Title'), help: t('step4Help') },
   ]
+  const visibleSteps = stepMeta.slice(minStep)
+  const progressPct = Math.round(((step - minStep + 1) / (TOTAL_STEPS - minStep)) * 100)
+  // Micro-copie d'encouragement : on annonce ce qui reste, pas ce qui manque.
+  const remaining = TOTAL_STEPS - 1 - step
+  const encouragement =
+    remaining === 0
+      ? isRtl ? '🎉 الخطوة الأخيرة، اقتربت من النهاية!' : '🎉 Dernière étape, vous y êtes presque !'
+      : remaining === 1
+        ? isRtl ? '💪 خطوة واحدة فقط تفصلك عن النهاية.' : '💪 Plus qu’une étape après celle-ci.'
+        : isRtl
+          ? `⏱️ يستغرق الأمر أقل من دقيقتين — بقيت ${remaining} خطوات.`
+          : `⏱️ Moins de 2 minutes — encore ${remaining} étapes après celle-ci.`
   const NextIcon = isRtl ? ArrowLeft : ArrowRight
   const BackIcon = isRtl ? ArrowRight : ArrowLeft
   const CurrentIcon = stepMeta[step].icon
@@ -546,7 +705,11 @@ export default function BeneficiaireForm({ organismes, logos = {} }: { organisme
         @keyframes beneficiaire-nudge-rtl { 0%,100%{transform:translateX(0)} 50%{transform:translateX(-5px)} }
         .beneficiaire-nudge { animation: beneficiaire-nudge 1.1s ease-in-out infinite; }
         [dir="rtl"] .beneficiaire-nudge { animation-name: beneficiaire-nudge-rtl; }
-        @media (prefers-reduced-motion: reduce) { .beneficiaire-nudge { animation: none; } }
+        @keyframes beneficiaire-shimmer { 0%{transform:translateX(-100%)} 100%{transform:translateX(300%)} }
+        .beneficiaire-shimmer { animation: beneficiaire-shimmer 2.2s ease-in-out infinite; }
+        @media (prefers-reduced-motion: reduce) {
+          .beneficiaire-nudge, .beneficiaire-shimmer { animation: none; }
+        }
       `}</style>
       {/* Bascule de langue */}
       <div className="mb-6 flex items-center justify-center gap-2">
@@ -586,18 +749,71 @@ export default function BeneficiaireForm({ organismes, logos = {} }: { organisme
 
       {/* Progression (recalée quand l'étape organisme est sautée via un lien) */}
       <div className="mb-6">
+        {/* Pastilles d'étape : les étapes franchies restent cliquables pour
+            revenir corriger une saisie sans perdre le reste du formulaire. */}
+        <div className="mb-3 flex items-center">
+          {visibleSteps.map((meta, i) => {
+            const idx = i + minStep
+            const done = idx < step
+            const current = idx === step
+            const Icon = meta.icon
+            return (
+              <Fragment key={idx}>
+                <motion.button
+                  type="button"
+                  disabled={idx >= step}
+                  onClick={() => {
+                    if (idx >= step) return
+                    setError('')
+                    setStep(idx)
+                    goTop()
+                  }}
+                  title={meta.title}
+                  aria-label={meta.title}
+                  aria-current={current ? 'step' : undefined}
+                  whileHover={done ? { scale: 1.08 } : undefined}
+                  whileTap={done ? { scale: 0.94 } : undefined}
+                  animate={current ? { scale: [1, 1.08, 1] } : { scale: 1 }}
+                  transition={{ duration: 0.45 }}
+                  className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full border-2 transition ${
+                    done
+                      ? 'cursor-pointer border-emerald-600 bg-emerald-600 text-white shadow-md shadow-emerald-600/25'
+                      : current
+                        ? 'border-emerald-600 bg-emerald-50 text-emerald-700 shadow-md shadow-emerald-500/20 dark:bg-emerald-950/50 dark:text-emerald-300'
+                        : 'cursor-default border-slate-200 bg-white text-slate-400 dark:border-slate-700 dark:bg-slate-800'
+                  }`}
+                >
+                  {done ? <Check className="h-5 w-5" /> : <Icon className="h-5 w-5" />}
+                </motion.button>
+                {i < visibleSteps.length - 1 && (
+                  <div className="mx-1.5 h-1.5 flex-1 overflow-hidden rounded-full bg-slate-200 dark:bg-slate-800">
+                    <motion.div
+                      className="h-full rounded-full bg-emerald-600"
+                      initial={false}
+                      animate={{ width: done ? '100%' : '0%' }}
+                      transition={{ duration: 0.4, ease: 'easeOut' }}
+                    />
+                  </div>
+                )}
+              </Fragment>
+            )
+          })}
+        </div>
+
         <div className="mb-2 flex items-center justify-between text-sm font-medium text-slate-500">
           <span>{t('stepOf', { current: step - minStep + 1, total: TOTAL_STEPS - minStep })}</span>
-          <span>{Math.round(((step - minStep + 1) / (TOTAL_STEPS - minStep)) * 100)}%</span>
+          <span className="tabular-nums">{progressPct}%</span>
         </div>
-        <div className="h-2.5 w-full overflow-hidden rounded-full bg-slate-200 dark:bg-slate-800">
+        <div className="relative h-2.5 w-full overflow-hidden rounded-full bg-slate-200 dark:bg-slate-800">
           <motion.div
-            className="h-full rounded-full bg-emerald-600"
+            className="h-full rounded-full bg-gradient-to-r from-emerald-500 to-emerald-700"
             initial={{ width: 0 }}
-            animate={{ width: `${((step - minStep + 1) / (TOTAL_STEPS - minStep)) * 100}%` }}
+            animate={{ width: `${progressPct}%` }}
             transition={{ duration: 0.5, ease: 'easeOut' }}
           />
+          <span className="beneficiaire-shimmer pointer-events-none absolute inset-y-0 left-0 w-1/4 bg-gradient-to-r from-transparent via-white/50 to-transparent" />
         </div>
+        <p className="mt-2 text-sm font-medium text-emerald-700 dark:text-emerald-400">{encouragement}</p>
       </div>
 
       {/* En-tête d'étape */}
@@ -718,20 +934,71 @@ export default function BeneficiaireForm({ organismes, logos = {} }: { organisme
               <label className={labelClass} htmlFor="prenom">
                 {t('prenom')} <span className="text-red-500">*</span>
               </label>
-              <input id="prenom" dir="ltr" lang="fr" disabled={editMode} className={`${inputClass} ${editMode ? 'cursor-not-allowed opacity-60' : ''}`} value={form.prenom} onChange={(e) => set('prenom', stripArabic(e.target.value))} />
+              <div className="relative">
+                <input
+                  id="prenom"
+                  dir="ltr"
+                  lang="fr"
+                  autoComplete="given-name"
+                  disabled={editMode}
+                  aria-invalid={touched.prenom && !fieldOk('prenom') ? true : undefined}
+                  style={PAD_RIGHT}
+                  className={`${inputClass} ${editMode ? 'cursor-not-allowed opacity-60' : ''} ${touched.prenom && !fieldOk('prenom') ? inputErrorClass : ''}`}
+                  value={form.prenom}
+                  onChange={(e) => set('prenom', stripArabic(e.target.value))}
+                  onBlur={() => touch('prenom')}
+                />
+                <ValidMark show={fieldOk('prenom')} />
+              </div>
+              <FieldError message={touched.prenom ? fieldError('prenom') : ''} />
             </div>
             <div>
               <label className={labelClass} htmlFor="nom">
                 {t('nom')} <span className="text-red-500">*</span>
               </label>
-              <input id="nom" dir="ltr" lang="fr" disabled={editMode} className={`${inputClass} ${editMode ? 'cursor-not-allowed opacity-60' : ''}`} value={form.nom} onChange={(e) => set('nom', stripArabic(e.target.value))} />
-              {!editMode && <p className="mt-1.5 text-sm text-amber-600 dark:text-amber-400">{t('nameLatinHint')}</p>}
+              <div className="relative">
+                <input
+                  id="nom"
+                  dir="ltr"
+                  lang="fr"
+                  autoComplete="family-name"
+                  disabled={editMode}
+                  aria-invalid={touched.nom && !fieldOk('nom') ? true : undefined}
+                  style={PAD_RIGHT}
+                  className={`${inputClass} ${editMode ? 'cursor-not-allowed opacity-60' : ''} ${touched.nom && !fieldOk('nom') ? inputErrorClass : ''}`}
+                  value={form.nom}
+                  onChange={(e) => set('nom', stripArabic(e.target.value))}
+                  onBlur={() => touch('nom')}
+                />
+                <ValidMark show={fieldOk('nom')} />
+              </div>
+              <FieldError message={touched.nom ? fieldError('nom') : ''} />
+              {!editMode && !touched.nom && <p className="mt-1.5 text-sm text-amber-600 dark:text-amber-400">{t('nameLatinHint')}</p>}
             </div>
             <div>
               <label className={labelClass} htmlFor="telephone">
                 {t('telephone')} <span className="text-red-500">*</span>
               </label>
-              <input id="telephone" type="tel" inputMode="tel" disabled={editMode} className={`${inputClass} ${editMode ? 'cursor-not-allowed opacity-60' : ''}`} value={form.telephone} onChange={(e) => set('telephone', e.target.value)} placeholder="0X XX XX XX XX" />
+              <div className="relative">
+                <Phone className="pointer-events-none absolute top-1/2 left-3.5 h-5 w-5 -translate-y-1/2 text-slate-400" aria-hidden="true" />
+                <input
+                  id="telephone"
+                  type="tel"
+                  inputMode="numeric"
+                  autoComplete="tel"
+                  dir="ltr"
+                  disabled={editMode}
+                  aria-invalid={touched.telephone && !fieldOk('telephone') ? true : undefined}
+                  style={PAD_LEFT_RIGHT}
+                  className={`${inputClass} ${editMode ? 'cursor-not-allowed opacity-60' : ''} ${touched.telephone && !fieldOk('telephone') ? inputErrorClass : ''}`}
+                  value={form.telephone}
+                  onChange={(e) => set('telephone', formatPhone(e.target.value))}
+                  onBlur={() => touch('telephone')}
+                  placeholder="0X XX XX XX XX"
+                />
+                <ValidMark show={fieldOk('telephone')} />
+              </div>
+              <FieldError message={touched.telephone ? fieldError('telephone') : ''} />
             </div>
 
             <AnimatePresence mode="wait">
@@ -757,19 +1024,28 @@ export default function BeneficiaireForm({ organismes, logos = {} }: { organisme
                   <label className={labelClass} htmlFor="email">
                     {t('email')} <span className="text-slate-400">({t('optional')})</span>
                   </label>
-                  <input id="email" type="email" inputMode="email" className={inputClass} value={form.email} onChange={(e) => set('email', e.target.value)} />
+                  <div className="relative">
+                    <Mail className={`pointer-events-none absolute top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400 ${isRtl ? 'right-3.5' : 'left-3.5'}`} aria-hidden="true" />
+                    <input id="email" type="email" inputMode="email" autoComplete="email" style={PAD_START} className={inputClass} value={form.email} onChange={(e) => set('email', e.target.value)} />
+                  </div>
                 </div>
                 <div>
                   <label className={labelClass} htmlFor="num_assure">
                     {t('numAssure')} <span className="text-slate-400">({t('optional')})</span>
                   </label>
-                  <input id="num_assure" className={inputClass} value={form.num_assure} onChange={(e) => set('num_assure', e.target.value)} />
+                  <div className="relative">
+                    <CreditCard className={`pointer-events-none absolute top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400 ${isRtl ? 'right-3.5' : 'left-3.5'}`} aria-hidden="true" />
+                    <input id="num_assure" style={PAD_START} className={inputClass} value={form.num_assure} onChange={(e) => set('num_assure', e.target.value)} />
+                  </div>
                 </div>
                 <div>
                   <label className={labelClass} htmlFor="adresse">
                     {t('adresse')} <span className="text-slate-400">({t('optional')})</span>
                   </label>
-                  <input id="adresse" className={inputClass} value={form.adresse} onChange={(e) => set('adresse', e.target.value)} />
+                  <div className="relative">
+                    <MapPin className={`pointer-events-none absolute top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400 ${isRtl ? 'right-3.5' : 'left-3.5'}`} aria-hidden="true" />
+                    <input id="adresse" autoComplete="street-address" style={PAD_START} className={inputClass} value={form.adresse} onChange={(e) => set('adresse', e.target.value)} />
+                  </div>
                 </div>
               </motion.div>
               )}
@@ -804,6 +1080,7 @@ export default function BeneficiaireForm({ organismes, logos = {} }: { organisme
                     type="button"
                     onClick={() => {
                       setError('')
+                      buzz()
                       set('situation_familiale', s.key)
                     }}
                     className={`rounded-2xl border-2 px-4 py-4 text-base font-semibold transition shadow-sm ${
@@ -894,6 +1171,63 @@ export default function BeneficiaireForm({ organismes, logos = {} }: { organisme
             transition={{ duration: 0.3 }}
             className="space-y-6"
           >
+            {/* Récapitulatif : l'utilisateur voit ce qu'il s'apprête à envoyer
+                et peut revenir en un clic sur l'étape à corriger. */}
+            <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4 dark:border-slate-700 dark:bg-slate-800/50">
+              <div className="mb-2 flex items-center justify-between">
+                <p className="text-sm font-bold uppercase tracking-wide text-slate-500 dark:text-slate-400">
+                  {isRtl ? 'ملخص ملفك' : 'Récapitulatif de votre dossier'}
+                </p>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setError('')
+                    setStep(minStep)
+                    goTop()
+                  }}
+                  className="inline-flex items-center gap-1 text-sm font-semibold text-emerald-600 hover:underline"
+                >
+                  <Pencil className="h-3.5 w-3.5" />
+                  {isRtl ? 'تعديل' : 'Modifier'}
+                </button>
+              </div>
+              <p className="text-base font-semibold text-slate-800 dark:text-white">
+                {form.prenom} {form.nom}
+              </p>
+              <p className="text-sm text-slate-500 dark:text-slate-400">
+                {form.telephone} · {form.organisme}
+                {form.projet_dedie ? ` · ${form.projet_dedie}` : ''}
+              </p>
+              {members.length > 0 && (
+                <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
+                  {isRtl
+                    ? `${members.length} من ذوي الحقوق`
+                    : `${members.length} ayant${members.length > 1 ? 's' : ''} droit`}
+                </p>
+              )}
+
+              {/* Ce qu'il reste à joindre, mis à jour en direct */}
+              <div className="mt-3 flex flex-wrap gap-2 border-t border-slate-200 pt-3 dark:border-slate-700">
+                {[
+                  { ok: !!photo || editMode, label: t('photoLabel') },
+                  { ok: !!document, label: isRtl ? 'الوثيقة' : 'Document' },
+                  { ok: consent, label: isRtl ? 'الموافقة' : 'Consentement' },
+                ].map((c) => (
+                  <span
+                    key={c.label}
+                    className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold transition ${
+                      c.ok
+                        ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300'
+                        : 'bg-slate-200 text-slate-500 dark:bg-slate-700 dark:text-slate-400'
+                    }`}
+                  >
+                    {c.ok ? <Check className="h-3.5 w-3.5" /> : <AlertCircle className="h-3.5 w-3.5" />}
+                    {c.label}
+                  </span>
+                ))}
+              </div>
+            </div>
+
             <div>
               <p className={labelClass}>
                 {t('photoLabel')} <span className="text-red-500">*</span>
@@ -1032,8 +1366,22 @@ export default function BeneficiaireForm({ organismes, logos = {} }: { organisme
               />
             </div>
 
-            <label className="flex items-start gap-3 rounded-xl bg-slate-50 p-4 text-base text-slate-600 dark:bg-slate-800/50 dark:text-slate-300">
-              <input type="checkbox" checked={consent} onChange={(e) => setConsent(e.target.checked)} className="mt-1 h-5 w-5 accent-emerald-600" />
+            <label
+              className={`flex cursor-pointer items-start gap-3 rounded-xl border-2 p-4 text-base transition ${
+                consent
+                  ? 'border-emerald-500 bg-emerald-50 text-emerald-800 dark:border-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300'
+                  : 'border-transparent bg-slate-50 text-slate-600 dark:bg-slate-800/50 dark:text-slate-300'
+              }`}
+            >
+              <input
+                type="checkbox"
+                checked={consent}
+                onChange={(e) => {
+                  buzz()
+                  setConsent(e.target.checked)
+                }}
+                className="mt-1 h-5 w-5 shrink-0 accent-emerald-600"
+              />
               <span>{t('consent')}</span>
             </label>
             </motion.div>
