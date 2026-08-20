@@ -282,22 +282,26 @@ function DoctorCard({
     >
       <div
         className={cn(
-          "relative flex h-full flex-col overflow-hidden rounded-[1.75rem] border bg-white transition-all duration-300 hover:-translate-y-1 dark:bg-slate-900",
+          "relative flex h-full flex-col overflow-hidden rounded-[1.75rem] border bg-white/95 backdrop-blur-sm transition-all duration-300 hover:-translate-y-1.5 dark:bg-slate-900/95",
           director 
-            ? "border-amber-400 shadow-[0_8px_30px_rgba(245,158,11,0.2)] ring-2 ring-amber-400/50 hover:shadow-[0_8px_40px_rgba(245,158,11,0.3)]" 
-            : "border-border/40 shadow-soft ring-1 ring-black/5 hover:shadow-elevated dark:border-white/10"
+            ? "border-amber-400/80 shadow-[0_10px_35px_rgba(245,158,11,0.22)] ring-2 ring-amber-400/50 hover:shadow-[0_16px_45px_rgba(245,158,11,0.35)]" 
+            : "border-border/60 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.06)] hover:shadow-[0_16px_36px_-8px_var(--hover-glow)] dark:border-white/10 dark:shadow-[0_4px_20px_-4px_rgba(0,0,0,0.4)]"
         )}
-        style={!director ? { '--tw-ring-color': `${accent}1A` } as React.CSSProperties : {}}
+        style={{
+          '--hover-glow': `${accent}33`,
+          borderColor: !director ? `${accent}25` : undefined,
+        } as React.CSSProperties}
       >
         {director && (
-          <div className="absolute -right-12 top-6 z-30 rotate-45 bg-gradient-to-r from-amber-500 via-yellow-400 to-amber-500 py-1.5 text-center shadow-lg w-48">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-white drop-shadow-sm">
-              {locale === 'ar' ? 'الإدارة' : 'Direction'}
+          <div className="absolute -right-12 top-6 z-30 rotate-45 bg-gradient-to-r from-amber-500 via-yellow-400 to-amber-500 py-1.5 text-center shadow-lg w-48 ring-1 ring-white/30">
+            <span className="text-[10px] font-black uppercase tracking-wider text-slate-950 drop-shadow-sm flex items-center justify-center gap-1">
+              <Sparkles className="h-2.5 w-2.5" />
+              {locale === 'ar' ? 'الإدارة الطبية' : 'Direction Médicale'}
             </span>
           </div>
         )}
 
-        {/* ----- Affiche ----- */}
+        {/* ----- Affiche / Photo ----- */}
         <button
           type="button"
           onClick={photoHidden ? undefined : () => onOpen(doctor)}
@@ -317,56 +321,59 @@ function DoctorCard({
               fill
               draggable={false}
               sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
-              className="object-cover transition-transform duration-700 group-hover:scale-[1.06] select-none"
+              className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.06] select-none"
             />
           )}
 
-          {/* Liseré supérieur (identité visuelle) */}
+          {/* Liseré supérieur bicolore luxueux */}
           <div
-            className="absolute inset-x-0 top-0 h-1"
-            style={{ backgroundImage: `linear-gradient(to right, ${accent}, #FDE68A, ${accent})` }}
+            className="absolute inset-x-0 top-0 h-1.5 z-20"
+            style={{ backgroundImage: `linear-gradient(90deg, ${accent}, #FDE68A 50%, ${accent})` }}
           />
 
-          {/* Voile sombre bas (lisibilité du nom) */}
-          <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
+          {/* Voile sombre bas avec dégradé doux pour une lisibilité parfaite */}
+          <div className="absolute inset-x-0 bottom-0 h-[55%] bg-gradient-to-t from-black/90 via-black/45 to-transparent pointer-events-none" />
 
           {/* Indice "agrandir" (sauf si la photo est masquée) */}
           {!photoHidden && (
-            <div className="absolute right-4 top-4 flex h-9 w-9 items-center justify-center rounded-full bg-white/20 text-white opacity-0 backdrop-blur-md transition-opacity duration-300 group-hover:opacity-100">
+            <div className="absolute right-4 top-4 flex h-9 w-9 items-center justify-center rounded-full bg-black/30 text-white opacity-0 backdrop-blur-md transition-all duration-300 group-hover:opacity-100 group-hover:scale-105 ring-1 ring-white/20">
               <Maximize2 className="h-4 w-4" />
             </div>
           )}
 
           {/* Spécialité, Nom + expérience (toujours visibles, posés sur le voile) */}
           <div
-            className="absolute inset-x-0 bottom-0 p-5 text-left flex flex-col items-start"
+            className="absolute inset-x-0 bottom-0 p-5 text-left flex flex-col items-start z-10"
           >
-            {/* Badge spécialité déplacé en bas pour ne pas cacher le visage */}
+            {/* Badge spécialité glassmorphism */}
             <div
-              className="mb-2.5 inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold text-white shadow-lg backdrop-blur-sm"
-              style={{ backgroundColor: `${accent}E6` }}
+              className="mb-2.5 inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold text-white shadow-lg backdrop-blur-md ring-1 ring-white/25"
+              style={{ 
+                backgroundColor: `${accent}E6`,
+                boxShadow: `0 4px 12px ${accent}40`,
+              }}
             >
-              <Icon className="h-3.5 w-3.5" />
-              {doctor.specialty}
+              <Icon className="h-3.5 w-3.5 drop-shadow-sm" />
+              <span>{doctor.specialty}</span>
             </div>
             
-            <h3 className="text-lg font-bold leading-tight text-white drop-shadow">
+            <h3 className="text-lg sm:text-[1.2rem] font-bold leading-tight text-white drop-shadow-md">
               {doctor.name}
             </h3>
             {doctor.subtitle && (
-              <p className="mt-0.5 text-sm font-medium text-white/85">
+              <p className="mt-0.5 text-xs sm:text-sm font-medium text-white/90 drop-shadow">
                 {doctor.subtitle}
               </p>
             )}
-            <div className="mt-2 flex flex-wrap items-center gap-2">
+            <div className="mt-2.5 flex flex-wrap items-center gap-2">
               {doctor.experience && (
-                <span className="inline-flex items-center gap-1.5 rounded-full bg-white/15 px-2.5 py-1 text-[11px] font-semibold text-white backdrop-blur-sm">
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-white/15 px-2.5 py-0.5 text-[11px] font-semibold text-white backdrop-blur-md ring-1 ring-white/20">
                   <Award className="h-3 w-3 text-amber-300" />
                   {doctor.experience}
                 </span>
               )}
               {doctor.customBadge && (
-                <span className="inline-flex items-center gap-1.5 rounded-full bg-[#FDE68A] px-2.5 py-1 text-[11px] font-bold text-slate-900 shadow-md">
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-gradient-to-r from-amber-200 to-yellow-300 px-2.5 py-0.5 text-[11px] font-bold text-slate-950 shadow-md">
                   <Sparkles className="h-3 w-3" />
                   {doctor.customBadge}
                 </span>
@@ -383,43 +390,46 @@ function DoctorCard({
               type="button"
               onClick={() => onPlay(doctor)}
               aria-label={locale === 'ar' ? `مشاهدة فيديو ${doctor.name}` : `Voir la vidéo de ${doctor.name}`}
-              className="group/play absolute left-3 top-3 z-20 inline-flex items-center gap-2 rounded-full bg-white/92 py-1.5 pl-1.5 pr-3 shadow-lg ring-1 ring-black/5 backdrop-blur-md transition-transform duration-200 hover:scale-[1.04] active:scale-95 dark:bg-slate-900/90"
+              className="group/play absolute left-3.5 top-3.5 z-20 inline-flex items-center gap-2 rounded-full bg-white/95 py-1.5 pl-1.5 pr-3 shadow-xl ring-1 ring-black/10 backdrop-blur-md transition-all duration-200 hover:scale-105 active:scale-95 dark:bg-slate-900/95 dark:ring-white/15"
             >
               <span
-                className="relative flex h-7 w-7 items-center justify-center rounded-full text-white"
+                className="relative flex h-7 w-7 items-center justify-center rounded-full text-white shadow-sm"
                 style={{ backgroundColor: accent }}
               >
-                {/* Onde sonar (invite à lire) */}
+                {/* Onde sonar */}
                 <span
                   aria-hidden="true"
                   className="absolute inset-0 rounded-full animate-ping"
-                  style={{ backgroundColor: accent, opacity: 0.35 }}
+                  style={{ backgroundColor: accent, opacity: 0.4 }}
                 />
                 <Play className="relative ml-0.5 h-3.5 w-3.5 fill-current" />
               </span>
-              <span className="text-[11px] font-bold leading-none" style={{ color: accent }}>
+              <span className="text-[11px] font-bold tracking-wide" style={{ color: accent }}>
                 {locale === 'ar' ? 'فيديو' : 'Vidéo'}
               </span>
             </button>
 
-            {/* Voile doux au survol (desktop) — décoratif, laisse passer le clic vers le zoom */}
+            {/* Voile doux au survol (desktop) */}
             <span
               aria-hidden="true"
               className="pointer-events-none absolute inset-0 z-[9] hidden opacity-0 transition-opacity duration-300 group-hover:opacity-100 sm:block"
-              style={{ background: 'radial-gradient(circle at 50% 42%, rgba(0,0,0,0.45), rgba(0,0,0,0.12) 60%, transparent 82%)' }}
+              style={{ background: 'radial-gradient(circle at 50% 42%, rgba(0,0,0,0.5), rgba(0,0,0,0.15) 60%, transparent 85%)' }}
             />
-            {/* Gros bouton play centré (desktop) — apparaît au survol, lance la vidéo */}
+            {/* Gros bouton play centré (desktop) */}
             <div
               onClick={() => onPlay(doctor)}
               aria-hidden="true"
-              className="pointer-events-none absolute left-1/2 top-[42%] z-10 hidden -translate-x-1/2 -translate-y-1/2 flex-col items-center gap-3 opacity-0 transition-opacity duration-300 group-hover:pointer-events-auto group-hover:opacity-100 sm:flex cursor-pointer"
+              className="pointer-events-none absolute left-1/2 top-[42%] z-10 hidden -translate-x-1/2 -translate-y-1/2 flex-col items-center gap-2.5 opacity-0 transition-all duration-300 group-hover:pointer-events-auto group-hover:opacity-100 sm:flex cursor-pointer"
             >
-              <span className="relative flex h-[68px] w-[68px] items-center justify-center rounded-full bg-white/25 ring-1 ring-white/50 backdrop-blur-md transition-transform duration-300 group-hover:scale-105">
-                <span aria-hidden="true" className="absolute inset-0 rounded-full border-2 border-white/70 animate-ping" />
-                <Play className="ml-1 h-7 w-7 fill-white text-white" />
+              <span 
+                className="relative flex h-[70px] w-[70px] items-center justify-center rounded-full bg-white/30 ring-2 ring-white/60 backdrop-blur-md shadow-2xl transition-transform duration-300 group-hover:scale-110"
+                style={{ boxShadow: `0 8px 30px ${accent}80` }}
+              >
+                <span aria-hidden="true" className="absolute inset-0 rounded-full border-2 border-white/80 animate-ping" />
+                <Play className="ml-1 h-7 w-7 fill-white text-white drop-shadow" />
               </span>
-              <span className="inline-flex items-center gap-1.5 rounded-full bg-black/55 px-3 py-1.5 text-xs font-semibold text-white backdrop-blur-sm">
-                <Play className="h-3.5 w-3.5 fill-[#FDE68A] text-[#FDE68A]" />
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-slate-950/75 px-3 py-1.5 text-xs font-bold text-white backdrop-blur-md shadow-lg ring-1 ring-white/20">
+                <Play className="h-3 w-3 fill-amber-300 text-amber-300" />
                 {locale === 'ar' ? 'شاهد الفيديو' : 'Voir la vidéo'}
               </span>
             </div>
@@ -427,62 +437,79 @@ function DoctorCard({
         )}
 
         {/* ----- Panneau d'informations ----- */}
-        <div className="flex flex-1 flex-col gap-4 p-5">
-          {/* Services — toujours visibles (max 7 + compteur) */}
-          <div className="flex flex-wrap gap-1.5">
-            {doctor.services.slice(0, 7).map((s) => (
-              <span
-                key={s}
-                className="rounded-lg border px-2.5 py-1 text-[11px] font-medium text-foreground/80"
-                style={{
-                  borderColor: `${accent}40`,
-                  backgroundColor: `${accent}10`,
-                }}
-              >
-                {s}
-              </span>
-            ))}
-            {doctor.services.length > 7 && (
-              <span
-                className="rounded-lg border px-2.5 py-1 text-[11px] font-semibold"
-                style={{ borderColor: `${accent}30`, color: accent }}
-              >
-                +{doctor.services.length - 7}
-              </span>
-            )}
-          </div>
-
-          {/* Horaires */}
-          <div className="space-y-1.5 text-sm text-muted-foreground">
-            <div className="flex items-center gap-2">
-              <Calendar className="h-4 w-4 shrink-0" style={{ color: accent }} />
-              <span>{doctor.days}</span>
+        <div className="flex flex-1 flex-col gap-4 p-5 sm:p-6">
+          {/* Services — badges interactifs */}
+          {doctor.services.length > 0 && (
+            <div className="flex flex-wrap gap-1.5">
+              {doctor.services.slice(0, 7).map((s) => (
+                <span
+                  key={s}
+                  className="rounded-lg border px-2.5 py-1 text-[11px] font-medium text-foreground/85 transition-all duration-200 hover:scale-[1.02]"
+                  style={{
+                    borderColor: `${accent}35`,
+                    backgroundColor: `${accent}0D`,
+                  }}
+                >
+                  {s}
+                </span>
+              ))}
+              {doctor.services.length > 7 && (
+                <span
+                  className="rounded-lg border px-2.5 py-1 text-[11px] font-bold transition-all"
+                  style={{ 
+                    borderColor: `${accent}45`, 
+                    color: accent,
+                    backgroundColor: `${accent}14`,
+                  }}
+                >
+                  +{doctor.services.length - 7}
+                </span>
+              )}
             </div>
-            <div className="flex items-center gap-2">
-              <Clock className="h-4 w-4 shrink-0" style={{ color: accent }} />
-              <span>{doctor.hours}</span>
-            </div>
-          </div>
+          )}
 
-          {/* CTA */}
-          <div className="mt-auto flex gap-2 pt-1">
+          {/* Horaires et jours de consultation */}
+          {(doctor.days || doctor.hours) && (
+            <div className="space-y-1.5 text-sm text-muted-foreground bg-muted/30 p-2.5 rounded-xl border border-border/40">
+              {doctor.days && (
+                <div className="flex items-center gap-2">
+                  <Calendar className="h-4 w-4 shrink-0" style={{ color: accent }} />
+                  <span className="text-xs sm:text-[13px] font-medium text-foreground/80">{doctor.days}</span>
+                </div>
+              )}
+              {doctor.hours && (
+                <div className="flex items-center gap-2">
+                  <Clock className="h-4 w-4 shrink-0" style={{ color: accent }} />
+                  <span className="text-xs sm:text-[13px] font-medium text-foreground/80">{doctor.hours}</span>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* CTAs */}
+          <div className="mt-auto flex gap-2 pt-2">
             <a
               href={`https://wa.me/${CLINIC_WHATSAPP}?text=${waMessage}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex flex-1 items-center justify-center gap-1.5 rounded-xl px-3 py-2.5 text-sm font-semibold text-white shadow-md transition-transform duration-200 hover:scale-[1.03] active:scale-95 touch-target"
-              style={{ backgroundColor: accent }}
+              className="group/btn relative inline-flex flex-1 items-center justify-center gap-2 overflow-hidden rounded-xl px-4 py-2.5 text-sm font-bold text-white shadow-md transition-all duration-200 hover:scale-[1.02] active:scale-95 touch-target"
+              style={{ 
+                background: `linear-gradient(135deg, ${accent} 0%, ${accent}dd 100%)`,
+                boxShadow: `0 4px 14px 0 ${accent}45`,
+              }}
             >
-              <MessageCircle className="h-4 w-4" />
-              {t('bookShort')}
+              {/* Reflet Shimmer au hover */}
+              <span className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/25 to-transparent transition-transform duration-700 group-hover/btn:translate-x-full" />
+              <MessageCircle className="h-4 w-4 relative z-10" />
+              <span className="relative z-10">{t('bookShort')}</span>
             </a>
             <a
               href={`tel:${doctor.phone || CLINIC_PHONE}`}
               aria-label={t('callFor', { name: String(doctor.name ?? '') })}
-              className="inline-flex items-center justify-center rounded-xl border px-3 py-2.5 text-foreground/80 transition-colors hover:bg-foreground/5 touch-target min-w-[48px]"
-              style={{ borderColor: `${accent}55` }}
+              className="inline-flex items-center justify-center rounded-xl border border-border/80 bg-background px-3 py-2.5 text-foreground/80 shadow-sm transition-all duration-200 hover:bg-accent hover:text-accent-foreground hover:scale-105 active:scale-95 touch-target min-w-[46px]"
+              style={{ borderColor: `${accent}40` }}
             >
-              <Phone className="h-4 w-4" />
+              <Phone className="h-4 w-4" style={{ color: accent }} />
             </a>
           </div>
         </div>
