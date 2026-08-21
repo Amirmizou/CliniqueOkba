@@ -175,21 +175,28 @@ function PoleCard({ pole, index }: { pole: Pole & { imageUrl?: string }; index: 
             </div>
           )}
 
-          {/* Icône flottante premium avec dégradé d'accent, halo et ring glassmorphism */}
-          <motion.div
-            className="absolute -bottom-6 right-6 z-30 flex h-14 w-14 sm:h-16 sm:w-16 items-center justify-center rounded-2xl shadow-xl ring-4 ring-background backdrop-blur-md transition-transform duration-300 group-hover:scale-110 group-hover:-translate-y-1"
-            style={{
-              background: `linear-gradient(135deg, ${pole.urgent ? '#ef4444' : pole.accent} 0%, ${pole.urgent ? '#dc2626' : pole.accent}dd 60%, ${pole.urgent ? '#991b1b' : pole.accent}99 100%)`,
-              boxShadow: `0 8px 24px -4px ${pole.urgent ? '#ef4444' : pole.accent}66, 0 4px 12px -2px ${pole.urgent ? '#ef4444' : pole.accent}40`,
-            }}
-            whileHover={{ scale: 1.12, rotate: 3 }}
-            transition={{ type: 'spring', stiffness: 350, damping: 20 }}
-          >
-            {/* Lueur interne subtile */}
-            <div className="absolute inset-0 rounded-2xl bg-white/20 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
-            <Icon className="relative z-10 h-7 w-7 text-white drop-shadow-md" />
-          </motion.div>
         </div>
+
+        {/* Icône flottante premium avec dégradé d'accent, halo et ring glassmorphism.
+            Elle est volontairement SŒUR du bandeau image et non son enfant : le
+            bandeau porte overflow-hidden, qui rognait la moitié débordante de la
+            pastille. Ancrée ici sur la carte, elle chevauche proprement la limite
+            image / texte.
+            top = hauteur du bandeau (12rem, 14rem en sm) − hauteur de la pastille
+            + le débord de 1.5rem d'origine. */}
+        <motion.div
+          className="absolute right-6 top-40 z-30 flex h-14 w-14 items-center justify-center rounded-2xl shadow-xl ring-4 ring-background backdrop-blur-md transition-transform duration-300 group-hover:scale-110 group-hover:-translate-y-1 sm:top-[11.5rem] sm:h-16 sm:w-16"
+          style={{
+            background: `linear-gradient(135deg, ${pole.urgent ? '#ef4444' : pole.accent} 0%, ${pole.urgent ? '#dc2626' : pole.accent}dd 60%, ${pole.urgent ? '#991b1b' : pole.accent}99 100%)`,
+            boxShadow: `0 8px 24px -4px ${pole.urgent ? '#ef4444' : pole.accent}66, 0 4px 12px -2px ${pole.urgent ? '#ef4444' : pole.accent}40`,
+          }}
+          whileHover={{ scale: 1.12, rotate: 3 }}
+          transition={{ type: 'spring', stiffness: 350, damping: 20 }}
+        >
+          {/* Lueur interne subtile */}
+          <div className="absolute inset-0 rounded-2xl bg-white/20 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+          <Icon className="relative z-10 h-7 w-7 text-white drop-shadow-md" />
+        </motion.div>
 
         {/* ── Contenu texte ── */}
         <div className="relative z-10 flex flex-1 flex-col p-6 sm:p-7">
