@@ -523,9 +523,19 @@ export default function Header({ siteSettings, poles }: HeaderProps) {
 
         {/* 3D SCANNER DESKTOP & MOBILE — Siemens Symbia Pro.specta */}
         <div className="pointer-events-auto relative w-full h-[95px] md:h-[110px] xl:h-[140px] transition-all duration-700">
-          <div className={cn(
+          <div
+            /* --sc-gutter = la gouttière vide à droite de la grille 1280px sur les
+               grands écrans. On l'ajoute à la largeur de la scène (xl+) pour que le
+               gantry, le moniteur et la table aillent jusqu'au bord de l'écran au
+               lieu de s'arrêter au bord du conteneur. La navigation, elle, garde sa
+               position exacte : son décalage droit absorbe la même gouttière.
+               Le 1372 (et non 1280) réserve une respiration d'environ 30px entre
+               le moniteur suspendu et le bord de l'écran, et absorbe la barre de
+               défilement, que 100vw compte mais pas la largeur utile. */
+            style={{ ['--sc-gutter' as string]: 'max(0px, (100vw - 1372px) / 2)' } as React.CSSProperties}
+            className={cn(
             "absolute top-0 left-0 h-[140px] origin-top-left transition-all duration-700",
-            "w-[142.8%] scale-[0.7] md:w-[125%] md:scale-[0.8] xl:w-full xl:scale-100",
+            "w-[142.8%] scale-[0.7] md:w-[125%] md:scale-[0.8] xl:w-[calc(100%_+_var(--sc-gutter))] xl:scale-100",
             isScrolled ? "opacity-95 xl:scale-95 xl:-translate-y-2" : "opacity-100 translate-y-0"
           )}>
 
@@ -856,7 +866,7 @@ export default function Header({ siteSettings, poles }: HeaderProps) {
           <div
             className={cn(
               // Adaptation mobile : la navigation devient scrollable horizontalement sur la table du gantry.
-              "absolute z-[34] flex items-center pl-1 sm:pl-[20px] xl:pl-[60px] origin-right overflow-x-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] bottom-[32px] h-[64px] left-[5px] right-[170px] xl:left-[10px] xl:right-[220px]",
+              "absolute z-[34] flex items-center pl-1 sm:pl-[20px] xl:pl-[60px] origin-right overflow-x-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] bottom-[32px] h-[64px] left-[5px] right-[170px] xl:left-[10px] xl:right-[calc(220px_+_var(--sc-gutter)_/_2)]",
               isHidden ? "translate-x-[200px] opacity-0 transition-all duration-[2000ms] ease-in-out" : "translate-x-0 opacity-100 transition-all duration-[1500ms] delay-[400ms] ease-out",
             )}
             style={{ 
