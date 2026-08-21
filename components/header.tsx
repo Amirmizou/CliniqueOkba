@@ -248,6 +248,26 @@ export default function Header({ siteSettings, poles }: HeaderProps) {
           92% { opacity: 1; }
           100% { left: 104%; opacity: 0; }
         }
+        /* Respiration du halo LED du bore — la lumière d'une machine sous tension
+           n'est jamais parfaitement stable. */
+        @keyframes boreBreath {
+          0%, 100% { opacity: 0.55; transform: scale(1); }
+          50%      { opacity: 0.95; transform: scale(1.035); }
+        }
+        /* Micro-variation de la lampe témoin (secteur) */
+        @keyframes statusFlicker {
+          0%, 42%, 100% { opacity: 1; }
+          46%           { opacity: 0.35; }
+          52%           { opacity: 1; }
+        }
+        /* Balayage spéculaire très lent sur la coque de l'anneau (reflet d'ambiance) */
+        @keyframes shellSheen {
+          0%   { transform: translateX(-120%) rotate(8deg); }
+          100% { transform: translateX(320%) rotate(8deg); }
+        }
+        @media (prefers-reduced-motion: reduce) {
+          [data-scanner-anim] { animation: none !important; }
+        }
       `}} />
       {/* ═══ BARRE UTILITAIRE (desktop) — infos essentielles (dans le flux) ═══ */}
       <div className="relative z-[60] hidden xl:block">
@@ -517,6 +537,13 @@ export default function Header({ siteSettings, poles }: HeaderProps) {
           }}>
             {/* Arête métallique brillante (haut) */}
             <div className="absolute inset-x-[6px] top-0 h-[2px] rounded-full" style={{ background:'linear-gradient(90deg,transparent,rgba(255,255,255,0.92),transparent)' }} />
+            {/* Chanfreins latéraux : clair côté lumière (gauche), sombre côté ombre (droite) */}
+            <div className="absolute inset-y-[2px] left-0 w-[4px]" style={{ background:'linear-gradient(90deg,rgba(255,255,255,0.60),rgba(255,255,255,0))', borderRadius:'0 0 0 10px' }} />
+            <div className="absolute inset-y-[2px] right-0 w-[6px]" style={{ background:'linear-gradient(270deg,rgba(0,0,0,0.20),rgba(0,0,0,0))', borderRadius:'0 0 10px 0' }} />
+            {/* Assombrissement de contact : le socle « pose » réellement sur le sol */}
+            <div className="absolute inset-x-0 bottom-0 h-[7px]" style={{ background:'linear-gradient(180deg,rgba(0,0,0,0),rgba(0,0,0,0.22))', borderRadius:'0 0 10px 10px' }} />
+            {/* Micro-grain de laque (casse le dégradé trop parfait) */}
+            <div className="absolute inset-0 opacity-30" style={{ borderRadius:'0 0 10px 10px', background:'repeating-linear-gradient(90deg,rgba(0,0,0,0.05) 0px,rgba(0,0,0,0.05) 1px,transparent 1px,transparent 4px)' }} />
           </div>
 
           {/* ══ CORPS DROIT — panneau latéral + LED console ══ */}
@@ -533,6 +560,17 @@ export default function Header({ siteSettings, poles }: HeaderProps) {
             <div className="absolute top-[28px] bottom-[22px] right-[10px] w-px" style={{ background:'linear-gradient(180deg,transparent,rgba(0,0,0,0.18) 20%,rgba(0,0,0,0.24) 50%,rgba(0,0,0,0.12) 80%,transparent)' }} />
             <div className="absolute bottom-[22px] right-[8px] left-[8px] h-[3px] rounded-full" style={{ background:'linear-gradient(90deg,rgba(0,102,51,0.65),rgba(0,166,81,1),rgba(0,102,51,0.65))', boxShadow:'0 0 8px 2px rgba(0,166,81,0.55)' }} />
             <div className="absolute bottom-[12px] right-[12px] left-[12px] h-[1.5px] rounded-full bg-black/10" />
+            {/* La barre LED verte éclaire la coque juste au-dessus d'elle */}
+            <div aria-hidden="true" className="pointer-events-none absolute bottom-[14px] left-[2px] right-[2px] h-[22px] mix-blend-screen" style={{
+              background:'radial-gradient(ellipse 80% 100% at 50% 100%,rgba(0,166,81,0.28),rgba(0,166,81,0) 72%)',
+            }} />
+            {/* Arête supérieure du capot + occlusion de raccord avec l'anneau */}
+            <div aria-hidden="true" className="pointer-events-none absolute left-[6px] right-[10px] top-0 h-[1.5px] rounded-full" style={{
+              background:'linear-gradient(90deg,rgba(255,255,255,0.85),rgba(255,255,255,0))',
+            }} />
+            <div aria-hidden="true" className="pointer-events-none absolute inset-y-0 left-0 w-[16px]" style={{
+              background:'linear-gradient(90deg,rgba(0,0,0,0.16),rgba(0,0,0,0))',
+            }} />
           </div>
 
           {/* ══ OMBRE SOL — ancrage 3D (contact net + halo ambiant large) ══ */}
@@ -547,6 +585,20 @@ export default function Header({ siteSettings, poles }: HeaderProps) {
             borderRadius:'50%',
             background:'radial-gradient(closest-side,rgba(0,40,20,0.13),rgba(0,0,0,0) 78%)',
             filter:'blur(8px)',
+          }} />
+          {/* Ombre de contact serrée (pénombre courte) — c'est elle qui « colle » la
+              machine au sol ; sans elle l'objet flotte. */}
+          <div aria-hidden="true" className="absolute z-[3] pointer-events-none" style={{
+            right:'50px', bottom:'-3px', width:'86px', height:'10px',
+            borderRadius:'50%',
+            background:'radial-gradient(closest-side,rgba(0,0,0,0.55),rgba(0,0,0,0) 72%)',
+            filter:'blur(1.2px)',
+          }} />
+          {/* Reflet du sol (miroir clinique atténué, écrasé verticalement) */}
+          <div aria-hidden="true" className="absolute z-[1] pointer-events-none" style={{
+            right:'22px', bottom:'-19px', width:'136px', height:'26px',
+            background:'radial-gradient(ellipse 46% 100% at 50% 0%,rgba(214,226,238,0.55),rgba(214,226,238,0) 74%)',
+            filter:'blur(5px)',
           }} />
 
           {/* ══ ANNEAU — disque de base (drop shadow profond) ══ */}
@@ -577,12 +629,67 @@ export default function Header({ siteSettings, poles }: HeaderProps) {
             </svg>
             {/* Reflet d'environnement froid (bas de l'anneau → métal réaliste) */}
             <div className="absolute inset-x-0 bottom-0 h-[42%] pointer-events-none" style={{ background:'linear-gradient(0deg,rgba(176,202,232,0.20),rgba(176,202,232,0) 100%)' }} />
+            {/* Rebond chaud du sol sur la lèvre basse (lumière indirecte) */}
+            <div className="absolute inset-x-0 bottom-0 h-[16%] pointer-events-none" style={{ background:'linear-gradient(0deg,rgba(255,236,200,0.22),rgba(255,236,200,0) 100%)' }} />
+            {/* Brossage radial (métal tourné) : micro-stries qui suivent la rotation
+                de la pièce — c'est ce qui distingue un métal d'un aplat gris. */}
+            <div className="absolute inset-0 pointer-events-none opacity-[0.38] mix-blend-overlay" style={{
+              background:'repeating-conic-gradient(from 0deg at 50% 50%,rgba(255,255,255,0.10) 0deg 1.6deg,rgba(0,0,0,0.06) 1.6deg 3.2deg)',
+              WebkitMaskImage:'radial-gradient(circle at center,transparent 38px,#000 56px,#000 66px,transparent 74px)',
+              maskImage:'radial-gradient(circle at center,transparent 38px,#000 56px,#000 66px,transparent 74px)',
+            }} />
+            {/* Terminateur : la lumière vient du haut-gauche, donc l'ombre propre
+                s'installe en bas-droite. */}
+            <div className="absolute inset-0 pointer-events-none" style={{
+              background:'radial-gradient(ellipse 78% 78% at 82% 88%,rgba(12,22,34,0.26) 0%,rgba(12,22,34,0.08) 42%,rgba(0,0,0,0) 70%)',
+            }} />
+            {/* Balayage spéculaire lent (reflet d'ambiance qui glisse sur la laque) */}
+            <div className="absolute inset-y-[-30%] w-[26%] pointer-events-none opacity-[0.30] mix-blend-screen" data-scanner-anim style={{
+              background:'linear-gradient(90deg,rgba(255,255,255,0) 0%,rgba(255,255,255,0.85) 50%,rgba(255,255,255,0) 100%)',
+              filter:'blur(5px)',
+              animation:'shellSheen 14s ease-in-out infinite',
+            }} />
           </div>
+
+          {/* ══ ANNEAU — chanfrein extérieur (bevel) : liseré lumineux au nord-ouest,
+              ombre au sud-est. Donne l'épaisseur réelle de la coque. ══ */}
+          <div aria-hidden="true" className="absolute right-[15px] bottom-[-2px] w-[150px] h-[150px] rounded-full z-[38] pointer-events-none" style={{
+            background:'conic-gradient(from 195deg at 50% 50%,rgba(255,255,255,0) 0deg,rgba(255,255,255,0.95) 55deg,rgba(255,255,255,0.35) 120deg,rgba(0,0,0,0.10) 175deg,rgba(0,0,0,0.32) 235deg,rgba(0,0,0,0.14) 300deg,rgba(255,255,255,0) 360deg)',
+            WebkitMaskImage:'radial-gradient(circle at center,transparent 70px,#000 71.5px,#000 74px,transparent 75px)',
+            maskImage:'radial-gradient(circle at center,transparent 70px,#000 71.5px,#000 74px,transparent 75px)',
+          }} />
+          {/* Fresnel : toute surface courbe s'éclaircit sur son bord silhouette */}
+          <div aria-hidden="true" className="absolute right-[15px] bottom-[-2px] w-[150px] h-[150px] rounded-full z-[38] pointer-events-none" style={{
+            background:'radial-gradient(circle at center,rgba(255,255,255,0) 62%,rgba(255,255,255,0.45) 100%)',
+            WebkitMaskImage:'radial-gradient(circle at center,transparent 24px,#000 27px)',
+            maskImage:'radial-gradient(circle at center,transparent 24px,#000 27px)',
+          }} />
 
           {/* ══ Liseré vert signature ══ */}
           <div className="absolute z-[39] rounded-full pointer-events-none" style={{
             right:'22px', bottom:'5px', width:'136px', height:'136px',
-            boxShadow:'inset 0 0 0 2px rgba(0,102,51,0.52),inset 0 0 0 4px rgba(0,102,51,0.08)',
+            boxShadow:[
+              'inset 0 0 0 1px rgba(255,255,255,0.80)',
+              'inset 0 0 0 3px rgba(0,102,51,0.55)',
+              'inset 0 0 0 4px rgba(0,48,24,0.30)',
+              'inset 0 0 0 5.5px rgba(0,102,51,0.08)',
+            ].join(','),
+          }} />
+          {/* Reflet directionnel sur le liseré : il est en relief, donc il capte
+              la lumière au nord-ouest et s'éteint au sud-est. */}
+          <div aria-hidden="true" className="absolute z-[39] rounded-full pointer-events-none" style={{
+            right:'22px', bottom:'5px', width:'136px', height:'136px',
+            background:'conic-gradient(from 200deg at 50% 50%,rgba(255,255,255,0) 0deg,rgba(255,255,255,0.85) 60deg,rgba(255,255,255,0.20) 130deg,rgba(0,0,0,0.22) 240deg,rgba(255,255,255,0) 360deg)',
+            WebkitMaskImage:'radial-gradient(circle at center,transparent 64px,#000 65.5px,#000 67px,transparent 68px)',
+            maskImage:'radial-gradient(circle at center,transparent 64px,#000 65.5px,#000 67px,transparent 68px)',
+          }} />
+
+          {/* Occlusion là où l'anneau rencontre le socle : deux volumes qui se
+              touchent produisent toujours une ombre de contact. */}
+          <div aria-hidden="true" className="pointer-events-none absolute z-[43]" style={{
+            right:'24px', bottom:'14px', width:'132px', height:'16px',
+            background:'radial-gradient(ellipse 60% 100% at 50% 100%,rgba(0,0,0,0.20),rgba(0,0,0,0) 72%)',
+            filter:'blur(2px)',
           }} />
 
           {/* ══ BORE — chanfrein externe (profondeur 3D) ══ */}
@@ -598,9 +705,19 @@ export default function Header({ siteSettings, poles }: HeaderProps) {
             background:'radial-gradient(ellipse 72% 62% at 46% 32%,#ffffff 0%,#f2f6fb 38%,#dfe8f2 68%,#cad5e4 100%)',
             boxShadow:'inset 0 7px 20px rgba(0,20,60,0.15),inset 0 -4px 10px rgba(255,255,255,0.80),inset 0 0 32px rgba(60,120,220,0.07)',
           }}>
-            <div className="absolute inset-[6px] rounded-full" style={{ border:'1px solid rgba(0,50,120,0.09)' }} />
-            <div className="absolute inset-[12px] rounded-full" style={{ border:'1px solid rgba(0,50,120,0.06)' }} />
-            <div className="absolute inset-[18px] rounded-full" style={{ border:'0.5px solid rgba(0,50,120,0.04)' }} />
+            {/* Parois du tunnel : les anneaux se décalent vers le point de fuite
+                (haut-gauche) au lieu d'être concentriques → vraie profondeur. */}
+            <div className="absolute inset-[6px] rounded-full" style={{ border:'1px solid rgba(0,50,120,0.09)', transform:'translate(0.8px,0.8px)' }} />
+            <div className="absolute inset-[12px] rounded-full" style={{ border:'1px solid rgba(0,50,120,0.06)', transform:'translate(1.6px,1.6px)' }} />
+            <div className="absolute inset-[18px] rounded-full" style={{ border:'0.5px solid rgba(0,50,120,0.04)', transform:'translate(2.4px,2.4px)' }} />
+            {/* Fond de tunnel : la lumière décroît avec la distance */}
+            <div className="absolute inset-[3px] rounded-full pointer-events-none" style={{
+              background:'radial-gradient(circle at 36% 28%,rgba(255,255,255,0) 34%,rgba(14,34,66,0.10) 74%,rgba(10,26,52,0.24) 100%)',
+            }} />
+            {/* Occlusion ambiante à l'entrée du bore (lèvre supérieure) */}
+            <div className="absolute inset-0 rounded-full pointer-events-none" style={{
+              boxShadow:'inset 0 7px 13px rgba(0,22,55,0.22),inset 0 -4px 9px rgba(255,255,255,0.55)',
+            }} />
             {/* Catchlight verre (reflet spéculaire → tunnel « verre » 3D) */}
             <div className="absolute left-[20%] top-[15%] z-[15] w-[12px] h-[7px] rounded-full pointer-events-none" style={{ background:'radial-gradient(ellipse at center,rgba(255,255,255,0.95),rgba(255,255,255,0) 72%)', transform:'rotate(-24deg)' }} />
             
@@ -611,7 +728,7 @@ export default function Header({ siteSettings, poles }: HeaderProps) {
 
             <div className="absolute left-[8%] right-[8%] top-0 h-[3px] z-20 rounded-full bg-[#00a651] shadow-[0_0_14px_4px_rgba(0,166,81,0.65)]" style={{ animation:'scanLaser 2.6s ease-in-out infinite alternate' }} />
             <div className="absolute left-0 right-0 top-0 h-[18px] z-20 -mt-[8px] opacity-50" style={{ background:'radial-gradient(ellipse at center,rgba(0,166,81,0.32),transparent 70%)', animation:'scanLaser 2.6s ease-in-out infinite alternate' }} />
-            <div className="absolute top-[25%] right-[15%] z-20 w-[3px] h-[3px] rounded-full bg-red-500 shadow-[0_0_8px_2px_rgba(239,68,68,0.88)] animate-pulse" />
+            <div data-scanner-anim className="absolute top-[25%] right-[15%] z-20 w-[3px] h-[3px] rounded-full bg-red-500 shadow-[0_0_8px_2px_rgba(239,68,68,0.88)]" style={{ animation:'statusFlicker 3.4s ease-in-out infinite' }} />
           </div>
 
           {/* ══ BORE — anneau LED bleu Siemens (lèvre) ══ */}
@@ -628,12 +745,24 @@ export default function Header({ siteSettings, poles }: HeaderProps) {
             ].join(','),
           }} />
 
+          {/* ══ RETOMBÉE DE LUMIÈRE DU BORE — la LED bleue éclaire réellement la
+              coque autour d'elle, et la coque la lui renvoie. ══ */}
+          <div aria-hidden="true" data-scanner-anim className="absolute z-[42] rounded-full pointer-events-none mix-blend-screen" style={{
+            width:'104px', height:'104px', right:'38px', bottom:'21px',
+            background:'radial-gradient(circle,rgba(72,152,242,0.26) 0%,rgba(72,152,242,0.10) 42%,rgba(72,152,242,0) 70%)',
+            animation:'boreBreath 5.2s ease-in-out infinite',
+          }} />
+
           {/* ══ DÉCALS DU GANTRY ══ */}
           <div className="absolute right-[15px] bottom-[-2px] w-[150px] h-[150px] rounded-full z-[42] pointer-events-none">
-            {/* Lignes de panneaux (Seams) */}
-            <div className="absolute top-0 bottom-[50%] left-[49.5%] right-[49.5%] bg-black/[0.04]" />
-            <div className="absolute top-[49.5%] bottom-[49.5%] left-0 right-[80%] bg-black/[0.04]" />
-            <div className="absolute top-[49.5%] bottom-[49.5%] left-[80%] right-0 bg-black/[0.04]" />
+            {/* Lignes de panneaux (Seams) — un vrai joint est un creux : trait
+                sombre + arête claire juste à côté, du côté de la lumière. */}
+            <div className="absolute top-0 bottom-[50%] left-[49.5%] right-[49.5%] bg-black/[0.07]" style={{ WebkitMaskImage:'linear-gradient(180deg,transparent,#000 22%,#000 78%,transparent)', maskImage:'linear-gradient(180deg,transparent,#000 22%,#000 78%,transparent)' }} />
+            <div className="absolute top-0 bottom-[50%] left-[48.8%] right-[50.5%] bg-white/40" style={{ WebkitMaskImage:'linear-gradient(180deg,transparent,#000 22%,#000 78%,transparent)', maskImage:'linear-gradient(180deg,transparent,#000 22%,#000 78%,transparent)' }} />
+            <div className="absolute top-[49.5%] bottom-[49.5%] left-0 right-[80%] bg-black/[0.09]" />
+            <div className="absolute top-[48.8%] bottom-[50.5%] left-0 right-[80%] bg-white/40" />
+            <div className="absolute top-[49.5%] bottom-[49.5%] left-[80%] right-0 bg-black/[0.09]" />
+            <div className="absolute top-[48.8%] bottom-[50.5%] left-[80%] right-0 bg-white/40" />
             
             {/* Bande signature verte (marque OKBA — aucune marque tierce) */}
             <div className="absolute right-[1px] top-[72px] w-[30px] h-[7px] overflow-hidden rounded-l-[1px] shadow-[inset_0_1px_2px_rgba(255,255,255,0.35)]" style={{ background: 'linear-gradient(90deg,#004d26 0%,#006633 42%,#00a651 100%)' }} />
@@ -689,6 +818,19 @@ export default function Header({ siteSettings, poles }: HeaderProps) {
 
 
 
+            {/* Arête spéculaire du capot (lumière rasante venant du haut-gauche) */}
+            <div aria-hidden="true" className="pointer-events-none absolute left-[6px] right-[10px] top-[9px] h-[1.5px] rounded-full" style={{
+              background:'linear-gradient(90deg,rgba(255,255,255,0),rgba(255,255,255,0.95) 22%,rgba(255,255,255,0.45) 68%,rgba(255,255,255,0) 100%)',
+            }} />
+            {/* Occlusion sous le matelas : le coussin se pose sur le capot */}
+            <div aria-hidden="true" className="pointer-events-none absolute left-[2px] right-0 top-[8px] h-[6px]" style={{
+              background:'linear-gradient(180deg,rgba(0,0,0,0.22),rgba(0,0,0,0))',
+            }} />
+            {/* Chanfrein inférieur — la face du capot s'assombrit en s'éloignant */}
+            <div aria-hidden="true" className="pointer-events-none absolute inset-x-0 bottom-0 h-[14px]" style={{
+              background:'linear-gradient(180deg,rgba(0,0,0,0),rgba(0,0,0,0.13))', borderRadius:'0 0 0 8px',
+            }} />
+
             {/* Lignes de structure horizontales (fentes) */}
             <div className="absolute bottom-[16px] left-[15px] right-[5px] h-[1.5px] bg-black/[0.08] rounded-full" />
             <div className="absolute bottom-[8px] left-[15px] right-[5px] h-[1.5px] bg-black/[0.08] rounded-full" />
@@ -697,6 +839,18 @@ export default function Header({ siteSettings, poles }: HeaderProps) {
             <div aria-hidden="true" className="pointer-events-none absolute right-0 top-0 bottom-0 w-[120px] z-10" style={{ background:'linear-gradient(to left,rgba(0,0,0,0.6) 0%,rgba(0,0,0,0.1) 50%,transparent 100%)' }} />
             <div aria-hidden="true" className="pointer-events-none absolute right-0 top-0 bottom-0 w-[30px] z-20" style={{ backdropFilter:'blur(2px)' }} />
           </div>
+
+          {/* Retombée bleu-vert du bore sur le plateau patient (light spill) */}
+          <div aria-hidden="true" className="pointer-events-none absolute z-[31] mix-blend-screen" style={{
+            right:'95px', bottom:'34px', width:'120px', height:'62px',
+            background:'radial-gradient(ellipse 100% 90% at 100% 40%,rgba(96,180,240,0.22),rgba(0,166,81,0.06) 45%,transparent 72%)',
+          }} />
+          {/* Ombre portée de la table sur le sol */}
+          <div aria-hidden="true" className="pointer-events-none absolute z-[4]" style={{
+            left:'26px', right:'150px', bottom:'-5px', height:'12px',
+            background:'linear-gradient(90deg,rgba(0,0,0,0) 0%,rgba(0,0,0,0.20) 22%,rgba(0,0,0,0.26) 100%)',
+            filter:'blur(4px)', borderRadius:'50%',
+          }} />
 
           {/* ══ NAVIGATION ══ */}
           <div
@@ -729,6 +883,11 @@ export default function Header({ siteSettings, poles }: HeaderProps) {
             {/* Câble en spirale */}
             <div className="absolute top-[28px] right-[4px] w-[4px] h-[40px] border-r-2 border-dashed border-[#888] opacity-70" style={{ borderRadius:'50%' }} />
 
+            {/* Halo de la dalle sur l'air ambiant (une vraie dalle éclaire autour d'elle) */}
+            <div aria-hidden="true" className="pointer-events-none absolute -inset-[10px] -z-[5] mix-blend-screen" style={{
+              background:'radial-gradient(ellipse at center,rgba(72,152,242,0.20),rgba(72,152,242,0) 70%)',
+            }} />
+
             {/* L'écran (casing large + double dalle) */}
             <div className="relative w-[46px] h-[30px] bg-[#1a1a1a] rounded-[2px] border border-[#333] shadow-[0_10px_20px_rgba(0,0,0,0.4),inset_0_1px_1px_rgba(255,255,255,0.2)] flex items-center justify-center p-[2px]">
               {/* Contenu de l'écran avec 2 fenêtres */}
@@ -751,6 +910,15 @@ export default function Header({ siteSettings, poles }: HeaderProps) {
                     <img src="/logo-mark.png" alt="Clinique Okba" className="absolute inset-0 h-full w-full object-contain opacity-95" />
                   </div>
                 </div>
+
+                {/* Reflet de verre en diagonale sur la dalle (anti-« sticker plat ») */}
+                <div aria-hidden="true" className="pointer-events-none absolute inset-0 z-30" style={{
+                  background:'linear-gradient(118deg,rgba(255,255,255,0.22) 0%,rgba(255,255,255,0.05) 26%,rgba(255,255,255,0) 46%,rgba(255,255,255,0) 100%)',
+                }} />
+                {/* Vignettage de la dalle (les bords d'un LCD sont toujours plus sombres) */}
+                <div aria-hidden="true" className="pointer-events-none absolute inset-0 z-30" style={{
+                  boxShadow:'inset 0 0 6px rgba(0,0,0,0.55)',
+                }} />
 
                 {/* Barre de menu basse */}
                 <div className="absolute bottom-0 left-0 right-0 h-[4px] bg-[#0a192f] flex justify-around items-center px-[2px]">
@@ -820,6 +988,24 @@ export default function Header({ siteSettings, poles }: HeaderProps) {
               </div>
             </div>
           </div>
+
+          {/* ══ ÉCLAIRAGE FIXE DES TÊTES — les détecteurs tournent, la source
+              lumineuse de la salle reste au même endroit : ce calque non tournant
+              rend la rotation crédible au lieu d'un simple sprite qui pivote. ══ */}
+          <div aria-hidden="true" className="pointer-events-none absolute z-[44] rounded-full" style={{
+            right:'-15px', bottom:'-32px', width:'210px', height:'210px',
+            background:'radial-gradient(ellipse 60% 42% at 30% 12%,rgba(255,255,255,0.55),rgba(255,255,255,0) 70%),radial-gradient(ellipse 58% 42% at 72% 90%,rgba(10,22,38,0.20),rgba(0,0,0,0) 72%)',
+            WebkitMaskImage:'radial-gradient(circle at center,transparent 62px,#000 78px,#000 92px,transparent 104px)',
+            maskImage:'radial-gradient(circle at center,transparent 62px,#000 78px,#000 92px,transparent 104px)',
+          }} />
+
+          {/* ══ GRAIN — micro-texture de laque : sans elle, les dégradés CSS
+              restent trop « propres » pour lire comme de la matière. ══ */}
+          <div aria-hidden="true" className="pointer-events-none absolute z-[47] opacity-[0.16] mix-blend-overlay" style={{
+            right:'-20px', bottom:'-20px', width:'230px', height:'200px',
+            backgroundImage:"url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23n)' opacity='0.5'/%3E%3C/svg%3E\")",
+            backgroundSize:'120px 120px',
+          }} />
 
           {/* ══ BOUTON GANTRY — Prendre RDV ══ */}
           <button
