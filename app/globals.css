@@ -781,3 +781,107 @@ html {
     scroll-behavior: smooth;
   }
 }
+/* ══════════════════════════════════════════════════════════════════════════
+   RÉVÉLATIONS D'ENTRÉE — 100 % CSS
+   ──────────────────────────────────────────────────────────────────────────
+   Ces animations remplacent les `initial={{ opacity: 0 }}` de Framer Motion
+   sur tout ce qui est above-the-fold.
+
+   Raison : Framer sérialise `initial` en style inline dans le HTML serveur.
+   Le contenu part donc à `opacity: 0` et ne redevient visible qu'une fois le
+   bundle JS téléchargé, parsé et hydraté — ce qui repousse le FCP ET le LCP
+   d'autant. Sur mobile (CPU throttlé), cela coûtait plusieurs secondes.
+
+   En CSS, l'animation démarre dès l'application de la feuille de style,
+   sans attendre la moindre ligne de JavaScript.
+   ══════════════════════════════════════════════════════════════════════════ */
+
+@keyframes okba-rise {
+  from {
+    opacity: 0;
+    transform: translateY(var(--okba-rise-from, 12px));
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes okba-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes okba-word-rise {
+  from {
+    opacity: 0;
+    transform: translateY(110%);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes okba-grow-x {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+@keyframes okba-pop {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* `backwards` : l'état initial s'applique pendant le delay, sans style inline.
+   L'élément est bien dans le HTML dès le départ — il est juste peint animé. */
+.okba-rise {
+  animation: okba-rise 0.5s cubic-bezier(0.22, 1, 0.36, 1) backwards;
+}
+
+.okba-fade {
+  animation: okba-fade 0.5s ease-out backwards;
+}
+
+.okba-word-rise {
+  animation: okba-word-rise 0.65s cubic-bezier(0.22, 1, 0.36, 1) backwards;
+}
+
+.okba-grow-x {
+  animation: okba-grow-x 0.7s cubic-bezier(0.23, 1, 0.32, 1) backwards;
+}
+
+.okba-pop {
+  animation: okba-pop 0.28s cubic-bezier(0.22, 1, 0.36, 1) backwards;
+}
+
+/* Transition de page : fondu court, sans état inline `opacity: 0`. */
+.okba-page-enter {
+  animation: okba-rise 0.3s ease-out backwards;
+  --okba-rise-from: 10px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .okba-rise,
+  .okba-fade,
+  .okba-word-rise,
+  .okba-grow-x,
+  .okba-pop,
+  .okba-page-enter {
+    animation: none !important;
+  }
+}

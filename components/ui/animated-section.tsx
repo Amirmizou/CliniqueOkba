@@ -1,14 +1,28 @@
 'use client'
 
 import { useEffect, useRef, ReactNode } from 'react'
-import { gsap } from 'gsap'
-import { ScrollTrigger } from 'gsap/ScrollTrigger'
+import type { gsap as GsapType } from 'gsap'
 import { useReducedMotion } from '@/hooks/use-reduced-motion'
 import { cn } from '@/lib/utils'
 
-// Register GSAP plugin
-if (typeof window !== 'undefined') {
-    gsap.registerPlugin(ScrollTrigger)
+/**
+ * PERF — GSAP + ScrollTrigger (~112 Ko) est chargé à la demande, pas au bundle
+ * initial. Ce composant n'anime qu'au scroll : rien ne justifie de payer le
+ * téléchargement et le parsing de la librairie avant le premier rendu.
+ * Un import statique la plaçait dans le chunk d'entrée de la page d'accueil.
+ */
+let gsapPromise: Promise<typeof GsapType> | null = null
+
+function loadGsap(): Promise<typeof GsapType> {
+    if (!gsapPromise) {
+        gsapPromise = Promise.all([import('gsap'), import('gsap/ScrollTrigger')]).then(
+            ([{ gsap }, { ScrollTrigger }]) => {
+                gsap.registerPlugin(ScrollTrigger)
+                return gsap
+            },
+        )
+    }
+    return gsapPromise
 }
 
 interface AnimatedSectionProps {
@@ -38,7 +52,14 @@ export function AnimatedSection({
     useEffect(() => {
         if (prefersReducedMotion || !sectionRef.current || animation === 'none') return
 
-        const ctx = gsap.context(() => {
+        let ctx: gsap.Context | undefined
+        let cancelled = false
+
+        loadGsap().then((gsap) => {
+            // Le composant a pu être démonté pendant le chargement du module.
+            if (cancelled || !sectionRef.current) return
+
+            ctx = gsap.context(() => {
             const elements = sectionRef.current!.querySelectorAll('.animate-item')
 
             let fromVars: gsap.TweenVars = {}
@@ -89,9 +110,13 @@ export function AnimatedSection({
             }
 
             gsap.fromTo(elements, fromVars, toVars)
-        }, sectionRef)
+            }, sectionRef)
+        })
 
-        return () => ctx.revert()
+        return () => {
+            cancelled = true
+            ctx?.revert()
+        }
     }, [prefersReducedMotion, animation, stagger, delay, duration])
 
     return (

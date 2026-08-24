@@ -10,6 +10,14 @@
  *                   car aucun transform n'est appliqué aux glyphes eux-mêmes.
  *
  * Les deux respectent prefers-reduced-motion (affichage direct, sans animation).
+ *
+ * PERF — le mode 'mount' est rendu en CSS, pas en Framer Motion.
+ * Le mode 'mount' sert aux titres above-the-fold (H1 du hero) : avec Framer,
+ * `initial={{ opacity: 0 }}` était sérialisé dans le HTML serveur et le titre
+ * — souvent l'élément LCP — restait invisible jusqu'à la fin de l'hydratation.
+ * Les `@keyframes` CSS jouent dès la feuille de style, sans attendre le JS.
+ * Le mode 'inView' (below-the-fold) reste sur Framer : il dépend du scroll,
+ * et son coût n'entre pas dans le chemin critique du premier rendu.
  */
 
 import React from 'react'
@@ -17,6 +25,8 @@ import { motion } from 'framer-motion'
 import { useReducedMotion } from '@/hooks/use-reduced-motion'
 
 const EASE = [0.22, 1, 0.36, 1] as const
+
+const RTL_RE = /[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF\uFB50-\uFDFF\uFE70-\uFEFF]/
 
 interface WordRevealProps {
   text: string
@@ -40,31 +50,58 @@ export function WordReveal({
   const words = text.split(' ').filter(Boolean)
 
   // Detect if text contains Arabic/RTL characters
-  const isRtl = /[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF\uFB50-\uFDFF\uFE70-\uFEFF]/.test(text)
+  const isRtl = RTL_RE.test(text)
 
   if (reduce) return <span className={className} dir={isRtl ? 'rtl' : undefined}>{text}</span>
 
-  // RTL text: animate the whole block at once to avoid bidi reordering issues
-  // Uses a smooth upward slide + fade (no word splitting = no reordering)
-  if (isRtl) {
-    const rtlAnimProps =
-      mode === 'mount'
-        ? {
-            initial: { y: 32, opacity: 0 },
-            animate: { y: 0, opacity: 1 },
-          }
-        : {
-            initial: { y: 32, opacity: 0 },
-            whileInView: { y: 0, opacity: 1 },
-            viewport: { once: true, margin: '-60px' },
-          }
+  /* ---------------------------------------------------------------------- */
+  /*  Mode 'mount' — CSS pur, visible sans JavaScript                        */
+  /* ---------------------------------------------------------------------- */
+  if (mode === 'mount') {
+    // RTL : on anime le bloc entier pour ne pas casser le réordonnancement bidi
+    if (isRtl) {
+      return (
+        <span
+          className={`okba-rise ${className ?? ''}`}
+          dir="rtl"
+          style={{ display: 'block', animationDelay: `${delay}s`, animationDuration: '0.8s', ['--okba-rise-from' as string]: '32px' }}
+        >
+          {text}
+        </span>
+      )
+    }
 
+    return (
+      <span className={className}>
+        {words.map((word, i) => (
+          <React.Fragment key={`${word}-${i}`}>
+            <span className="inline-block overflow-hidden align-bottom pb-[0.15em] pt-[0.15em]">
+              <span
+                className="okba-word-rise inline-block will-change-transform"
+                style={{ animationDelay: `${delay + i * stagger}s` }}
+              >
+                {word}
+              </span>
+            </span>
+            {i < words.length - 1 ? ' ' : null}
+          </React.Fragment>
+        ))}
+      </span>
+    )
+  }
+
+  /* ---------------------------------------------------------------------- */
+  /*  Mode 'inView' — Framer (below-the-fold, piloté par le scroll)          */
+  /* ---------------------------------------------------------------------- */
+  if (isRtl) {
     return (
       <motion.span
         className={className}
         dir="rtl"
         style={{ display: 'block' }}
-        {...rtlAnimProps}
+        initial={{ y: 32, opacity: 0 }}
+        whileInView={{ y: 0, opacity: 1 }}
+        viewport={{ once: true, margin: '-60px' }}
         transition={{ duration: 0.8, ease: EASE, delay }}
       >
         {text}
@@ -72,19 +109,12 @@ export function WordReveal({
     )
   }
 
-  const animProps =
-    mode === 'mount'
-      ? { initial: 'hidden' as const, animate: 'visible' as const }
-      : {
-          initial: 'hidden' as const,
-          whileInView: 'visible' as const,
-          viewport: { once: true, margin: '-60px' },
-        }
-
   return (
     <motion.span
       className={className}
-      {...animProps}
+      initial="hidden"
+      whileInView="visible"
+      viewport={{ once: true, margin: '-60px' }}
       transition={{ staggerChildren: stagger, delayChildren: delay }}
     >
       {words.map((word, i) => (

@@ -3,15 +3,28 @@
 import { useEffect, useRef } from 'react'
 import Image from 'next/image'
 import { useTranslations, useLocale } from 'next-intl'
-import * as LucideIcons from 'lucide-react'
+import { resolveLucideIcon } from '@/components/ui/lucide-icon'
 import { urlFor, sanityImageLoader } from '@/sanity/lib/image'
-import { gsap } from 'gsap'
-import { ScrollTrigger } from 'gsap/ScrollTrigger'
+import type { gsap as GsapType } from 'gsap'
 import { useReducedMotion } from '@/hooks/use-reduced-motion'
 
-// Register GSAP plugin
-if (typeof window !== 'undefined') {
-  gsap.registerPlugin(ScrollTrigger)
+/**
+ * PERF — GSAP + ScrollTrigger (~112 Ko) chargé à la demande.
+ * Les animations d'`about` ne se déclenchent qu'au scroll : les embarquer dans
+ * le chunk d'entrée retardait l'hydratation de la page d'accueil pour rien.
+ */
+let gsapPromise: Promise<typeof GsapType> | null = null
+
+function loadGsap(): Promise<typeof GsapType> {
+  if (!gsapPromise) {
+    gsapPromise = Promise.all([import('gsap'), import('gsap/ScrollTrigger')]).then(
+      ([{ gsap }, { ScrollTrigger }]) => {
+        gsap.registerPlugin(ScrollTrigger)
+        return gsap
+      },
+    )
+  }
+  return gsapPromise
 }
 
 interface AboutData {
@@ -50,17 +63,20 @@ export default function About({ data, sectionContent }: AboutProps) {
 
   const values = data?.values || []
 
-  const getIcon = (name?: string) => {
-    if (!name) return LucideIcons.Check;
-    const formattedName = name.charAt(0).toUpperCase() + name.slice(1);
-    return (LucideIcons as any)[formattedName] || (LucideIcons as any)[name] || LucideIcons.Check;
-  }
+  const getIcon = (name?: string) => resolveLucideIcon(name)
 
   // GSAP Scroll Animations
   useEffect(() => {
     if (prefersReducedMotion || !sectionRef.current) return
 
-    const ctx = gsap.context(() => {
+    let ctx: gsap.Context | undefined
+    let cancelled = false
+
+    loadGsap().then((gsap) => {
+      // Le composant a pu être démonté pendant le chargement du module.
+      if (cancelled || !sectionRef.current) return
+
+      ctx = gsap.context(() => {
       // Image reveal with surgical curtain effect (horizontal wipe)
       if (imageRef.current) {
         gsap.fromTo(
@@ -129,9 +145,13 @@ export default function About({ data, sectionContent }: AboutProps) {
           }
         )
       }
-    }, sectionRef)
+      }, sectionRef)
+    })
 
-    return () => ctx.revert()
+    return () => {
+      cancelled = true
+      ctx?.revert()
+    }
   }, [prefersReducedMotion])
 
   return (

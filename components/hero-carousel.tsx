@@ -254,15 +254,13 @@ export default function HeroCarousel({ slides: rawSlides = [], siteSettings, sec
                 <div className="grid w-full items-center gap-10 lg:grid-cols-12">
                     {/* Colonne texte */}
                     <div className="lg:col-span-7">
-                        {/* Badge (fixe) */}
-                        <motion.div
-                            initial={{ opacity: 0, y: 12 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: 0.15 }}
-                            className="mb-5 inline-flex items-center gap-2 rounded-full border border-white/30 bg-white/10 px-4 py-2 text-xs font-medium text-white backdrop-blur-md sm:text-sm"
+                        {/* Badge (fixe) — animation CSS : peinte sans attendre l'hydratation */}
+                        <div
+                            style={{ animationDelay: '0.15s' }}
+                            className="okba-rise mb-5 inline-flex items-center gap-2 rounded-full border border-white/30 bg-white/10 px-4 py-2 text-xs font-medium text-white backdrop-blur-md sm:text-sm"
                         >
                             {isAr ? (sectionContent?.badge_ar || sectionContent?.badge || t('badge')) : (sectionContent?.badge || t('badge'))}
-                        </motion.div>
+                        </div>
 
                         {/* Titre H1 FIXE (SEO + marque) — révélation mot à mot au montage */}
                         <h1
@@ -273,16 +271,17 @@ export default function HeroCarousel({ slides: rawSlides = [], siteSettings, sec
                         </h1>
 
                         {/* Filet dégradé signature (épuré) */}
-                        <motion.div
-                            initial={{ scaleX: 0 }}
-                            animate={{ scaleX: 1 }}
-                            transition={{ delay: 0.5, duration: 0.7, ease: EASE_OUT }}
-                            className="mt-5 h-1 w-32 origin-left rounded-full bg-gradient-to-r from-[#006633] to-[#FDE68A]"
+                        <div
+                            style={{ animationDelay: '0.5s' }}
+                            className="okba-grow-x mt-5 h-1 w-32 origin-left rounded-full bg-gradient-to-r from-[#006633] to-[#FDE68A]"
                         />
 
                         {/* Message animé par slide (réserve de hauteur → pas de saut de mise en page) */}
                         <div className="mt-5 min-h-[3.5rem] max-w-xl sm:min-h-[4rem]">
-                            <AnimatePresence mode="wait">
+                            {/* `initial={false}` : au premier rendu la ligne est peinte
+                                telle quelle (pas de `opacity:0` dans le HTML serveur).
+                                Les changements de slide restent animés. */}
+                            <AnimatePresence mode="wait" initial={false}>
                                 {slideLine && (
                                     <motion.p
                                         key={currentIndex}
@@ -300,34 +299,27 @@ export default function HeroCarousel({ slides: rawSlides = [], siteSettings, sec
                         </div>
 
                         {/* Chips de réassurance (confiance above-the-fold) */}
-                        <motion.ul
-                            initial={{ opacity: 0, y: 16 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: 0.5 }}
-                            className="mt-6 flex flex-wrap gap-2 max-w-[320px] sm:max-w-none"
+                        <ul
+                            style={{ animationDelay: '0.5s', ['--okba-rise-from' as string]: '16px' }}
+                            className="okba-rise mt-6 flex flex-wrap gap-2 max-w-[320px] sm:max-w-none"
                         >
                             {trustChips.map((c, i) => (
-                                <motion.li
+                                <li
                                     key={i}
-                                    initial={{ opacity: 0, scale: 0.9 }}
-                                    animate={{ opacity: 1, scale: 1 }}
-                                    transition={{ delay: 0.5 + i * 0.07, duration: 0.28 }}
-                                    className="inline-flex items-center gap-1.5 sm:gap-2 rounded-full border border-white/25 px-2.5 py-1.5 sm:px-3.5 sm:py-2 backdrop-blur-md"
-                                    style={{ background: 'rgba(255,255,255,0.12)' }}
+                                    className="okba-pop inline-flex items-center gap-1.5 sm:gap-2 rounded-full border border-white/25 px-2.5 py-1.5 sm:px-3.5 sm:py-2 backdrop-blur-md"
+                                    style={{ background: 'rgba(255,255,255,0.12)', animationDelay: `${0.5 + i * 0.07}s` }}
                                 >
                                     <span className="text-xs sm:text-sm font-extrabold tabular-nums text-[#FDE68A] leading-none">{c.value}</span>
                                     <span className="h-3 w-px bg-white/25" aria-hidden="true" />
                                     <span className="text-[10px] sm:text-[11px] font-medium text-white/90 leading-none">{c.label}</span>
-                                </motion.li>
+                                </li>
                             ))}
-                        </motion.ul>
+                        </ul>
 
                         {/* CTAs (fixe) */}
-                        <motion.div
-                            initial={{ opacity: 0, y: 16 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: 0.6 }}
-                            className="mt-8 flex w-full flex-col gap-3 sm:w-auto sm:flex-row sm:items-center"
+                        <div
+                            style={{ animationDelay: '0.6s', ['--okba-rise-from' as string]: '16px' }}
+                            className="okba-rise mt-8 flex w-full flex-col gap-3 sm:w-auto sm:flex-row sm:items-center"
                         >
                             <Magnetic className="w-full sm:w-fit">
                                 <button
@@ -349,7 +341,7 @@ export default function HeroCarousel({ slides: rawSlides = [], siteSettings, sec
                                 <Phone className="h-5 w-5 group-hover:text-[#006633] transition-colors" />
                                 {t('cta.call')}
                             </button>
-                        </motion.div>
+                        </div>
                     </div>
                 </div>
             </motion.div>

@@ -210,6 +210,41 @@ function LogoAnimation({ onComplete }: { onComplete: () => void }) {
   )
 }
 
+/**
+ * Conditions de lecture du rideau d'ouverture.
+ *
+ * Le splash est un aplat blanc plein écran de ~1,75 s posé APRÈS l'hydratation.
+ * Il recouvre donc l'élément LCP au pire moment possible : sur mobile, où le
+ * budget CPU est déjà saturé, il coûtait à lui seul plusieurs points.
+ * On le réserve aux contextes où il ne pénalise personne — grand écran,
+ * appareil correct, connexion non économique.
+ */
+function shouldPlayIntro(): boolean {
+  if (typeof window === 'undefined') return false
+
+  // Mouvement réduit demandé (vestibulaire, épilepsie) : pas de rideau du tout.
+  if (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) return false
+
+  // Mobile et tablette : jamais. C'est là que le budget de rendu est le plus serré.
+  if (window.matchMedia?.('(max-width: 1023px)').matches) return false
+  if (window.matchMedia?.('(pointer: coarse)').matches) return false
+
+  // Appareil très peu puissant : l'animation saccaderait de toute façon.
+  // Seuil bas volontairement : le filtre grand écran + pointeur fin ci-dessus
+  // a déjà écarté le mobile, il ne reste ici que des postes de travail.
+  const cores = navigator.hardwareConcurrency
+  if (typeof cores === 'number' && cores > 0 && cores <= 2) return false
+
+  // Mode économie de données / réseau lent.
+  const conn = (navigator as unknown as {
+    connection?: { saveData?: boolean; effectiveType?: string }
+  }).connection
+  if (conn?.saveData) return false
+  if (conn?.effectiveType && ['slow-2g', '2g', '3g'].includes(conn.effectiveType)) return false
+
+  return true
+}
+
 // ─── Écran de démarrage (splash) ────────────────────────────────────────────
 export function LogoIntro() {
   const [visible, setVisible] = useState(false)
@@ -219,8 +254,7 @@ export function LogoIntro() {
   useEffect(() => {
     setMounted(true)
 
-    // Mouvement réduit demandé (vestibulaire, épilepsie) : pas de rideau du tout.
-    if (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) return
+    if (!shouldPlayIntro()) return
 
     // Ne s'affiche qu'une seule fois par session
     if (typeof sessionStorage !== 'undefined') {
