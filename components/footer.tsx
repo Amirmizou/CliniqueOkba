@@ -4,6 +4,7 @@ import { Link } from '@/navigation'
 import { motion } from 'framer-motion'
 import { Facebook, Instagram, Mail, MapPin, Phone, ArrowRight, HeartPulse } from 'lucide-react'
 import { useTranslations, useLocale } from 'next-intl'
+import { WordMorph } from '@/components/ui/word-morph'
 import { cn } from '@/lib/utils'
 import { poles } from '@/data/poles'
 import { siteConfig as siteConfigFallback } from '@/data/site-config'
@@ -134,9 +135,9 @@ export default function Footer({ siteSettings, footerContent, sanityPoles }: Foo
               </div>
               <div className="flex flex-col">
                 {isAr ? (
-                    <span className='block text-2xl font-bold tracking-tight text-white drop-shadow-md'>المصحة الطبية <span className="text-primary font-extrabold">عقبة</span></span>
+                    <span className='block text-2xl font-bold tracking-tight text-white drop-shadow-md'><WordMorph from="المصحة الطبية" to="مستشفى" /> <span className="text-primary font-extrabold">عقبة</span></span>
                 ) : (
-                    <span className='block text-2xl font-bold tracking-tight text-white drop-shadow-md'>Clinique <span className="text-primary font-extrabold">OKBA</span></span>
+                    <span className='block text-2xl font-bold tracking-tight text-white drop-shadow-md'><WordMorph from="Clinique" to="Hôpital" /> <span className="text-primary font-extrabold">OKBA</span></span>
                 )}
                 <span className='text-[10px] w-fit text-primary font-bold tracking-[0.25em] uppercase mt-1 opacity-80'>
                   {tNav('tagline')}

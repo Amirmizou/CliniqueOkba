@@ -37,6 +37,7 @@ import {
 } from 'lucide-react'
 import { LanguageSwitcher } from '@/components/language-switcher'
 import { useTranslations, useLocale } from 'next-intl'
+import { BrandNameMorph } from '@/components/ui/word-morph'
 import { useTheme } from 'next-themes'
 import Image from 'next/image'
 import { motion, AnimatePresence, useScroll, useMotionValueEvent } from 'framer-motion'
@@ -219,11 +220,8 @@ export default function Header({ siteSettings, poles }: HeaderProps) {
     ? siteSettings.clinicName
     : (locale === 'ar' ? 'المصحة الطبية عقبة' : 'Clinique OKBA')
 
-  // Marque bicolore : 1er mot en vert clair, le reste en vert foncé (comme le lockup).
-  const clinicNameFirst = clinicNameText.includes(' ') ? clinicNameText.split(' ')[0] : ''
-  const clinicNameRest = clinicNameText.includes(' ')
-    ? clinicNameText.slice(clinicNameText.indexOf(' ') + 1)
-    : clinicNameText
+  // Marque bicolore : le mot « Clinique » (en vert clair) se métamorphose en
+  // « Hôpital », le reste du lockup reste en vert foncé — cf. BrandNameMorph.
 
   /* Barre utilitaire — infos essentielles (depuis Sanity siteSettings) */
   const utilPhone = (siteSettings?.phone || '').split('/')[0].trim()
@@ -372,8 +370,7 @@ export default function Header({ siteSettings, poles }: HeaderProps) {
                 calc(50vw-640px) est trop étroite et le bloc déborde de l'écran. */}
             <span className="mt-2.5 hidden max-w-[124px] flex-col items-center text-center 2xl:flex">
               <span className="text-[13px] font-bold uppercase leading-none tracking-[0.06em] text-[#00532a] dark:text-white">
-                {clinicNameFirst && <span className="text-[#00a651]">{clinicNameFirst} </span>}
-                {clinicNameRest}
+                <BrandNameMorph text={clinicNameText} wordClassName="text-[#00a651]" />
               </span>
               <span className="mt-1.5 text-[9.5px] font-medium italic leading-snug text-[#006633]/60 dark:text-white/55">
                 {t('slogan')}
@@ -1062,7 +1059,7 @@ export default function Header({ siteSettings, poles }: HeaderProps) {
                   </div>
                   <div className="min-w-0">
                     <p className="truncate text-[13px] font-black uppercase leading-none tracking-tight text-white">
-                      {clinicNameText}
+                      <BrandNameMorph text={clinicNameText} />
                     </p>
                     <p className="mt-1 text-[10px] font-medium leading-none text-[#FDE68A]/85">
                       {t('tagline')}

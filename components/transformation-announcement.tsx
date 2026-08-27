@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useMemo, useState } from 'react'
-import { motion, useReducedMotion } from 'framer-motion'
+import { motion } from 'framer-motion'
 import {
     ArrowRight,
     BedDouble,
@@ -12,6 +12,7 @@ import {
     Stethoscope,
     Users,
 } from 'lucide-react'
+import { WordMorph } from '@/components/ui/word-morph'
 
 const ICONS_MAP: Record<string, any> = {
     BedDouble,
@@ -61,84 +62,6 @@ const HIGHLIGHTS = [
     },
 ]
 
-/* ── Mot qui se métamorphose, lettre par lettre ── */
-function MorphingWord({
-    from,
-    to,
-    isAr,
-    reduce,
-}: {
-    from: string
-    to: string
-    isAr: boolean
-    reduce: boolean | null
-}) {
-    const [showTo, setShowTo] = useState(false)
-
-    useEffect(() => {
-        if (reduce) return
-        const id = setInterval(() => setShowTo((v) => !v), 3800)
-        return () => clearInterval(id)
-    }, [reduce])
-
-    // Mouvement réduit : les deux mots côte à côte, sans animation
-    if (reduce) {
-        return (
-            <span className="inline-flex items-center gap-3">
-                <span className="text-white/35 line-through decoration-white/25">{from}</span>
-                <ArrowRight className={`h-6 w-6 text-[#4ade80] sm:h-8 sm:w-8 ${isAr ? 'rotate-180' : ''}`} />
-                <span className="text-white">{to}</span>
-            </span>
-        )
-    }
-
-    const word = showTo ? to : from
-    // L'arabe est une écriture liée : la découper lettre par lettre casserait les ligatures.
-    // On anime alors le mot entier d'un seul bloc.
-    const isCursive = /[؀-ۿ]/.test(word)
-    const parts = isCursive ? [word] : Array.from(word)
-    const colorClass = showTo ? 'text-white' : 'text-white/55'
-
-    return (
-        <span className="relative inline-grid align-bottom">
-            {/* Gabarit invisible (hauteur nulle) : la colonne prend la largeur du plus large
-                des deux mots, donc « Okba » ne bouge jamais pendant la métamorphose. */}
-            <span
-                aria-hidden
-                className="invisible col-start-1 row-start-2 block h-0 overflow-hidden whitespace-nowrap"
-            >
-                {showTo ? from : to}
-            </span>
-
-            <span className="col-start-1 row-start-1 flex justify-center whitespace-nowrap">
-                {parts.map((part, i) => (
-                    <motion.span
-                        key={`${showTo ? 'to' : 'from'}-${i}`}
-                        initial={{ opacity: 0, y: 18, filter: 'blur(8px)' }}
-                        animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
-                        transition={{
-                            duration: 0.55,
-                            delay: isCursive ? 0 : i * 0.035,
-                            ease: [0.22, 1, 0.36, 1],
-                        }}
-                        className={colorClass}
-                    >
-                        {part}
-                    </motion.span>
-                ))}
-            </span>
-
-            {/* Ligne de scan : clin d’œil au scanner d’imagerie de la clinique */}
-            <span
-                aria-hidden
-                className="pointer-events-none absolute inset-x-[-6%] top-0 h-full overflow-hidden"
-            >
-                <span className="okba-scan-line absolute inset-x-0 h-[2px] bg-gradient-to-r from-transparent via-[#4ade80] to-transparent" />
-            </span>
-        </span>
-    )
-}
-
 /* ── Compte à rebours (jours) ── */
 function useDaysLeft(targetDate?: string) {
     const [days, setDays] = useState<number | null>(null)
@@ -167,28 +90,18 @@ export default function TransformationAnnouncement({
     data,
 }: TransformationAnnouncementProps) {
     const isAr = locale === 'ar'
-    const reduce = useReducedMotion()
 
+    // L'annonce peut être retirée du site depuis Sanity (champ « Annonce active »)
     if (data && data.enabled === false) return null
 
-    return (
-        <TransformationSection isAr={isAr} reduce={reduce} data={data} />
-    )
+    return <TransformationSection isAr={isAr} data={data} />
 }
 
-function TransformationSection({
-    isAr,
-    reduce,
-    data,
-}: {
-    isAr: boolean
-    reduce: boolean | null
-    data?: any
-}) {
+function TransformationSection({ isAr, data }: { isAr: boolean; data?: any }) {
     const badge = isAr ? data?.badge_ar || 'إعلان رسمي' : data?.badge || 'Annonce officielle'
     const kicker = isAr
-        ? data?.kicker_ar || 'بعد جديد للرعاية الصحية في باتنة'
-        : data?.kicker || 'Une nouvelle dimension du soin à Batna'
+        ? data?.kicker_ar || 'بعد جديد للرعاية الصحية في قسنطينة'
+        : data?.kicker || 'Une nouvelle dimension du soin à Constantine'
     const subtitle = isAr
         ? data?.subtitle_ar ||
           'تتحول عيادة عقبة قريباً إلى مستشفى عقبة: أسرّة أكثر، تخصصات أوسع، وتجهيزات تقنية متطورة — بنفس الفريق ونفس مستوى الالتزام منذ اليوم الأول.'
@@ -262,7 +175,14 @@ function TransformationSection({
                     </p>
 
                     <h2 className="mt-4 text-4xl font-bold leading-[1.1] tracking-tight text-white sm:text-6xl md:text-7xl">
-                        <MorphingWord from={fromWord} to={toWord} isAr={isAr} reduce={reduce} />{' '}
+                        <WordMorph
+                            from={fromWord}
+                            to={toWord}
+                            variant="display"
+                            fromClassName="text-white/55"
+                            toClassName="text-white"
+                            reducedFallback="both"
+                        />{' '}
                         <span className="bg-gradient-to-br from-[#4ade80] to-[#006633] bg-clip-text text-transparent">
                             {brandWord}
                         </span>

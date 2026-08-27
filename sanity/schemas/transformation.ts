@@ -82,14 +82,14 @@ export default defineType({
             name: 'kicker',
             title: 'Accroche au-dessus du titre (FR)',
             type: 'string',
-            initialValue: 'Une nouvelle dimension du soin à Batna',
+            initialValue: 'Une nouvelle dimension du soin à Constantine',
             group: 'general',
         }),
         defineField({
             name: 'kicker_ar',
             title: 'Accroche au-dessus du titre (AR)',
             type: 'string',
-            initialValue: 'بعد جديد للرعاية الصحية في باتنة',
+            initialValue: 'بعد جديد للرعاية الصحية في قسنطينة',
             group: 'general',
         }),
         defineField({

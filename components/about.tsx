@@ -3,6 +3,7 @@
 import { useEffect, useRef } from 'react'
 import Image from 'next/image'
 import { useTranslations, useLocale } from 'next-intl'
+import { BrandNameMorph } from '@/components/ui/word-morph'
 import { resolveLucideIcon } from '@/components/ui/lucide-icon'
 import { urlFor, sanityImageLoader } from '@/sanity/lib/image'
 import type { gsap as GsapType } from 'gsap'
@@ -179,7 +180,7 @@ export default function About({ data, sectionContent }: AboutProps) {
                 {sectionContent?.badge || data?.subtitle || t('title')}
               </p>
               <h2 className='text-foreground text-2xl sm:text-3xl md:text-4xl font-bold'>
-                {sectionContent?.title || data?.title || 'Clinique OKBA'}
+                <BrandNameMorph text={sectionContent?.title || data?.title || 'Clinique OKBA'} />
               </h2>
             </div>
 
