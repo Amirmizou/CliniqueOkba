@@ -3,6 +3,7 @@ import HeroCarousel from '@/components/hero-carousel'
 import About from '@/components/about'
 import VideosGallery from '@/components/videos-gallery'
 import TrustBand from '@/components/trust-band'
+import TransformationAnnouncement from '@/components/transformation-announcement'
 import LatestNews from '@/components/latest-news'
 import Poles from '@/components/poles'
 import DoctorsShowcase from '@/components/doctors-showcase'
@@ -42,6 +43,7 @@ import {
   getVideos,
   getFooterContent,
   getArticles,
+  getTransformation,
 } from '@/sanity/lib/fetch'
 import { localizeSanityData } from '@/sanity/lib/localize'
 import type { ClinicEvent } from '@/lib/events'
@@ -72,6 +74,7 @@ export default async function Home(props: { params: Promise<{ locale: string }> 
     videos,
     footerContent,
     articles,
+    transformation,
   ] = await Promise.all([
     getSiteSettings(),
     getAboutSection(),
@@ -88,6 +91,7 @@ export default async function Home(props: { params: Promise<{ locale: string }> 
     getVideos(),
     getFooterContent(),
     getArticles(),
+    getTransformation(),
   ])
 
   // Localize all fetched data
@@ -134,6 +138,9 @@ export default async function Home(props: { params: Promise<{ locale: string }> 
         
         {/* Bande confiance immediately after hero */}
         <TrustBand siteSettings={localizedData.siteSettings} />
+
+        {/* Annonce : la Clinique Okba devient l'Hopital Okba */}
+        <TransformationAnnouncement locale={locale} data={transformation} />
         
         {/* Services first — visitors want to know WHAT we treat before WHO we are */}
         <Poles data={localizedData.poles} />

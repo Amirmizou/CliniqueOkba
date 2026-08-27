@@ -655,3 +655,19 @@ export const labResultsQuery = groq`
     }
   }
 `
+
+// ==========================================
+// ANNONCE — TRANSFORMATION EN HÔPITAL
+// ==========================================
+
+export const transformationQuery = groq`
+  *[_type == "transformation"][0] {
+    ...,
+    milestones[] {
+      period, period_ar, label, label_ar, status
+    },
+    highlights[] {
+      icon, title, title_ar, desc, desc_ar
+    }
+  }
+`

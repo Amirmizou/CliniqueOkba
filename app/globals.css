@@ -885,3 +885,32 @@ html {
     animation: none !important;
   }
 }
+
+/* Ligne de balayage « scanner » — annonce de la transformation en hôpital */
+@keyframes okba-scan {
+  0% {
+    top: -10%;
+    opacity: 0;
+  }
+  12% {
+    opacity: 0.9;
+  }
+  88% {
+    opacity: 0.9;
+  }
+  100% {
+    top: 110%;
+    opacity: 0;
+  }
+}
+
+.okba-scan-line {
+  animation: okba-scan 3.8s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .okba-scan-line {
+    animation: none !important;
+    opacity: 0 !important;
+  }
+}

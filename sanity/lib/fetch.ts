@@ -30,6 +30,7 @@ import {
     pageSeoQuery,
     allPageSeoQuery,
     labResultsQuery,
+    transformationQuery,
 } from './queries'
 
 // En développement : revalidation quasi immédiate (1 s) → les changements publiés
@@ -290,4 +291,12 @@ export async function getHomePageData() {
 
 export async function getLabResults() {
     return safeFetch(client.fetch(labResultsQuery, {}, cacheOptions), null)
+}
+
+// ==========================================
+// ANNONCE — TRANSFORMATION EN HÔPITAL
+// ==========================================
+
+export async function getTransformation() {
+    return safeFetch(client.fetch(transformationQuery, {}, cacheOptions), null)
 }

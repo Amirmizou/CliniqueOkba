@@ -19,6 +19,7 @@ import pageSeo from './pageSeo'
 import insuranceSection from './insurance'
 import video from './video'
 import labResults from './labResults'
+import transformation from './transformation'
 
 export const schemaTypes = [
     // Configuration Générale
@@ -29,6 +30,7 @@ export const schemaTypes = [
     heroSlide,
     aboutSection,
     sectionContent,
+    transformation,
 
     // Services & Spécialités
     pole,

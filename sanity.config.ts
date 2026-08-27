@@ -57,6 +57,14 @@ export default defineConfig({
                                     .title('Contenu Accueil')
                                     .items([
                                         S.listItem()
+                                            .title('Annonce — Hôpital Okba')
+                                            .icon(() => '🏥')
+                                            .child(
+                                                S.document()
+                                                    .schemaType('transformation')
+                                                    .documentId('transformation')
+                                            ),
+                                        S.listItem()
                                             .title('Slides Hero (Carrousel)')
                                             .icon(() => '🎬')
                                             .child(S.documentTypeList('heroSlide').title('Slides Hero')),
