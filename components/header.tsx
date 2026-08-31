@@ -47,6 +47,8 @@ import { siteConfig as siteConfigFallback } from '@/data/site-config'
 import PoleMotifRotator from '@/components/pole-motif-rotator'
 import LogoReveal from '@/components/logo-reveal'
 import SiteSearch from '@/components/site-search'
+import StickyNav from '@/components/sticky-nav'
+import { buildWhatsAppUrl } from '@/lib/whatsapp'
 import Link from 'next/link'
 import { useRouter, usePathname } from 'next/navigation'
 
@@ -108,6 +110,9 @@ interface SiteSettings {
   address?: string
   hours?: { emergency?: string; weekdays?: string; saturday?: string }
   social?: { facebook?: string; instagram?: string }
+  whatsappNumber?: string
+  appointmentMessage?: string
+  appointmentMessage_ar?: string
 }
 
 interface HeaderProps {
@@ -122,6 +127,8 @@ export default function Header({ siteSettings, poles }: HeaderProps) {
   const [isOpen, setIsOpen] = useState(false)
   const [isScrolled, setIsScrolled] = useState(false)
   const [isHidden, setIsHidden] = useState(false)
+  // Le header est dans le flux : passé sa hauteur, la barre compacte prend le relais.
+  const [showStickyNav, setShowStickyNav] = useState(false)
   const [activeTab, setActiveTab] = useState('home')
   const [hovered, setHovered] = useState<string | null>(null)
   const { scrollY } = useScroll()
@@ -178,6 +185,7 @@ export default function Header({ siteSettings, poles }: HeaderProps) {
 
   useMotionValueEvent(scrollY, 'change', (latest) => {
     setIsScrolled(latest > 24)
+    setShowStickyNav(latest > 320)
     
     const previous = scrollY.getPrevious() || 0
     if (latest > previous && latest > 150) {
@@ -231,8 +239,38 @@ export default function Header({ siteSettings, poles }: HeaderProps) {
   const utilFacebook = siteSettings?.social?.facebook || siteConfigFallback.social.facebook
   const utilInstagram = siteSettings?.social?.instagram || siteConfigFallback.social.instagram
 
+  /* Lien « Prendre rendez-vous » de la barre compacte — même WhatsApp que le
+     hero et la barre d'actions mobile, message localisé. */
+  const stickyAppointmentHref =
+    buildWhatsAppUrl(
+      siteSettings?.whatsappNumber || utilPhone,
+      (locale === 'ar'
+        ? siteSettings?.appointmentMessage_ar || siteSettings?.appointmentMessage
+        : siteSettings?.appointmentMessage
+      )?.trim() ||
+        (locale === 'ar'
+          ? `مرحباً، أرغب في حجز موعد.`
+          : `Bonjour ${clinicNameText}, je souhaite prendre un rendez-vous.`),
+    ) || undefined
+
   return (
     <>
+      {/* Navigation compacte prenant le relais du header une fois celui-ci
+          sorti de l'écran — le header lui-même reste inchangé. */}
+      <StickyNav
+        visible={showStickyNav && !isOpen}
+        locale={locale}
+        homeHref={homeHref}
+        clinicName={clinicNameText}
+        activeTab={activeTab}
+        poles={navPoles}
+        poleIcons={POLE_ICONS}
+        phone={utilPhone}
+        phoneHref={utilPhoneHref}
+        appointmentHref={stickyAppointmentHref}
+        onNavigate={scrollToSection}
+        onOpenMenu={() => setIsOpen(true)}
+      />
       <style dangerouslySetInnerHTML={{__html: `
         @keyframes scanLaser {
           0% { transform: translateY(2px); opacity: 0; }

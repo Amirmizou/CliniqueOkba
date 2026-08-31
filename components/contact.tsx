@@ -240,7 +240,7 @@ export default function Contact({ siteSettings, sectionContent }: ContactProps) 
 
 
   return (
-    <section id='contact' className='bg-background py-12 sm:py-16 md:py-20'>
+    <section id='contact' className='bg-background py-16 sm:py-20 md:py-24'>
       <div className='mx-auto max-w-7xl px-4 sm:px-6 lg:px-8'>
         <ScrollAnimation variant="fadeUp" className='mb-16 space-y-4 text-center'>
           <p className='text-primary text-sm font-semibold tracking-wide uppercase'>

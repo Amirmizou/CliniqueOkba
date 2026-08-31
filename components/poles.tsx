@@ -25,6 +25,7 @@ import { poles, CLINIC_PHONE, type Pole } from '@/data/poles'
 import { Link } from '@/navigation'
 import { AnimatedSection } from '@/components/ui/animated-section'
 import { ECGLine, ecgVariantForIcon } from '@/components/ui/ecg-line'
+import SectionHeader from '@/components/ui/section-header'
 import { LineReveal } from '@/components/ui/reveal-text'
 import SectionGlow from '@/components/ui/section-glow'
 
@@ -321,17 +322,18 @@ export default function Poles({ data }: { data?: any[] }) {
       />
 
       <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <AnimatedSection animation="fade" className="mb-12 text-center">
-          <div className="animate-item">
-            <span className="mb-4 inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-4 py-2 text-sm font-semibold leading-normal text-primary">
+        <AnimatedSection animation="fade">
+          <SectionHeader
+            className="animate-item"
+            badgeIcon={
               <span className="relative flex h-2 w-2">
                 <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary opacity-75" />
                 <span className="relative inline-flex h-2 w-2 rounded-full bg-primary" />
               </span>
-              {t('badge')}
-            </span>
-            <h2 className="mb-4 text-3xl font-bold sm:text-4xl md:text-5xl">
-              {isAr ? (
+            }
+            badge={t('badge')}
+            title={
+              isAr ? (
                 <LineReveal className="text-gradient">
                   {t('titleLine1')} <span className="text-foreground">{t('titleLine2')}</span>
                 </LineReveal>
@@ -341,16 +343,15 @@ export default function Poles({ data }: { data?: any[] }) {
                   <br />
                   <LineReveal className="text-foreground" delay={0.12}>{t('titleLine2')}</LineReveal>
                 </>
-              )}
-            </h2>
-            {/* Ligne ECG sous le titre */}
-            <div className="mx-auto mb-4 h-8 max-w-md">
-              <ECGLine height={32} />
-            </div>
-            <p className="mx-auto max-w-2xl text-base text-muted-foreground sm:text-lg">
-              {t('subtitle')}
-            </p>
-          </div>
+              )
+            }
+            divider={
+              <div className="mx-auto mb-4 h-8 max-w-md">
+                <ECGLine height={32} />
+              </div>
+            }
+            subtitle={t('subtitle')}
+          />
         </AnimatedSection>
 
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">

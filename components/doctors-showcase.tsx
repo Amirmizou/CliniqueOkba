@@ -53,6 +53,7 @@ import { LineReveal } from '@/components/ui/reveal-text'
 import { UniversalPlayer } from '@/components/ui/universal-player'
 import { cn } from '@/lib/utils'
 import SectionGlow from '@/components/ui/section-glow'
+import SectionHeader from '@/components/ui/section-header'
 
 /* Couverture thématique « laboratoire » — utilisée quand un médecin ne
    souhaite pas que sa photo soit partagée. Remplace l'affiche par un visuel
@@ -669,21 +670,14 @@ export default function DoctorsShowcase({ data, sectionContent }: { data?: any[]
 
       <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* En-tête */}
-        <AnimatedSection animation="fade" className="mb-14 text-center">
-          <div className="animate-item">
-            <span 
-              className="mb-4 inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-semibold leading-normal"
-              style={{ 
-                color: sectionAccent, 
-                backgroundColor: `${sectionAccent}0D`, 
-                borderColor: `${sectionAccent}33` 
-              }}
-            >
-              <Sparkles className="h-4 w-4" />
-              {isAr ? (sectionContent?.badge_ar || sectionContent?.badge || t('badge')) : (sectionContent?.badge || t('badge'))}
-            </span>
-            <h2 className="mb-4 text-3xl font-bold sm:text-4xl md:text-5xl">
-              {locale === 'ar' ? (
+        <AnimatedSection animation="fade">
+          <SectionHeader
+            className="animate-item mb-14"
+            accent={sectionAccent}
+            badgeIcon={<Sparkles className="h-4 w-4" />}
+            badge={isAr ? (sectionContent?.badge_ar || sectionContent?.badge || t('badge')) : (sectionContent?.badge || t('badge'))}
+            title={
+              locale === 'ar' ? (
                 <LineReveal className="text-gradient">
                   {sectionContent?.title_ar || sectionContent?.title ? (
                     (sectionContent?.title_ar || sectionContent?.title) as string
@@ -691,24 +685,18 @@ export default function DoctorsShowcase({ data, sectionContent }: { data?: any[]
                     <>{t('titleLine1')} <span className="text-foreground">{t('titleLine2')}</span></>
                   )}
                 </LineReveal>
+              ) : sectionContent?.title ? (
+                <LineReveal className="text-gradient">{sectionContent.title}</LineReveal>
               ) : (
                 <>
-                  {sectionContent?.title ? (
-                    <LineReveal className="text-gradient">{sectionContent.title}</LineReveal>
-                  ) : (
-                    <>
-                      <LineReveal className="text-gradient">{t('titleLine1')}</LineReveal>
-                      <br />
-                      <LineReveal className="text-foreground" delay={0.12}>{t('titleLine2')}</LineReveal>
-                    </>
-                  )}
+                  <LineReveal className="text-gradient">{t('titleLine1')}</LineReveal>
+                  <br />
+                  <LineReveal className="text-foreground" delay={0.12}>{t('titleLine2')}</LineReveal>
                 </>
-              )}
-            </h2>
-            <p className="mx-auto max-w-2xl text-base text-muted-foreground sm:text-lg">
-              {isAr ? (sectionContent?.subtitle_ar || sectionContent?.subtitle || t('subtitle')) : (sectionContent?.subtitle || t('subtitle'))}
-            </p>
-          </div>
+              )
+            }
+            subtitle={isAr ? (sectionContent?.subtitle_ar || sectionContent?.subtitle || t('subtitle')) : (sectionContent?.subtitle || t('subtitle'))}
+          />
         </AnimatedSection>
 
         {/* Grille (flex centré : s'équilibre quel que soit le nombre de médecins) */}

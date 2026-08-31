@@ -136,7 +136,7 @@ function TransformationSection({ isAr, data }: { isAr: boolean; data?: any }) {
         <section
             id="transformation"
             aria-label={isAr ? 'إعلان التحول إلى مستشفى' : 'Annonce de la transformation en hôpital'}
-            className="relative overflow-hidden bg-[#04140c] py-20 sm:py-28"
+            className="relative overflow-hidden bg-[#04140c] py-20 sm:py-24 md:py-32"
         >
             {/* Décor : halos verts + trame technique */}
             <div aria-hidden className="pointer-events-none absolute inset-0">

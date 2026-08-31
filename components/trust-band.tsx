@@ -1,7 +1,6 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
-import { motion, useInView, animate, useReducedMotion } from 'framer-motion'
+import { motion } from 'framer-motion'
 import { ShieldCheck, Clock, Phone } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 
@@ -9,45 +8,7 @@ interface TrustBandProps {
   siteSettings?: {
     phone?: string
     hours?: { emergency?: string; weekdays?: string; saturday?: string }
-    heroStats?: { value?: string; label?: string }[]
   }
-}
-
-/* Compteur animé (entiers), respecte prefers-reduced-motion */
-function StatValue({ raw }: { raw: string }) {
-  const ref = useRef<HTMLSpanElement>(null)
-  const inView = useInView(ref, { once: true, margin: '-40px' })
-  const reduce = useReducedMotion()
-  const match = /^(\d+)(\+?)$/.exec(raw)
-  const isNumeric = match !== null
-  const target = match ? parseInt(match[1], 10) : 0
-  const suffix = match ? match[2] : ''
-  const [count, setCount] = useState(0)
-
-  useEffect(() => {
-    if (!isNumeric || !inView) return
-    if (reduce) {
-      setCount(target)
-      return
-    }
-    const controls = animate(0, target, {
-      duration: 1.4,
-      ease: [0.23, 1, 0.32, 1],
-      onUpdate: (v) => setCount(Math.round(v)),
-    })
-    return () => controls.stop()
-    // Dépendances primitives uniquement (pas l'objet `match`) pour éviter une relance en boucle
-  }, [inView, target, reduce, isNumeric])
-
-  // Valeur non numérique (ex : « 24/7 ») : affichage direct
-  if (!isNumeric) return <span ref={ref}>{raw}</span>
-
-  return (
-    <span ref={ref}>
-      {count}
-      {suffix}
-    </span>
-  )
 }
 
 export default function TrustBand({ siteSettings }: TrustBandProps) {
@@ -59,8 +20,6 @@ export default function TrustBand({ siteSettings }: TrustBandProps) {
   const emergency = siteSettings?.hours?.emergency || ''
   const weekdays = siteSettings?.hours?.weekdays || ''
 
-  const stats = siteSettings?.heroStats || []
-
   return (
     <section className="relative z-10 bg-background pb-6">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -69,27 +28,14 @@ export default function TrustBand({ siteSettings }: TrustBandProps) {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: '-60px' }}
           transition={{ duration: 0.6, ease: [0.23, 1, 0.32, 1] }}
-          className="-mt-10 grid overflow-hidden rounded-2xl border border-border/60 bg-card/80 shadow-xl backdrop-blur-sm sm:-mt-14 lg:grid-cols-12"
+          className="-mt-10 overflow-hidden rounded-2xl border border-border/60 bg-card/80 shadow-xl backdrop-blur-sm sm:-mt-14"
         >
-          {/* Chiffres-clés */}
-          <div className="grid grid-cols-3 lg:col-span-5">
-            {stats.map((s) => (
-              <div
-                key={s.label}
-                className="px-3 py-5 text-center sm:px-5 sm:py-6"
-              >
-                <p className="stat-number bg-gradient-to-br from-[#006633] to-[#4caf6e] bg-clip-text text-2xl font-bold tracking-tight text-transparent sm:text-3xl md:text-4xl">
-                  <StatValue raw={s.value || ''} />
-                </p>
-                <p className="mt-1 text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                  {s.label}
-                </p>
-              </div>
-            ))}
-          </div>
-
-          {/* Infos pratiques */}
-          <div className="grid border-t border-border/60 sm:grid-cols-3 lg:col-span-7 lg:border-t-0 lg:border-l">
+          {/* Infos pratiques. Les chiffres-clés (heroStats) ne sont plus repris
+              ici : ils sont déjà affichés en chips dans le hero, juste au-dessus,
+              et les voir deux fois à 200px d'intervalle diluait les deux blocs.
+              Cette carte porte désormais uniquement le « quand / comment nous
+              joindre », sur trois colonnes pleines. */}
+          <div className="grid sm:grid-cols-3">
             <TrustItem
               icon={<ShieldCheck className="h-5 w-5" />}
               label={t('emergency')}

@@ -68,6 +68,30 @@ There are two separate admin interfaces:
 
 Authentication uses NextAuth with a single credentials provider (password-only, no username). It tries `ADMIN_PASSWORD_HASH` (bcrypt) first, falls back to plaintext `ADMIN_PASSWORD`. Login page is at `/auth/signin`.
 
+### Section Layout Conventions
+
+Public sections follow two vertical rhythms and one shared header component:
+
+- **Standard section**: `py-16 sm:py-20 md:py-24`
+- **Accent section** (dark full-bleed moments — `home-care`, `transformation-announcement`): `py-20 sm:py-24 md:py-32`
+
+The badge → H2 → subtitle block is `components/ui/section-header.tsx`. Use it rather than
+recopying the markup — it owns the H2 scale and the badge pill for the whole site. It is
+presentational only: sections keep their own animation wrapper (`AnimatedSection`,
+`ScrollAnimation`, `motion.div`) and pass an already-composed `title` node.
+
+Two sizes: `size="section"` (default, `text-3xl sm:text-4xl md:text-5xl`, centered) for top-level
+sections, and `size="subsection"` (`text-2xl sm:text-3xl`, left-aligned) for headings *inside* a
+content page — the pole detail pages use this one. Pole sub-sections run on their own tighter
+rhythm, `py-14 sm:py-16 md:py-20`; the page's closing CTA uses the standard section rhythm.
+
+### Sticky Navigation
+
+The homepage `Header` (the 3D scanner scene) is in normal flow and scrolls away. `components/sticky-nav.tsx`
+is a compact 60px bar that `Header` renders and reveals past 320px of scroll; it reuses the header's
+resolved poles, active-section state and mobile menu. The header markup itself is frozen — see the
+navbar note in memory. Anchor offsets rely on `scroll-padding-top: 80px` in `app/globals.css`.
+
 ### Page Data Pattern
 
 Server components fetch all Sanity data in parallel via `Promise.all()`, then pass it through `localizeSanityData()` before passing down to client components. See `app/[locale]/page.tsx` for the canonical example.

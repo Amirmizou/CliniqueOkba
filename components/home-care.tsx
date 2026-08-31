@@ -69,7 +69,7 @@ export default function HomeCare({ data, sectionContent }: HomeCareProps) {
   const displayPrestations = prestations.length > 0 ? prestations : defaultPrestations
 
   return (
-    <section id='home-care' className='relative overflow-hidden bg-gradient-to-br from-[#006633] via-[#004d26] to-[#002211] py-24 sm:py-32'>
+    <section id='home-care' className='relative overflow-hidden bg-gradient-to-br from-[#006633] via-[#004d26] to-[#002211] py-20 sm:py-24 md:py-32'>
       
       {/* ── Décor de fond Premium ── */}
       <div className="pointer-events-none absolute inset-0">

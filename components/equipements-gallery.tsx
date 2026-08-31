@@ -22,6 +22,7 @@ import {
 import { urlFor, hiResImage } from '@/sanity/lib/image'
 import { AnimatedSection } from '@/components/ui/animated-section'
 import SectionGlow from '@/components/ui/section-glow'
+import SectionHeader from '@/components/ui/section-header'
 
 type Filter = 'all' | EquipementCategoryId
 
@@ -321,14 +322,13 @@ export default function EquipementsGallery({ data }: { data?: any[] }) {
 
       <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* En-tête */}
-        <AnimatedSection animation="fade" className="mb-10 text-center">
-          <div className="animate-item">
-            <span className="mb-4 inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-4 py-2 text-sm font-semibold leading-normal text-primary">
-              <Sparkles className="h-4 w-4" />
-              {t('badge')}
-            </span>
-            <h2 className="mb-4 text-3xl font-bold sm:text-4xl md:text-5xl">
-              {isAr ? (
+        <AnimatedSection animation="fade">
+          <SectionHeader
+            className="animate-item mb-10"
+            badgeIcon={<Sparkles className="h-4 w-4" />}
+            badge={t('badge')}
+            title={
+              isAr ? (
                 <span>
                   <span className="text-gradient">{t('titleLine1')}</span>{' '}
                   <span className="text-foreground">{t('titleLine2')}</span>
@@ -339,12 +339,10 @@ export default function EquipementsGallery({ data }: { data?: any[] }) {
                   <br />
                   <span className="text-foreground">{t('titleLine2')}</span>
                 </>
-              )}
-            </h2>
-            <p className="mx-auto max-w-2xl text-base text-muted-foreground sm:text-lg">
-              {t('subtitle')}
-            </p>
-          </div>
+              )
+            }
+            subtitle={t('subtitle')}
+          />
         </AnimatedSection>
 
         {/* Filtres */}

@@ -22,6 +22,7 @@ import {
 import { UniversalPlayer } from '@/components/ui/universal-player'
 import { Link } from '@/navigation'
 import { ECGLine, ecgVariantForIcon } from '@/components/ui/ecg-line'
+import SectionHeader from '@/components/ui/section-header'
 import { PoleMotif, motifVariantForIcon } from '@/components/ui/pole-motif'
 import { urlFor, hiResImage, sanityImageLoader } from '@/sanity/lib/image'
 import { useReducedMotion } from '@/hooks/use-reduced-motion'
@@ -360,9 +361,9 @@ export default function PolePageContent({
 
       {/* ═══════════════════════════════ PRESTATIONS ══════════════════════════════ */}
       {pole.items.length > 0 && (
-        <section className="bg-background py-14 sm:py-20">
+        <section className="bg-background py-14 sm:py-16 md:py-20">
           <div className="mx-auto max-w-7xl px-6 lg:px-8">
-            <h2 className="mb-10 text-2xl font-bold sm:text-3xl">{t('prestationsSection')}</h2>
+            <SectionHeader size="subsection" className="mb-10" title={t('prestationsSection')} />
             {/* Numbered grid with hairline bg-border/20 separators */}
             <div className="overflow-hidden rounded-2xl border border-border/30 bg-border/20">
               <div className="grid gap-px bg-border/20 sm:grid-cols-2 lg:grid-cols-3">
@@ -401,9 +402,9 @@ export default function PolePageContent({
 
       {/* ════════════════════════════════ VIDÉOS ══════════════════════════════════ */}
       {videos.length > 0 && current && (
-        <section className="bg-background py-14 sm:py-16">
+        <section className="bg-background py-14 sm:py-16 md:py-20">
           <div className="mx-auto max-w-5xl px-6 lg:px-8">
-            <h2 className="mb-8 text-2xl font-bold sm:text-3xl">{t('inVideo')}</h2>
+            <SectionHeader size="subsection" title={t('inVideo')} />
 
             <div className="group relative overflow-hidden rounded-[2rem] shadow-[0_20px_50px_rgba(0,0,0,0.1)] ring-1 ring-border/50">
               <div className="relative z-10 overflow-hidden rounded-[2rem] bg-black">
@@ -533,9 +534,9 @@ export default function PolePageContent({
 
       {/* ════════════════════════════════ GALERIE ═════════════════════════════════ */}
       {photos.length > 0 && (
-        <section className="bg-muted/20 py-14 sm:py-16">
+        <section className="bg-muted/20 py-14 sm:py-16 md:py-20">
           <div className="mx-auto max-w-6xl px-6 lg:px-8">
-            <h2 className="mb-8 text-2xl font-bold sm:text-3xl">{t('inImages')}</h2>
+            <SectionHeader size="subsection" title={t('inImages')} />
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {photos.map((p, i) => (
                 <motion.button
@@ -576,7 +577,7 @@ export default function PolePageContent({
       {/* ════════════════════════════════ ÉQUIPEMENTS ═════════════════════════════ */}
       {/* Bandeau « imagerie augmentée par l'IA » */}
       {pole.aiBoosted && (
-        <section className="relative overflow-hidden py-12 sm:py-16" style={{ background: `linear-gradient(135deg, ${pole.accent}0F, transparent 70%)` }}>
+        <section className="relative overflow-hidden py-14 sm:py-16 md:py-20" style={{ background: `linear-gradient(135deg, ${pole.accent}0F, transparent 70%)` }}>
           <div className="mx-auto max-w-6xl px-6 lg:px-8">
             <div className="flex flex-col items-start gap-5 rounded-3xl border border-border/50 bg-card/60 p-6 shadow-sm backdrop-blur-sm sm:flex-row sm:items-center sm:p-8">
               <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl text-white shadow-lg" style={{ backgroundColor: pole.accent }}>
@@ -599,14 +600,14 @@ export default function PolePageContent({
       )}
 
       {equipments && equipments.length > 0 && (
-        <section className="relative overflow-hidden bg-background py-16 sm:py-24">
+        <section className="relative overflow-hidden bg-background py-14 sm:py-16 md:py-20">
           <div className="mx-auto max-w-6xl px-6 lg:px-8">
-            <div className="mb-12">
-              <h2 className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
-                {t('equipments')}
-              </h2>
-              <p className="mt-4 max-w-2xl text-lg text-muted-foreground">{t('capabilities')}</p>
-            </div>
+            <SectionHeader
+              size="subsection"
+              className="mb-12"
+              title={t('equipments')}
+              subtitle={t('capabilities')}
+            />
 
             <div className="space-y-16">
               {equipments.map((eq, i) => (
@@ -714,7 +715,7 @@ export default function PolePageContent({
 
       {/* ════════════════════════════════ CLOSING CTA ═════════════════════════════ */}
       <section
-        className="py-16 sm:py-24"
+        className="py-16 sm:py-20 md:py-24"
         style={{
           backgroundColor: `${pole.accent}0A`,
           borderTop: `1px solid ${pole.accent}20`,
@@ -724,10 +725,12 @@ export default function PolePageContent({
           <div className="mx-auto mb-8 h-10 max-w-xs opacity-60">
             <ECGLine color={pole.accent} height={40} variant={ecgVariant} />
           </div>
-          <h2 className="text-2xl font-bold text-foreground sm:text-3xl md:text-4xl">
-            {t('ctaTitle')}
-          </h2>
-          <p className="mt-4 text-base text-muted-foreground sm:text-lg">{t('ctaSubtitle')}</p>
+          <SectionHeader
+            className="mb-0"
+            align="center"
+            title={t('ctaTitle')}
+            subtitle={t('ctaSubtitle')}
+          />
           <div className="mt-8 flex flex-wrap justify-center gap-4">
             <a
               href={`tel:${phone}`}

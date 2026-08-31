@@ -156,7 +156,7 @@ export default function About({ data, sectionContent }: AboutProps) {
   }, [prefersReducedMotion])
 
   return (
-    <section ref={sectionRef} id='about' className='bg-card py-12 sm:py-16 md:py-20 overflow-hidden'>
+    <section ref={sectionRef} id='about' className='bg-card py-16 sm:py-20 md:py-24 overflow-hidden'>
       <div className='mx-auto max-w-7xl px-4 sm:px-6 lg:px-8'>
         <div className='grid items-center gap-12 md:grid-cols-2'>
           {/* Image with surgical curtain reveal */}

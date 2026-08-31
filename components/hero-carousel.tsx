@@ -155,8 +155,24 @@ export default function HeroCarousel({ slides: rawSlides = [], siteSettings, sec
         ? (sectionContent?.title_ar || sectionContent?.title || siteSettings?.clinicName_ar || siteSettings?.clinicName || 'المصحة الطبية عقبة')
         : (sectionContent?.title || siteSettings?.clinicName || 'Clinique OKBA')
 
-    /* Ligne animée par slide (le titre/sous-titre de la slide devient le message tournant) */
-    const slideLine = currentSlide.subtitle || currentSlide.title || ''
+    /* Ligne animée par slide (le titre/sous-titre de la slide devient le message tournant).
+       Garde-fou éditorial : plusieurs slides Sanity reprennent mot pour mot le nom
+       de la clinique, qui est déjà le H1 juste au-dessus. Dans ce cas on retombe
+       sur l'autre champ de la slide, puis sur le sous-titre de section — plutôt
+       que d'afficher deux fois la même phrase à 20px d'intervalle. */
+    const normalize = (v?: string) =>
+        (v || '')
+            .toLowerCase()
+            .replace(/^(la|le|l'|el|al)\s+/u, '')
+            .replace(/\s+/gu, ' ')
+            .trim()
+    const sectionSubtitle = isAr
+        ? (sectionContent?.subtitle_ar || sectionContent?.subtitle)
+        : sectionContent?.subtitle
+    const slideLine =
+        [currentSlide.subtitle, currentSlide.title, sectionSubtitle].find(
+            (candidate) => candidate && normalize(candidate) !== normalize(heroTitle),
+        ) || ''
 
     /* Chips de réassurance : Sanity (heroStats) sinon valeurs par défaut bilingues */
     const trustChips =

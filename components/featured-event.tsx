@@ -15,6 +15,7 @@ import {
 import { urlFor } from '@/sanity/lib/image'
 import { type ClinicEvent } from '@/lib/events'
 import SectionGlow from '@/components/ui/section-glow'
+import SectionHeader from '@/components/ui/section-header'
 
 function formatDateTime(value: string, dateLocale: string) {
   return new Date(value).toLocaleString(dateLocale, {
@@ -60,15 +61,12 @@ export default function FeaturedEvent({ event }: { event: ClinicEvent }) {
 
       <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* En-tête */}
-        <div className="mb-10 text-center">
-          <span className="mb-4 inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-4 py-2 text-sm font-semibold leading-normal text-primary">
-            <Sparkles className="h-4 w-4" />
-            {t('badge')}
-          </span>
-          <h2 className="text-3xl font-bold sm:text-4xl md:text-5xl">
-            <span className="text-gradient">{t('nextEvent')}</span>
-          </h2>
-        </div>
+        <SectionHeader
+          className="mb-10"
+          badgeIcon={<Sparkles className="h-4 w-4" />}
+          badge={t('badge')}
+          title={<span className="text-gradient">{t('nextEvent')}</span>}
+        />
 
         <motion.div
           initial={{ opacity: 0, y: 40 }}

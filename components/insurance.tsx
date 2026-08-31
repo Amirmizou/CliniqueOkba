@@ -9,6 +9,7 @@ import { urlFor } from '@/sanity/lib/image'
 import { AnimatedSection } from '@/components/ui/animated-section'
 import { useLocale, useTranslations } from 'next-intl'
 import SectionGlow from '@/components/ui/section-glow'
+import SectionHeader from '@/components/ui/section-header'
 
 interface InsuranceProvider {
   name: string
@@ -59,19 +60,14 @@ export default function Insurance({ data }: InsuranceProps) {
       />
 
       <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <AnimatedSection animation="fade" className="mb-12 text-center">
-          <div className="animate-item">
-            <span className="mb-4 inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-4 py-2 text-sm font-semibold leading-normal text-primary">
-              <ShieldCheck className="h-4 w-4" />
-              {isAr ? (data.badge_ar || data.badge) : data.badge}
-            </span>
-            <h2 className="mb-4 text-3xl font-bold sm:text-4xl md:text-5xl">
-              <span className="text-foreground">{isAr ? (data.title_ar || data.title) : data.title}</span>
-            </h2>
-            <p className="mx-auto max-w-2xl text-base text-muted-foreground sm:text-lg">
-              {isAr ? (data.subtitle_ar || data.subtitle) : data.subtitle}
-            </p>
-          </div>
+        <AnimatedSection animation="fade">
+          <SectionHeader
+            className="animate-item"
+            badgeIcon={<ShieldCheck className="h-4 w-4" />}
+            badge={isAr ? (data.badge_ar || data.badge) : data.badge}
+            title={<span className="text-foreground">{isAr ? (data.title_ar || data.title) : data.title}</span>}
+            subtitle={isAr ? (data.subtitle_ar || data.subtitle) : data.subtitle}
+          />
         </AnimatedSection>
 
         {/* Grille des conventions (remplace le cylindre pour éviter les duplications) */}

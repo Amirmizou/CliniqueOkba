@@ -11,6 +11,7 @@ import { AnimatedSection } from '@/components/ui/animated-section'
 import { LineReveal } from '@/components/ui/reveal-text'
 import { UniversalPlayer } from '@/components/ui/universal-player'
 import SectionGlow from '@/components/ui/section-glow'
+import SectionHeader from '@/components/ui/section-header'
 
 const EASE = [0.22, 1, 0.36, 1] as const
 
@@ -118,14 +119,13 @@ export default function VideosGallery({ data }: { data?: VideoItem[] }) {
 
       <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* En-tête */}
-        <AnimatedSection animation="fade" className="mb-12 text-center">
-          <div className="animate-item">
-            <span className="mb-4 inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-4 py-2 text-sm font-semibold leading-normal text-primary">
-              <Film className="h-4 w-4" />
-              {t.has('badge') ? t('badge') : 'Espace Éducatif'}
-            </span>
-            <h2 className="mb-4 text-3xl font-bold sm:text-4xl md:text-5xl">
-              {isAr ? (
+        <AnimatedSection animation="fade">
+          <SectionHeader
+            className="animate-item"
+            badgeIcon={<Film className="h-4 w-4" />}
+            badge={t.has('badge') ? t('badge') : 'Espace Éducatif'}
+            title={
+              isAr ? (
                 <LineReveal className="text-gradient">
                   {t.has('titleLine1') ? t('titleLine1') : 'Bibliothèque'} <span className="text-foreground">{t.has('titleLine2') ? t('titleLine2') : 'Médicale'}</span>
                 </LineReveal>
@@ -135,12 +135,10 @@ export default function VideosGallery({ data }: { data?: VideoItem[] }) {
                   <br />
                   <LineReveal className="text-foreground" delay={0.12}>{t.has('titleLine2') ? t('titleLine2') : 'Médicale'}</LineReveal>
                 </>
-              )}
-            </h2>
-            <p className="mx-auto max-w-2xl text-base text-muted-foreground sm:text-lg">
-              {t.has('subtitle') ? t('subtitle') : 'Découvrez nos vidéos éducatives et conseils médicaux.'}
-            </p>
-          </div>
+              )
+            }
+            subtitle={t.has('subtitle') ? t('subtitle') : 'Découvrez nos vidéos éducatives et conseils médicaux.'}
+          />
         </AnimatedSection>
 
         {/* Filtres par médecins (Miniatures) */}

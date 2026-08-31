@@ -4,6 +4,7 @@ import { Link } from '@/navigation'
 import ScrollAnimation from '@/components/ui/scroll-animation'
 import { type FaqItem } from '@/data/faq'
 import SectionGlow from '@/components/ui/section-glow'
+import SectionHeader from '@/components/ui/section-header'
 
 interface FaqTeaserProps {
   data?: FaqItem[]
@@ -68,19 +69,13 @@ export default function FaqTeaser({ data, sectionContent, limit = 5 }: FaqTeaser
       />
 
       <div className="relative z-10 mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
-        <ScrollAnimation variant="fadeUp" className="mb-12 text-center">
-          <span className="mb-4 inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-4 py-2 text-sm font-semibold leading-normal text-primary">
-            <HelpCircle className="h-4 w-4" />
-            {badge}
-          </span>
-          <h2 className="mb-4 text-3xl font-bold sm:text-4xl md:text-5xl">
-            <span className="text-foreground">
-              {title}
-            </span>
-          </h2>
-          <p className="mx-auto max-w-2xl text-base text-muted-foreground sm:text-lg">
-            {subtitle}
-          </p>
+        <ScrollAnimation variant="fadeUp">
+          <SectionHeader
+            badgeIcon={<HelpCircle className="h-4 w-4" />}
+            badge={badge}
+            title={<span className="text-foreground">{title}</span>}
+            subtitle={subtitle}
+          />
         </ScrollAnimation>
 
         <div className="space-y-3">
