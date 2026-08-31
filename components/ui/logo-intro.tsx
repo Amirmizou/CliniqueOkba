@@ -3,221 +3,381 @@
 import { useEffect, useState, useRef } from 'react'
 import Image from 'next/image'
 import { motion, AnimatePresence } from 'framer-motion'
+import { useLocale, useTranslations } from 'next-intl'
 
-// Durées (ms) de la chorégraphie Remotion, resserrées : le rideau d'ouverture
-// se paie en First Contentful Paint perçu, donc chaque phase garde sa lecture
-// mais l'ensemble tient sous 1,8 s au lieu de 3,4 s.
-const T_STEM_END      = 220   // la tige finit de monter
-const T_PLANT_START   = 160   // début du wipe plante (chevauchement voulu)
-const T_PLANT_END     = 620   // wipe plante terminé
-const T_CLINIQUE_START= 480   // début wipe CLINIQUE
-const T_CLINIQUE_END  = 1000  // wipe CLINIQUE terminé
-const T_SHINE_START   = 980   // reflet démarre
-const T_SHINE_END     = 1280  // reflet terminé
-const T_HOLD_END      = 1450  // durée totale avant sortie
-const T_EXIT_END      = 1750  // fondu sortant terminé → démontage
+/**
+ * Rideau d'ouverture — chorégraphie en quatre temps :
+ *
+ *   1. l'anneau se trace (rappel du portique du scanner, vert → or) ;
+ *   2. l'emblème éclot depuis la base de la tige, en révélation circulaire ;
+ *   3. le nom se compose lettre par lettre ;
+ *   4. « Clinique » se dissout sous une ligne de balayage et se reforme en
+ *      « Hôpital » — la transformation de l'établissement, racontée dès la
+ *      première seconde.
+ *
+ * Le wordmark est du VRAI TEXTE, pas `logo-main.png` : le nom y était cuit
+ * dans l'image, ce qui rendait la métamorphose impossible et le lockup flou
+ * en montée d'échelle. On utilise donc `logo-mark.png` (emblème seul) et on
+ * compose le nom en Lemon Milk, la police d'affichage du site.
+ *
+ * La 4e phase allonge le rideau de ~1,75 s à ~2,2 s. C'est assumé : le splash
+ * est déjà réservé au desktop non contraint et ne joue qu'une fois par session
+ * (voir `shouldPlayIntro`), et c'est la seule surface où l'annonce touche le
+ * visiteur avant qu'il ne scrolle.
+ */
 
-const EASE_EXPO  = [0.16, 1, 0.3, 1] as const
-const EASE_SMOOTH= [0.4,  0, 0.2, 1] as const
+// ── Chronologie (ms) ────────────────────────────────────────────────────────
+const T_RING_END = 460 // l'anneau a fini de se tracer
+const T_MARK_START = 140 // l'emblème commence à éclore (chevauchement voulu)
+const T_MARK_END = 720
+const T_WORD_START = 620 // les lettres du nom montent
+const T_WORD_END = 980
+const T_SLOGAN = 1020 // le slogan complète le lockup avant la métamorphose
+const T_MORPH_START = 1100 // « Clinique » se dissout
+const T_MORPH_END = 1660
+const T_HOLD_END = 2000 // fin du palier de lecture : le nouveau nom doit poser
+const T_EXIT_END = 2300 // fondu sortant terminé → démontage
 
-// ─── Tige SVG — dessine une ligne verticale en montant ─────────────────────
-function Stem({ onDone }: { onDone: () => void }) {
+const EASE_EXPO = [0.16, 1, 0.3, 1] as const
+const EASE_BRAND = [0.22, 1, 0.36, 1] as const
+
+const GREEN_DARK = '#00532a'
+const GREEN = '#006633'
+const GREEN_LIGHT = '#4caf6e'
+const GOLD = '#FDE68A'
+
+/* ── Mots de la métamorphose, par langue ─────────────────────────────────── */
+const BRAND_WORDS: Record<string, { from: string; to: string; rest: string }> = {
+  fr: { from: 'CLINIQUE', to: 'HÔPITAL', rest: 'OKBA' },
+  ar: { from: 'عيادة', to: 'مستشفى', rest: 'عقبة' },
+}
+
+/* ─── Anneau tracé : vert de marque puis touche d'or ──────────────────────── */
+function Ring() {
   return (
-    <motion.svg
+    <svg
       viewBox="0 0 100 100"
-      style={{
-        position: 'absolute', inset: 0, width: '100%', height: '100%',
-        overflow: 'visible', pointerEvents: 'none',
-      }}
+      style={{ position: 'absolute', inset: 0, width: '100%', height: '100%' }}
       aria-hidden
     >
-      {/* Tige — position approximative du tronc dans le logo.png */}
-      <motion.line
-        x1="46.5" y1="54" x2="46.5" y2="38"
-        stroke="#006633"
-        strokeWidth="0.7"
-        strokeLinecap="round"
-        initial={{ pathLength: 0, opacity: 0 }}
-        animate={{ pathLength: 1, opacity: [0, 1, 1, 0] }}
-        transition={{
-          pathLength: { duration: T_STEM_END / 1000, ease: [0, 0.55, 0.45, 1] },
-          opacity:    { duration: (T_PLANT_END + 200) / 1000, times: [0, 0.05, 0.7, 1] },
-        }}
-        onAnimationComplete={onDone}
-      />
-      {/* Petite lueur apex */}
-      <motion.circle
-        cx="46.5" cy="38" r="1.2"
-        fill="#4caf6e"
-        initial={{ scale: 0, opacity: 0 }}
-        animate={{ scale: [0, 1.6, 0], opacity: [0, 0.9, 0] }}
-        transition={{ delay: T_STEM_END / 1000 - 0.05, duration: 0.4 }}
-        style={{ transformOrigin: '46.5px 38px', filter: 'blur(0.5px)' }}
-      />
-    </motion.svg>
+      <g transform="rotate(-90 50 50)">
+        {/* Anneau principal */}
+        <motion.circle
+          cx="50"
+          cy="50"
+          r="47"
+          fill="none"
+          stroke={GREEN}
+          strokeWidth="0.9"
+          strokeLinecap="round"
+          initial={{ pathLength: 0, opacity: 0 }}
+          animate={{ pathLength: 1, opacity: 0.7 }}
+          transition={{
+            pathLength: { duration: T_RING_END / 1000, ease: EASE_EXPO },
+            opacity: { duration: 0.2 },
+          }}
+        />
+        {/* Arc doré — la seconde couleur de la marque, en pointe */}
+        <motion.circle
+          cx="50"
+          cy="50"
+          r="47"
+          fill="none"
+          stroke={GOLD}
+          strokeWidth="1.4"
+          strokeLinecap="round"
+          pathLength={1}
+          strokeDasharray="0.16 0.84"
+          initial={{ rotate: 0, opacity: 0 }}
+          animate={{ rotate: 300, opacity: [0, 0.95, 0.95, 0] }}
+          transition={{
+            rotate: { duration: 1.1, ease: EASE_EXPO, delay: T_RING_END / 1000 - 0.22 },
+            opacity: { duration: 1.1, times: [0, 0.18, 0.7, 1], delay: T_RING_END / 1000 - 0.22 },
+          }}
+          style={{ transformOrigin: '50px 50px' }}
+        />
+      </g>
+    </svg>
   )
 }
 
-// ─── Composant principal ────────────────────────────────────────────────────
-function LogoAnimation({ onComplete }: { onComplete: () => void }) {
-  const [phase, setPhase] = useState<'stem' | 'plant' | 'clinique' | 'shine' | 'done'>('stem')
-  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
-
-  useEffect(() => {
-    const schedule = (fn: () => void, delay: number) => {
-      timerRef.current = setTimeout(fn, delay)
-    }
-
-    schedule(() => setPhase('plant'),    T_PLANT_START)
-    schedule(() => setPhase('clinique'), T_CLINIQUE_START)
-    schedule(() => setPhase('shine'),    T_SHINE_START)
-    schedule(() => setPhase('done'),     T_HOLD_END)
-    schedule(onComplete,                 T_EXIT_END)
-
-    return () => { if (timerRef.current) clearTimeout(timerRef.current) }
-  }, [onComplete])
-
+/* ─── Emblème : éclosion circulaire depuis la base de la tige ─────────────── */
+function Emblem() {
   return (
-    <div
-      style={{
-        position: 'relative',
-        width: '100%',
-        height: '100%',
-      }}
-    >
-      {/* ── Tige montante ─────────────────────────────────────────────── */}
-      <Stem onDone={() => {}} />
-
-      {/* ── Halo vert (apparaît avec la plante) ──────────────────────── */}
+    <div style={{ position: 'relative', width: '100%', height: '100%' }}>
+      {/* Halo vert doux — donne de la profondeur au blanc */}
       <motion.div
         style={{
           position: 'absolute',
-          inset: '-20%',
+          inset: '-26%',
           borderRadius: '50%',
-          background:
-            'radial-gradient(circle, rgba(76,175,110,0.22) 0%, rgba(0,102,51,0.06) 50%, transparent 72%)',
-          filter: 'blur(1px)',
+          background: `radial-gradient(circle, ${GREEN_LIGHT}33 0%, ${GREEN}0F 48%, transparent 72%)`,
         }}
-        initial={{ opacity: 0, scale: 0.7 }}
-        animate={phase !== 'stem'
-          ? { opacity: 1, scale: 1 }
-          : { opacity: 0, scale: 0.7 }}
-        transition={{ duration: 0.8, ease: EASE_EXPO }}
+        initial={{ opacity: 0, scale: 0.75 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.9, ease: EASE_EXPO, delay: T_MARK_START / 1000 }}
       />
 
-      {/* ── Couche plante + OKBA (wipe bas→haut) ─────────────────────── */}
+      <Ring />
+
+      {/* La branche éclot depuis le pied de la tige (50% / 74%) — révélation
+          circulaire plutôt qu'un balayage rectangulaire, qui coupait
+          l'emblème sur une arête nette. */}
       <motion.div
-        style={{
-          position: 'absolute', inset: 0,
-          clipPath: 'inset(0 0 100% 0)',
-        }}
-        animate={
-          phase === 'stem'
-            ? { clipPath: 'inset(0 0 100% 0)', opacity: 1 }
-            : { clipPath: 'inset(0 0 40% 0)',  opacity: 1 }
-        }
-        initial={{ clipPath: 'inset(0 0 100% 0)', opacity: 0 }}
+        style={{ position: 'absolute', inset: '11%' }}
+        initial={{ clipPath: 'circle(0% at 50% 74%)', opacity: 0 }}
+        animate={{ clipPath: 'circle(78% at 50% 74%)', opacity: 1 }}
         transition={{
           clipPath: {
-            delay: T_PLANT_START / 1000,
-            duration: (T_PLANT_END - T_PLANT_START) / 1000,
+            delay: T_MARK_START / 1000,
+            duration: (T_MARK_END - T_MARK_START) / 1000,
             ease: EASE_EXPO,
           },
-          opacity: { duration: 0.28 },
+          opacity: { delay: T_MARK_START / 1000, duration: 0.24 },
         }}
       >
         <motion.div
           style={{ position: 'relative', width: '100%', height: '100%' }}
-          initial={{ y: 12, opacity: 0 }}
-          animate={{ y: 0,  opacity: 1 }}
+          initial={{ scale: 0.92 }}
+          animate={{ scale: 1 }}
           transition={{
-            delay: T_PLANT_START / 1000,
-            duration: (T_PLANT_END - T_PLANT_START) / 1000,
+            delay: T_MARK_START / 1000,
+            duration: (T_MARK_END - T_MARK_START) / 1000,
             ease: EASE_EXPO,
           }}
         >
           <Image
-            src="/logo-main.png"
-            alt="Clinique OKBA"
+            src="/logo-mark.png"
+            alt=""
             fill
-            sizes="280px"
+            sizes="200px"
             className="object-contain"
             priority
+            aria-hidden
           />
         </motion.div>
       </motion.div>
 
-      {/* ── Couche CLINIQUE (wipe gauche→droite) ─────────────────────── */}
-      <motion.div
-        style={{ position: 'absolute', inset: 0 }}
-        initial={{ clipPath: 'inset(58% 100% 0 0)', opacity: 0 }}
-        animate={
-          phase === 'stem' || phase === 'plant'
-            ? { clipPath: 'inset(58% 100% 0 0)', opacity: 0 }
-            : { clipPath: 'inset(58% 0% 0 0)',   opacity: 1 }
-        }
-        transition={{
-          clipPath: {
-            delay:    phase === 'clinique' ? 0 : (T_CLINIQUE_START / 1000),
-            duration: (T_CLINIQUE_END - T_CLINIQUE_START) / 1000,
-            ease: EASE_EXPO,
-          },
-          opacity: { duration: 0.2 },
-        }}
-      >
-        <Image
-          src="/logo-main.png"
-          alt=""
-          fill
-          sizes="280px"
-          className="object-contain"
-          aria-hidden
-        />
-      </motion.div>
-
-      {/* ── Reflet diagonal ───────────────────────────────────────────── */}
-      <motion.div
+      {/* Éclat à l'apex de la feuille haute, à l'instant où l'éclosion l'atteint */}
+      <motion.span
         style={{
-          position: 'absolute', inset: 0,
-          overflow: 'hidden',
-          pointerEvents: 'none',
+          position: 'absolute',
+          left: '50%',
+          top: '10%',
+          width: 10,
+          height: 10,
+          marginLeft: -5,
+          borderRadius: '50%',
+          background: `radial-gradient(circle, #ffffff 0%, ${GREEN_LIGHT} 45%, transparent 70%)`,
         }}
-        initial={{ opacity: 0 }}
-        animate={phase === 'shine'
-          ? { opacity: [0, 1, 1, 0] }
-          : { opacity: 0 }}
-        transition={{ duration: (T_SHINE_END - T_SHINE_START) / 1000, ease: EASE_SMOOTH }}
-      >
-        <motion.div
+        initial={{ scale: 0, opacity: 0 }}
+        animate={{ scale: [0, 1.5, 0], opacity: [0, 0.9, 0] }}
+        transition={{ delay: (T_MARK_END - 180) / 1000, duration: 0.5, ease: 'easeOut' }}
+      />
+    </div>
+  )
+}
+
+/* ─── Nom de la marque + métamorphose « Clinique » → « Hôpital » ──────────── */
+function Wordmark({ locale }: { locale: string }) {
+  const [morphed, setMorphed] = useState(false)
+  const words = BRAND_WORDS[locale] ?? BRAND_WORDS.fr
+  const isCursive = locale === 'ar'
+
+  useEffect(() => {
+    const id = setTimeout(() => setMorphed(true), T_MORPH_START)
+    return () => clearTimeout(id)
+  }, [])
+
+  const word = morphed ? words.to : words.from
+  // L'arabe est une écriture liée : le découper lettre par lettre casserait
+  // les ligatures. Il est donc toujours animé d'un seul bloc.
+  const parts = isCursive ? [word] : Array.from(word)
+
+  // Avant la métamorphose, les lettres montent en cascade avec le reste du
+  // lockup ; après, elles se reforment immédiatement sous la ligne de scan.
+  const baseDelay = morphed ? 0 : T_WORD_START / 1000
+
+  return (
+    <div
+      style={{
+        display: 'flex',
+        alignItems: 'baseline',
+        justifyContent: 'center',
+        gap: '0.32em',
+        fontFamily: 'var(--font-heading), Montserrat, system-ui, sans-serif',
+        fontWeight: 700,
+        fontSize: 'clamp(22px, 3.2vw, 34px)',
+        letterSpacing: isCursive ? 0 : '0.045em',
+        lineHeight: 1.1,
+        whiteSpace: 'nowrap',
+      }}
+    >
+      {/* Le mot qui se métamorphose. */}
+      <span style={{ position: 'relative', display: 'inline-grid' }}>
+        <span style={{ gridColumn: 1, gridRow: 1, display: 'flex', justifyContent: 'center' }}>
+          {parts.map((part, i) => (
+            <motion.span
+              key={`${morphed ? 'to' : 'from'}-${i}`}
+              initial={{ opacity: 0, y: 18, filter: 'blur(8px)' }}
+              animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+              transition={{
+                duration: 0.55,
+                delay: baseDelay + (isCursive ? 0 : i * 0.035),
+                ease: EASE_BRAND,
+              }}
+              style={{ color: GREEN_LIGHT, display: 'inline-block' }}
+            >
+              {part === ' ' ? ' ' : part}
+            </motion.span>
+          ))}
+        </span>
+
+        {/* Gabarit de largeur, en rangée 2 (hauteur nulle) : la colonne prend
+            la largeur du plus long des deux mots, donc « Okba » ne bouge pas
+            d'un pixel pendant la métamorphose. En rangée 1 il aurait imposé sa
+            ligne de base — la seconde rangée laisse celle du texte visible. */}
+        <span
+          aria-hidden
+          style={{
+            gridColumn: 1,
+            gridRow: 2,
+            visibility: 'hidden',
+            height: 0,
+            overflow: 'hidden',
+            whiteSpace: 'nowrap',
+          }}
+        >
+          {words.from.length >= words.to.length ? words.from : words.to}
+        </span>
+
+        {/* Ligne de balayage — le geste du scanner, signature du site. Elle
+            traverse le mot au moment exact où il se dissout. */}
+        <motion.span
+          aria-hidden
           style={{
             position: 'absolute',
-            top: 0, bottom: 0,
-            width: '22%',
-            background:
-              'linear-gradient(108deg, transparent 0%, rgba(255,255,255,0.68) 50%, transparent 100%)',
-            transform: 'skewX(-12deg)',
+            left: '-12%',
+            right: '-12%',
+            height: 2,
+            borderRadius: 2,
+            background: `linear-gradient(90deg, transparent, ${GREEN_LIGHT}, transparent)`,
+            boxShadow: `0 0 10px 1px ${GREEN_LIGHT}99`,
           }}
-          initial={{ left: '-10%' }}
-          animate={phase === 'shine' ? { left: '130%' } : { left: '-10%' }}
+          initial={{ top: '-20%', opacity: 0 }}
+          animate={{ top: ['-20%', '120%'], opacity: [0, 1, 1, 0] }}
           transition={{
-            duration: (T_SHINE_END - T_SHINE_START) / 1000,
-            ease: EASE_SMOOTH,
+            duration: (T_MORPH_END - T_MORPH_START) / 1000,
+            delay: (T_MORPH_START - 120) / 1000,
+            times: [0, 0.15, 0.8, 1],
+            ease: 'easeInOut',
           }}
         />
-      </motion.div>
+      </span>
 
+      {/* « Okba » — fixe, en vert profond, comme dans le logo */}
+      <motion.span
+        initial={{ opacity: 0, y: 18, filter: 'blur(8px)' }}
+        animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+        transition={{
+          duration: 0.55,
+          delay: (T_WORD_START + 120) / 1000,
+          ease: EASE_BRAND,
+        }}
+        style={{ color: GREEN_DARK }}
+      >
+        {words.rest}
+      </motion.span>
     </div>
+  )
+}
+
+/* ─── Chorégraphie complète ──────────────────────────────────────────────── */
+function LogoAnimation({ onComplete, locale }: { onComplete: () => void; locale: string }) {
+  const t = useTranslations('nav')
+  const [exiting, setExiting] = useState(false)
+  const timers = useRef<ReturnType<typeof setTimeout>[]>([])
+
+  useEffect(() => {
+    const list = timers.current
+    list.push(setTimeout(() => setExiting(true), T_HOLD_END))
+    list.push(setTimeout(onComplete, T_EXIT_END))
+    return () => list.forEach(clearTimeout)
+  }, [onComplete])
+
+  return (
+    <motion.div
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        gap: 'clamp(18px, 3vw, 26px)',
+      }}
+      /* Le lockup entier s'élève d'un cheveu en sortant : le rideau se lève,
+         il ne s'éteint pas.
+
+         La sortie est pilotée par un état, pas par des keyframes `times` : avec
+         un ease exponentiel, framer applique la courbe à l'ensemble de la
+         timeline, si bien que le palier de lecture était avalé en un quart du
+         temps réel et le fondu démarrait à 1,4 s au lieu de 1,9 s. */
+      animate={exiting ? { y: -14, opacity: 0 } : { y: 0, opacity: 1 }}
+      transition={{ duration: (T_EXIT_END - T_HOLD_END) / 1000, ease: EASE_EXPO }}
+    >
+      <div
+        style={{
+          position: 'relative',
+          width: 'min(212px, 46vw)',
+          height: 'min(212px, 46vw)',
+        }}
+      >
+        <Emblem />
+      </div>
+
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10 }}>
+        <Wordmark locale={locale} />
+
+        {/* Filet vert → or : la signature qui court sous tout le site */}
+        <motion.span
+          aria-hidden
+          style={{
+            height: 2,
+            borderRadius: 2,
+            background: `linear-gradient(90deg, ${GREEN}, ${GREEN_LIGHT} 45%, ${GOLD})`,
+          }}
+          initial={{ width: 0, opacity: 0 }}
+          animate={{ width: 'clamp(84px, 13vw, 124px)', opacity: 1 }}
+          transition={{ delay: (T_WORD_END - 120) / 1000, duration: 0.6, ease: EASE_EXPO }}
+        />
+
+        <motion.p
+          style={{
+            margin: 0,
+            fontFamily: 'var(--font-base), Montserrat, system-ui, sans-serif',
+            fontSize: 'clamp(10px, 1.5vw, 13px)',
+            letterSpacing: locale === 'ar' ? 0 : '0.2em',
+            textTransform: locale === 'ar' ? 'none' : 'uppercase',
+            color: `${GREEN}A6`,
+            whiteSpace: 'nowrap',
+          }}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: T_SLOGAN / 1000, duration: 0.5 }}
+        >
+          {t('slogan')}
+        </motion.p>
+      </div>
+    </motion.div>
   )
 }
 
 /**
  * Conditions de lecture du rideau d'ouverture.
  *
- * Le splash est un aplat blanc plein écran de ~1,75 s posé APRÈS l'hydratation.
- * Il recouvre donc l'élément LCP au pire moment possible : sur mobile, où le
- * budget CPU est déjà saturé, il coûtait à lui seul plusieurs points.
- * On le réserve aux contextes où il ne pénalise personne — grand écran,
- * appareil correct, connexion non économique.
+ * Le splash est un aplat plein écran posé APRÈS l'hydratation. Il recouvre
+ * donc l'élément LCP au pire moment possible : sur mobile, où le budget CPU
+ * est déjà saturé, il coûtait à lui seul plusieurs points. On le réserve aux
+ * contextes où il ne pénalise personne — grand écran, appareil correct,
+ * connexion non économique.
  */
 function shouldPlayIntro(): boolean {
   if (typeof window === 'undefined') return false
@@ -236,9 +396,11 @@ function shouldPlayIntro(): boolean {
   if (typeof cores === 'number' && cores > 0 && cores <= 2) return false
 
   // Mode économie de données / réseau lent.
-  const conn = (navigator as unknown as {
-    connection?: { saveData?: boolean; effectiveType?: string }
-  }).connection
+  const conn = (
+    navigator as unknown as {
+      connection?: { saveData?: boolean; effectiveType?: string }
+    }
+  ).connection
   if (conn?.saveData) return false
   if (conn?.effectiveType && ['slow-2g', '2g', '3g'].includes(conn.effectiveType)) return false
 
@@ -247,6 +409,7 @@ function shouldPlayIntro(): boolean {
 
 // ─── Écran de démarrage (splash) ────────────────────────────────────────────
 export function LogoIntro() {
+  const locale = useLocale()
   const [visible, setVisible] = useState(false)
   const [leaving, setLeaving] = useState(false)
   const [mounted, setMounted] = useState(false)
@@ -266,7 +429,7 @@ export function LogoIntro() {
 
   const handleComplete = () => {
     setLeaving(true)
-    setTimeout(() => setVisible(false), 350)
+    setTimeout(() => setVisible(false), 340)
   }
 
   if (!mounted || !visible) return null
@@ -278,48 +441,22 @@ export function LogoIntro() {
           key="okba-intro"
           initial={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          transition={{ duration: 0.35, ease: [0.4, 0, 1, 1] }}
+          transition={{ duration: 0.34, ease: [0.4, 0, 1, 1] }}
           style={{
             position: 'fixed',
             inset: 0,
             zIndex: 9999,
-            background: '#ffffff',
+            /* Blanc chaud plutôt qu'un #fff plat : le fond respire et le fondu
+               sortant ne claque pas comme une lightbox qui se ferme. */
+            background: `radial-gradient(ellipse 70% 60% at 50% 44%, #ffffff 0%, #f4faf6 58%, #eaf5ee 100%)`,
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
           }}
-          aria-label="Chargement Clinique OKBA"
+          aria-label="Chargement"
           role="status"
         >
-          {/* Conteneur logo — taille fixe adaptative */}
-          <div style={{ width: 'min(280px, 52vw)', height: 'min(280px, 52vw)', position: 'relative' }}>
-            <LogoAnimation onComplete={handleComplete} />
-          </div>
-
-          {/* Tagline discrète en bas */}
-          <motion.p
-            style={{
-              position: 'absolute',
-              bottom: '7%',
-              left: '50%',
-              transform: 'translateX(-50%)',
-              fontSize: 'clamp(9px, 1.8vw, 12px)',
-              fontFamily: 'system-ui, sans-serif',
-              letterSpacing: '0.22em',
-              textTransform: 'uppercase',
-              color: '#006633',
-              opacity: 0,
-              whiteSpace: 'nowrap',
-            }}
-            animate={{ opacity: [0, 0, 0.55, 0.55, 0] }}
-            transition={{
-              duration: T_EXIT_END / 1000,
-              times: [0, 0.4, 0.52, 0.85, 1],
-              ease: 'linear',
-            }}
-          >
-            Soins · Excellence · Confiance
-          </motion.p>
+          <LogoAnimation onComplete={handleComplete} locale={locale} />
         </motion.div>
       )}
     </AnimatePresence>
