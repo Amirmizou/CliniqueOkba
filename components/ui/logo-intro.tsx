@@ -20,7 +20,7 @@ import { useLocale, useTranslations } from 'next-intl'
  * en montée d'échelle. On utilise donc `logo-mark.png` (emblème seul) et on
  * compose le nom en Lemon Milk, la police d'affichage du site.
  *
- * La 4e phase allonge le rideau de ~1,75 s à ~2,2 s. C'est assumé : le splash
+ * Le rideau dure ~3,1 s. C'est assumé : le splash
  * est déjà réservé au desktop non contraint et ne joue qu'une fois par session
  * (voir `shouldPlayIntro`), et c'est la seule surface où l'annonce touche le
  * visiteur avant qu'il ne scrolle.
@@ -34,12 +34,19 @@ const T_WORD_START = 620 // les lettres du nom montent
 const T_WORD_END = 980
 const T_SLOGAN = 1020 // le slogan complète le lockup avant la métamorphose
 const T_MORPH_START = 1100 // « Clinique » se dissout
-const T_MORPH_END = 1660
-const T_HOLD_END = 2000 // fin du palier de lecture : le nouveau nom doit poser
-const T_EXIT_END = 2300 // fondu sortant terminé → démontage
+// Fin RÉELLE de la métamorphose : la dernière lettre démarre à
+// T_MORPH_START + 6 × 35 ms de cascade et dure 550 ms (voir `Wordmark`).
+// La constante valait 1660, soit 200 ms avant que le mot ne soit posé — le
+// palier de lecture était donc amputé d'autant.
+const T_MORPH_END = 1880
+const T_HOLD_END = 2700 // palier de lecture : ~820 ms sur le nom formé
+const T_EXIT_END = 3160 // fondu sortant terminé → démontage
 
 const EASE_EXPO = [0.16, 1, 0.3, 1] as const
 const EASE_BRAND = [0.22, 1, 0.36, 1] as const
+// Sortie en ease-IN : le lockup tient sa pose puis s'échappe, au lieu de
+// perdre la moitié de son opacité dès les premières frames.
+const EASE_EXIT = [0.55, 0, 0.85, 0.25] as const
 
 const GREEN_DARK = '#00532a'
 const GREEN = '#006633'
@@ -320,8 +327,17 @@ function LogoAnimation({ onComplete, locale }: { onComplete: () => void; locale:
          un ease exponentiel, framer applique la courbe à l'ensemble de la
          timeline, si bien que le palier de lecture était avalé en un quart du
          temps réel et le fondu démarrait à 1,4 s au lieu de 1,9 s. */
-      animate={exiting ? { y: -14, opacity: 0 } : { y: 0, opacity: 1 }}
-      transition={{ duration: (T_EXIT_END - T_HOLD_END) / 1000, ease: EASE_EXPO }}
+      animate={
+        exiting ? { y: -22, scale: 1.03, opacity: 0 } : { y: 0, scale: 1, opacity: 1 }
+      }
+      transition={{
+        duration: (T_EXIT_END - T_HOLD_END) / 1000,
+        ease: EASE_EXPO,
+        /* L'opacité suit sa propre courbe : avec EASE_EXPO (un ease-OUT) elle
+           chutait dès la première frame et mangeait le palier de lecture par
+           l'autre bout. En ease-IN, le nom reste plein puis cède d'un coup. */
+        opacity: { duration: (T_EXIT_END - T_HOLD_END) / 1000, ease: EASE_EXIT },
+      }}
     >
       <div
         style={{
@@ -429,7 +445,7 @@ export function LogoIntro() {
 
   const handleComplete = () => {
     setLeaving(true)
-    setTimeout(() => setVisible(false), 340)
+    setTimeout(() => setVisible(false), 420)
   }
 
   if (!mounted || !visible) return null
@@ -441,7 +457,7 @@ export function LogoIntro() {
           key="okba-intro"
           initial={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          transition={{ duration: 0.34, ease: [0.4, 0, 1, 1] }}
+          transition={{ duration: 0.42, ease: [0.4, 0, 1, 1] }}
           style={{
             position: 'fixed',
             inset: 0,
