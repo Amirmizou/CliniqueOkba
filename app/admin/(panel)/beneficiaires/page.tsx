@@ -64,6 +64,26 @@ const STATUS: Record<string, { label: string; cls: string; icon: any }> = {
   rejete: { label: 'Rejeté', cls: 'bg-red-100 text-red-700 dark:bg-red-950 dark:text-red-400', icon: XCircle },
 }
 
+/**
+ * Avatar du tableau : INITIALES, jamais la photo.
+ *
+ * Le `<img src={photoUrl}>` d'origine telechargeait l'original — jusqu'a 8 Mo,
+ * aucune compression a l'upload — pour l'afficher en 44 px, sur chaque ligne.
+ * Avec ~150 beneficiaires, une seule ouverture de cette page coutait plusieurs
+ * centaines de Mo d'egress Supabase : le quota de 5 Go/mois du plan Free
+ * partait en une dizaine de consultations, et le projet etait restreint
+ * (`exceed_egress_quota`), bloquant les nouvelles inscriptions.
+ *
+ * La photo reste accessible en un clic — mais elle n'est plus tiree que
+ * lorsqu'on la demande vraiment.
+ */
+function initialsOf(prenom: string, nom: string) {
+  const a = (prenom || '').trim().charAt(0)
+  const b = (nom || '').trim().charAt(0)
+  // Chaine vide si le nom manque : l'appelant retombe alors sur l'icone.
+  return (a + b).toUpperCase().slice(0, 2)
+}
+
 const inputCls =
   'rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-800 outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 dark:border-slate-700 dark:bg-slate-800 dark:text-white'
 
@@ -536,17 +556,24 @@ export default function BeneficiairesPage() {
                   <td className="px-4 py-3 font-medium text-slate-800 dark:text-white">
                     <div className="flex items-center gap-3">
                       {b.photoUrl ? (
-                        <a href={b.photoUrl} target="_blank" rel="noreferrer" title="Voir la photo en grand" className="shrink-0">
-                          {/* eslint-disable-next-line @next/next/no-img-element */}
-                          <img
-                            src={b.photoUrl}
-                            alt={`${b.prenom} ${b.nom}`}
-                            className="h-11 w-11 rounded-full object-cover ring-1 ring-slate-200 transition hover:ring-2 hover:ring-emerald-500 dark:ring-slate-700"
-                          />
+                        <a
+                          href={b.photoUrl}
+                          target="_blank"
+                          rel="noreferrer"
+                          title="Ouvrir la photo (chargee a la demande)"
+                          className="relative flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-emerald-100 text-sm font-semibold text-emerald-700 ring-1 ring-emerald-200 transition hover:ring-2 hover:ring-emerald-500 dark:bg-emerald-950 dark:text-emerald-300 dark:ring-emerald-900"
+                        >
+                          {initialsOf(b.prenom, b.nom)}
+                          <span className="absolute -bottom-0.5 -end-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-white text-emerald-600 ring-1 ring-emerald-200 dark:bg-slate-900 dark:ring-emerald-900">
+                            <ImageIcon className="h-2.5 w-2.5" />
+                          </span>
                         </a>
                       ) : (
-                        <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-slate-100 text-slate-400 dark:bg-slate-800">
-                          <UserRound className="h-5 w-5" />
+                        <span
+                          title="Aucune photo"
+                          className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-slate-100 text-sm font-semibold text-slate-400 dark:bg-slate-800"
+                        >
+                          {initialsOf(b.prenom, b.nom) || <UserRound className="h-5 w-5" />}
                         </span>
                       )}
                       <div className="min-w-0">
