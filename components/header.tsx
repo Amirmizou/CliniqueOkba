@@ -353,8 +353,57 @@ export default function Header({ siteSettings, poles }: HeaderProps) {
 
       {/* La bande porte le vert de marque (#006633) en voile : assez présent pour
           l'identité, assez léger pour garder le menu et la scène du scanner lisibles.
-          La bordure basse est remplacée par le dégradé vert → or (voir plus bas). */}
-      <header className="relative z-[60] flex flex-col items-center gap-2 px-4 py-3 bg-gradient-to-b from-[#eaf5ee]/95 to-[#d9ebe0]/95 backdrop-blur-md shadow-[0_2px_14px_rgba(0,102,51,0.10)] dark:from-slate-950/90 dark:to-[#04120b]/90">
+          La bordure basse est remplacée par le dégradé vert → or (voir plus bas).
+
+          Surface en trois temps plutôt qu'un aplat vert : le haut part d'un
+          blanc quasi pur — c'est le registre clinique, pas la menthe — et le
+          vert ne revient qu'en bas, pour rejoindre le filet vert → or. Le
+          dégradé à deux arrêts (#eaf5ee → #d9ebe0) teintait la bande sur toute
+          sa hauteur et l'aplatissait. */}
+      <header className="relative z-[60] flex flex-col items-center gap-2 px-4 py-3 bg-gradient-to-b from-[#fbfdfc]/95 via-[#f1f8f4]/95 to-[#e3efe8]/95 backdrop-blur-md shadow-[inset_0_1px_0_rgba(255,255,255,0.75),0_10px_30px_-14px_rgba(0,83,42,0.30)] dark:from-slate-950/90 dark:via-slate-950/90 dark:to-[#04120b]/90 dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.06),0_10px_30px_-14px_rgba(0,0,0,0.6)]">
+
+        {/* ═══ Fond de bande — toutes tailles ═══
+            Deux voiles CSS purs (ni image, ni SVG, ni animation) : le coût de
+            rendu est nul, ce qui compte sur mobile où le budget est déjà serré.
+
+            1. « Éclairage opératoire » : une nappe blanche tombant du haut.
+               Elle creuse la bande et empêche le dégradé de se lire comme un
+               aplat uniforme.
+            2. Papier millimétré ECG, masqué au centre pour laisser respirer le
+               logo et le menu. C'est la signature médicale qui manquait en
+               dessous de xl — le décor riche ci-dessous est en `xl:block`, donc
+               mobile et tablette n'avaient strictement rien. */}
+        <div aria-hidden="true" className="pointer-events-none absolute inset-0 z-0 overflow-hidden">
+          <div
+            className="absolute inset-0 dark:opacity-25"
+            style={{ background: 'radial-gradient(140% 130% at 50% -60%, #ffffff 0%, rgba(255,255,255,0) 62%)' }}
+          />
+          <div
+            className="absolute inset-0 opacity-[0.55] xl:hidden dark:opacity-[0.18]"
+            style={{
+              backgroundImage:
+                'repeating-linear-gradient(0deg, rgba(0,102,51,0.10) 0 1px, transparent 1px 9px), repeating-linear-gradient(90deg, rgba(0,102,51,0.10) 0 1px, transparent 1px 9px)',
+              WebkitMaskImage: 'linear-gradient(90deg, #000, transparent 32%, transparent 68%, #000)',
+              maskImage: 'linear-gradient(90deg, #000, transparent 32%, transparent 68%, #000)',
+            }}
+          />
+          {/* Tracé ECG statique, réservé aux petites tailles : le grand décor
+              en a déjà deux, animés, à partir de xl. */}
+          <svg
+            className="absolute bottom-0 left-0 h-5 w-full text-[#006633]/[0.13] xl:hidden dark:text-emerald-400/20"
+            viewBox="0 0 1200 40"
+            preserveAspectRatio="none"
+            fill="none"
+          >
+            <path
+              d="M0 22 H300 l9 -13 l8 25 l9 -19 l7 7 H620 l10 -8 l8 17 l7 -9 H1200"
+              stroke="currentColor"
+              strokeWidth="1.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
+        </div>
         
         {/* LOGO — Design circulaire premium */}
         <div className="absolute inset-y-0 left-0 w-[calc(50vw-640px)] hidden xl:flex items-center justify-center pointer-events-auto z-[100]">
