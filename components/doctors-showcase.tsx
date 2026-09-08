@@ -700,7 +700,7 @@ export default function DoctorsShowcase({ data, sectionContent }: { data?: any[]
      Le carrousel tourne tout seul et se met en pause au survol, pendant
      un drag, quand une lightbox est ouverte, ou quelques secondes apres
      une action manuelle. Respecte prefers-reduced-motion. */
-  const AUTOPLAY_MS = 4500
+  const AUTOPLAY_MS = 4000
   const [hovered, setHovered] = useState(false)
   const [heldUntilInteraction, setHeldUntilInteraction] = useState(false)
   const [reduceMotion, setReduceMotion] = useState(false)
@@ -882,7 +882,12 @@ export default function DoctorsShowcase({ data, sectionContent }: { data?: any[]
                       scale: isCenter ? 1 : abs === 1 ? 0.9 : 0.8,
                       opacity: visible ? 1 : 0,
                     }}
-                    transition={{ type: 'spring', stiffness: 190, damping: 26, mass: 0.9 }}
+                    initial={false}
+                    transition={{
+                      type: 'tween',
+                      duration: 0.95,
+                      ease: [0.32, 0.72, 0, 1],
+                    }}
                     onClick={() => {
                       if (!isCenter && visible) selectIndex(i)
                     }}
