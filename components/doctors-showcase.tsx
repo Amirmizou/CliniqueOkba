@@ -3,12 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useTranslations, useLocale } from 'next-intl'
 import Image from 'next/image'
-import {
-  motion,
-  AnimatePresence,
-  useMotionValue,
-  useAnimation,
-} from 'framer-motion'
+import { motion, AnimatePresence } from 'framer-motion'
 import {
   Calendar,
   Clock,
@@ -278,16 +273,10 @@ function DoctorCard({
   )
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 40 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: '-80px' }}
-      transition={{ duration: 0.6, delay: index * 0.12, ease: [0.22, 1, 0.36, 1] }}
-      className="group relative h-full"
-    >
+    <div className="group relative h-full">
       <div
         className={cn(
-          "relative flex h-full flex-col overflow-hidden rounded-[1.75rem] border bg-white/95 backdrop-blur-sm transition-all duration-300 hover:-translate-y-1.5 dark:bg-slate-900/95",
+          "relative flex h-full flex-col overflow-hidden rounded-[1.5rem] border bg-white/95 backdrop-blur-sm transition-all duration-300 dark:bg-slate-900/95",
           director 
             ? "border-amber-400/80 shadow-[0_10px_35px_rgba(245,158,11,0.22)] ring-2 ring-amber-400/50 hover:shadow-[0_16px_45px_rgba(245,158,11,0.35)]" 
             : "border-border/60 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.06)] hover:shadow-[0_16px_36px_-8px_var(--hover-glow)] dark:border-white/10 dark:shadow-[0_4px_20px_-4px_rgba(0,0,0,0.4)]"
@@ -312,7 +301,7 @@ function DoctorCard({
           onClick={photoHidden ? undefined : () => onOpen(doctor)}
           aria-label={photoHidden ? doctor.name : `Agrandir la photo de ${doctor.name}`}
           className={cn(
-            'relative block aspect-[3/4] w-full overflow-hidden bg-slate-100 touch-manipulation dark:bg-slate-800',
+            'relative block w-full flex-1 min-h-0 overflow-hidden bg-slate-100 touch-manipulation dark:bg-slate-800',
             photoHidden ? 'cursor-default' : 'cursor-zoom-in',
           )}
         >
@@ -442,11 +431,11 @@ function DoctorCard({
         )}
 
         {/* ----- Panneau d'informations ----- */}
-        <div className="flex flex-1 flex-col gap-4 p-5 sm:p-6">
+        <div className="flex shrink-0 flex-col gap-3 p-4 sm:p-5">
           {/* Services — badges interactifs */}
           {doctor.services.length > 0 && (
             <div className="flex flex-wrap gap-1.5">
-              {doctor.services.slice(0, 7).map((s) => (
+              {doctor.services.slice(0, 4).map((s) => (
                 <span
                   key={s}
                   className="rounded-lg border px-2.5 py-1 text-[11px] font-medium text-foreground/85 transition-all duration-200 hover:scale-[1.02]"
@@ -458,7 +447,7 @@ function DoctorCard({
                   {s}
                 </span>
               ))}
-              {doctor.services.length > 7 && (
+              {doctor.services.length > 4 && (
                 <span
                   className="rounded-lg border px-2.5 py-1 text-[11px] font-bold transition-all"
                   style={{ 
@@ -467,7 +456,7 @@ function DoctorCard({
                     backgroundColor: `${accent}14`,
                   }}
                 >
-                  +{doctor.services.length - 7}
+                  +{doctor.services.length - 4}
                 </span>
               )}
             </div>
@@ -519,7 +508,7 @@ function DoctorCard({
           </div>
         </div>
       </div>
-    </motion.div>
+    </div>
   )
 }
 
@@ -659,41 +648,62 @@ export default function DoctorsShowcase({ data, sectionContent }: { data?: any[]
   
   const sectionAccent = sectionContent?.accentColor || '#006633'
 
-  // --- 3D Carousel Logic ---
+  /* ---------------------------------------------------------------
+     Carrousel 3D « coverflow » : la carte active est plate et nette,
+     les voisines s'inclinent et reculent en profondeur. Beaucoup plus
+     lisible qu'un cylindre complet (plus de cartes écrasées sur les
+     côtés ni de dos de cartes qui traversent la scène).
+  ---------------------------------------------------------------- */
   const numItems = list.length
-  const angleStep = 360 / numItems
-  // Largeur de base de la carte
-  const cardWidth = 320
-  // Le rayon s'adapte au nombre d'éléments pour garder un espacement cohérent
-  const radius = Math.round((cardWidth / 2) / Math.tan(Math.PI / numItems)) + 40
-
   const [currentIndex, setCurrentIndex] = useState(0)
-  const controls = useAnimation()
-  
-  useEffect(() => {
-    controls.start({ 
-      rotateY: currentIndex * -angleStep, 
-      transition: { type: "spring", stiffness: 150, damping: 20, mass: 1 } 
-    })
-  }, [currentIndex, angleStep, controls])
+  const [dims, setDims] = useState({ width: 320, height: 540, gap: 250, depth: 200, tilt: 30 })
 
-  const handleDragEnd = (event: any, info: any) => {
-    const dragThreshold = 40
-    if (info.offset.x < -dragThreshold) {
-      setCurrentIndex((prev) => prev + 1)
-    } else if (info.offset.x > dragThreshold) {
-      setCurrentIndex((prev) => prev - 1)
-    } else {
-      // Revenir à la position courante
-      controls.start({ 
-        rotateY: currentIndex * -angleStep, 
-        transition: { type: "spring", stiffness: 300, damping: 30 } 
-      })
+  useEffect(() => {
+    const compute = () => {
+      const vw = window.innerWidth
+      if (vw < 640) {
+        const w = Math.max(240, Math.min(300, vw - 64))
+        setDims({ width: w, height: 480, gap: w * 0.62, depth: 140, tilt: 26 })
+      } else if (vw < 1024) {
+        setDims({ width: 300, height: 520, gap: 232, depth: 175, tilt: 30 })
+      } else {
+        setDims({ width: 330, height: 560, gap: 288, depth: 215, tilt: 32 })
+      }
     }
+    compute()
+    window.addEventListener('resize', compute)
+    return () => window.removeEventListener('resize', compute)
+  }, [])
+
+  /* Décalage circulaire le plus court entre une carte et la carte active */
+  const offsetOf = (i: number) => {
+    if (numItems === 0) return 0
+    let d = i - currentIndex
+    if (d > numItems / 2) d -= numItems
+    if (d < -numItems / 2) d += numItems
+    return d
   }
 
-  const handleNext = () => setCurrentIndex(prev => prev + 1)
-  const handlePrev = () => setCurrentIndex(prev => prev - 1)
+  const go = (dir: number) =>
+    setCurrentIndex((prev) => (numItems ? (prev + dir + numItems) % numItems : 0))
+  const handleNext = () => go(1)
+  const handlePrev = () => go(-1)
+
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'ArrowRight') go(isAr ? -1 : 1)
+      else if (e.key === 'ArrowLeft') go(isAr ? 1 : -1)
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [numItems, isAr])
+
+  const handleDragEnd = (_event: any, info: any) => {
+    const threshold = 60
+    if (info.offset.x < -threshold || info.velocity.x < -450) go(1)
+    else if (info.offset.x > threshold || info.velocity.x > 450) go(-1)
+  }
 
   return (
     <section
@@ -737,65 +747,156 @@ export default function DoctorsShowcase({ data, sectionContent }: { data?: any[]
           />
         </AnimatedSection>
 
-        {/* 3D Carousel Cylinder */}
-        <div className="relative flex flex-col items-center justify-center pt-8 pb-16" style={{ perspective: '1600px' }}>
-          
-          {/* Couche d'ombrage pour adoucir le fond si besoin */}
-          <div className="absolute inset-0 z-0 pointer-events-none" style={{ background: 'radial-gradient(circle at 50% 50%, transparent 40%, var(--background) 80%)' }} />
-
-          <motion.div
-            className="relative z-10 flex items-center justify-center cursor-grab active:cursor-grabbing"
-            style={{ 
-              width: cardWidth, 
-              height: '560px', 
-              transformStyle: 'preserve-3d',
-            }}
-            animate={controls}
-            drag="x"
-            dragConstraints={{ left: 0, right: 0 }}
-            dragElastic={0.15}
-            onDragEnd={handleDragEnd}
+        {/* ---------------- Carrousel 3D coverflow ---------------- */}
+        <div className="relative">
+          <div
+            className="relative mx-auto flex items-center justify-center overflow-hidden px-2"
+            style={{ perspective: '1500px', perspectiveOrigin: '50% 45%' }}
           >
-            {list.map((doctor, i) => {
-              return (
-                <div
-                  key={doctor.id}
-                  className="absolute left-0 top-0 w-full h-full"
-                  style={{
-                    transform: `rotateY(${i * angleStep}deg) translateZ(${radius}px)`,
-                    backfaceVisibility: 'hidden',
-                  }}
-                >
-                  <div className="w-full h-full pointer-events-none">
-                    {/* On réactive les clics à l'intérieur de la carte */}
-                    <div className="pointer-events-auto h-full w-full">
-                      <DoctorCard doctor={doctor} index={i} onOpen={setActive} onPlay={handlePlayVideo} sectionAccent={sectionAccent} />
-                    </div>
-                  </div>
-                </div>
-              )
-            })}
-          </motion.div>
+            {/* Fondus latéraux : les cartes lointaines se dissolvent dans le fond */}
+            <div
+              aria-hidden="true"
+              className="pointer-events-none absolute inset-y-0 left-0 z-30 w-12 sm:w-28"
+              style={{ background: 'linear-gradient(90deg, var(--background), transparent)' }}
+            />
+            <div
+              aria-hidden="true"
+              className="pointer-events-none absolute inset-y-0 right-0 z-30 w-12 sm:w-28"
+              style={{ background: 'linear-gradient(270deg, var(--background), transparent)' }}
+            />
 
-          {/* Navigation Controls */}
-          <div className="relative z-20 mt-20 flex items-center gap-6">
-            <button
-              onClick={handlePrev}
-              className="flex h-12 w-12 items-center justify-center rounded-full border border-border bg-background/50 shadow-sm backdrop-blur-md transition-all hover:bg-background hover:scale-110 active:scale-95 hover:text-primary"
-              aria-label={isAr ? 'السابق' : 'Précédent'}
+            <motion.div
+              className="relative w-full cursor-grab select-none active:cursor-grabbing"
+              style={{ height: dims.height, transformStyle: 'preserve-3d' }}
+              drag="x"
+              dragConstraints={{ left: 0, right: 0 }}
+              dragElastic={0.08}
+              dragMomentum={false}
+              onDragEnd={handleDragEnd}
             >
-              <ChevronLeft className="h-5 w-5" />
-            </button>
-            <p className="text-sm font-medium text-muted-foreground/60 select-none">
-              {isAr ? 'اسحب للتدوير' : 'Glisser pour tourner'}
+              {/* Ombre portée au sol, sous la carte active */}
+              <div
+                aria-hidden="true"
+                className="pointer-events-none absolute left-1/2 -translate-x-1/2"
+                style={{
+                  bottom: -20,
+                  width: dims.width * 0.78,
+                  height: 30,
+                  background:
+                    'radial-gradient(ellipse at center, rgba(0,0,0,0.22), transparent 70%)',
+                  filter: 'blur(6px)',
+                }}
+              />
+
+              {list.map((doctor, i) => {
+                const off = offsetOf(i)
+                const abs = Math.abs(off)
+                const visible = abs <= 2
+                const isCenter = off === 0
+
+                return (
+                  <motion.div
+                    key={doctor.id}
+                    className="absolute top-0 left-1/2"
+                    style={{
+                      width: dims.width,
+                      height: dims.height,
+                      marginLeft: -dims.width / 2,
+                      transformStyle: 'preserve-3d',
+                      zIndex: 20 - abs,
+                      pointerEvents: visible ? 'auto' : 'none',
+                    }}
+                    animate={{
+                      x: off * dims.gap,
+                      z: -abs * dims.depth,
+                      rotateY: off === 0 ? 0 : off > 0 ? -dims.tilt : dims.tilt,
+                      scale: isCenter ? 1 : abs === 1 ? 0.9 : 0.8,
+                      opacity: visible ? 1 : 0,
+                    }}
+                    transition={{ type: 'spring', stiffness: 190, damping: 26, mass: 0.9 }}
+                    onClick={() => {
+                      if (!isCenter && visible) setCurrentIndex(i)
+                    }}
+                    aria-hidden={!visible}
+                  >
+                    <div
+                      className={cn(
+                        'relative h-full w-full rounded-[1.5rem] transition-shadow duration-500',
+                        isCenter
+                          ? 'shadow-[0_30px_70px_-24px_rgba(0,0,0,0.45)]'
+                          : 'cursor-pointer shadow-[0_18px_40px_-22px_rgba(0,0,0,0.4)]',
+                      )}
+                    >
+                      <div className={cn('h-full w-full', !isCenter && 'pointer-events-none')}>
+                        <DoctorCard
+                          doctor={doctor}
+                          index={i}
+                          onOpen={setActive}
+                          onPlay={handlePlayVideo}
+                          sectionAccent={sectionAccent}
+                        />
+                      </div>
+
+                      {/* Voile qui fond les cartes latérales dans le fond de page
+                          (plutôt qu'une simple opacité, qui les rendrait transparentes) */}
+                      <motion.div
+                        aria-hidden="true"
+                        className="pointer-events-none absolute inset-0 rounded-[1.5rem] bg-background"
+                        animate={{ opacity: isCenter ? 0 : abs === 1 ? 0.4 : 0.7 }}
+                        transition={{ duration: 0.4 }}
+                      />
+                    </div>
+                  </motion.div>
+                )
+              })}
+            </motion.div>
+          </div>
+
+          {/* ---------------- Navigation ---------------- */}
+          <div className="mt-10 flex flex-col items-center gap-5">
+            <div className="flex items-center gap-4">
+              <button
+                onClick={handlePrev}
+                className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-border/70 bg-background/70 shadow-sm backdrop-blur-md transition-transform hover:scale-105 active:scale-95"
+                style={{ color: sectionAccent }}
+                aria-label={isAr ? 'السابق' : 'Précédent'}
+              >
+                <ChevronLeft className="h-5 w-5" />
+              </button>
+
+              {/* Puces de progression */}
+              <div className="flex max-w-[50vw] flex-wrap items-center justify-center gap-2">
+                {list.map((doctor, i) => {
+                  const isCenter = offsetOf(i) === 0
+                  return (
+                    <button
+                      key={doctor.id}
+                      onClick={() => setCurrentIndex(i)}
+                      aria-label={doctor.name}
+                      aria-current={isCenter}
+                      className="h-2 rounded-full transition-all duration-300"
+                      style={{
+                        width: isCenter ? 26 : 8,
+                        backgroundColor: isCenter ? sectionAccent : `${sectionAccent}33`,
+                      }}
+                    />
+                  )
+                })}
+              </div>
+
+              <button
+                onClick={handleNext}
+                className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-border/70 bg-background/70 shadow-sm backdrop-blur-md transition-transform hover:scale-105 active:scale-95"
+                style={{ color: sectionAccent }}
+                aria-label={isAr ? 'التالي' : 'Suivant'}
+              >
+                <ChevronRight className="h-5 w-5" />
+              </button>
+            </div>
+
+            <p className="select-none text-xs font-medium tracking-wide text-muted-foreground/70">
+              {isAr ? 'اسحب أو استخدم الأسهم للتنقل' : 'Glissez ou utilisez les flèches'}
             </p>
-            <button
-              onClick={handleNext}
-              className="flex h-12 w-12 items-center justify-center rounded-full border border-border bg-background/50 shadow-sm backdrop-blur-md transition-all hover:bg-background hover:scale-110 active:scale-95 hover:text-primary"
-              aria-label={isAr ? 'التالي' : 'Suivant'}
-            >
-              <ChevronRight className="h-5 w-5" />
-            </button>
           </div>
         </div>
       </div>
