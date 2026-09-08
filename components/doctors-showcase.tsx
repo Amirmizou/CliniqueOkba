@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import { useTranslations, useLocale } from 'next-intl'
 import Image from 'next/image'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -301,7 +301,7 @@ function DoctorCard({
           onClick={photoHidden ? undefined : () => onOpen(doctor)}
           aria-label={photoHidden ? doctor.name : `Agrandir la photo de ${doctor.name}`}
           className={cn(
-            'relative block w-full flex-1 min-h-0 overflow-hidden bg-slate-100 touch-manipulation dark:bg-slate-800',
+            'relative block aspect-[3/4] w-full shrink-0 overflow-hidden bg-slate-100 touch-manipulation dark:bg-slate-800',
             photoHidden ? 'cursor-default' : 'cursor-zoom-in',
           )}
         >
@@ -315,6 +315,7 @@ function DoctorCard({
               fill
               draggable={false}
               sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+              style={{ objectPosition: '50% 28%' }}
               className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.06] select-none"
             />
           )}
@@ -431,10 +432,10 @@ function DoctorCard({
         )}
 
         {/* ----- Panneau d'informations ----- */}
-        <div className="flex shrink-0 flex-col gap-3 p-4 sm:p-5">
+        <div className="flex min-h-0 flex-1 flex-col gap-3 overflow-hidden p-4 sm:p-5">
           {/* Services — badges interactifs */}
           {doctor.services.length > 0 && (
-            <div className="flex flex-wrap gap-1.5">
+            <div className="flex min-h-0 shrink flex-wrap gap-1.5 overflow-hidden">
               {doctor.services.slice(0, 4).map((s) => (
                 <span
                   key={s}
@@ -464,7 +465,7 @@ function DoctorCard({
 
           {/* Horaires et jours de consultation */}
           {(doctor.days || doctor.hours) && (
-            <div className="space-y-1.5 text-sm text-muted-foreground bg-muted/30 p-2.5 rounded-xl border border-border/40">
+            <div className="shrink-0 space-y-1.5 rounded-xl border border-border/40 bg-muted/30 p-2.5 text-sm text-muted-foreground">
               {doctor.days && (
                 <div className="flex items-center gap-2">
                   <Calendar className="h-4 w-4 shrink-0" style={{ color: accent }} />
@@ -481,7 +482,7 @@ function DoctorCard({
           )}
 
           {/* CTAs */}
-          <div className="mt-auto flex gap-2 pt-2">
+          <div className="mt-auto flex shrink-0 gap-2 pt-2">
             <a
               href={`https://wa.me/${CLINIC_WHATSAPP}?text=${waMessage}`}
               target="_blank"
@@ -661,13 +662,19 @@ export default function DoctorsShowcase({ data, sectionContent }: { data?: any[]
   useEffect(() => {
     const compute = () => {
       const vw = window.innerWidth
+      /* La hauteur derive de la largeur : affiche 3/4 intacte + panneau infos. */
+      const build = (w: number, panel: number, rest: { gap: number; depth: number; tilt: number }) => ({
+        width: w,
+        height: Math.round((w * 4) / 3) + panel,
+        ...rest,
+      })
       if (vw < 640) {
-        const w = Math.max(240, Math.min(300, vw - 64))
-        setDims({ width: w, height: 480, gap: w * 0.62, depth: 140, tilt: 26 })
+        const w = Math.max(230, Math.min(280, vw - 72))
+        setDims(build(w, 196, { gap: w * 0.62, depth: 140, tilt: 26 }))
       } else if (vw < 1024) {
-        setDims({ width: 300, height: 520, gap: 232, depth: 175, tilt: 30 })
+        setDims(build(285, 210, { gap: 220, depth: 175, tilt: 30 }))
       } else {
-        setDims({ width: 330, height: 560, gap: 288, depth: 215, tilt: 32 })
+        setDims(build(310, 218, { gap: 272, depth: 215, tilt: 32 }))
       }
     }
     compute()
@@ -684,15 +691,71 @@ export default function DoctorsShowcase({ data, sectionContent }: { data?: any[]
     return d
   }
 
-  const go = (dir: number) =>
-    setCurrentIndex((prev) => (numItems ? (prev + dir + numItems) % numItems : 0))
-  const handleNext = () => go(1)
-  const handlePrev = () => go(-1)
+  const go = useCallback(
+    (dir: number) => setCurrentIndex((prev) => (numItems ? (prev + dir + numItems) % numItems : 0)),
+    [numItems],
+  )
+
+  /* ---------------- Defilement automatique ----------------
+     Le carrousel tourne tout seul et se met en pause au survol, pendant
+     un drag, quand une lightbox est ouverte, ou quelques secondes apres
+     une action manuelle. Respecte prefers-reduced-motion. */
+  const AUTOPLAY_MS = 4500
+  const [hovered, setHovered] = useState(false)
+  const [heldUntilInteraction, setHeldUntilInteraction] = useState(false)
+  const [reduceMotion, setReduceMotion] = useState(false)
+  const resumeTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  useEffect(() => {
+    const mq = window.matchMedia('(prefers-reduced-motion: reduce)')
+    const apply = () => setReduceMotion(mq.matches)
+    apply()
+    mq.addEventListener('change', apply)
+    return () => mq.removeEventListener('change', apply)
+  }, [])
+
+  /* Suspend l'autoplay puis le relance apres une periode de calme. */
+  const holdAutoplay = useCallback((ms = 9000) => {
+    setHeldUntilInteraction(true)
+    if (resumeTimer.current) clearTimeout(resumeTimer.current)
+    resumeTimer.current = setTimeout(() => setHeldUntilInteraction(false), ms)
+  }, [])
+
+  useEffect(() => () => {
+    if (resumeTimer.current) clearTimeout(resumeTimer.current)
+  }, [])
+
+  const autoplayRunning =
+    numItems > 1 && !hovered && !heldUntilInteraction && !reduceMotion && !active && !activeVideo
+
+  useEffect(() => {
+    if (!autoplayRunning) return
+    const id = setInterval(() => go(1), AUTOPLAY_MS)
+    return () => clearInterval(id)
+  }, [autoplayRunning, go])
+
+  const handleNext = () => {
+    holdAutoplay()
+    go(1)
+  }
+  const handlePrev = () => {
+    holdAutoplay()
+    go(-1)
+  }
+  const selectIndex = (i: number) => {
+    holdAutoplay()
+    setCurrentIndex(i)
+  }
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'ArrowRight') go(isAr ? -1 : 1)
-      else if (e.key === 'ArrowLeft') go(isAr ? 1 : -1)
+      if (e.key === 'ArrowRight') {
+        holdAutoplay()
+        go(isAr ? -1 : 1)
+      } else if (e.key === 'ArrowLeft') {
+        holdAutoplay()
+        go(isAr ? 1 : -1)
+      }
     }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
@@ -701,6 +764,7 @@ export default function DoctorsShowcase({ data, sectionContent }: { data?: any[]
 
   const handleDragEnd = (_event: any, info: any) => {
     const threshold = 60
+    holdAutoplay()
     if (info.offset.x < -threshold || info.velocity.x < -450) go(1)
     else if (info.offset.x > threshold || info.velocity.x > 450) go(-1)
   }
@@ -752,6 +816,10 @@ export default function DoctorsShowcase({ data, sectionContent }: { data?: any[]
           <div
             className="relative mx-auto flex items-center justify-center overflow-hidden px-2"
             style={{ perspective: '1500px', perspectiveOrigin: '50% 45%' }}
+            onMouseEnter={() => setHovered(true)}
+            onMouseLeave={() => setHovered(false)}
+            onFocusCapture={() => setHovered(true)}
+            onBlurCapture={() => setHovered(false)}
           >
             {/* Fondus latéraux : les cartes lointaines se dissolvent dans le fond */}
             <div
@@ -772,6 +840,7 @@ export default function DoctorsShowcase({ data, sectionContent }: { data?: any[]
               dragConstraints={{ left: 0, right: 0 }}
               dragElastic={0.08}
               dragMomentum={false}
+              onDragStart={() => holdAutoplay()}
               onDragEnd={handleDragEnd}
             >
               {/* Ombre portée au sol, sous la carte active */}
@@ -815,7 +884,7 @@ export default function DoctorsShowcase({ data, sectionContent }: { data?: any[]
                     }}
                     transition={{ type: 'spring', stiffness: 190, damping: 26, mass: 0.9 }}
                     onClick={() => {
-                      if (!isCenter && visible) setCurrentIndex(i)
+                      if (!isCenter && visible) selectIndex(i)
                     }}
                     aria-hidden={!visible}
                   >
@@ -871,15 +940,30 @@ export default function DoctorsShowcase({ data, sectionContent }: { data?: any[]
                   return (
                     <button
                       key={doctor.id}
-                      onClick={() => setCurrentIndex(i)}
+                      onClick={() => selectIndex(i)}
                       aria-label={doctor.name}
                       aria-current={isCenter}
-                      className="h-2 rounded-full transition-all duration-300"
+                      className="relative h-2 overflow-hidden rounded-full transition-all duration-300"
                       style={{
-                        width: isCenter ? 26 : 8,
-                        backgroundColor: isCenter ? sectionAccent : `${sectionAccent}33`,
+                        width: isCenter ? 30 : 8,
+                        backgroundColor: isCenter ? `${sectionAccent}33` : `${sectionAccent}33`,
                       }}
-                    />
+                    >
+                      {/* Remplissage : minuterie de l'autoplay sur la puce active */}
+                      {isCenter && (
+                        <motion.span
+                          key={`${currentIndex}-${autoplayRunning}`}
+                          className="absolute inset-y-0 left-0 rounded-full"
+                          style={{ backgroundColor: sectionAccent }}
+                          initial={{ width: autoplayRunning ? '0%' : '100%' }}
+                          animate={{ width: '100%' }}
+                          transition={{
+                            duration: autoplayRunning ? AUTOPLAY_MS / 1000 : 0,
+                            ease: 'linear',
+                          }}
+                        />
+                      )}
+                    </button>
                   )
                 })}
               </div>
@@ -895,7 +979,7 @@ export default function DoctorsShowcase({ data, sectionContent }: { data?: any[]
             </div>
 
             <p className="select-none text-xs font-medium tracking-wide text-muted-foreground/70">
-              {isAr ? 'اسحب أو استخدم الأسهم للتنقل' : 'Glissez ou utilisez les flèches'}
+              {isAr ? 'يعمل تلقائياً — اسحب أو استخدم الأسهم' : 'Défilement automatique — glissez ou utilisez les flèches'}
             </p>
           </div>
         </div>
