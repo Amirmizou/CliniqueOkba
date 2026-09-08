@@ -68,6 +68,11 @@ const isDembri = (o: string) => {
   return s.includes('dembri') || s.includes('dambri')
 }
 
+const isEducation = (o: string) => {
+  const s = (o || '').toLowerCase()
+  return s.includes('education') || s.includes('éducation') || s.includes('educ') || s.includes('éduc')
+}
+
 const familyMemberSchema = z.object({
   nom: z.string().trim().min(1).max(80),
   prenom: z.string().trim().min(1).max(80),
@@ -372,13 +377,15 @@ export async function POST(request: Request) {
       documentVersoPath = res.path
     }
 
-    // Justificatif de propriété : uniquement pour les acquéreurs (Dembri).
+    // Justificatif de propriété (Dembri) ou attestation de travail/carte professionnelle (Education).
     let justificatifPath: string | undefined
     const justificatif = form.get('justificatif')
-    if (isDembri(data.organisme) && justificatif instanceof File && justificatif.size > 0) {
+    if ((isDembri(data.organisme) || isEducation(data.organisme)) && justificatif instanceof File && justificatif.size > 0) {
       const res = await uploadFile(supabase, justificatif, `${orgSlug}/justificatifs`, JUSTIF_TYPES)
       if (res.error) return NextResponse.json({ error: `Justificatif : ${res.error}` }, { status: 400 })
       justificatifPath = res.path
+    } else if (isEducation(data.organisme) && (!justificatif || justificatif.size === 0)) {
+      return NextResponse.json({ error: 'Une attestation de travail ou carte professionnelle est obligatoire.' }, { status: 400 })
     }
 
     const { data: inserted, error: dbError } = await supabase
@@ -571,7 +578,7 @@ export async function PATCH(request: Request) {
     }
     let justificatifPath: string | undefined
     const justificatif = form.get('justificatif')
-    if (isDembri(data.organisme) && justificatif instanceof File && justificatif.size > 0) {
+    if ((isDembri(data.organisme) || isEducation(data.organisme)) && justificatif instanceof File && justificatif.size > 0) {
       const res = await uploadFile(supabase, justificatif, `${orgSlug}/justificatifs`, JUSTIF_TYPES)
       if (res.error) return NextResponse.json({ error: `Justificatif : ${res.error}` }, { status: 400 })
       justificatifPath = res.path

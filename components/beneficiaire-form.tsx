@@ -74,6 +74,11 @@ const isDembri = (o: string) => {
   return s.includes('dembri') || s.includes('dambri')
 }
 
+const isEducation = (o: string) => {
+  const s = (o || '').toLowerCase()
+  return s.includes('education') || s.includes('éducation') || s.includes('educ') || s.includes('éduc')
+}
+
 // Résidences des acquéreurs de la Promotion Dembri (sous-catégories).
 const DEMBRI_RESIDENCES = [
   'RESIDENCE MALIKA GAID 292/1448 ILOT 01',
@@ -352,7 +357,8 @@ export default function BeneficiaireForm({ organismes, logos = {} }: { organisme
   const [documentType, setDocumentType] = useState<'pdf' | 'photo'>('photo')
   const [document, setDocument] = useState<File | null>(null)
   const [documentVerso, setDocumentVerso] = useState<File | null>(null)
-  // Justificatif de propriété (facture élec/gaz/eau) — acquéreurs Dembri.
+  // Justificatif de propriété (facture élec/gaz/eau) — acquéreurs Dembri,
+  // ou attestation de travail / carte pro — education.
   const [justificatif, setJustificatif] = useState<File | null>(null)
   const [consent, setConsent] = useState(false)
   const [submitting, setSubmitting] = useState(false)
@@ -500,6 +506,7 @@ export default function BeneficiaireForm({ organismes, logos = {} }: { organisme
     // enregistrée reste valable : on n'exige un fichier que si l'on crée
     // une nouvelle fiche.
     if (!editMode && !photo) return setError(t('errorPhoto'))
+    if (!editMode && isEducation(form.organisme) && !justificatif) return setError(isRtl ? 'يرجى إرفاق شهادة العمل أو البطاقة المهنية' : 'Veuillez joindre une attestation de travail ou une carte professionnelle')
     if (!consent) return setError(t('errorConsent'))
     setSubmitting(true)
     try {
@@ -522,7 +529,7 @@ export default function BeneficiaireForm({ organismes, logos = {} }: { organisme
       if (photo) fd.append('photo', photo)
       if (document) fd.append('document', document)
       if (documentType === 'photo' && documentVerso) fd.append('document_verso', documentVerso)
-      if (justificatif && isDembri(form.organisme)) fd.append('justificatif', justificatif)
+      if (justificatif && (isDembri(form.organisme) || isEducation(form.organisme))) fd.append('justificatif', justificatif)
 
       const res = await fetch('/api/beneficiaires', { method: editMode ? 'PATCH' : 'POST', body: fd })
       // Déjà inscrit : on ne crée pas de doublon, on propose la modification.
@@ -1345,6 +1352,33 @@ export default function BeneficiaireForm({ organismes, logos = {} }: { organisme
                     isRtl
                       ? 'فاتورة حديثة باسم المالك لإثبات ملكية السكن.'
                       : 'Une facture récente au nom du propriétaire pour prouver la propriété du logement.'
+                  }
+                  isRtl={isRtl}
+                />
+              </div>
+            )}
+
+            {/* Attestation de travail / carte professionnelle — uniquement pour Education */}
+            {isEducation(form.organisme) && (
+              <div>
+                <p className={labelClass}>
+                  {isRtl
+                    ? 'شهادة العمل أو البطاقة المهنية'
+                    : 'Attestation de travail ou carte professionnelle'} <span className="text-red-500">*</span>
+                </p>
+                <MediaPicker
+                  file={justificatif}
+                  setFile={setJustificatif}
+                  capture="environment"
+                  accept="image/*,application/pdf"
+                  takeLabel={isRtl ? 'تصوير الوثيقة' : 'Scanner le document'}
+                  chooseLabel={t('chooseDoc')}
+                  changeLabel={t('change')}
+                  addedLabel={t('added')}
+                  tip={
+                    isRtl
+                      ? 'إثبات الانتماء لقطاع التربية إلزامي.'
+                      : 'Une preuve d\'appartenance au secteur de l\'éducation est obligatoire.'
                   }
                   isRtl={isRtl}
                 />
