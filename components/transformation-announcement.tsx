@@ -25,10 +25,8 @@ const ICONS_MAP: Record<string, any> = {
 
 /* ── Repli local (si Sanity est vide ou injoignable) ── */
 const MILESTONES = [
-    { period: '2016', period_ar: '2016', label: 'Ouverture de la Clinique Okba', label_ar: 'افتتاح عيادة عقبة', status: 'done' },
-    { period: '2024', period_ar: '2024', label: 'Plateau technique & imagerie de pointe', label_ar: 'تجهيزات تقنية وتصوير طبي متطور', status: 'done' },
     { period: 'En cours', period_ar: 'جارٍ حالياً', label: 'Travaux d’extension', label_ar: 'أشغال التوسعة', status: 'current' },
-    { period: 'Prochainement', period_ar: 'قريباً', label: 'Ouverture de l’Hôpital Okba', label_ar: 'افتتاح مستشفى عقبة', status: 'upcoming' },
+    { period: 'Avril 2026', period_ar: 'أبريل 2026', label: 'Ouverture de l’Hôpital Okba', label_ar: 'افتتاح مستشفى عقبة', status: 'upcoming' },
 ]
 
 const HIGHLIGHTS = [
