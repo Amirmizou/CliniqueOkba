@@ -384,7 +384,7 @@ export async function POST(request: Request) {
       const res = await uploadFile(supabase, justificatif, `${orgSlug}/justificatifs`, JUSTIF_TYPES)
       if (res.error) return NextResponse.json({ error: `Justificatif : ${res.error}` }, { status: 400 })
       justificatifPath = res.path
-    } else if (isEducation(data.organisme) && (!justificatif || justificatif.size === 0)) {
+    } else if (isEducation(data.organisme) && (!(justificatif instanceof File) || justificatif.size === 0)) {
       return NextResponse.json({ error: 'Une attestation de travail ou carte professionnelle est obligatoire.' }, { status: 400 })
     }
 
