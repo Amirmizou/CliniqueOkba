@@ -282,6 +282,33 @@ export const doctors: Doctor[] = [
     accent: '#0EA5E9',
     gradient: 'from-sky-500 via-cyan-500 to-teal-500',
   },
+  {
+    id: 'bouzid-soraya',
+    name: 'Dr. Soraya BOUZID eps KARA',
+    name_ar: 'د. ثريا بوزيد',
+    specialty: 'ORL',
+    specialty_ar: 'أنف أذن حنجرة',
+    subtitle: 'Spécialiste ORL',
+    subtitle_ar: 'أخصائية أنف وأذن وحنجرة',
+    services: [
+      'Consultation spécialisée ORL',
+      'Exploration endoscopique',
+      'Chirurgie ORL',
+    ],
+    services_ar: [
+      'استشارة متخصصة في الأنف والأذن والحنجرة',
+      'استكشاف بالمنظار',
+      'جراحة الأنف والأذن والحنجرة',
+    ],
+    days: 'Du dimanche au jeudi',
+    days_ar: 'من الأحد إلى الخميس',
+    hours: '08h00 – 16h00',
+    hours_ar: 'من 08:00 إلى 16:00',
+    poster: '/images/spec/portrait-bouzid-soraya.jpg',
+    icon: Stethoscope,
+    accent: '#8B5CF6',
+    gradient: 'from-violet-500 via-purple-500 to-fuchsia-500',
+  },
 ]
 
 /** Numéro WhatsApp principal de la clinique (format international, sans +) */
