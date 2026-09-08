@@ -1,11 +1,13 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useTranslations, useLocale } from 'next-intl'
 import Image from 'next/image'
 import {
   motion,
   AnimatePresence,
+  useMotionValue,
+  useAnimation,
 } from 'framer-motion'
 import {
   Calendar,
@@ -44,6 +46,8 @@ import {
   Accessibility,
   PersonStanding,
   Footprints,
+  ChevronLeft,
+  ChevronRight,
   type LucideIcon,
 } from 'lucide-react'
 import { doctors, CLINIC_WHATSAPP, CLINIC_PHONE, type Doctor } from '@/data/doctors'
@@ -655,12 +659,47 @@ export default function DoctorsShowcase({ data, sectionContent }: { data?: any[]
   
   const sectionAccent = sectionContent?.accentColor || '#006633'
 
+  // --- 3D Carousel Logic ---
+  const numItems = list.length
+  const angleStep = 360 / numItems
+  // Largeur de base de la carte
+  const cardWidth = 320
+  // Le rayon s'adapte au nombre d'éléments pour garder un espacement cohérent
+  const radius = Math.round((cardWidth / 2) / Math.tan(Math.PI / numItems)) + 40
+
+  const [currentIndex, setCurrentIndex] = useState(0)
+  const controls = useAnimation()
+  
+  useEffect(() => {
+    controls.start({ 
+      rotateY: currentIndex * -angleStep, 
+      transition: { type: "spring", stiffness: 150, damping: 20, mass: 1 } 
+    })
+  }, [currentIndex, angleStep, controls])
+
+  const handleDragEnd = (event: any, info: any) => {
+    const dragThreshold = 40
+    if (info.offset.x < -dragThreshold) {
+      setCurrentIndex((prev) => prev + 1)
+    } else if (info.offset.x > dragThreshold) {
+      setCurrentIndex((prev) => prev - 1)
+    } else {
+      // Revenir à la position courante
+      controls.start({ 
+        rotateY: currentIndex * -angleStep, 
+        transition: { type: "spring", stiffness: 300, damping: 30 } 
+      })
+    }
+  }
+
+  const handleNext = () => setCurrentIndex(prev => prev + 1)
+  const handlePrev = () => setCurrentIndex(prev => prev - 1)
+
   return (
     <section
       id="medecins"
       className="relative overflow-hidden bg-background py-16 sm:py-20 md:py-24"
     >
-      {/* Décor d'ambiance dynamique — teinte pilotée par le pôle affiché */}
       <SectionGlow
         glows={[
           { at: '100% 0%', size: 384, color: sectionAccent, opacity: 0.15 },
@@ -669,7 +708,6 @@ export default function DoctorsShowcase({ data, sectionContent }: { data?: any[]
       />
 
       <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        {/* En-tête */}
         <AnimatedSection animation="fade">
           <SectionHeader
             className="animate-item mb-14"
@@ -699,30 +737,69 @@ export default function DoctorsShowcase({ data, sectionContent }: { data?: any[]
           />
         </AnimatedSection>
 
-        {/* Grille (flex centré : s'équilibre quel que soit le nombre de médecins) */}
-        <div className="relative">
-          {/* Fondu droit — indicateur de scroll mobile */}
-          <div className="pointer-events-none absolute bottom-8 right-0 top-0 z-10 w-16 bg-gradient-to-l from-background to-transparent sm:hidden" aria-hidden="true" />
+        {/* 3D Carousel Cylinder */}
+        <div className="relative flex flex-col items-center justify-center pt-8 pb-16" style={{ perspective: '1600px' }}>
+          
+          {/* Couche d'ombrage pour adoucir le fond si besoin */}
+          <div className="absolute inset-0 z-0 pointer-events-none" style={{ background: 'radial-gradient(circle at 50% 50%, transparent 40%, var(--background) 80%)' }} />
 
-          <div className="flex flex-nowrap overflow-x-auto pb-8 snap-x snap-proximity touch-pan-x touch-pan-y gap-4 overscroll-x-contain sm:gap-6 sm:flex-wrap sm:justify-center sm:overflow-visible sm:pb-0 sm:snap-none sm:touch-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
-            {list.map((doctor, i) => (
-              <div
-                key={doctor.id}
-                className="w-[85vw] shrink-0 snap-center sm:w-[calc(50%-0.75rem)] sm:shrink lg:w-[calc(33.333%-1rem)] xl:w-[calc(25%-1.125rem)]"
-              >
-                <DoctorCard doctor={doctor} index={i} onOpen={setActive} onPlay={handlePlayVideo} sectionAccent={sectionAccent} />
-              </div>
-            ))}
+          <motion.div
+            className="relative z-10 flex items-center justify-center cursor-grab active:cursor-grabbing"
+            style={{ 
+              width: cardWidth, 
+              height: '560px', 
+              transformStyle: 'preserve-3d',
+            }}
+            animate={controls}
+            drag="x"
+            dragConstraints={{ left: 0, right: 0 }}
+            dragElastic={0.15}
+            onDragEnd={handleDragEnd}
+          >
+            {list.map((doctor, i) => {
+              return (
+                <div
+                  key={doctor.id}
+                  className="absolute left-0 top-0 w-full h-full"
+                  style={{
+                    transform: `rotateY(${i * angleStep}deg) translateZ(${radius}px)`,
+                    backfaceVisibility: 'hidden',
+                  }}
+                >
+                  <div className="w-full h-full pointer-events-none">
+                    {/* On réactive les clics à l'intérieur de la carte */}
+                    <div className="pointer-events-auto h-full w-full">
+                      <DoctorCard doctor={doctor} index={i} onOpen={setActive} onPlay={handlePlayVideo} sectionAccent={sectionAccent} />
+                    </div>
+                  </div>
+                </div>
+              )
+            })}
+          </motion.div>
+
+          {/* Navigation Controls */}
+          <div className="relative z-20 mt-20 flex items-center gap-6">
+            <button
+              onClick={handlePrev}
+              className="flex h-12 w-12 items-center justify-center rounded-full border border-border bg-background/50 shadow-sm backdrop-blur-md transition-all hover:bg-background hover:scale-110 active:scale-95 hover:text-primary"
+              aria-label={isAr ? 'السابق' : 'Précédent'}
+            >
+              <ChevronLeft className="h-5 w-5" />
+            </button>
+            <p className="text-sm font-medium text-muted-foreground/60 select-none">
+              {isAr ? 'اسحب للتدوير' : 'Glisser pour tourner'}
+            </p>
+            <button
+              onClick={handleNext}
+              className="flex h-12 w-12 items-center justify-center rounded-full border border-border bg-background/50 shadow-sm backdrop-blur-md transition-all hover:bg-background hover:scale-110 active:scale-95 hover:text-primary"
+              aria-label={isAr ? 'التالي' : 'Suivant'}
+            >
+              <ChevronRight className="h-5 w-5" />
+            </button>
           </div>
-
-          {/* Hint textuel swipe — mobile uniquement */}
-          <p className="mt-1 text-center text-xs text-muted-foreground/60 sm:hidden" aria-hidden="true">
-            {isAr ? '← اسحب لمزيد من الأطباء' : 'Glisser pour voir tous les médecins →'}
-          </p>
         </div>
       </div>
 
-      {/* Lightbox affiche */}
       <AnimatePresence>
         {active && <PosterLightbox doctor={active} onClose={() => setActive(null)} />}
         {activeVideo && <VideoLightbox doctor={activeVideo} onClose={() => setActiveVideo(null)} />}
