@@ -94,7 +94,7 @@ export default function StickyNav({
               }}
             />
 
-            <div className="mx-auto flex h-14 max-w-7xl items-center gap-4 px-4 sm:px-6 lg:h-[60px] lg:gap-6 lg:px-8">
+            <div className="mx-auto flex h-14 max-w-5xl items-center gap-3 px-4 sm:px-6 lg:h-[60px] lg:px-8">
               {/* ── Marque ── (zone gauche, même largeur que la zone droite) */}
               <div className="flex flex-1 basis-0 justify-start">
               <a
@@ -120,7 +120,7 @@ export default function StickyNav({
 
               {/* ── Liens (desktop) — bloc central ── */}
               <nav
-                className="hidden shrink-0 items-center justify-center gap-1.5 xl:flex"
+                className="hidden shrink-0 items-center justify-center gap-0.5 xl:flex"
                 aria-label={t('specialties')}
               >
                 <StickyLink

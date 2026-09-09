@@ -26,7 +26,13 @@ const ICONS_MAP: Record<string, any> = {
 /* ── Repli local (si Sanity est vide ou injoignable) ── */
 const MILESTONES = [
     { period: 'En cours', period_ar: 'جارٍ حالياً', label: 'Travaux d’extension', label_ar: 'أشغال التوسعة', status: 'current' },
-    { period: 'Avril 2026', period_ar: 'أبريل 2026', label: 'Ouverture de l’Hôpital Okba', label_ar: 'افتتاح مستشفى عقبة', status: 'upcoming' },
+    {
+        period: 'Avril 2026',
+        period_ar: 'أبريل 2026',
+        label: 'Ouverture de l’Établissement Hospitalier Privé Okba',
+        label_ar: 'افتتاح المؤسسة الاستشفائية الخاصة عقبة',
+        status: 'upcoming',
+    },
 ]
 
 const HIGHLIGHTS = [
@@ -55,8 +61,8 @@ const HIGHLIGHTS = [
         icon: 'ScanLine',
         title: 'Plateau technique étendu',
         title_ar: 'تجهيزات تقنية موسّعة',
-        desc: 'Imagerie, laboratoire et blocs opératoires à la hauteur d’un hôpital moderne.',
-        desc_ar: 'تصوير طبي ومخبر وكتل جراحية بمستوى مستشفى عصري.',
+        desc: 'Imagerie, laboratoire et blocs opératoires à la hauteur d’un établissement hospitalier moderne.',
+        desc_ar: 'تصوير طبي ومخبر وكتل جراحية بمستوى مؤسسة استشفائية عصرية.',
     },
 ]
 
@@ -102,11 +108,11 @@ function TransformationSection({ isAr, data }: { isAr: boolean; data?: any }) {
         : data?.kicker || 'Une nouvelle dimension du soin à Constantine'
     const subtitle = isAr
         ? data?.subtitle_ar ||
-          'تتحول عيادة عقبة قريباً إلى مستشفى عقبة: أسرّة أكثر، تخصصات أوسع، وتجهيزات تقنية متطورة — بنفس الفريق ونفس مستوى الالتزام منذ اليوم الأول.'
+          'تتحول عيادة عقبة قريباً إلى مؤسسة استشفائية خاصة عقبة: أسرّة أكثر، تخصصات أوسع، وتجهيزات تقنية متطورة — بنفس الفريق ونفس مستوى الالتزام منذ اليوم الأول.'
         : data?.subtitle ||
-          "La Clinique Okba devient prochainement l'Hôpital Okba : plus de lits, plus de spécialités, un plateau technique élargi — avec la même équipe et la même exigence depuis le premier jour."
+          "La Clinique Okba devient prochainement l'Établissement Hospitalier Privé Okba : plus de lits, plus de spécialités, un plateau technique élargi — avec la même équipe et la même exigence depuis le premier jour."
     const fromWord = isAr ? data?.fromWord_ar || 'عيادة' : data?.fromWord || 'Clinique'
-    const toWord = isAr ? data?.toWord_ar || 'مستشفى' : data?.toWord || 'Hôpital'
+    const toWord = isAr ? data?.toWord_ar || 'مؤسسة استشفائية خاصة' : data?.toWord || 'Établissement Hospitalier Privé'
     const brandWord = isAr ? data?.brandWord_ar || 'عقبة' : data?.brandWord || 'Okba'
     const ctaText = isAr ? data?.ctaText_ar || 'اتصل بنا' : data?.ctaText || 'Nous contacter'
     const ctaHref = data?.ctaHref || '#contact'
@@ -133,7 +139,11 @@ function TransformationSection({ isAr, data }: { isAr: boolean; data?: any }) {
     return (
         <section
             id="transformation"
-            aria-label={isAr ? 'إعلان التحول إلى مستشفى' : 'Annonce de la transformation en hôpital'}
+            aria-label={
+                isAr
+                    ? 'إعلان التحول إلى مؤسسة استشفائية خاصة'
+                    : 'Annonce de la transformation en établissement hospitalier privé'
+            }
             className="relative overflow-hidden bg-[#04140c] py-20 sm:py-24 md:py-32"
         >
             {/* Décor : halos verts + trame technique */}
@@ -172,7 +182,7 @@ function TransformationSection({ isAr, data }: { isAr: boolean; data?: any }) {
                         {kicker}
                     </p>
 
-                    <h2 className="mt-4 text-4xl font-bold leading-[1.1] tracking-tight text-white sm:text-6xl md:text-7xl">
+                    <h2 className="mt-4 text-2xl font-bold leading-[1.15] tracking-tight text-white sm:text-4xl md:text-5xl">
                         <WordMorph
                             from={fromWord}
                             to={toWord}

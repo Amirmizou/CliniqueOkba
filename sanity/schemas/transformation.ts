@@ -1,13 +1,13 @@
 import { defineField, defineType } from 'sanity'
 
 /**
- * Annonce de la transformation « Clinique Okba » → « Hôpital Okba ».
+ * Annonce de la transformation « Clinique Okba » → « Établissement Hospitalier Privé Okba ».
  * Document unique (singleton) : une seule fiche à éditer dans le Studio.
  * Passer « Annonce active » à non pour retirer la section du site.
  */
 export default defineType({
     name: 'transformation',
-    title: '🏥 Annonce — Hôpital Okba',
+    title: '🏥 Annonce — Étab. Hospitalier Privé Okba',
     type: 'document',
     groups: [
         { name: 'general', title: 'Général', default: true },
@@ -52,16 +52,16 @@ export default defineType({
         }),
         defineField({
             name: 'toWord',
-            title: "Mot d'arrivée (FR) — ex. « Hôpital »",
+            title: "Mot d'arrivée (FR) — ex. « Établissement Hospitalier Privé »",
             type: 'string',
-            initialValue: 'Hôpital',
+            initialValue: 'Établissement Hospitalier Privé',
             group: 'general',
         }),
         defineField({
             name: 'toWord_ar',
             title: "Mot d'arrivée (AR)",
             type: 'string',
-            initialValue: 'مستشفى',
+            initialValue: 'مؤسسة استشفائية خاصة',
             group: 'general',
         }),
         defineField({
@@ -98,7 +98,7 @@ export default defineType({
             type: 'text',
             rows: 3,
             initialValue:
-                "La Clinique Okba devient prochainement l'Hôpital Okba : plus de lits, plus de spécialités, un plateau technique élargi — avec la même équipe et la même exigence depuis le premier jour.",
+                "La Clinique Okba devient prochainement l'Établissement Hospitalier Privé Okba : plus de lits, plus de spécialités, un plateau technique élargi — avec la même équipe et la même exigence depuis le premier jour.",
             group: 'general',
         }),
         defineField({
@@ -107,7 +107,7 @@ export default defineType({
             type: 'text',
             rows: 3,
             initialValue:
-                'تتحول عيادة عقبة قريباً إلى مستشفى عقبة: أسرّة أكثر، تخصصات أوسع، وتجهيزات تقنية متطورة — بنفس الفريق ونفس مستوى الالتزام منذ اليوم الأول.',
+                'تتحول عيادة عقبة قريباً إلى مؤسسة استشفائية خاصة عقبة: أسرّة أكثر، تخصصات أوسع، وتجهيزات تقنية متطورة — بنفس الفريق ونفس مستوى الالتزام منذ اليوم الأول.',
             group: 'general',
         }),
         defineField({
@@ -206,6 +206,6 @@ export default defineType({
         }),
     ],
     preview: {
-        prepare: () => ({ title: 'Annonce — Hôpital Okba' }),
+        prepare: () => ({ title: 'Annonce — Étab. Hospitalier Privé Okba' }),
     },
 })

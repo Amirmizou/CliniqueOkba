@@ -74,7 +74,16 @@ export function WordMorph({
     // Écriture liée (arabe) : on n'a pas le droit de séparer les lettres.
     const isCursive = /[؀-ۿ]/.test(word)
     const isDisplay = variant === 'display'
-    const parts = isCursive || !isDisplay ? [word] : Array.from(word)
+    // Libellé de plusieurs mots (« Établissement Hospitalier Privé ») : on anime
+    // mot par mot et on autorise le retour à la ligne. Découpé en lettres, chaque
+    // espace deviendrait un item flex de largeur nulle — les mots se colleraient.
+    const isPhrase = /\s/.test(from.trim()) || /\s/.test(to.trim())
+    const parts =
+        isCursive || !isDisplay
+            ? [word]
+            : isPhrase
+              ? word.trim().split(/\s+/)
+              : Array.from(word)
     const stateClass = showTo ? toClassName : fromClassName
 
     return (
@@ -83,12 +92,18 @@ export function WordMorph({
                 plus large des deux mots, donc rien ne bouge autour. */}
             <span
                 aria-hidden
-                className="invisible col-start-1 row-start-2 block h-0 overflow-hidden whitespace-nowrap"
+                className={`invisible col-start-1 row-start-2 block h-0 overflow-hidden ${
+                    isPhrase ? '' : 'whitespace-nowrap'
+                }`}
             >
                 {showTo ? from : to}
             </span>
 
-            <span className="col-start-1 row-start-1 flex justify-center whitespace-nowrap">
+            <span
+                className={`col-start-1 row-start-1 flex justify-center ${
+                    isPhrase ? 'flex-wrap gap-x-[0.28em]' : 'whitespace-nowrap'
+                }`}
+            >
                 {parts.map((part, i) => (
                     <motion.span
                         key={`${showTo ? 'to' : 'from'}-${i}`}
