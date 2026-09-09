@@ -46,6 +46,20 @@ export default function Insurance({ data }: InsuranceProps) {
   const [selectedProvider, setSelectedProvider] = useState<InsuranceProvider | null>(null)
   const [photoIndex, setPhotoIndex] = useState(0)
 
+  const providers = data.providers ? [...data.providers] : []
+  
+  // Ajouter l'ONA s'il n'est pas déjà configuré dans le CMS
+  const hasONA = providers.some(p => (p.name || '').toLowerCase().includes('ona') || (p.name || '').toLowerCase().includes('architecte'))
+  if (!hasONA) {
+    providers.push({
+      name: 'ONA - Ordre National des Architectes',
+      name_ar: 'النقابة الوطنية للمهندسين المعماريين',
+      description: 'Convention spéciale pour les architectes affiliés et leurs familles. Cliquez ici pour vous inscrire.',
+      description_ar: 'اتفاقية خاصة للمهندسين المعماريين المنتسبين وعائلاتهم. اضغط هنا للتسجيل.',
+      registrationLink: 'https://facture.cliniqueokba.com/ona-inscription', // Lien vers le projet Facture Okba
+    })
+  }
+
   return (
     <section
       id="prise-en-charge"
@@ -72,7 +86,7 @@ export default function Insurance({ data }: InsuranceProps) {
 
         {/* Grille des conventions (remplace le cylindre pour éviter les duplications) */}
         <div className="mt-16 flex flex-wrap justify-center gap-6">
-          {data.providers.map((provider, i) => {
+          {providers.map((provider, i) => {
             let logoUrl = typeof provider.logo === 'string'
               ? provider.logo
               : provider.logo
@@ -86,6 +100,7 @@ export default function Insurance({ data }: InsuranceProps) {
               else if (n.includes('ensb')) logoUrl = '/images/conventions/ensb.png'
               else if (n.includes('seaco')) logoUrl = '/images/conventions/seaco.png'
               else if (n.includes('oncolog')) logoUrl = '/images/conventions/oncologica.png'
+              else if (n.includes('ona') || n.includes('architecte')) logoUrl = '/images/conventions/ona.png'
             }
             
             const hasPhotos = Array.isArray(provider.signaturePhotos) && provider.signaturePhotos.length > 0
