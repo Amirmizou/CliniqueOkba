@@ -206,9 +206,9 @@ export default function StickyNav({
                 {phone && (
                   <a
                     href={phoneHref}
-                    className="hidden items-center gap-1.5 rounded-full border border-[#006633]/20 px-2.5 py-1 text-[11.5px] font-semibold text-[#006633] transition-colors hover:bg-[#006633]/[0.07] lg:flex dark:border-white/15 dark:text-white"
+                    className="hidden shrink-0 whitespace-nowrap items-center gap-1.5 rounded-full border border-[#006633]/20 px-2.5 py-1 text-[11.5px] font-semibold text-[#006633] transition-colors hover:bg-[#006633]/[0.07] lg:flex dark:border-white/15 dark:text-white"
                   >
-                    <Phone className="h-3 w-3" />
+                    <Phone className="h-3 w-3 shrink-0" />
                     <span dir="ltr">{phone}</span>
                   </a>
                 )}
@@ -218,9 +218,9 @@ export default function StickyNav({
                     href={appointmentHref}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center gap-1.5 rounded-full bg-[#006633] px-3 py-1.5 text-[11.5px] font-bold text-white shadow-sm transition-colors hover:bg-[#004d26] sm:px-3.5"
+                    className="flex shrink-0 whitespace-nowrap items-center gap-1.5 rounded-full bg-[#006633] px-3 py-1.5 text-[11.5px] font-bold text-white shadow-sm transition-colors hover:bg-[#004d26] sm:px-3.5"
                   >
-                    <MessageCircle className="h-3.5 w-3.5" />
+                    <MessageCircle className="h-3.5 w-3.5 shrink-0" />
                     <span className="hidden sm:inline">{t('appointment')}</span>
                     <span className="sm:hidden">RDV</span>
                   </a>

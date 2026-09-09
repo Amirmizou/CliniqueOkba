@@ -360,7 +360,7 @@ export default function Header({ siteSettings, poles }: HeaderProps) {
           vert ne revient qu'en bas, pour rejoindre le filet vert → or. Le
           dégradé à deux arrêts (#eaf5ee → #d9ebe0) teintait la bande sur toute
           sa hauteur et l'aplatissait. */}
-      <header className="relative z-[60] flex flex-col items-center gap-2 px-4 py-3 bg-gradient-to-b from-[#fbfdfc]/95 via-[#f1f8f4]/95 to-[#e3efe8]/95 backdrop-blur-md shadow-[inset_0_1px_0_rgba(255,255,255,0.75),0_10px_30px_-14px_rgba(0,83,42,0.30)] dark:from-slate-950/90 dark:via-slate-950/90 dark:to-[#04120b]/90 dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.06),0_10px_30px_-14px_rgba(0,0,0,0.6)]">
+      <header className="relative z-[60] flex flex-col items-center gap-1 px-4 py-1.5 bg-gradient-to-b from-[#fbfdfc]/95 via-[#f1f8f4]/95 to-[#e3efe8]/95 backdrop-blur-md shadow-[inset_0_1px_0_rgba(255,255,255,0.75),0_10px_30px_-14px_rgba(0,83,42,0.30)] dark:from-slate-950/90 dark:via-slate-950/90 dark:to-[#04120b]/90 dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.06),0_10px_30px_-14px_rgba(0,0,0,0.6)]">
 
         {/* ═══ Fond de bande — toutes tailles ═══
             Deux voiles CSS purs (ni image, ni SVG, ni animation) : le coût de
@@ -606,7 +606,7 @@ export default function Header({ siteSettings, poles }: HeaderProps) {
         </div>
 
         {/* 3D SCANNER DESKTOP & MOBILE — Siemens Symbia Pro.specta */}
-        <div className="pointer-events-auto relative w-full h-[95px] md:h-[110px] xl:h-[140px] transition-all duration-700">
+        <div className="pointer-events-auto relative w-full h-[80px] md:h-[95px] xl:h-[120px] transition-all duration-700">
           <div
             /* --sc-gutter = la gouttière vide à droite de la grille 1280px sur les
                grands écrans. On l'ajoute à la largeur de la scène (xl+) pour que le
@@ -619,7 +619,7 @@ export default function Header({ siteSettings, poles }: HeaderProps) {
             style={{ ['--sc-gutter' as string]: 'max(0px, (100vw - 1372px) / 2)' } as React.CSSProperties}
             className={cn(
             "absolute top-0 left-0 h-[140px] origin-top-left transition-all duration-700",
-            "w-[142.8%] scale-[0.7] md:w-[125%] md:scale-[0.8] xl:w-[calc(100%_+_var(--sc-gutter))] xl:scale-100",
+            "w-[166.6%] scale-[0.6] md:w-[133.3%] md:scale-[0.75] xl:w-[calc(117.6%_+_var(--sc-gutter))] xl:scale-[0.85]",
             isScrolled ? "opacity-95 xl:scale-95 xl:-translate-y-2" : "opacity-100 translate-y-0"
           )}>
 
