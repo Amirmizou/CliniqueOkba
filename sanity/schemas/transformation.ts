@@ -65,6 +65,19 @@ export default defineType({
             group: 'general',
         }),
         defineField({
+            name: 'shortWord',
+            title: "Abréviation (FR) — ex. « EHP » (3ᵉ temps de l'animation, vide = désactivé)",
+            type: 'string',
+            initialValue: 'EHP',
+            group: 'general',
+        }),
+        defineField({
+            name: 'shortWord_ar',
+            title: "Abréviation (AR) — vide = désactivé (pas d'abréviation d'usage en arabe)",
+            type: 'string',
+            group: 'general',
+        }),
+        defineField({
             name: 'brandWord',
             title: 'Mot invariable (FR) — ex. « Okba »',
             type: 'string',

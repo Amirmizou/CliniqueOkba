@@ -113,6 +113,9 @@ function TransformationSection({ isAr, data }: { isAr: boolean; data?: any }) {
           "La Clinique Okba devient prochainement l'Établissement Hospitalier Privé Okba : plus de lits, plus de spécialités, un plateau technique élargi — avec la même équipe et la même exigence depuis le premier jour."
     const fromWord = isAr ? data?.fromWord_ar || 'عيادة' : data?.fromWord || 'Clinique'
     const toWord = isAr ? data?.toWord_ar || 'مؤسسة استشفائية خاصة' : data?.toWord || 'Établissement Hospitalier Privé'
+    // Troisième palier de la métamorphose : l'abréviation officielle.
+    // (l'arabe n'a pas d'abréviation d'usage : 3ᵉ temps désactivé par défaut)
+    const shortWord = isAr ? (data?.shortWord_ar ?? '') : (data?.shortWord ?? 'EHP')
     const brandWord = isAr ? data?.brandWord_ar || 'عقبة' : data?.brandWord || 'Okba'
     const ctaText = isAr ? data?.ctaText_ar || 'اتصل بنا' : data?.ctaText || 'Nous contacter'
     const ctaHref = data?.ctaHref || '#contact'
@@ -185,7 +188,7 @@ function TransformationSection({ isAr, data }: { isAr: boolean; data?: any }) {
                     <h2 className="mt-4 text-2xl font-bold leading-[1.15] tracking-tight text-white sm:text-4xl md:text-5xl">
                         <WordMorph
                             from={fromWord}
-                            to={toWord}
+                            to={[toWord, shortWord]}
                             variant="display"
                             fromClassName="text-white/55"
                             toClassName="text-white"

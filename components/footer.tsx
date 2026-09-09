@@ -135,9 +135,9 @@ export default function Footer({ siteSettings, footerContent, sanityPoles }: Foo
               </div>
               <div className="flex flex-col">
                 {isAr ? (
-                    <span className='block text-2xl font-bold tracking-tight text-white drop-shadow-md'><WordMorph from="المصحة الطبية" to="مستشفى" /> <span className="text-primary font-extrabold">عقبة</span></span>
+                    <span className='block text-2xl font-bold tracking-tight text-white drop-shadow-md'><WordMorph from="المصحة الطبية" to="مؤسسة استشفائية خاصة" /> <span className="text-primary font-extrabold">عقبة</span></span>
                 ) : (
-                    <span className='block text-2xl font-bold tracking-tight text-white drop-shadow-md'><WordMorph from="Clinique" to="Hôpital" /> <span className="text-primary font-extrabold">OKBA</span></span>
+                    <span className='block text-2xl font-bold tracking-tight text-white drop-shadow-md'><WordMorph from="Clinique" to={['Établissement Hospitalier Privé', 'EHP']} /> <span className="text-primary font-extrabold">OKBA</span></span>
                 )}
                 <span className='text-[10px] w-fit text-primary font-bold tracking-[0.25em] uppercase mt-1 opacity-80'>
                   {tNav('tagline')}

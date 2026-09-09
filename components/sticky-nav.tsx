@@ -206,9 +206,9 @@ export default function StickyNav({
                 {phone && (
                   <a
                     href={phoneHref}
-                    className="hidden items-center gap-2 rounded-full border border-[#006633]/20 px-3 py-1.5 text-[13px] font-semibold text-[#006633] transition-colors hover:bg-[#006633]/[0.07] lg:flex dark:border-white/15 dark:text-white"
+                    className="hidden items-center gap-1.5 rounded-full border border-[#006633]/20 px-2.5 py-1 text-[11.5px] font-semibold text-[#006633] transition-colors hover:bg-[#006633]/[0.07] lg:flex dark:border-white/15 dark:text-white"
                   >
-                    <Phone className="h-3.5 w-3.5" />
+                    <Phone className="h-3 w-3" />
                     <span dir="ltr">{phone}</span>
                   </a>
                 )}
@@ -218,9 +218,9 @@ export default function StickyNav({
                     href={appointmentHref}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center gap-2 rounded-full bg-[#006633] px-3.5 py-2 text-[13px] font-bold text-white shadow-sm transition-colors hover:bg-[#004d26] sm:px-4"
+                    className="flex items-center gap-1.5 rounded-full bg-[#006633] px-3 py-1.5 text-[11.5px] font-bold text-white shadow-sm transition-colors hover:bg-[#004d26] sm:px-3.5"
                   >
-                    <MessageCircle className="h-4 w-4" />
+                    <MessageCircle className="h-3.5 w-3.5" />
                     <span className="hidden sm:inline">{t('appointment')}</span>
                     <span className="sm:hidden">RDV</span>
                   </a>
@@ -231,9 +231,9 @@ export default function StickyNav({
                   type="button"
                   aria-label={t('more')}
                   onClick={onOpenMenu}
-                  className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-[#006633]/20 bg-white/80 text-[#006633] shadow-sm transition-colors active:scale-95 xl:hidden dark:border-white/15 dark:bg-slate-800/80 dark:text-white"
+                  className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-[#006633]/20 bg-white/80 text-[#006633] shadow-sm transition-colors active:scale-95 xl:hidden dark:border-white/15 dark:bg-slate-800/80 dark:text-white"
                 >
-                  <Menu className="h-5 w-5" strokeWidth={2.2} />
+                  <Menu className="h-4.5 w-4.5" strokeWidth={2.2} />
                 </button>
               </div>
             </div>
