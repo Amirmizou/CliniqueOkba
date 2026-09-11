@@ -622,6 +622,7 @@ export default function Header({ siteSettings, poles }: HeaderProps) {
             "w-[181.8%] scale-[0.55] md:w-[133.3%] md:scale-[0.75] xl:w-[calc(117.6%_+_var(--sc-gutter))] xl:scale-[0.85]",
             isScrolled ? "opacity-95 xl:scale-95 xl:-translate-y-2" : "opacity-100 translate-y-0"
           )}>
+          <div className="absolute inset-0 mx-auto w-full h-full max-w-[800px] md:max-w-[900px] xl:max-w-[1050px]">
 
           {/* ══ FLOOR MOUNT ══ */}
           <div className="absolute right-[10px] bottom-0 w-[174px] h-[18px] z-0 pointer-events-none" style={{
@@ -868,7 +869,7 @@ export default function Header({ siteSettings, poles }: HeaderProps) {
           </div>
 
           {/* ══ PLATEAU PATIENT - BASE TÉLESCOPIQUE ══ */}
-          <div className={cn("absolute z-[5] pointer-events-none origin-right left-[20%] lg:left-[30%] xl:left-[40%] right-[145px] bottom-0 h-[32px]", isHidden ? "translate-x-[200px] opacity-0 transition-all duration-[2000ms] ease-in-out" : "translate-x-0 opacity-100 transition-all duration-[1500ms] delay-[400ms] ease-out")} style={{
+          <div className={cn("absolute z-[5] pointer-events-none origin-right left-[20%] right-[145px] bottom-0 h-[32px]", isHidden ? "translate-x-[200px] opacity-0 transition-all duration-[2000ms] ease-in-out" : "translate-x-0 opacity-100 transition-all duration-[1500ms] delay-[400ms] ease-out")} style={{
             borderRadius:'4px 4px 0 0',
             background:'linear-gradient(180deg, #fcfcfc 0%, #e6e6e6 70%, #d4d4d4 100%)',
             boxShadow:'0 6px 12px rgba(0,0,0,0.2), inset 2px 0 6px rgba(255,255,255,0.9)',
@@ -883,14 +884,14 @@ export default function Header({ siteSettings, poles }: HeaderProps) {
           </div>
 
           {/* Glissière sous la table */}
-          <div className={cn("absolute z-[29] pointer-events-none origin-right left-[20px] lg:left-[25%] xl:left-[35%] right-[135px] bottom-[26px] h-[8px]", isHidden ? "translate-x-[200px] opacity-0 transition-all duration-[2000ms] ease-in-out" : "translate-x-0 opacity-100 transition-all duration-[1500ms] delay-[400ms] ease-out")} style={{
+          <div className={cn("absolute z-[29] pointer-events-none origin-right left-[20px] right-[135px] bottom-[26px] h-[8px]", isHidden ? "translate-x-[200px] opacity-0 transition-all duration-[2000ms] ease-in-out" : "translate-x-0 opacity-100 transition-all duration-[1500ms] delay-[400ms] ease-out")} style={{
             borderRadius:'0 0 0 4px',
             background:'linear-gradient(180deg,#888 0%,#bbb 40%,#777 100%)',
             boxShadow:'inset 0 1px 3px rgba(0,0,0,0.5), 0 3px 6px rgba(0,0,0,0.2)',
           }} />
 
           {/* Table Patient (Matelas + Base Blanche Principale) */}
-          <div className={cn("absolute z-[30] flex flex-col justify-end origin-right hover:-translate-x-1 left-[10px] lg:left-[20%] xl:left-[30%] right-[95px] bottom-[32px] h-[64px]", isHidden ? "translate-x-[200px] opacity-0 transition-all duration-[2000ms] ease-in-out" : "translate-x-0 opacity-100 transition-all duration-[1500ms] delay-[400ms] ease-out")} style={{
+          <div className={cn("absolute z-[30] flex flex-col justify-end origin-right hover:-translate-x-1 left-[10px] right-[95px] bottom-[32px] h-[64px]", isHidden ? "translate-x-[200px] opacity-0 transition-all duration-[2000ms] ease-in-out" : "translate-x-0 opacity-100 transition-all duration-[1500ms] delay-[400ms] ease-out")} style={{
             borderRadius:'12px 0 0 8px',
             background:'linear-gradient(180deg, #ffffff 0%, #f4f4f4 80%, #e8e8e8 100%)',
             boxShadow:'0 12px 24px -4px rgba(0,0,0,0.3), inset 0 2px 6px rgba(255,255,255,1)',
@@ -1113,6 +1114,7 @@ export default function Header({ siteSettings, poles }: HeaderProps) {
             </span>
           </button>
 
+          </div>
         </div>
         </div>
         </div>
