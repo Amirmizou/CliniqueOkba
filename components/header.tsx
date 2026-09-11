@@ -947,7 +947,7 @@ export default function Header({ siteSettings, poles }: HeaderProps) {
           <div
             className={cn(
               // Adaptation mobile : la navigation devient scrollable horizontalement sur la table du gantry.
-              "absolute z-[34] flex items-center pl-2 sm:pl-[20px] xl:pl-[30px] origin-right overflow-x-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] bottom-[32px] h-[64px] left-[5px] lg:left-[20%] xl:left-[30%] right-[148px] md:right-[170px] xl:right-[calc(220px_+_var(--sc-gutter)_/_2)]",
+              "absolute z-[34] flex items-center pl-2 sm:pl-[20px] xl:pl-[60px] origin-right overflow-x-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] bottom-[32px] h-[64px] left-[5px] right-[148px] md:right-[170px] xl:left-[10px] xl:right-[calc(220px_+_var(--sc-gutter)_/_2)]",
               // Fondu de defilement : degrade sur les 40 derniers pixels au lieu
               // d'une coupe seche a 85 %, qui tranchait un libelle en plein mot.
               "[-webkit-mask-image:linear-gradient(90deg,#000_calc(100%_-_40px),transparent)] [mask-image:linear-gradient(90deg,#000_calc(100%_-_40px),transparent)]",
