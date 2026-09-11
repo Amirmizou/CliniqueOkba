@@ -868,8 +868,7 @@ export default function Header({ siteSettings, poles }: HeaderProps) {
           </div>
 
           {/* ══ PLATEAU PATIENT - BASE TÉLESCOPIQUE ══ */}
-          <div className={cn("absolute z-[5] pointer-events-none origin-right", isHidden ? "translate-x-[200px] opacity-0 transition-all duration-[2000ms] ease-in-out" : "translate-x-0 opacity-100 transition-all duration-[1500ms] delay-[400ms] ease-out")} style={{
-            left:'20%', right:'145px', bottom:'0px', height:'32px',
+          <div className={cn("absolute z-[5] pointer-events-none origin-right left-[20%] lg:left-[30%] xl:left-[40%] right-[145px] bottom-0 h-[32px]", isHidden ? "translate-x-[200px] opacity-0 transition-all duration-[2000ms] ease-in-out" : "translate-x-0 opacity-100 transition-all duration-[1500ms] delay-[400ms] ease-out")} style={{
             borderRadius:'4px 4px 0 0',
             background:'linear-gradient(180deg, #fcfcfc 0%, #e6e6e6 70%, #d4d4d4 100%)',
             boxShadow:'0 6px 12px rgba(0,0,0,0.2), inset 2px 0 6px rgba(255,255,255,0.9)',
@@ -884,16 +883,14 @@ export default function Header({ siteSettings, poles }: HeaderProps) {
           </div>
 
           {/* Glissière sous la table */}
-          <div className={cn("absolute z-[29] pointer-events-none origin-right", isHidden ? "translate-x-[200px] opacity-0 transition-all duration-[2000ms] ease-in-out" : "translate-x-0 opacity-100 transition-all duration-[1500ms] delay-[400ms] ease-out")} style={{
-            left:'20px', right:'135px', bottom:'26px', height:'8px',
+          <div className={cn("absolute z-[29] pointer-events-none origin-right left-[20px] lg:left-[25%] xl:left-[35%] right-[135px] bottom-[26px] h-[8px]", isHidden ? "translate-x-[200px] opacity-0 transition-all duration-[2000ms] ease-in-out" : "translate-x-0 opacity-100 transition-all duration-[1500ms] delay-[400ms] ease-out")} style={{
             borderRadius:'0 0 0 4px',
             background:'linear-gradient(180deg,#888 0%,#bbb 40%,#777 100%)',
             boxShadow:'inset 0 1px 3px rgba(0,0,0,0.5), 0 3px 6px rgba(0,0,0,0.2)',
           }} />
 
           {/* Table Patient (Matelas + Base Blanche Principale) */}
-          <div className={cn("absolute z-[30] flex flex-col justify-end origin-right hover:-translate-x-1", isHidden ? "translate-x-[200px] opacity-0 transition-all duration-[2000ms] ease-in-out" : "translate-x-0 opacity-100 transition-all duration-[1500ms] delay-[400ms] ease-out")} style={{
-            left:'10px', right:'95px', bottom:'32px', height:'64px',
+          <div className={cn("absolute z-[30] flex flex-col justify-end origin-right hover:-translate-x-1 left-[10px] lg:left-[20%] xl:left-[30%] right-[95px] bottom-[32px] h-[64px]", isHidden ? "translate-x-[200px] opacity-0 transition-all duration-[2000ms] ease-in-out" : "translate-x-0 opacity-100 transition-all duration-[1500ms] delay-[400ms] ease-out")} style={{
             borderRadius:'12px 0 0 8px',
             background:'linear-gradient(180deg, #ffffff 0%, #f4f4f4 80%, #e8e8e8 100%)',
             boxShadow:'0 12px 24px -4px rgba(0,0,0,0.3), inset 0 2px 6px rgba(255,255,255,1)',
@@ -950,7 +947,7 @@ export default function Header({ siteSettings, poles }: HeaderProps) {
           <div
             className={cn(
               // Adaptation mobile : la navigation devient scrollable horizontalement sur la table du gantry.
-              "absolute z-[34] flex items-center pl-2 sm:pl-[20px] xl:pl-[60px] origin-right overflow-x-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] bottom-[32px] h-[64px] left-[5px] right-[148px] md:right-[170px] xl:left-[10px] xl:right-[calc(220px_+_var(--sc-gutter)_/_2)]",
+              "absolute z-[34] flex items-center pl-2 sm:pl-[20px] xl:pl-[30px] origin-right overflow-x-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] bottom-[32px] h-[64px] left-[5px] lg:left-[20%] xl:left-[30%] right-[148px] md:right-[170px] xl:right-[calc(220px_+_var(--sc-gutter)_/_2)]",
               // Fondu de defilement : degrade sur les 40 derniers pixels au lieu
               // d'une coupe seche a 85 %, qui tranchait un libelle en plein mot.
               "[-webkit-mask-image:linear-gradient(90deg,#000_calc(100%_-_40px),transparent)] [mask-image:linear-gradient(90deg,#000_calc(100%_-_40px),transparent)]",
@@ -1358,8 +1355,8 @@ function NavIconLink({ icon: Icon, label, id, indicatorKey, activeTab, onClick, 
       onMouseEnter={onHover}
       onFocus={onHover}
       className={cn(
-        'group relative flex flex-row items-center gap-1.5 rounded-full px-3 py-2 transition-all duration-300 focus-visible:outline-none whitespace-nowrap',
-        isHighlighted ? 'text-[#006633]' : 'text-gray-600 hover:text-[#006633]'
+        'group relative flex flex-row items-center gap-2 rounded-full px-4 py-2 transition-all duration-300 focus-visible:outline-none whitespace-nowrap',
+        isHighlighted ? 'text-[#006633]' : 'text-gray-700 hover:text-[#006633]'
       )}
     >
       {isHighlighted && (
@@ -1370,8 +1367,8 @@ function NavIconLink({ icon: Icon, label, id, indicatorKey, activeTab, onClick, 
           transition={{ type: 'spring', stiffness: 400, damping: 30 }}
         />
       )}
-      <Icon className="relative z-10 w-4 h-4 stroke-[2px] shrink-0" />
-      <span className="relative z-10 text-[10px] md:text-[11px] xl:text-[12px] font-extrabold tracking-wide uppercase truncate">{label}</span>
+      <Icon className="relative z-10 w-4 h-4 md:w-4.5 md:h-4.5 stroke-[2px] shrink-0" />
+      <span className="relative z-10 text-[12px] md:text-[13px] xl:text-[14px] font-bold tracking-tight truncate">{label}</span>
       {isCurrent && !isHighlighted && (
         <span className="absolute -bottom-1 left-4 right-4 h-[2px] bg-[#006633]/40 rounded-full" />
       )}
@@ -1399,8 +1396,8 @@ function NavIconDropdown({ icon: Icon, label, id, indicatorKey, activeTab, onHov
         }}
         onFocus={onHover}
         className={cn(
-          'group relative flex flex-row items-center gap-1.5 rounded-full px-3 py-2 transition-all duration-300 focus-visible:outline-none whitespace-nowrap',
-          isHighlighted ? 'text-[#006633]' : 'text-gray-600 hover:text-[#006633]'
+          'group relative flex flex-row items-center gap-2 rounded-full px-4 py-2 transition-all duration-300 focus-visible:outline-none whitespace-nowrap',
+          isHighlighted ? 'text-[#006633]' : 'text-gray-700 hover:text-[#006633]'
         )}
       >
         {isHighlighted && (
@@ -1411,8 +1408,8 @@ function NavIconDropdown({ icon: Icon, label, id, indicatorKey, activeTab, onHov
             transition={{ type: 'spring', stiffness: 400, damping: 30 }}
           />
         )}
-        <Icon className="relative z-10 w-4 h-4 stroke-[2px] shrink-0" />
-        <span className="relative z-10 text-[10px] md:text-[11px] xl:text-[12px] font-extrabold tracking-wide uppercase truncate">{label}</span>
+        <Icon className="relative z-10 w-4 h-4 md:w-4.5 md:h-4.5 stroke-[2px] shrink-0" />
+        <span className="relative z-10 text-[12px] md:text-[13px] xl:text-[14px] font-bold tracking-tight truncate">{label}</span>
         {isCurrent && !isHighlighted && (
           <span className="absolute -bottom-1 left-4 right-4 h-[2px] bg-[#006633]/40 rounded-full" />
         )}

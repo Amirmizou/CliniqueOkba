@@ -96,10 +96,10 @@ export default function StickyNav({
 
             <div className="mx-auto flex h-14 max-w-5xl items-center gap-3 px-4 sm:px-6 lg:h-[60px] lg:px-8">
               {/* ── Marque ── (zone gauche) */}
-              <div className="flex justify-start">
+              <div className="flex shrink-0 min-w-0 justify-start">
               <a
                 href={homeHref}
-                className="group flex shrink-0 items-center gap-2.5"
+                className="group flex min-w-0 items-center gap-2.5"
                 aria-label={clinicName}
               >
                 <span className="relative flex h-9 w-9 items-center justify-center rounded-full bg-white shadow-sm ring-1 ring-[#006633]/15 transition-transform duration-300 group-hover:scale-105 dark:bg-white/95">
@@ -112,7 +112,7 @@ export default function StickyNav({
                     className="h-full w-full object-contain p-[9%]"
                   />
                 </span>
-                <span className="hidden text-[13px] font-bold uppercase leading-none tracking-[0.06em] text-[#00532a] sm:inline dark:text-white">
+                <span className="hidden truncate text-[13px] font-bold uppercase leading-none tracking-[0.06em] text-[#00532a] sm:inline dark:text-white">
                   {clinicName}
                 </span>
               </a>
@@ -202,7 +202,7 @@ export default function StickyNav({
               </nav>
 
               {/* ── Actions ── (zone droite) */}
-              <div className="flex justify-end gap-2">
+              <div className="flex shrink-0 justify-end gap-2">
                 {phone && (
                   <a
                     href={phoneHref}
@@ -246,10 +246,10 @@ export default function StickyNav({
 
 function navLinkClass(active: boolean) {
   return cn(
-    'relative flex items-center gap-1 rounded-lg px-3 py-2 text-[12.5px] font-bold uppercase tracking-[0.04em] transition-colors',
+    'relative flex items-center gap-1 rounded-lg px-3 py-2 text-[13px] xl:text-[14px] font-bold tracking-tight transition-colors whitespace-nowrap',
     active
       ? 'text-[#006633] dark:text-emerald-400'
-      : 'text-[#00532a]/70 hover:text-[#006633] dark:text-white/70 dark:hover:text-white',
+      : 'text-[#00532a]/80 hover:text-[#006633] dark:text-white/70 dark:hover:text-white',
   )
 }
 
