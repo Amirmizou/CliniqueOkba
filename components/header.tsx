@@ -948,7 +948,7 @@ export default function Header({ siteSettings, poles }: HeaderProps) {
           <div
             className={cn(
               // Adaptation mobile : la navigation devient scrollable horizontalement sur la table du gantry.
-              "absolute z-[34] flex items-center pl-2 sm:pl-[20px] xl:pl-[60px] origin-right overflow-x-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] bottom-[32px] h-[64px] left-[5px] right-[148px] md:right-[170px] xl:left-[10px] xl:right-[calc(220px_+_var(--sc-gutter)_/_2)]",
+              "absolute z-[34] flex items-center pl-2 sm:pl-[20px] xl:pl-[40px] origin-right overflow-x-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] bottom-[32px] h-[64px] left-[5px] right-[148px] md:right-[170px] xl:left-[10px] xl:right-[220px]",
               // Fondu de defilement : degrade sur les 40 derniers pixels au lieu
               // d'une coupe seche a 85 %, qui tranchait un libelle en plein mot.
               "[-webkit-mask-image:linear-gradient(90deg,#000_calc(100%_-_40px),transparent)] [mask-image:linear-gradient(90deg,#000_calc(100%_-_40px),transparent)]",
@@ -957,7 +957,7 @@ export default function Header({ siteSettings, poles }: HeaderProps) {
               isHidden ? "translate-x-[200px] opacity-0 transition-all duration-[2000ms] ease-in-out" : "translate-x-0 opacity-100 transition-all duration-[1500ms] delay-[400ms] ease-out",
             )}
           >
-            <nav className="flex items-center justify-start xl:justify-center gap-2 xl:gap-2 2xl:gap-6 pointer-events-auto relative px-1 w-max xl:w-full xl:flex-1" onMouseLeave={() => setHovered(null)}>
+            <nav className="flex items-center justify-start xl:justify-evenly gap-2 xl:gap-2 2xl:gap-4 pointer-events-auto relative px-1 w-max xl:w-full xl:flex-1" onMouseLeave={() => setHovered(null)}>
               <NavIconLink id="about" icon={Home} label={t('center')} indicatorKey={indicatorKey} activeTab={activeTab} onClick={() => scrollToSection('#about')} onHover={() => setHovered('about')} />
               <NavIconDropdown id="specialties" icon={Stethoscope} label={t('specialties')} indicatorKey={indicatorKey} activeTab={activeTab} onHover={() => setHovered('specialties')} onClick={() => scrollToSection('#specialties')} poles={navPoles} locale={locale} />
               <NavIconLink id="equipements" icon={Activity} label={t('equipment')} indicatorKey={indicatorKey} activeTab={activeTab} onClick={() => scrollToSection('#equipements')} onHover={() => setHovered('equipements')} />
