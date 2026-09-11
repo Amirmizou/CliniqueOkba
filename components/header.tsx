@@ -606,7 +606,7 @@ export default function Header({ siteSettings, poles }: HeaderProps) {
         </div>
 
         {/* 3D SCANNER DESKTOP & MOBILE — Siemens Symbia Pro.specta */}
-        <div className="pointer-events-auto relative w-full h-[80px] md:h-[95px] xl:h-[120px] transition-all duration-700">
+        <div className="pointer-events-auto relative w-full h-[78px] md:h-[95px] xl:h-[120px] transition-all duration-700">
           <div
             /* --sc-gutter = la gouttière vide à droite de la grille 1280px sur les
                grands écrans. On l'ajoute à la largeur de la scène (xl+) pour que le
@@ -619,7 +619,7 @@ export default function Header({ siteSettings, poles }: HeaderProps) {
             style={{ ['--sc-gutter' as string]: 'max(0px, (100vw - 1372px) / 2)' } as React.CSSProperties}
             className={cn(
             "absolute top-0 left-0 h-[140px] origin-top-left transition-all duration-700",
-            "w-[166.6%] scale-[0.6] md:w-[133.3%] md:scale-[0.75] xl:w-[calc(117.6%_+_var(--sc-gutter))] xl:scale-[0.85]",
+            "w-[181.8%] scale-[0.55] md:w-[133.3%] md:scale-[0.75] xl:w-[calc(117.6%_+_var(--sc-gutter))] xl:scale-[0.85]",
             isScrolled ? "opacity-95 xl:scale-95 xl:-translate-y-2" : "opacity-100 translate-y-0"
           )}>
 
@@ -950,13 +950,14 @@ export default function Header({ siteSettings, poles }: HeaderProps) {
           <div
             className={cn(
               // Adaptation mobile : la navigation devient scrollable horizontalement sur la table du gantry.
-              "absolute z-[34] flex items-center pl-1 sm:pl-[20px] xl:pl-[60px] origin-right overflow-x-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] bottom-[32px] h-[64px] left-[5px] right-[170px] xl:left-[10px] xl:right-[calc(220px_+_var(--sc-gutter)_/_2)]",
+              "absolute z-[34] flex items-center pl-2 sm:pl-[20px] xl:pl-[60px] origin-right overflow-x-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] bottom-[32px] h-[64px] left-[5px] right-[148px] md:right-[170px] xl:left-[10px] xl:right-[calc(220px_+_var(--sc-gutter)_/_2)]",
+              // Fondu de defilement : degrade sur les 40 derniers pixels au lieu
+              // d'une coupe seche a 85 %, qui tranchait un libelle en plein mot.
+              "[-webkit-mask-image:linear-gradient(90deg,#000_calc(100%_-_40px),transparent)] [mask-image:linear-gradient(90deg,#000_calc(100%_-_40px),transparent)]",
+              // A partir de xl tout tient : aucun masque, le dernier lien reste net.
+              "xl:[-webkit-mask-image:none] xl:[mask-image:none]",
               isHidden ? "translate-x-[200px] opacity-0 transition-all duration-[2000ms] ease-in-out" : "translate-x-0 opacity-100 transition-all duration-[1500ms] delay-[400ms] ease-out",
             )}
-            style={{ 
-              WebkitMaskImage: 'linear-gradient(90deg, #000 85%, transparent 100%)',
-              maskImage: 'linear-gradient(90deg, #000 85%, transparent 100%)'
-            }}
           >
             <nav className="flex items-center justify-start xl:justify-center gap-2 xl:gap-2 2xl:gap-6 pointer-events-auto relative px-1 w-max xl:w-full xl:flex-1" onMouseLeave={() => setHovered(null)}>
               <NavIconLink id="about" icon={Home} label={t('center')} indicatorKey={indicatorKey} activeTab={activeTab} onClick={() => scrollToSection('#about')} onHover={() => setHovered('about')} />
