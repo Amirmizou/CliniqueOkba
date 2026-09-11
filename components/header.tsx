@@ -957,7 +957,7 @@ export default function Header({ siteSettings, poles }: HeaderProps) {
               isHidden ? "translate-x-[200px] opacity-0 transition-all duration-[2000ms] ease-in-out" : "translate-x-0 opacity-100 transition-all duration-[1500ms] delay-[400ms] ease-out",
             )}
           >
-            <nav className="flex items-center justify-start xl:justify-evenly gap-2 xl:gap-2 2xl:gap-4 pointer-events-auto relative px-1 w-max xl:w-full xl:flex-1" onMouseLeave={() => setHovered(null)}>
+            <nav className="flex items-center justify-start xl:justify-center gap-2 xl:gap-6 2xl:gap-8 pointer-events-auto relative px-1 w-max xl:w-full xl:flex-1" onMouseLeave={() => setHovered(null)}>
               <NavIconLink id="about" icon={Home} label={t('center')} indicatorKey={indicatorKey} activeTab={activeTab} onClick={() => scrollToSection('#about')} onHover={() => setHovered('about')} />
               <NavIconDropdown id="specialties" icon={Stethoscope} label={t('specialties')} indicatorKey={indicatorKey} activeTab={activeTab} onHover={() => setHovered('specialties')} onClick={() => scrollToSection('#specialties')} poles={navPoles} locale={locale} />
               <NavIconLink id="equipements" icon={Activity} label={t('equipment')} indicatorKey={indicatorKey} activeTab={activeTab} onClick={() => scrollToSection('#equipements')} onHover={() => setHovered('equipements')} />

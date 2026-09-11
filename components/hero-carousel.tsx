@@ -58,13 +58,19 @@ export default function HeroCarousel({ slides: rawSlides = [], siteSettings, sec
     const isAr = locale === 'ar'
 
     const slides = rawSlides
-        .map((slide, index) => ({
-            id: slide._id || String(index),
-            title: isAr ? (slide.title_ar || slide.title) : slide.title,
-            subtitle: isAr ? (slide.subtitle_ar || slide.subtitle) : (slide.subtitle || ''),
-            image: slide.image ? urlFor(slide.image).url() : '',
-            videoUrl: slide.videoUrl || '',
-        }))
+        .map((slide, index) => {
+            let imageUrl = slide.image ? urlFor(slide.image).url() : '';
+            if (index === 0) {
+                imageUrl = '/images/facade.jpg';
+            }
+            return {
+                id: slide._id || String(index),
+                title: isAr ? (slide.title_ar || slide.title) : slide.title,
+                subtitle: isAr ? (slide.subtitle_ar || slide.subtitle) : (slide.subtitle || ''),
+                image: imageUrl,
+                videoUrl: slide.videoUrl || '',
+            };
+        })
         .filter((slide) => slide.image !== '' || slide.videoUrl !== '')
 
     const [currentIndex, setCurrentIndex] = useState(0)
