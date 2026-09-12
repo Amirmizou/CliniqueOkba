@@ -457,7 +457,7 @@ export default function Header({ siteSettings, poles }: HeaderProps) {
                 calc(50vw-640px) est trop étroite et le bloc déborde de l'écran. */}
             <span className="mt-2.5 hidden max-w-[124px] flex-col items-center text-center 2xl:flex">
               <span className="text-[13px] font-bold uppercase leading-none tracking-[0.06em] text-[#00532a] dark:text-white">
-                <BrandNameMorph text={clinicNameText} wordClassName="text-[#00a651]" />
+                <BrandNameMorph text={clinicNameText} wordClassName="text-[#00a651]" compact />
               </span>
               <span className="mt-1.5 text-[9.5px] font-medium italic leading-snug text-[#006633]/60 dark:text-white/55">
                 {t('slogan')}
@@ -948,16 +948,17 @@ export default function Header({ siteSettings, poles }: HeaderProps) {
           <div
             className={cn(
               // Adaptation mobile : la navigation devient scrollable horizontalement sur la table du gantry.
-              "absolute z-[34] flex items-center pl-2 sm:pl-[20px] xl:pl-[40px] origin-right overflow-x-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] bottom-[32px] h-[64px] left-[5px] right-[148px] md:right-[170px] xl:left-[10px] xl:right-[220px]",
+              "absolute z-[34] flex items-center pl-2 sm:pl-[20px] xl:pl-[40px] xl:pr-[18px] origin-right overflow-x-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] bottom-[32px] h-[64px] left-[5px] right-[148px] md:right-[150px] xl:left-[10px] xl:right-[220px]",
               // Fondu de defilement : degrade sur les 40 derniers pixels au lieu
               // d'une coupe seche a 85 %, qui tranchait un libelle en plein mot.
               "[-webkit-mask-image:linear-gradient(90deg,#000_calc(100%_-_40px),transparent)] [mask-image:linear-gradient(90deg,#000_calc(100%_-_40px),transparent)]",
-              // A partir de xl tout tient : aucun masque, le dernier lien reste net.
-              "xl:[-webkit-mask-image:none] xl:[mask-image:none]",
+              // A partir de md les six liens tiennent sur la table : plus de
+              // masque, le dernier reste net. En dessous la bande defile vraiment.
+              "md:[-webkit-mask-image:none] md:[mask-image:none]",
               isHidden ? "translate-x-[200px] opacity-0 transition-all duration-[2000ms] ease-in-out" : "translate-x-0 opacity-100 transition-all duration-[1500ms] delay-[400ms] ease-out",
             )}
           >
-            <nav className="flex items-center justify-start xl:justify-center gap-2 xl:gap-6 2xl:gap-8 pointer-events-auto relative px-1 w-max xl:w-full xl:flex-1" onMouseLeave={() => setHovered(null)}>
+            <nav className="flex items-center justify-start xl:justify-between gap-2 pointer-events-auto relative px-1 w-max xl:w-full xl:flex-1" onMouseLeave={() => setHovered(null)}>
               <NavIconLink id="about" icon={Home} label={t('center')} indicatorKey={indicatorKey} activeTab={activeTab} onClick={() => scrollToSection('#about')} onHover={() => setHovered('about')} />
               <NavIconDropdown id="specialties" icon={Stethoscope} label={t('specialties')} indicatorKey={indicatorKey} activeTab={activeTab} onHover={() => setHovered('specialties')} onClick={() => scrollToSection('#specialties')} poles={navPoles} locale={locale} />
               <NavIconLink id="equipements" icon={Activity} label={t('equipment')} indicatorKey={indicatorKey} activeTab={activeTab} onClick={() => scrollToSection('#equipements')} onHover={() => setHovered('equipements')} />
@@ -1146,7 +1147,7 @@ export default function Header({ siteSettings, poles }: HeaderProps) {
                   </div>
                   <div className="min-w-0">
                     <p className="truncate text-[13px] font-black uppercase leading-none tracking-tight text-white">
-                      <BrandNameMorph text={clinicNameText} />
+                      <BrandNameMorph text={clinicNameText} compact />
                     </p>
                     <p className="mt-1 text-[10px] font-medium leading-none text-[#FDE68A]/85">
                       {t('tagline')}
@@ -1357,7 +1358,7 @@ function NavIconLink({ icon: Icon, label, id, indicatorKey, activeTab, onClick, 
       onMouseEnter={onHover}
       onFocus={onHover}
       className={cn(
-        'group relative flex flex-row items-center gap-2 rounded-full px-4 py-2 transition-all duration-300 focus-visible:outline-none whitespace-nowrap',
+        'group relative flex flex-row items-center gap-2 xl:gap-1.5 rounded-full px-4 md:px-2.5 py-2 transition-all duration-300 focus-visible:outline-none whitespace-nowrap',
         isHighlighted ? 'text-[#006633]' : 'text-gray-700 hover:text-[#006633]'
       )}
     >
@@ -1398,7 +1399,7 @@ function NavIconDropdown({ icon: Icon, label, id, indicatorKey, activeTab, onHov
         }}
         onFocus={onHover}
         className={cn(
-          'group relative flex flex-row items-center gap-2 rounded-full px-4 py-2 transition-all duration-300 focus-visible:outline-none whitespace-nowrap',
+          'group relative flex flex-row items-center gap-2 xl:gap-1.5 rounded-full px-4 md:px-2.5 py-2 transition-all duration-300 focus-visible:outline-none whitespace-nowrap',
           isHighlighted ? 'text-[#006633]' : 'text-gray-700 hover:text-[#006633]'
         )}
       >

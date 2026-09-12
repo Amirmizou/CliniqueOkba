@@ -156,13 +156,13 @@ export function WordMorph({
    « hôpital ». Le cycle affiche le libellé complet puis son abréviation :
    EHP n'est qu'un raccourci, il ne remplace pas la dénomination. L'arabe n'a
    pas d'abréviation d'usage : il s'en tient au libellé complet. */
-const CLINIC_WORDS: { from: string; to: string[] }[] = [
-    { from: 'المصحة الطبية', to: ['مؤسسة استشفائية خاصة'] },
-    { from: 'CLINIQUE', to: ['ÉTABLISSEMENT HOSPITALIER PRIVÉ', 'EHP'] },
-    { from: 'Clinique', to: ['Établissement Hospitalier Privé', 'EHP'] },
-    { from: 'clinique', to: ['établissement hospitalier privé', 'EHP'] },
-    { from: 'عيادة', to: ['مؤسسة استشفائية خاصة'] },
-    { from: 'مصحة', to: ['مؤسسة استشفائية خاصة'] },
+const CLINIC_WORDS: { from: string; to: string[]; short: string[] }[] = [
+    { from: 'المصحة الطبية', to: ['مؤسسة استشفائية خاصة'], short: ['EHP'] },
+    { from: 'CLINIQUE', to: ['ÉTABLISSEMENT HOSPITALIER PRIVÉ', 'EHP'], short: ['EHP'] },
+    { from: 'Clinique', to: ['Établissement Hospitalier Privé', 'EHP'], short: ['EHP'] },
+    { from: 'clinique', to: ['établissement hospitalier privé', 'EHP'], short: ['EHP'] },
+    { from: 'عيادة', to: ['مؤسسة استشفائية خاصة'], short: ['EHP'] },
+    { from: 'مصحة', to: ['مؤسسة استشفائية خاصة'], short: ['EHP'] },
 ]
 
 /**
@@ -175,11 +175,16 @@ export function BrandNameMorph({
     variant = 'inline',
     className = '',
     wordClassName = '',
+    compact = false,
 }: {
     text?: string
     variant?: 'display' | 'inline'
     className?: string
     wordClassName?: string
+    /** Lockup étroit (logo du header, ligne du menu mobile) : seule
+     *  l'abréviation y tient. Le libellé complet, posé sur 124px, passe sur
+     *  quatre lignes et pousse la signature hors du header. */
+    compact?: boolean
 }) {
     if (!text) return null
 
@@ -195,7 +200,7 @@ export function BrandNameMorph({
             {before}
             <WordMorph
                 from={match.from}
-                to={match.to}
+                to={compact ? match.short : match.to}
                 variant={variant}
                 fromClassName={wordClassName}
                 toClassName={wordClassName}
