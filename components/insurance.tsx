@@ -37,6 +37,9 @@ interface InsuranceProps {
   } | null
 }
 
+/** Reconnait la convention des architectes sans attraper « Nationale ». */
+const isONA = (name?: string) => /ona/i.test(name || '') || /architect/i.test(name || '')
+
 export default function Insurance({ data }: InsuranceProps) {
   if (!data?.providers || data.providers.length === 0) return null
 
@@ -48,8 +51,11 @@ export default function Insurance({ data }: InsuranceProps) {
 
   const providers = data.providers ? [...data.providers] : []
   
-  // Ajouter l'ONA s'il n'est pas déjà configuré dans le CMS
-  const hasONA = providers.some(p => (p.name || '').toLowerCase().includes('ona') || (p.name || '').toLowerCase().includes('architecte'))
+  // Ajouter l'ONA s'il n'est pas déjà configuré dans le CMS.
+  // `includes('ona')` matchait « École Nati-ona-le » (ENSB) : le repli était
+  // donc toujours désactivé et la carte des architectes ne s'affichait jamais.
+  // On exige l'acronyme isolé ou le mot « architecte ».
+  const hasONA = providers.some(p => isONA(p.name))
   if (!hasONA) {
     providers.push({
       name: 'ONA - Ordre National des Architectes',
@@ -100,7 +106,9 @@ export default function Insurance({ data }: InsuranceProps) {
               else if (n.includes('ensb')) logoUrl = '/images/conventions/ensb.png'
               else if (n.includes('seaco')) logoUrl = '/images/conventions/seaco.png'
               else if (n.includes('oncolog')) logoUrl = '/images/conventions/oncologica.png'
-              else if (n.includes('ona') || n.includes('architecte')) logoUrl = '/images/conventions/ona.png'
+              // (pas de repli pour l'ONA : /images/conventions/ona.png n'existe
+              //  pas, et un fichier manquant afficherait une image cassée —
+              //  sans logo la carte tombe proprement sur l'icône par défaut)
             }
             
             const hasPhotos = Array.isArray(provider.signaturePhotos) && provider.signaturePhotos.length > 0
