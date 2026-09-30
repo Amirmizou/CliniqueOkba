@@ -914,3 +914,15 @@ html {
     opacity: 0 !important;
   }
 }
+
+/* Fond d'attente du rideau d'ouverture. `LogoIntroGate` pose l'attribut avant
+   la première image ; le splash, chargé après l'hydratation, vient s'y
+   superposer puis le retire. Même fond que le splash (`logo-intro.tsx`) pour
+   que le relais soit invisible. */
+html[data-okba-intro] body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 9998;
+  background: radial-gradient(ellipse 70% 60% at 50% 44%, #ffffff 0%, #f4faf6 58%, #eaf5ee 100%);
+}

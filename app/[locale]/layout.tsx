@@ -10,7 +10,8 @@ import { ServiceWorkerRegistration as SWRegistrationComponent } from '@/componen
 import { AuraBackground } from '@/components/ui/aura-background'
 import { VisitTracker } from '@/components/visit-tracker'
 
-import { LogoIntroWrapper } from '@/components/ui/logo-intro-wrapper'
+import { LogoIntro } from '@/components/ui/logo-intro'
+import { LogoIntroGate } from '@/components/ui/logo-intro-gate'
 
 export const metadata: Metadata = {
   ...defaultMetadata,
@@ -39,6 +40,8 @@ export default async function LocaleLayout({
 
   return (
     <NextIntlClientProvider locale={locale} messages={messages}>
+      {/* Avant tout contenu : décide du rideau d'ouverture avant la première image */}
+      <LogoIntroGate />
       {/* Données structurées MedicalOrganization (SEO local + fiche Google) */}
       <script
         type="application/ld+json"
@@ -52,8 +55,11 @@ export default async function LocaleLayout({
         enableSystem={false}
         disableTransitionOnChange
       >
-        {/* Splash logo — première visite uniquement (sessionStorage guard) */}
-        <LogoIntroWrapper />
+        {/* Splash logo — première visite uniquement (sessionStorage guard).
+            Import direct, pas next/dynamic : une frontière chargée à la demande
+            s'hydrate en dernière priorité et, sur un poste lent, le splash
+            n'arrivait jamais. */}
+        <LogoIntro />
         <AuraBackground>
           <PageTransition>
             {children}

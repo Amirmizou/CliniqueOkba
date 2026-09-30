@@ -4,6 +4,7 @@ import { useEffect, useState, useRef } from 'react'
 import Image from 'next/image'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useLocale, useTranslations } from 'next-intl'
+import { INTRO_ATTR } from './logo-intro-gate'
 
 /**
  * Rideau d'ouverture — chorégraphie en quatre temps :
@@ -22,7 +23,7 @@ import { useLocale, useTranslations } from 'next-intl'
  *
  * Le rideau dure ~3,1 s. C'est assumé : le splash
  * est déjà réservé au desktop non contraint et ne joue qu'une fois par session
- * (voir `shouldPlayIntro`), et c'est la seule surface où l'annonce touche le
+ * (voir `logo-intro-gate.tsx`), et c'est la seule surface où l'annonce touche le
  * visiteur avant qu'il ne scrolle.
  */
 
@@ -386,43 +387,6 @@ function LogoAnimation({ onComplete, locale }: { onComplete: () => void; locale:
   )
 }
 
-/**
- * Conditions de lecture du rideau d'ouverture.
- *
- * Le splash est un aplat plein écran posé APRÈS l'hydratation. Il recouvre
- * donc l'élément LCP au pire moment possible : sur mobile, où le budget CPU
- * est déjà saturé, il coûtait à lui seul plusieurs points. On le réserve aux
- * contextes où il ne pénalise personne — grand écran, appareil correct,
- * connexion non économique.
- */
-function shouldPlayIntro(): boolean {
-  if (typeof window === 'undefined') return false
-
-  // Mouvement réduit demandé (vestibulaire, épilepsie) : pas de rideau du tout.
-  if (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) return false
-
-  // Mobile et tablette : jamais. C'est là que le budget de rendu est le plus serré.
-  if (window.matchMedia?.('(max-width: 1023px)').matches) return false
-  if (window.matchMedia?.('(pointer: coarse)').matches) return false
-
-  // Appareil très peu puissant : l'animation saccaderait de toute façon.
-  // Seuil bas volontairement : le filtre grand écran + pointeur fin ci-dessus
-  // a déjà écarté le mobile, il ne reste ici que des postes de travail.
-  const cores = navigator.hardwareConcurrency
-  if (typeof cores === 'number' && cores > 0 && cores <= 2) return false
-
-  // Mode économie de données / réseau lent.
-  const conn = (
-    navigator as unknown as {
-      connection?: { saveData?: boolean; effectiveType?: string }
-    }
-  ).connection
-  if (conn?.saveData) return false
-  if (conn?.effectiveType && ['slow-2g', '2g', '3g'].includes(conn.effectiveType)) return false
-
-  return true
-}
-
 // ─── Écran de démarrage (splash) ────────────────────────────────────────────
 export function LogoIntro() {
   const locale = useLocale()
@@ -433,15 +397,16 @@ export function LogoIntro() {
   useEffect(() => {
     setMounted(true)
 
-    if (!shouldPlayIntro()) return
-
-    // Ne s'affiche qu'une seule fois par session
-    if (typeof sessionStorage !== 'undefined') {
-      if (sessionStorage.getItem('okba-intro')) return
-      sessionStorage.setItem('okba-intro', '1')
-    }
+    // La décision (contexte, une fois par session) est prise avant le premier
+    // rendu par `LogoIntroGate`, qui a déjà tiré le fond du rideau.
+    if (!document.documentElement.hasAttribute(INTRO_ATTR)) return
     setVisible(true)
   }, [])
+
+  // Le splash est à l'écran, sur le même fond : on retire le fond d'attente.
+  useEffect(() => {
+    if (visible) document.documentElement.removeAttribute(INTRO_ATTR)
+  }, [visible])
 
   const handleComplete = () => {
     setLeaving(true)
