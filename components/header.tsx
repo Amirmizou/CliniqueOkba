@@ -606,7 +606,11 @@ export default function Header({ siteSettings, poles }: HeaderProps) {
         </div>
 
         {/* 3D SCANNER DESKTOP & MOBILE — Siemens Symbia Pro.specta */}
-        <div className="pointer-events-auto relative w-full h-[78px] md:h-[95px] xl:h-[120px] transition-all duration-700">
+        {/* La scène est dessinée à 140px de haut puis mise à l'échelle par palier.
+            Trois valeurs vont ensemble et se règlent en même temps : l'échelle,
+            la largeur (100 / échelle, pour que la scène réduite occupe 100 % de
+            la bande) et la hauteur de ce conteneur (140 × échelle). */}
+        <div className="pointer-events-auto relative w-full h-[96px] md:h-[112px] lg:h-[134px] xl:h-[140px] 2xl:h-[154px] transition-all duration-700">
           <div
             /* --sc-gutter = la gouttière vide à droite de la grille 1280px sur les
                grands écrans. On l'ajoute à la largeur de la scène (xl+) pour que le
@@ -619,7 +623,7 @@ export default function Header({ siteSettings, poles }: HeaderProps) {
             style={{ ['--sc-gutter' as string]: 'max(0px, (100vw - 1372px) / 2)' } as React.CSSProperties}
             className={cn(
             "absolute top-0 left-0 h-[140px] origin-top-left transition-all duration-700",
-            "w-[181.8%] scale-[0.55] md:w-[133.3%] md:scale-[0.75] xl:w-[calc(117.6%_+_var(--sc-gutter))] xl:scale-[0.85]",
+            "w-[147.1%] scale-[0.68] md:w-[125%] md:scale-[0.8] lg:w-[105.3%] lg:scale-[0.95] xl:w-[calc(100%_+_var(--sc-gutter))] xl:scale-100 2xl:w-[calc(90.9%_+_var(--sc-gutter))] 2xl:scale-[1.1]",
             isScrolled ? "opacity-95 xl:scale-95 xl:-translate-y-2" : "opacity-100 translate-y-0"
           )}>
           <div className="absolute inset-0 mx-auto w-full h-full max-w-[800px] md:max-w-[900px] xl:max-w-[1050px]">
@@ -970,8 +974,9 @@ export default function Header({ siteSettings, poles }: HeaderProps) {
 
           {/* ══ ÉCRAN DE CONTRÔLE SUSPENDU (Display Monitor) ══ */}
           <div className="absolute z-[45] pointer-events-none" style={{ right:'-15px', top:'20px' }}>
-            {/* Bras de suspension plafond */}
-            <div className="absolute bottom-[20px] left-[18px] w-[8px] h-[80px] bg-gradient-to-r from-[#ddd] to-[#eee] border-l border-[#bbb] shadow-md -z-10" />
+            {/* Bras de suspension plafond — 70px et non 80 : avec la scène
+                agrandie, 80px remontait dans la barre verte du haut. */}
+            <div className="absolute bottom-[20px] left-[18px] w-[8px] h-[70px]bg-gradient-to-r from-[#ddd] to-[#eee] border-l border-[#bbb] shadow-md -z-10" />
             <div className="absolute bottom-[20px] left-[15px] w-[14px] h-[6px] bg-[#fff] rounded-sm shadow-sm" />
             
             {/* Câble en spirale */}
