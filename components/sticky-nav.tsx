@@ -106,7 +106,7 @@ export default function StickyNav({
               }}
             />
 
-            <div className="mx-auto flex h-14 max-w-5xl items-center gap-3 px-4 sm:px-6 lg:h-[60px] lg:px-8">
+            <div className="mx-auto flex h-14 max-w-7xl items-center gap-3 px-4 sm:px-6 lg:h-[60px] lg:px-8">
               {/* ── Marque ── (zone gauche) */}
               <div className="flex shrink-0 min-w-0 justify-start">
               <a
