@@ -169,11 +169,13 @@
   }
 
   /* Titres en Lemon Milk (police d'affichage tout en majuscules).
-     Légère réduction du tracking : Lemon Milk est large par nature.
+     Tracking optique : `1px - 0.04em` décroît avec la taille du titre —
+     ≈ +0.03em à 14px (petites capitales lisibles), ≈ 0 vers 24px,
+     ≈ -0.02em à 48px (grands titres resserrés) — borné par clamp().
      text-wrap: balance — évite les mots orphelins sur la dernière ligne. */
   h1, h2, h3, h4, h5, h6 {
     font-family: var(--font-heading);
-    letter-spacing: -0.01em;
+    letter-spacing: clamp(-0.025em, calc(1px - 0.04em), 0.04em);
     text-wrap: balance;
   }
 

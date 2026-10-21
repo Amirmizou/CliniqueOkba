@@ -23,8 +23,10 @@ export function Magnetic({ children, strength = 0.25, className }: MagneticProps
 
   const x = useMotionValue(0)
   const y = useMotionValue(0)
-  const sx = useSpring(x, { stiffness: 200, damping: 16, mass: 0.5 })
-  const sy = useSpring(y, { stiffness: 200, damping: 16, mass: 0.5 })
+  /* Amortissement critique (damping = 2·√(k·m) = 20) : le survol n'a pas d'élan,
+     l'élément rejoint le curseur sans dépasser ni rebondir. */
+  const sx = useSpring(x, { stiffness: 200, damping: 20, mass: 0.5 })
+  const sy = useSpring(y, { stiffness: 200, damping: 20, mass: 0.5 })
 
   function handleMove(e: MouseEvent<HTMLDivElement>) {
     if (reduce) return
