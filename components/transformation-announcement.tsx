@@ -24,13 +24,29 @@ const ICONS_MAP: Record<string, any> = {
 }
 
 /* ── Repli local (si Sanity est vide ou injoignable) ── */
+/* Avril 2026 = ouverture de la Clinique Okba (déjà faite). L'extension en
+   Établissement Hospitalier Privé est en travaux : pas encore en service,
+   date de mise en service non connue. */
 const MILESTONES = [
-    { period: 'En cours', period_ar: 'جارٍ حالياً', label: 'Travaux d’extension', label_ar: 'أشغال التوسعة', status: 'current' },
     {
         period: 'Avril 2026',
         period_ar: 'أبريل 2026',
-        label: 'Ouverture de l’Établissement Hospitalier Privé Okba',
-        label_ar: 'افتتاح المؤسسة الاستشفائية الخاصة عقبة',
+        label: 'Ouverture de la Clinique Okba',
+        label_ar: 'افتتاح المصحة الطبية عقبة',
+        status: 'done',
+    },
+    {
+        period: 'En cours',
+        period_ar: 'جارٍ حالياً',
+        label: 'Travaux d’extension vers l’Établissement Hospitalier Privé',
+        label_ar: 'أشغال التوسعة نحو المؤسسة الاستشفائية الخاصة',
+        status: 'current',
+    },
+    {
+        period: 'Prochainement',
+        period_ar: 'قريباً',
+        label: 'Mise en service de l’Établissement Hospitalier Privé Okba',
+        label_ar: 'دخول المؤسسة الاستشفائية الخاصة عقبة حيز الخدمة',
         status: 'upcoming',
     },
 ]
