@@ -1,7 +1,7 @@
 'use client'
 
-import { useEffect } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
+import { useEffect, type PointerEvent as ReactPointerEvent } from 'react'
+import { motion, AnimatePresence, useDragControls, type PanInfo } from 'framer-motion'
 import {
   X,
   Phone,
@@ -27,6 +27,22 @@ const ICONS: Record<string, LucideIcon> = { Siren, Bell, ScanLine, FlaskConical,
 export function CallMenu({ open, onClose }: { open: boolean; onClose: () => void }) {
   const locale = useLocale()
   const isAr = locale === 'ar'
+  const dragControls = useDragControls()
+
+  /* La poignée et l'en-tête tirent la feuille vers le bas (tactile seulement :
+     la liste garde son propre défilement). */
+  const startDrag = (e: ReactPointerEvent) => {
+    if (e.pointerType === 'mouse' || (e.target as HTMLElement).closest('button')) return
+    dragControls.start(e)
+  }
+
+  /* Fermeture si la feuille est lancée vers le bas ou tirée au-delà d'un
+     tiers de sa hauteur ; sinon elle revient en place sur un ressort. */
+  const handleDragEnd = (e: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
+    const sheet = (e.target as HTMLElement | null)?.closest('[role="dialog"]')
+    const height = sheet?.getBoundingClientRect().height ?? 400
+    if (info.velocity.y > 500 || info.offset.y > height / 3) onClose()
+  }
 
   useEffect(() => {
     if (!open) return
@@ -64,12 +80,23 @@ export function CallMenu({ open, onClose }: { open: boolean; onClose: () => void
             animate={{ y: 0, opacity: 1 }}
             exit={{ y: '100%', opacity: 0 }}
             transition={{ type: 'spring', stiffness: 320, damping: 32 }}
+            drag="y"
+            dragControls={dragControls}
+            dragListener={false}
+            dragConstraints={{ top: 0, bottom: 0 }}
+            dragElastic={{ top: 0.08, bottom: 1 }}
+            dragTransition={{ bounceStiffness: 400, bounceDamping: 40 }}
+            onDragEnd={handleDragEnd}
             onClick={(e) => e.stopPropagation()}
             className="relative z-10 w-full max-w-md overflow-hidden rounded-t-3xl bg-white shadow-2xl dark:bg-slate-900 sm:rounded-3xl"
             style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
           >
             {/* En-tête vert */}
-            <div className="relative px-5 pb-4 pt-4" style={{ background: 'linear-gradient(135deg, #006633 0%, #004422 100%)' }}>
+            <div
+              className="relative touch-none px-5 pb-4 pt-4 sm:touch-auto"
+              style={{ background: 'linear-gradient(135deg, #006633 0%, #004422 100%)' }}
+              onPointerDown={startDrag}
+            >
               <div className="mx-auto mb-3 h-1 w-10 rounded-full bg-white/30 sm:hidden" />
               <div className="flex items-center gap-3">
                 <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-white/15 text-white ring-1 ring-white/20">

@@ -1,9 +1,17 @@
 'use client'
 
-import { useState, useEffect, useRef, useCallback } from 'react'
+import { useState, useEffect, useRef, useCallback, type ReactNode } from 'react'
 import { useTranslations, useLocale } from 'next-intl'
 import Image from 'next/image'
-import { motion, AnimatePresence } from 'framer-motion'
+import {
+  motion,
+  AnimatePresence,
+  animate,
+  useMotionValue,
+  useTransform,
+  type MotionValue,
+  type ValueAnimationTransition,
+} from 'framer-motion'
 import {
   Calendar,
   Clock,
@@ -616,6 +624,106 @@ function VideoLightbox({
 }
 
 /* -------------------------------------------------------------------------- */
+/*  Coverflow : une position continue pilote toutes les cartes                 */
+/* -------------------------------------------------------------------------- */
+
+/* Décalage circulaire le plus court, en fractions de carte. */
+function wrapOffset(d: number, n: number) {
+  if (n === 0) return 0
+  let r = ((d % n) + n) % n
+  if (r > n / 2) r -= n
+  return r
+}
+
+/* Point d'arrêt projeté d'un lancer (formule d'Apple, décélération du scroll). */
+function projectMomentum(velocity: number, decelerationRate = 0.998) {
+  return ((velocity / 1000) * decelerationRate) / (1 - decelerationRate)
+}
+
+interface CoverflowDims {
+  width: number
+  height: number
+  gap: number
+  depth: number
+  tilt: number
+}
+
+/* Chaque carte dérive sa pose de `position` : pendant un glisser, le doigt
+   déplace la position 1:1 et toute la scène (décalage, profondeur, rotation,
+   voile) suit en continu, au lieu de sauter d'un état à l'autre. */
+function CoverflowSlot({
+  index,
+  numItems,
+  position,
+  dims,
+  interactive,
+  isCenter,
+  onSelect,
+  children,
+}: {
+  index: number
+  numItems: number
+  position: MotionValue<number>
+  dims: CoverflowDims
+  interactive: boolean
+  isCenter: boolean
+  onSelect: () => void
+  children: ReactNode
+}) {
+  const off = useTransform(position, (p) => wrapOffset(index - p, numItems))
+  const abs = useTransform(off, Math.abs)
+  const x = useTransform(off, (o) => o * dims.gap)
+  const z = useTransform(abs, (a) => -a * dims.depth)
+  const rotateY = useTransform(off, (o) => -Math.max(-1, Math.min(1, o)) * dims.tilt)
+  const scale = useTransform(abs, (a) => (a <= 2 ? 1 - 0.1 * a : 0.8))
+  const opacity = useTransform(abs, (a) => (a <= 2 ? 1 : Math.max(0, 1 - (a - 2) * 2)))
+  const zIndex = useTransform(abs, (a) => 20 - Math.round(a))
+  const veil = useTransform(abs, (a) => (a <= 1 ? 0.4 * a : Math.min(0.7, 0.4 + 0.3 * (a - 1))))
+
+  return (
+    <motion.div
+      className="absolute top-0 left-1/2"
+      style={{
+        width: dims.width,
+        height: dims.height,
+        marginLeft: -dims.width / 2,
+        transformStyle: 'preserve-3d',
+        x,
+        z,
+        rotateY,
+        scale,
+        opacity,
+        zIndex,
+        pointerEvents: interactive ? 'auto' : 'none',
+      }}
+      onClick={() => {
+        if (!isCenter && interactive) onSelect()
+      }}
+      aria-hidden={!interactive}
+    >
+      <div
+        className={cn(
+          'relative h-full w-full rounded-[1.5rem] transition-shadow duration-500',
+          isCenter
+            ? 'shadow-[0_30px_70px_-24px_rgba(0,0,0,0.45)]'
+            : 'cursor-pointer shadow-[0_18px_40px_-22px_rgba(0,0,0,0.4)]',
+        )}
+      >
+        <div className={cn('h-full w-full', !isCenter && 'pointer-events-none')}>{children}</div>
+
+        {/* Voile qui fond les cartes latérales dans le fond de page
+            (plutôt qu'une simple opacité, qui les rendrait transparentes) */}
+        <motion.div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0 rounded-[1.5rem] bg-background"
+          style={{ opacity: veil }}
+        />
+      </div>
+    </motion.div>
+  )
+}
+
+/* -------------------------------------------------------------------------- */
 
 /*  Section principale                                                         */
 /* -------------------------------------------------------------------------- */
@@ -683,28 +791,16 @@ export default function DoctorsShowcase({ data, sectionContent }: { data?: any[]
   }, [])
 
   /* Décalage circulaire le plus court entre une carte et la carte active */
-  const offsetOf = (i: number) => {
-    if (numItems === 0) return 0
-    let d = i - currentIndex
-    if (d > numItems / 2) d -= numItems
-    if (d < -numItems / 2) d += numItems
-    return d
-  }
+  const offsetOf = (i: number) => wrapOffset(i - currentIndex, numItems)
 
-  const go = useCallback(
-    (dir: number) => setCurrentIndex((prev) => (numItems ? (prev + dir + numItems) % numItems : 0)),
-    [numItems],
-  )
-
-  /* ---------------- Defilement automatique ----------------
-     Le carrousel tourne tout seul et se met en pause au survol, pendant
-     un drag, quand une lightbox est ouverte, ou quelques secondes apres
-     une action manuelle. Respecte prefers-reduced-motion. */
-  const AUTOPLAY_MS = 4000
-  const [hovered, setHovered] = useState(false)
-  const [heldUntilInteraction, setHeldUntilInteraction] = useState(false)
+  /* ---------------- Position continue ----------------
+     `position` est l'index affiché, en fractions de carte et sans bornes
+     (le bouclage est fait par wrapOffset). Toute navigation anime cette
+     valeur depuis sa valeur courante, avec sa vitesse courante : on peut
+     reprendre une carte en plein vol et la relancer sans à-coup. */
+  const position = useMotionValue(0)
+  const targetRef = useRef(0)
   const [reduceMotion, setReduceMotion] = useState(false)
-  const resumeTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   useEffect(() => {
     const mq = window.matchMedia('(prefers-reduced-motion: reduce)')
@@ -713,6 +809,30 @@ export default function DoctorsShowcase({ data, sectionContent }: { data?: any[]
     mq.addEventListener('change', apply)
     return () => mq.removeEventListener('change', apply)
   }, [])
+
+  const settleTo = useCallback(
+    (target: number, transition?: ValueAnimationTransition<number>) => {
+      targetRef.current = target
+      setCurrentIndex(numItems ? ((Math.round(target) % numItems) + numItems) % numItems : 0)
+      if (reduceMotion) {
+        position.jump(target)
+        return
+      }
+      animate(position, target, transition ?? { type: 'spring', bounce: 0, duration: 0.7 })
+    },
+    [numItems, position, reduceMotion],
+  )
+
+  const go = useCallback((dir: number) => settleTo(targetRef.current + dir), [settleTo])
+
+  /* ---------------- Defilement automatique ----------------
+     Le carrousel tourne tout seul et se met en pause au survol, pendant
+     un drag, quand une lightbox est ouverte, ou quelques secondes apres
+     une action manuelle. Respecte prefers-reduced-motion. */
+  const AUTOPLAY_MS = 4000
+  const [hovered, setHovered] = useState(false)
+  const [heldUntilInteraction, setHeldUntilInteraction] = useState(false)
+  const resumeTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   /* Suspend l'autoplay puis le relance apres une periode de calme. */
   const holdAutoplay = useCallback((ms = 9000) => {
@@ -744,29 +864,102 @@ export default function DoctorsShowcase({ data, sectionContent }: { data?: any[]
   }
   const selectIndex = (i: number) => {
     holdAutoplay()
-    setCurrentIndex(i)
+    settleTo(targetRef.current + wrapOffset(i - targetRef.current, numItems))
   }
 
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'ArrowRight') {
-        holdAutoplay()
-        go(isAr ? -1 : 1)
-      } else if (e.key === 'ArrowLeft') {
-        holdAutoplay()
-        go(isAr ? 1 : -1)
-      }
-    }
-    window.addEventListener('keydown', onKey)
-    return () => window.removeEventListener('keydown', onKey)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [numItems, isAr])
-
-  const handleDragEnd = (_event: any, info: any) => {
-    const threshold = 60
+  /* Flèches du clavier : seulement quand le carrousel a le focus — un écouteur
+     sur window faisait tourner les médecins pendant la saisie d'un formulaire. */
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key !== 'ArrowRight' && e.key !== 'ArrowLeft') return
+    e.preventDefault()
     holdAutoplay()
-    if (info.offset.x < -threshold || info.velocity.x < -450) go(1)
-    else if (info.offset.x > threshold || info.velocity.x > 450) go(-1)
+    const forward = e.key === 'ArrowRight'
+    go(forward !== isAr ? 1 : -1)
+  }
+
+  /* ---------------- Glisser ----------------
+     Suivi 1:1 du doigt après un seuil de 8px (le geste vertical reste au
+     scroll natif), puis au lâcher : projection de l'élan pour choisir la
+     carte d'arrivée, et ressort qui repart à la vitesse du doigt. */
+  const dragRef = useRef<{
+    id: number
+    startX: number
+    startY: number
+    startPos: number
+    active: boolean
+    samples: { t: number; x: number }[]
+  } | null>(null)
+  const suppressClick = useRef(false)
+
+  const handlePointerDown = (e: React.PointerEvent) => {
+    if (numItems < 2 || (e.pointerType === 'mouse' && e.button !== 0)) return
+    suppressClick.current = false
+    dragRef.current = {
+      id: e.pointerId,
+      startX: e.clientX,
+      startY: e.clientY,
+      startPos: position.get(),
+      active: false,
+      samples: [],
+    }
+  }
+
+  const handlePointerMove = (e: React.PointerEvent) => {
+    const d = dragRef.current
+    if (!d || e.pointerId !== d.id) return
+    if (!d.active) {
+      const dx = e.clientX - d.startX
+      const dy = e.clientY - d.startY
+      if (Math.abs(dx) < 8 && Math.abs(dy) < 8) return
+      if (Math.abs(dy) >= Math.abs(dx)) {
+        dragRef.current = null
+        return
+      }
+      /* Intention horizontale confirmée : on saisit la scène là où elle est. */
+      d.active = true
+      d.startX = e.clientX
+      position.stop()
+      d.startPos = position.get()
+      holdAutoplay()
+      e.currentTarget.setPointerCapture(e.pointerId)
+    }
+    position.set(d.startPos - (e.clientX - d.startX) / dims.gap)
+    const now = performance.now()
+    d.samples.push({ t: now, x: e.clientX })
+    while (d.samples.length > 2 && now - d.samples[0].t > 100) d.samples.shift()
+  }
+
+  const handlePointerEnd = (e: React.PointerEvent) => {
+    const d = dragRef.current
+    if (!d || e.pointerId !== d.id) return
+    dragRef.current = null
+    if (!d.active) return
+    suppressClick.current = true
+
+    let vx = 0
+    const first = d.samples[0]
+    const last = d.samples[d.samples.length - 1]
+    if (e.type === 'pointerup' && first && last && last.t > first.t && performance.now() - last.t < 80) {
+      vx = ((last.x - first.x) / (last.t - first.t)) * 1000
+    }
+
+    const projected = position.get() - projectMomentum(vx) / dims.gap
+    const reach = Math.max(1, Math.floor(numItems / 2))
+    const clamped = Math.max(d.startPos - reach, Math.min(d.startPos + reach, projected))
+    settleTo(Math.round(clamped), {
+      type: 'spring',
+      bounce: vx === 0 ? 0 : 0.15,
+      duration: 0.55,
+      velocity: -vx / dims.gap,
+    })
+  }
+
+  /* Un glisser ne doit pas finir en clic sur une carte latérale. */
+  const handleClickCapture = (e: React.MouseEvent) => {
+    if (!suppressClick.current) return
+    suppressClick.current = false
+    e.preventDefault()
+    e.stopPropagation()
   }
 
   return (
@@ -814,8 +1007,13 @@ export default function DoctorsShowcase({ data, sectionContent }: { data?: any[]
         {/* ---------------- Carrousel 3D coverflow ---------------- */}
         <div className="relative">
           <div
-            className="relative mx-auto flex items-center justify-center overflow-hidden px-2"
+            className="relative mx-auto flex items-center justify-center overflow-hidden rounded-[1.5rem] px-2 outline-none focus-visible:ring-2 focus-visible:ring-[#006633]/40"
             style={{ perspective: '1500px', perspectiveOrigin: '50% 45%' }}
+            role="region"
+            aria-roledescription={isAr ? 'عرض دوّار' : 'carrousel'}
+            aria-label={isAr ? 'أطباؤنا' : 'Nos médecins'}
+            tabIndex={0}
+            onKeyDown={handleKeyDown}
             onMouseEnter={() => setHovered(true)}
             onMouseLeave={() => setHovered(false)}
             onFocusCapture={() => setHovered(true)}
@@ -833,15 +1031,14 @@ export default function DoctorsShowcase({ data, sectionContent }: { data?: any[]
               style={{ background: 'linear-gradient(270deg, var(--background), transparent)' }}
             />
 
-            <motion.div
+            <div
               className="relative w-full cursor-grab select-none active:cursor-grabbing"
-              style={{ height: dims.height, transformStyle: 'preserve-3d' }}
-              drag="x"
-              dragConstraints={{ left: 0, right: 0 }}
-              dragElastic={0.08}
-              dragMomentum={false}
-              onDragStart={() => holdAutoplay()}
-              onDragEnd={handleDragEnd}
+              style={{ height: dims.height, transformStyle: 'preserve-3d', touchAction: 'pan-y' }}
+              onPointerDown={handlePointerDown}
+              onPointerMove={handlePointerMove}
+              onPointerUp={handlePointerEnd}
+              onPointerCancel={handlePointerEnd}
+              onClickCapture={handleClickCapture}
             >
               {/* Ombre portée au sol, sous la carte active */}
               <div
@@ -859,71 +1056,28 @@ export default function DoctorsShowcase({ data, sectionContent }: { data?: any[]
 
               {list.map((doctor, i) => {
                 const off = offsetOf(i)
-                const abs = Math.abs(off)
-                const visible = abs <= 2
-                const isCenter = off === 0
-
                 return (
-                  <motion.div
+                  <CoverflowSlot
                     key={doctor.id}
-                    className="absolute top-0 left-1/2"
-                    style={{
-                      width: dims.width,
-                      height: dims.height,
-                      marginLeft: -dims.width / 2,
-                      transformStyle: 'preserve-3d',
-                      zIndex: 20 - abs,
-                      pointerEvents: visible ? 'auto' : 'none',
-                    }}
-                    animate={{
-                      x: off * dims.gap,
-                      z: -abs * dims.depth,
-                      rotateY: off === 0 ? 0 : off > 0 ? -dims.tilt : dims.tilt,
-                      scale: isCenter ? 1 : abs === 1 ? 0.9 : 0.8,
-                      opacity: visible ? 1 : 0,
-                    }}
-                    initial={false}
-                    transition={{
-                      type: 'tween',
-                      duration: 0.95,
-                      ease: [0.32, 0.72, 0, 1],
-                    }}
-                    onClick={() => {
-                      if (!isCenter && visible) selectIndex(i)
-                    }}
-                    aria-hidden={!visible}
+                    index={i}
+                    numItems={numItems}
+                    position={position}
+                    dims={dims}
+                    interactive={Math.abs(off) <= 2}
+                    isCenter={off === 0}
+                    onSelect={() => selectIndex(i)}
                   >
-                    <div
-                      className={cn(
-                        'relative h-full w-full rounded-[1.5rem] transition-shadow duration-500',
-                        isCenter
-                          ? 'shadow-[0_30px_70px_-24px_rgba(0,0,0,0.45)]'
-                          : 'cursor-pointer shadow-[0_18px_40px_-22px_rgba(0,0,0,0.4)]',
-                      )}
-                    >
-                      <div className={cn('h-full w-full', !isCenter && 'pointer-events-none')}>
-                        <DoctorCard
-                          doctor={doctor}
-                          index={i}
-                          onOpen={setActive}
-                          onPlay={handlePlayVideo}
-                          sectionAccent={sectionAccent}
-                        />
-                      </div>
-
-                      {/* Voile qui fond les cartes latérales dans le fond de page
-                          (plutôt qu'une simple opacité, qui les rendrait transparentes) */}
-                      <motion.div
-                        aria-hidden="true"
-                        className="pointer-events-none absolute inset-0 rounded-[1.5rem] bg-background"
-                        animate={{ opacity: isCenter ? 0 : abs === 1 ? 0.4 : 0.7 }}
-                        transition={{ duration: 0.4 }}
-                      />
-                    </div>
-                  </motion.div>
+                    <DoctorCard
+                      doctor={doctor}
+                      index={i}
+                      onOpen={setActive}
+                      onPlay={handlePlayVideo}
+                      sectionAccent={sectionAccent}
+                    />
+                  </CoverflowSlot>
                 )
               })}
-            </motion.div>
+            </div>
           </div>
 
           {/* ---------------- Navigation ---------------- */}
