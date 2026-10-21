@@ -869,6 +869,22 @@ html {
   animation: okba-pop 0.28s cubic-bezier(0.22, 1, 0.36, 1) backwards;
 }
 
+/* Minuterie du hero : la barre est animée par le compositeur (scaleY),
+   la durée et la pause (animation-play-state) viennent du composant. */
+@keyframes okba-grow-y {
+  from {
+    transform: scaleY(0);
+  }
+  to {
+    transform: scaleY(1);
+  }
+}
+
+.okba-hero-progress {
+  animation: okba-grow-y linear both;
+  transform-origin: top;
+}
+
 /* Transition de page : fondu court, sans état inline `opacity: 0`. */
 .okba-page-enter {
   animation: okba-rise 0.3s ease-out backwards;

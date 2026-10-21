@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import {
   Menu,
   Phone,
@@ -64,6 +64,18 @@ export default function StickyNav({
 }: StickyNavProps) {
   const t = useTranslations('nav')
   const [polesOpen, setPolesOpen] = useState(false)
+  const polesRef = useRef<HTMLDivElement>(null)
+  const lastPointerType = useRef('')
+
+  /* Ouvert au toucher : un appui ailleurs le referme. */
+  useEffect(() => {
+    if (!polesOpen) return
+    const onDown = (e: PointerEvent) => {
+      if (!polesRef.current?.contains(e.target as Node)) setPolesOpen(false)
+    }
+    document.addEventListener('pointerdown', onDown)
+    return () => document.removeEventListener('pointerdown', onDown)
+  }, [polesOpen])
 
   const links = [
     { id: 'about', label: t('center'), anchor: '#about' },
@@ -130,17 +142,38 @@ export default function StickyNav({
                   onClick={() => onNavigate('#about')}
                 />
 
-                {/* Spécialités — déroulant des pôles */}
+                {/* Spécialités — déroulant des pôles.
+                    Souris : ouvert au survol, le clic garde son rôle d'ancre.
+                    Tactile et clavier : le clic ouvre / ferme le menu, qui
+                    propose aussi le lien vers la section. */}
                 <div
+                  ref={polesRef}
                   className="relative"
-                  onMouseEnter={() => setPolesOpen(true)}
-                  onMouseLeave={() => setPolesOpen(false)}
+                  onPointerEnter={(e) => e.pointerType === 'mouse' && setPolesOpen(true)}
+                  onPointerLeave={(e) => e.pointerType === 'mouse' && setPolesOpen(false)}
+                  onBlur={(e) => {
+                    if (!e.currentTarget.contains(e.relatedTarget as Node)) setPolesOpen(false)
+                  }}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Escape' && polesOpen) {
+                      setPolesOpen(false)
+                      polesRef.current?.querySelector('button')?.focus()
+                    }
+                  }}
                 >
                   <button
                     type="button"
                     aria-haspopup="true"
                     aria-expanded={polesOpen}
-                    onClick={() => onNavigate('#specialties')}
+                    onPointerDown={(e) => {
+                      lastPointerType.current = e.pointerType
+                    }}
+                    onClick={() => {
+                      const viaMouse = lastPointerType.current === 'mouse'
+                      lastPointerType.current = ''
+                      if (viaMouse || poles.length === 0) onNavigate('#specialties')
+                      else setPolesOpen((o) => !o)
+                    }}
                     className={navLinkClass(activeTab === 'specialties')}
                   >
                     {t('specialties')}
@@ -156,10 +189,11 @@ export default function StickyNav({
                   <AnimatePresence>
                     {polesOpen && poles.length > 0 && (
                       <motion.div
-                        initial={{ opacity: 0, y: 6 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: 6 }}
-                        transition={{ duration: 0.16 }}
+                        initial={{ opacity: 0, y: -4, scale: 0.96 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        exit={{ opacity: 0, y: -4, scale: 0.96 }}
+                        transition={{ type: 'spring', bounce: 0, duration: 0.25 }}
+                        style={{ originX: locale === 'ar' ? 1 : 0, originY: 0 }}
                         className="absolute start-0 top-full w-[300px] pt-2"
                       >
                         <div className="overflow-hidden rounded-2xl border border-[#006633]/10 bg-white p-2 shadow-xl shadow-[#006633]/10 dark:border-white/10 dark:bg-slate-900">
@@ -184,6 +218,18 @@ export default function StickyNav({
                               </Link>
                             )
                           })}
+                          <div className="mt-1 border-t border-[#006633]/10 pt-1 dark:border-white/10">
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setPolesOpen(false)
+                                onNavigate('#specialties')
+                              }}
+                              className="flex w-full items-center justify-center rounded-xl px-2.5 py-2 text-[12.5px] font-bold text-[#006633] transition-colors hover:bg-[#006633]/[0.06] dark:text-emerald-400 dark:hover:bg-white/5"
+                            >
+                              {t('ourPoles')}
+                            </button>
+                          </div>
                         </div>
                       </motion.div>
                     )}
@@ -231,7 +277,7 @@ export default function StickyNav({
                   type="button"
                   aria-label={t('more')}
                   onClick={onOpenMenu}
-                  className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-[#006633]/20 bg-white/80 text-[#006633] shadow-sm transition-colors active:scale-95 xl:hidden dark:border-white/15 dark:bg-slate-800/80 dark:text-white"
+                  className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-[#006633]/20 bg-white/80 text-[#006633] shadow-sm transition-[color,background-color,transform] duration-100 ease-out active:scale-95 xl:hidden dark:border-white/15 dark:bg-slate-800/80 dark:text-white"
                 >
                   <Menu className="h-4.5 w-4.5" strokeWidth={2.2} />
                 </button>

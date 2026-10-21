@@ -30,6 +30,9 @@ import { CallMenu } from '@/components/call-menu'
 // Courbe d'easing forte (sortie) — plus de « punch » que les easings CSS par défaut
 const EASE_OUT = [0.23, 1, 0.32, 1] as const
 
+// Durée d'affichage d'une slide en lecture automatique
+const SLIDE_MS = 7000
+
 interface HeroCarouselProps {
     slides?: any[]
     siteSettings?: {
@@ -75,7 +78,6 @@ export default function HeroCarousel({ slides: rawSlides = [], siteSettings, sec
 
     const [currentIndex, setCurrentIndex] = useState(0)
     const [isAutoPlaying, setIsAutoPlaying] = useState(true)
-    const [progress, setProgress] = useState(0)
     const [callOpen, setCallOpen] = useState(false)
     const prefersReducedMotion = useReducedMotion()
     const heroRef = useRef<HTMLElement>(null)
@@ -87,28 +89,31 @@ export default function HeroCarousel({ slides: rawSlides = [], siteSettings, sec
     const contentOpacity = useTransform(scrollY, [0, 480], [1, 0])
 
 
-    /* Auto-play */
+    /* Auto-play — un seul minuteur par slide, sans re-rendu intermédiaire.
+       La barre de progression est une animation CSS mise en pause en même
+       temps (animation-play-state) ; à la reprise, le minuteur repart du
+       temps restant, donc barre et changement de slide restent alignés. */
+    const remainingRef = useRef(SLIDE_MS)
+
+    useEffect(() => {
+        remainingRef.current = SLIDE_MS
+    }, [currentIndex])
+
     useEffect(() => {
         if (!isAutoPlaying || slides.length <= 1) return
-        setProgress(0)
-        const duration = 7000
-        const interval = 50
-        let elapsed = 0
-        const timer = setInterval(() => {
-            elapsed += interval
-            setProgress((elapsed / duration) * 100)
-            if (elapsed >= duration) {
-                setCurrentIndex((prev) => (prev + 1) % slides.length)
-                elapsed = 0
-                setProgress(0)
-            }
-        }, interval)
-        return () => clearInterval(timer)
+        const startedAt = performance.now()
+        const timer = setTimeout(
+            () => setCurrentIndex((prev) => (prev + 1) % slides.length),
+            remainingRef.current,
+        )
+        return () => {
+            clearTimeout(timer)
+            remainingRef.current = Math.max(0, remainingRef.current - (performance.now() - startedAt))
+        }
     }, [isAutoPlaying, slides.length, currentIndex])
 
     const goTo = (index: number) => {
         setCurrentIndex((index + slides.length) % slides.length)
-        setProgress(0)
         setIsAutoPlaying(false)
     }
 
@@ -219,13 +224,18 @@ export default function HeroCarousel({ slides: rawSlides = [], siteSettings, sec
                 style={prefersReducedMotion ? undefined : { y: yImage }}
                 className="absolute inset-0 z-0"
             >
-                <AnimatePresence mode="wait" initial={false}>
+                {/* Fondu croisé : la slide sortante reste peinte sous la
+                    nouvelle pendant que celle-ci apparaît — plus de passage
+                    par le fond sombre entre deux images. */}
+                <AnimatePresence initial={false}>
                     <motion.div
                         key={currentIndex}
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        exit={{ opacity: 0 }}
-                        transition={{ duration: 1 }}
+                        initial={{ opacity: 0, zIndex: 1 }}
+                        animate={{ opacity: 1, zIndex: 1 }}
+                        /* 0.999 et non 1 : une sortie sans changement de valeur
+                           serait terminée aussitôt et la slide retirée d'un coup. */
+                        exit={{ opacity: 0.999, zIndex: 0 }}
+                        transition={{ duration: 1, zIndex: { duration: 0 } }}
                         className="absolute inset-0"
                     >
                         <motion.div
@@ -391,8 +401,12 @@ export default function HeroCarousel({ slides: rawSlides = [], siteSettings, sec
                             >
                                 {index === currentIndex && (
                                     <span
-                                        className="absolute inset-x-0 top-0 rounded-full bg-gradient-to-b from-[#FDE68A] to-[#006633]"
-                                        style={{ height: `${progress}%` }}
+                                        key={currentIndex}
+                                        className="okba-hero-progress absolute inset-0 rounded-full bg-gradient-to-b from-[#FDE68A] to-[#006633]"
+                                        style={{
+                                            animationDuration: `${SLIDE_MS}ms`,
+                                            animationPlayState: isAutoPlaying ? 'running' : 'paused',
+                                        }}
                                     />
                                 )}
                             </button>
